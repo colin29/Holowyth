@@ -41,6 +41,7 @@ import com.mygdx.holowyth.polygon.MapPolygonDrawer;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
+import com.mygdx.holowyth.util.KeyTracker;
 import com.mygdx.holowyth.util.Pair;
 import com.mygdx.holowyth.util.constants.Holo;
 
@@ -112,8 +113,6 @@ public class PolyMapEditor implements Screen, InputProcessor {
 
 		// Input and Controls
 		Gdx.input.setCursorCatched(Holo.enableCursorGrabbing);
-		initTrackedKeys();
-
 	}
 
 	FPSLogger fps = new FPSLogger();
@@ -158,7 +157,9 @@ public class PolyMapEditor implements Screen, InputProcessor {
 		System.out.println("Screen showed");
 
 		multiplexer.clear();
+		multiplexer.addProcessor(keyTracker);
 		multiplexer.addProcessor(stage);
+		multiplexer.addProcessor(this);
 		Gdx.input.setInputProcessor(multiplexer);
 
 	}
@@ -553,42 +554,25 @@ public class PolyMapEditor implements Screen, InputProcessor {
 	private float keyboardScrollSpeed = 450;
 
 	private void handleKeyboardCameraScroll(float delta) {
-		if (isKeyDown(Keys.RIGHT)) {
+		if (keyTracker.isKeyDown(Keys.RIGHT)) {
 			camera.position.x += keyboardScrollSpeed * delta;
 		}
-		if (isKeyDown(Keys.LEFT)) {
+		if (keyTracker.isKeyDown(Keys.LEFT)) {
 			camera.position.x -= keyboardScrollSpeed * delta;
 		}
-		if (isKeyDown(Keys.UP)) {
+		if (keyTracker.isKeyDown(Keys.UP)) {
 			camera.position.y += keyboardScrollSpeed * delta;
 		}
-		if (isKeyDown(Keys.DOWN)) {
+		if (keyTracker.isKeyDown(Keys.DOWN)) {
 			camera.position.y -= keyboardScrollSpeed * delta;
 		}
 
 	}
 
 	// Input Related
-	private Map<Integer, Boolean> keyIsDown = new HashMap<Integer, Boolean>();
 	private final int[] TRACKED_KEYS = new int[] { Keys.LEFT, Keys.RIGHT, Keys.UP, Keys.DOWN };
 
-	private void initTrackedKeys() {
-		for (int keycode : TRACKED_KEYS) {
-			keyIsDown.put(keycode, false);
-		}
-	}
-
-	/**
-	 * Use this instead of directly querying keyIsDown to allow for fail-fast behaviour when an untracked key is used.
-	 */
-	private boolean isKeyDown(int keycode) {
-		if (keyIsDown.containsKey(keycode)) {
-			return keyIsDown.get(keycode);
-		} else {
-			throw new RuntimeException("isKeyDown: Key is not tracked");
-		}
-	}
-
+	KeyTracker keyTracker = new KeyTracker(TRACKED_KEYS, multiplexer);
 	// Misc. Functions
 
 	/* ^^^^^^ End of User Methods ^^^^^^ */
@@ -598,8 +582,8 @@ public class PolyMapEditor implements Screen, InputProcessor {
 		if (keycode == Keys.A) {
 			if (this.map != null) {
 				enterDrawPolygonMode();
+				return true;
 			}
-			return true;
 		}
 		if (keycode == Keys.D) {
 			exitDrawPolygonMode();
@@ -607,13 +591,8 @@ public class PolyMapEditor implements Screen, InputProcessor {
 		}
 		if (keycode == Keys.L) {
 			loadMapFromDisk("../saveFiles/polySaveFile.ser");
-		}
-
-		// For tracked keys, mark the key down if is pressed.
-		for (Map.Entry<Integer, Boolean> entry : keyIsDown.entrySet()) {
-			if (keycode == entry.getKey()) {
-				entry.setValue(true);
-			}
+			return true;
+			
 		}
 
 		// toggle cursor-lock (and ability to mouse scroll)
@@ -634,13 +613,6 @@ public class PolyMapEditor implements Screen, InputProcessor {
 
 	@Override
 	public boolean keyUp(int keycode) {
-		// For tracked keys, mark the key up when it is lifted.
-		for (Map.Entry<Integer, Boolean> entry : keyIsDown.entrySet()) {
-			if (keycode == entry.getKey()) {
-				entry.setValue(false);
-			}
-		}
-
 		return false;
 	}
 
