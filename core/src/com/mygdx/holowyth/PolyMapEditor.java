@@ -147,9 +147,6 @@ public class PolyMapEditor implements Screen, InputProcessor {
 		// fps.log();
 
 		// Testing area
-		
-		
-
 	}
 
 	@Override
@@ -570,10 +567,13 @@ public class PolyMapEditor implements Screen, InputProcessor {
 	}
 
 	// Input Related
-	private final int[] TRACKED_KEYS = new int[] { Keys.LEFT, Keys.RIGHT, Keys.UP, Keys.DOWN };
-
+	
+	final int[] TRACKED_KEYS = new int[] { Keys.LEFT, Keys.RIGHT, Keys.UP, Keys.DOWN };
 	KeyTracker keyTracker = new KeyTracker(TRACKED_KEYS, multiplexer);
+	
 	// Misc. Functions
+	
+	
 
 	/* ^^^^^^ End of User Methods ^^^^^^ */
 
