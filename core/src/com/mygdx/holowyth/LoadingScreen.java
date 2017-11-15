@@ -75,7 +75,7 @@ public class LoadingScreen implements Screen {
 		}
 	}
 	
-	private void queueAssets(){
+	void queueAssets(){
 		game.assets.load("ui/uiskin.atlas", TextureAtlas.class);
 		game.assets.load("img/touhou_kagerou.jpg", Texture.class);
 		game.assets.load("icons/cursors/cursor.png", Texture.class);

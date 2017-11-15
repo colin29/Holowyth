@@ -219,8 +219,6 @@ public class PolyMapEditor implements Screen, InputProcessor {
 		HoloIO.renderMapBoundaries(map, shapeRenderer);
 	}
 
-	TextButton b1, b2, b3, b4;
-
 	// Editor UI
 	private void createOptionButtons() {
 
@@ -656,7 +654,7 @@ public class PolyMapEditor implements Screen, InputProcessor {
 	}
 
 	/**
-	 * Logically speaking, this is called whenever a new map is loaded.
+	 * Logically speaking, this should be called whenever a new map is loaded.
 	 * 
 	 */
 	private void loadMap(Field map) {

@@ -1,5 +1,7 @@
 package com.mygdx.holowyth;
 
+import java.awt.geom.Line2D;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
@@ -26,6 +28,7 @@ import com.mygdx.holowyth.exception.ErrorCode;
 import com.mygdx.holowyth.exception.HoloException;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.Vertex;
+import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.KeyTracker;
@@ -78,13 +81,11 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		camera.update();
 
 		renderGraph();
-		
+
 		if (this.map != null) {
 			renderMapPolygons();
 			renderMapBoundaries();
 		}
-
-		
 
 		// UI
 		stage.act(delta);
@@ -157,7 +158,8 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	// Pathfinding
 
-	private float CELL_SIZE = 15; // size in pixels
+	private int CELL_SIZE = 15;//15; // size in pixels
+	
 	Vertex[][] graph;
 	int graphWidth, graphHeight;
 
@@ -177,64 +179,92 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		}
 	}
 
+	
 	private void processVertex(Vertex v, int ix, int iy) {
-		//v.N = isPointWithinMap(ix+CELL_SIZE + );
-		v.N = true;
-		v.S = true;
-		v.W = true;
-		v.E = true;
+		int x = ix*CELL_SIZE;
+		int y = iy*CELL_SIZE;
+		// v.N = isPointWithinMap(ix+CELL_SIZE + );
+		v.N = edgePathable(x, y, x, y+CELL_SIZE);
+		v.S = edgePathable(x, y, x, y-CELL_SIZE);
+		v.W = edgePathable(x, y, x-CELL_SIZE, y);
+		v.E = edgePathable(x, y, x+CELL_SIZE, y);
 
-		v.NW = true;
-		v.NE = true;
-		v.SW = true;
-		v.SE = true;
+		v.NW = edgePathable(x, y, x-CELL_SIZE, y+CELL_SIZE);
+		v.NE = edgePathable(x, y, x+CELL_SIZE, y+CELL_SIZE);
+		v.SW = edgePathable(x, y, x-CELL_SIZE, y-CELL_SIZE);
+		v.SE = edgePathable(x, y, x+CELL_SIZE, y-CELL_SIZE);
+		
+		if(ix==0)
+			v.W = v.NW = v.SW = false;
+		if(ix==graphWidth-1)
+			v.E = v.NE = v.SE = false;
+		if(iy==0)
+			v.S = v.SW = v.SE = false;
+		if(iy==graphHeight-1)
+			v.N = v.NW = v.NE = false;
 	}
 
+	private boolean edgePathable(int x, int y, int x2, int y2) {
+		boolean intersects = false;
+		for (Polygon polygon : map.polys) {
+			for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
+				if (Line2D.linesIntersect(x, y, x2, y2, polygon.vertexes[i], polygon.vertexes[i + 1],
+						polygon.vertexes[(i + 2) % polygon.count], polygon.vertexes[(i + 3) % polygon.count])) {
+					intersects = true;
+				}
+//				System.out.format("[(%d %d) (%d %d), (%f %f) (%f %f) %b]%n", x, y, x2, y2, polygon.vertexes[i], polygon.vertexes[i + 1],
+//						polygon.vertexes[(i + 2) % polygon.count], polygon.vertexes[(i + 3) % polygon.count], Line2D.linesIntersect(x, y, x2, y2, polygon.vertexes[i], polygon.vertexes[i + 1],
+//								polygon.vertexes[(i + 2) % polygon.count], polygon.vertexes[(i + 3) % polygon.count]));
+			}
+		}
+		return !intersects;
+	}
+
+
 	private void renderGraph() {
-		
-		
+
 		// Draw Edges
 		shapeRenderer.setColor(Color.CORAL);
 		shapeRenderer.begin(ShapeType.Line);
 		for (int y = 0; y < graphHeight; y++) {
 			for (int x = 0; x < graphWidth; x++) {
 				Vertex v = graph[y][x];
-				if(v.N)
-					drawLine(x, y, x, y+1);
-				if(v.S)
-					drawLine(x, y, x, y-1);
-				if(v.W)
-					drawLine(x, y, x-1, y);
-				if(v.E)
-					drawLine(x, y, x+1, y);
-				
-				if(v.NW)
-					drawLine(x, y, x-1, y+1);
-				if(v.NE)
-					drawLine(x, y, x+1, y+1);
-				if(v.SW)
-					drawLine(x, y, x-1, y-1);
-				if(v.SE)
-					drawLine(x, y, x+1, y-1);
+				if (v.N)
+					drawLine(x, y, x, y + 1);
+				if (v.S)
+					drawLine(x, y, x, y - 1);
+				if (v.W)
+					drawLine(x, y, x - 1, y);
+				if (v.E)
+					drawLine(x, y, x + 1, y);
+
+				if (v.NW)
+					drawLine(x, y, x - 1, y + 1);
+				if (v.NE)
+					drawLine(x, y, x + 1, y + 1);
+				if (v.SW)
+					drawLine(x, y, x - 1, y - 1);
+				if (v.SE)
+					drawLine(x, y, x + 1, y - 1);
 			}
 		}
 		shapeRenderer.end();
-		
+
 		// Draw vertexes as points
-//		shapeRenderer.setColor(Color.BLACK);
-//		shapeRenderer.begin(ShapeType.Filled);
-//		
-//		for (int y = 0; y < graphHeight; y++) {
-//			for (int x = 0; x < graphWidth; x++) {
-//				shapeRenderer.circle(x * CELL_SIZE, y * CELL_SIZE, 1.5f);
-//			}
-//		}
-//		shapeRenderer.end();
+		 shapeRenderer.setColor(Color.BLACK);
+		 shapeRenderer.begin(ShapeType.Filled);
 		
+		 for (int y = 0; y < graphHeight; y++) {
+		 for (int x = 0; x < graphWidth; x++) {
+		 shapeRenderer.circle(x * CELL_SIZE, y * CELL_SIZE, 1.5f);
+		 }
+		 }
+		 shapeRenderer.end();
+
 	}
-	
-	private void drawLine(int ix, int iy, int ix2, int iy2){
-		shapeRenderer.line(ix*CELL_SIZE, iy*CELL_SIZE, 0, ix2*CELL_SIZE, iy2*CELL_SIZE, 0);
+
+	private void drawLine(int ix, int iy, int ix2, int iy2) {
+		shapeRenderer.line(ix * CELL_SIZE, iy * CELL_SIZE, 0, ix2 * CELL_SIZE, iy2 * CELL_SIZE, 0);
 	}
 
 	private boolean isPointWithinMap(float x, float y) {
@@ -310,7 +340,13 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		camera.position.set(map.width() / 2, map.height() / 2, 0);
 
 		createGraph();
+		
+		long startTime = System.nanoTime();
 		linearFillGraph();
+		long endTime = System.nanoTime();
+		
+		long duration = (endTime - startTime);  //divide by 1000000 to get milliseconds.
+		System.out.format("Time elapsed: %d mililseconds", duration/1000000);
 	}
 	// Input Related
 
