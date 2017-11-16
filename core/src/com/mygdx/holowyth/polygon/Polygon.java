@@ -9,6 +9,5 @@ public class Polygon implements java.io.Serializable {
 	public Polygon(float[] vertexes, int count){
 		this.count = count;
 		this.vertexes = vertexes.clone();
-	}
-
+	}	
 }

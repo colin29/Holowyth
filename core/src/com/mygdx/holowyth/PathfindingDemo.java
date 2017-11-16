@@ -1,6 +1,9 @@
 package com.mygdx.holowyth;
 
 import java.awt.geom.Line2D;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -27,6 +30,7 @@ import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.exception.ErrorCode;
 import com.mygdx.holowyth.exception.HoloException;
 import com.mygdx.holowyth.map.Field;
+import com.mygdx.holowyth.pathfinding.Node;
 import com.mygdx.holowyth.pathfinding.Vertex;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.util.HoloIO;
@@ -158,8 +162,8 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	// Pathfinding
 
-	private int CELL_SIZE = 15;//15; // size in pixels
-	
+	private int CELL_SIZE = 15;// 15; // size in pixels
+
 	Vertex[][] graph;
 	int graphWidth, graphHeight;
 
@@ -179,28 +183,27 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		}
 	}
 
-	
 	private void processVertex(Vertex v, int ix, int iy) {
-		int x = ix*CELL_SIZE;
-		int y = iy*CELL_SIZE;
+		int x = ix * CELL_SIZE;
+		int y = iy * CELL_SIZE;
 		// v.N = isPointWithinMap(ix+CELL_SIZE + );
-		v.N = edgePathable(x, y, x, y+CELL_SIZE);
-		v.S = edgePathable(x, y, x, y-CELL_SIZE);
-		v.W = edgePathable(x, y, x-CELL_SIZE, y);
-		v.E = edgePathable(x, y, x+CELL_SIZE, y);
+		v.N = edgePathable(x, y, x, y + CELL_SIZE);
+		v.S = edgePathable(x, y, x, y - CELL_SIZE);
+		v.W = edgePathable(x, y, x - CELL_SIZE, y);
+		v.E = edgePathable(x, y, x + CELL_SIZE, y);
 
-		v.NW = edgePathable(x, y, x-CELL_SIZE, y+CELL_SIZE);
-		v.NE = edgePathable(x, y, x+CELL_SIZE, y+CELL_SIZE);
-		v.SW = edgePathable(x, y, x-CELL_SIZE, y-CELL_SIZE);
-		v.SE = edgePathable(x, y, x+CELL_SIZE, y-CELL_SIZE);
-		
-		if(ix==0)
+		v.NW = edgePathable(x, y, x - CELL_SIZE, y + CELL_SIZE);
+		v.NE = edgePathable(x, y, x + CELL_SIZE, y + CELL_SIZE);
+		v.SW = edgePathable(x, y, x - CELL_SIZE, y - CELL_SIZE);
+		v.SE = edgePathable(x, y, x + CELL_SIZE, y - CELL_SIZE);
+
+		if (ix == 0)
 			v.W = v.NW = v.SW = false;
-		if(ix==graphWidth-1)
+		if (ix == graphWidth - 1)
 			v.E = v.NE = v.SE = false;
-		if(iy==0)
+		if (iy == 0)
 			v.S = v.SW = v.SE = false;
-		if(iy==graphHeight-1)
+		if (iy == graphHeight - 1)
 			v.N = v.NW = v.NE = false;
 	}
 
@@ -212,14 +215,15 @@ public class PathfindingDemo implements Screen, InputProcessor {
 						polygon.vertexes[(i + 2) % polygon.count], polygon.vertexes[(i + 3) % polygon.count])) {
 					intersects = true;
 				}
-//				System.out.format("[(%d %d) (%d %d), (%f %f) (%f %f) %b]%n", x, y, x2, y2, polygon.vertexes[i], polygon.vertexes[i + 1],
-//						polygon.vertexes[(i + 2) % polygon.count], polygon.vertexes[(i + 3) % polygon.count], Line2D.linesIntersect(x, y, x2, y2, polygon.vertexes[i], polygon.vertexes[i + 1],
-//								polygon.vertexes[(i + 2) % polygon.count], polygon.vertexes[(i + 3) % polygon.count]));
+				// System.out.format("[(%d %d) (%d %d), (%f %f) (%f %f) %b]%n", x, y, x2, y2, polygon.vertexes[i],
+				// polygon.vertexes[i + 1],
+				// polygon.vertexes[(i + 2) % polygon.count], polygon.vertexes[(i + 3) % polygon.count],
+				// Line2D.linesIntersect(x, y, x2, y2, polygon.vertexes[i], polygon.vertexes[i + 1],
+				// polygon.vertexes[(i + 2) % polygon.count], polygon.vertexes[(i + 3) % polygon.count]));
 			}
 		}
 		return !intersects;
 	}
-
 
 	private void renderGraph() {
 
@@ -251,15 +255,15 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		shapeRenderer.end();
 
 		// Draw vertexes as points
-		 shapeRenderer.setColor(Color.BLACK);
-		 shapeRenderer.begin(ShapeType.Filled);
-		
-		 for (int y = 0; y < graphHeight; y++) {
-		 for (int x = 0; x < graphWidth; x++) {
-		 shapeRenderer.circle(x * CELL_SIZE, y * CELL_SIZE, 1.5f);
-		 }
-		 }
-		 shapeRenderer.end();
+		shapeRenderer.setColor(Color.BLACK);
+		shapeRenderer.begin(ShapeType.Filled);
+
+		for (int y = 0; y < graphHeight; y++) {
+			for (int x = 0; x < graphWidth; x++) {
+				shapeRenderer.circle(x * CELL_SIZE, y * CELL_SIZE, 1.5f);
+			}
+		}
+		shapeRenderer.end();
 
 	}
 
@@ -267,8 +271,102 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		shapeRenderer.line(ix * CELL_SIZE, iy * CELL_SIZE, 0, ix2 * CELL_SIZE, iy2 * CELL_SIZE, 0);
 	}
 
-	private boolean isPointWithinMap(float x, float y) {
-		return (x > map.width() || x < 0 || y > map.height() || y < 0);
+	boolean[] visited;
+	int[] ancestor;
+	float[] minCost; // Mininum cost found to get here from the start
+	PriorityQueue<Node> q = new PriorityQueue<Node>(new Comparator<Node>() {
+		public int compare(Node n1, Node n2) { // get lowest g+h first
+			if (((n2.costToGetHere * n2.costToGetHere + n2.hSquared)
+					- (n1.costToGetHere * n1.costToGetHere + n1.hSquared)) > 0) {
+				return 1;
+			} else {
+				return -1;
+			}
+		}
+	});
+
+	private void initAStar(int startVertex, int goalVertex) {
+		visited = new boolean[graphWidth * graphHeight];
+		ancestor = new int[graphWidth * graphHeight];
+		Arrays.fill(ancestor, -1);
+		minCost = new float[graphWidth * graphHeight];
+		Arrays.fill(ancestor, 99999999);
+		q.add(new Node(startVertex, 0, calculateH(startVertex, goalVertex)));
+	}
+
+	private final float SQRT2 = 1.414214f; // rounded up slightly so that h is valid
+
+	private void doAStar(int goalVertex) {
+		while (!q.isEmpty()) {
+			Node curNode = q.remove();
+
+			// terminate if this node is the goal
+			if (curNode.vertexID == goalVertex) {
+				return;
+			}
+
+			// visit this node
+			visited[curNode.vertexID] = true;
+
+			// Create the 8 successors of curNode, if the edges are pathable
+			Vertex curVertex = graph[curNode.vertexID % CELL_SIZE][curNode.vertexID / CELL_SIZE];
+			int sucId;
+			float cost;
+			if (curVertex.N) {
+				addNodeIfNoCheaperExists(curNode, curNode.vertexID + graphWidth, 1, goalVertex);
+			}
+			if (curVertex.S) {
+				addNodeIfNoCheaperExists(curNode, curNode.vertexID - graphWidth, 1, goalVertex);
+			}
+			if (curVertex.W) {
+				sucId = curNode.vertexID - 1;
+				addNodeIfNoCheaperExists(curNode, curNode.vertexID + 1, 1, goalVertex);
+			}
+			if (curVertex.E) {
+				addNodeIfNoCheaperExists(curNode, curNode.vertexID - 1, 1, goalVertex);
+			}
+
+			if (curVertex.NW) {
+				addNodeIfNoCheaperExists(curNode, curNode.vertexID + graphWidth - 1, SQRT2, goalVertex);
+			}
+			if (curVertex.NE) {
+				addNodeIfNoCheaperExists(curNode, curNode.vertexID + graphWidth + 1, SQRT2, goalVertex);
+			}
+			if (curVertex.SW) {
+				addNodeIfNoCheaperExists(curNode, curNode.vertexID - graphWidth - 1, SQRT2, goalVertex);
+			}
+			if (curVertex.SE) {
+				addNodeIfNoCheaperExists(curNode, curNode.vertexID - graphWidth + 1, SQRT2, goalVertex);
+			}
+		}
+		System.out.println("Warning: A-star search completed without finding the goalNode");
+	}
+
+	private float cost;
+	private void addNodeIfNoCheaperExists(Node curNode, int sucId, float edgeCost, int goalVertex) {
+		cost = curNode.costToGetHere + edgeCost;
+		if (cost < minCost[sucId]) {
+			minCost[sucId] = cost;
+			q.add(new Node(sucId, cost, calculateH(sucId, goalVertex)));
+		}
+	}
+
+	private void retrievePath(int goalVertex){
+		//TODO: stub
+	}
+	
+	/**
+	 * @param startVertex
+	 * @param goalVertex
+	 * @return the square of the distance from current to goal vertex, in cells;
+	 */
+	private float calculateH(int startVertex, int goalVertex) {
+		int gy = goalVertex / graphWidth;
+		int gx = goalVertex % graphWidth;
+		int sx = startVertex / graphWidth;
+		int sy = startVertex % graphWidth;
+
+		return (gx - sx) * (gx - sx) + (gy - sy) * (gy - sy);
 	}
 
 	// UI and Disk
@@ -340,13 +438,13 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		camera.position.set(map.width() / 2, map.height() / 2, 0);
 
 		createGraph();
-		
+
 		long startTime = System.nanoTime();
 		linearFillGraph();
 		long endTime = System.nanoTime();
-		
-		long duration = (endTime - startTime);  //divide by 1000000 to get milliseconds.
-		System.out.format("Time elapsed: %d mililseconds", duration/1000000);
+
+		long duration = (endTime - startTime); // divide by 1000000 to get milliseconds.
+		System.out.format("Time elapsed: %d mililseconds", duration / 1000000);
 	}
 	// Input Related
 
