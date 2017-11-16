@@ -7,19 +7,26 @@ package com.mygdx.holowyth.pathfinding;
  */
 public class Node {
 	
+	public static int graphWidth;
+	
 	public int vertexID;
 	
 	public float costToGetHere;
 	/**
 	 * Underestimate of cost to reach goal, squared
 	 */
-	public float hSquared;  
-	
-	
+	public float h;  
+	public String coordinates;
+	public float f;
 	
 	public Node(int ID, float costToGetHere, float hSquared){
 		this.vertexID = ID;
 		this.costToGetHere = costToGetHere;
-		this.hSquared = hSquared;		
+		this.h = costToGetHere + hSquared/2;		
+		this.coordinates = ID%graphWidth + ", " + ID/graphWidth; 
+		
+		f = h+costToGetHere;
 	}
+	
+	
 }
