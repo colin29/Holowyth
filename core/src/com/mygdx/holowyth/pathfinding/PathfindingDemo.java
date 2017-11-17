@@ -21,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
@@ -82,11 +83,11 @@ public class PathfindingDemo implements Screen, InputProcessor {
 				| (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
 		camera.update();
 
-//		renderGraph();
+		// renderGraph();
 
 		if (this.map != null) {
 			renderMapPolygons();
-//			renderMapBoundaries();
+			// renderMapBoundaries();
 		}
 
 		// UI
@@ -100,14 +101,11 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		// User Controls
 
 		// Testing area
-		stepAStar(0, 40*40);
+		pathing.stepAStar();
 		renderSearchResult();
-		
-		System.out.format("Next Node in Queue:  (%s) %s %s %n", q.peek().coordinates, q.peek().f, q.peek().costToGetHere);
 
-		
- 		int blank = 1;
-		blank = blank +1 ;
+		int blank = 1;
+		blank = blank + 1;
 	}
 
 	private void renderMapPolygons() {
@@ -231,7 +229,6 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	}
 
 	private void renderGraph() {
-
 		// Draw Edges
 		shapeRenderer.setColor(Color.CORAL);
 		shapeRenderer.begin(ShapeType.Line);
@@ -276,177 +273,14 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		shapeRenderer.line(ix * CELL_SIZE, iy * CELL_SIZE, 0, ix2 * CELL_SIZE, iy2 * CELL_SIZE, 0);
 	}
 
-	boolean[] visited;
-	int[] ancestor;
-	float[] minCost; // Mininum cost found to get here from the start
-	PriorityQueue<Node> q = new PriorityQueue<Node>(new Comparator<Node>() {
-		public int compare(Node n1, Node n2) { 
-//			 get lowest g+h first
-			if (n2.f - n1.f > 0) {
-				return -1;
-			} else {
-				return 1;
-			}
-//			if ((n2.costToGetHere)
-//					- (n1.costToGetHere) > 0) {
-//				return 1;
-//			} else {
-//				return -1;
-//			}
-		}
-	});
-
-	private void initAStar() {
-		visited = new boolean[graphWidth * graphHeight];
-		ancestor = new int[graphWidth * graphHeight];
-		Arrays.fill(ancestor, -1);
-		minCost = new float[graphWidth * graphHeight];
-		Arrays.fill(minCost, 99999999);
-	}
-
-	private final float SQRT2 = 1.414214f; // rounded up slightly so that h is valid
-
-	int goalVertex = -1;
-
-	private void doAStar(int startVertex, int goalVertex) {
-		q.add(new Node(startVertex, 0, calculateHSquared(startVertex, goalVertex)));
-		minCost[startVertex] = 0;
-		while (!q.isEmpty()) {
-			Node curNode = q.remove();
-
-			// terminate if this node is the goal
-			if (curNode.vertexID == goalVertex) {
-				return;
-			}
-
-			// visit this node
-			visited[curNode.vertexID] = true;
-
-			System.out.format("Current Node: (%s, %s) %n", (curNode.vertexID % graphWidth),
-					(curNode.vertexID / graphWidth));
-
-			// Create the 8 successors of curNode, if the edges are pathable
-			Vertex curVertex = graph[curNode.vertexID / graphWidth][curNode.vertexID % graphWidth];
-			int sucId;
-			float cost;
-			if (curVertex.N) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID + graphWidth, 1, goalVertex);
-			}
-			if (curVertex.S) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID - graphWidth, 1, goalVertex);
-			}
-			if (curVertex.W) {
-				sucId = curNode.vertexID - 1;
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID - 1, 1, goalVertex);
-			}
-			if (curVertex.E) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID + 1, 1, goalVertex);
-			}
-
-			if (curVertex.NW) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID + graphWidth - 1, SQRT2, goalVertex);
-			}
-			if (curVertex.NE) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID + graphWidth + 1, SQRT2, goalVertex);
-			}
-			if (curVertex.SW) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID - graphWidth - 1, SQRT2, goalVertex);
-			}
-			if (curVertex.SE) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID - graphWidth + 1, SQRT2, goalVertex);
-			}
-		}
-		System.out.println("Warning: A-star search completed without finding the goalNode");
-	}
-	
-
-	boolean searchDone;
-	
-	private void initStepAStar(int startVertex, int goalVertex){
-		Node.graphWidth = graphWidth;
-		q.add(new Node(startVertex, 0, calculateHSquared(startVertex, goalVertex)));
-		minCost[startVertex] = 0;
-		searchDone = false;
-	}
-	private void stepAStar(int startVertex, int goalVertex) {
-		if(searchDone){
-			return;
-		}
-		if (!q.isEmpty()) {
-			Node curNode = q.remove();
-
-			// terminate if this node is the goal
-			if (curNode.vertexID == goalVertex) {
-				searchDone = true;
-				return;
-			}
-
-			// visit this node
-			visited[curNode.vertexID] = true;
-
-			System.out.format("Current Node: (%s, %s) %s %s %n", (curNode.vertexID % graphWidth),
-					(curNode.vertexID / graphWidth), curNode.costToGetHere, curNode.h);
-
-			// Create the 8 successors of curNode, if the edges are pathable
-			Vertex curVertex = graph[curNode.vertexID / graphWidth][curNode.vertexID % graphWidth];
-			int sucId;
-			if (curVertex.N) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID + graphWidth, 1, goalVertex);
-			}
-			if (curVertex.S) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID - graphWidth, 1, goalVertex);
-			}
-			if (curVertex.W) {
-				sucId = curNode.vertexID - 1;
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID - 1, 1, goalVertex);
-			}
-			if (curVertex.E) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID + 1, 1, goalVertex);
-			}
-
-			if (curVertex.NW) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID + graphWidth - 1, SQRT2, goalVertex);
-			}
-			if (curVertex.NE) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID + graphWidth + 1, SQRT2, goalVertex);
-			}
-			if (curVertex.SW) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID - graphWidth - 1, SQRT2, goalVertex);
-			}
-			if (curVertex.SE) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID - graphWidth + 1, SQRT2, goalVertex);
-			}
-		}
-		if (q.isEmpty()) {
-			System.out.println("Warning: A-star search completed without finding the goalNode");
-			searchDone = true;
-		}
-	}
-
-	private float cost;
-
-	private void addNodeIfNoCheaperExists(Node curNode, int sucId, float edgeCost, int goalVertex) {
-		cost = curNode.costToGetHere + edgeCost;
-		System.out.format("SucNode ID: %s %s %s %n", sucId, cost, minCost[sucId]);
-		if (cost < minCost[sucId]) {
-			minCost[sucId] = cost;
-			ancestor[sucId] = curNode.vertexID;
-			q.add(new Node(sucId, cost, calculateHSquared(sucId, goalVertex)));
-		}
-	}
-
-	private void retrievePath(int goalVertex) {
-		// TODO: stub
-	}
-
 	private void renderSearchResult() {
 		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setColor(Color.BLACK);
 		for (int i = 0; i < graphHeight; i++) {
 			for (int j = 0; j < graphWidth; j++) {
 				int vertexId = i * graphWidth + j;
-				if (ancestor[vertexId] >= 0) {
-					int ancestorId = ancestor[vertexId];
+				if (pathing.ancestor[vertexId] >= 0) {
+					int ancestorId = pathing.ancestor[vertexId];
 					int prevIx = ancestorId % graphWidth;
 					int prevIy = ancestorId / graphWidth;
 					drawLine(prevIx, prevIy, j, i);
@@ -456,18 +290,8 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		shapeRenderer.end();
 	}
 
-	/**
-	 * @param startVertex
-	 * @param goalVertex
-	 * @return the square of the distance from current to goal vertex, in cells;
-	 */
-	private float calculateHSquared(int startVertex, int goalVertex) {
-		int gy = goalVertex / graphWidth;
-		int gx = goalVertex % graphWidth;
-		int sy = startVertex / graphWidth;
-		int sx = startVertex % graphWidth;
-
-		return (gx - sx) * (gx - sx) + (gy - sy) * (gy - sy);
+	private void retrievePath(int goalVertex) {
+		// TODO: stub
 	}
 
 	// UI and Disk
@@ -531,6 +355,8 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	}
 
+	AStarSearch pathing;
+
 	private void loadMap(Field map) {
 		System.out.println("New map loaded");
 		this.map = map;
@@ -546,18 +372,11 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		long duration = (endTime - startTime); // divide by 1000000 to get milliseconds.
 		System.out.format("Time elapsed: %d mililseconds%n", duration / 1000000);
 
-		initAStar();
-		initStepAStar(0, 40*40);
-		
-		//doAStar(0, 40 * 40);
-		
-		
-		for(int i=40-1;i>=0;i--){
-			for(int j=0;j<40; j++){
-				System.out.format("%s ", minCost[i*graphWidth+j]);
-			}
-			System.out.format("%n");
-		}
+		pathing = new AStarSearch(graphWidth, graphHeight, graph);
+//		pathing.initStepAStar(0, 40 * 40);
+
+		pathing.doAStar(0, 40 * 40);
+
 	}
 	// Input Related
 
