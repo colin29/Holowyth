@@ -8,7 +8,7 @@ public class Unit {
 	
 	float x, y;
 	float vx, vy;
-	float speed = 2; //world units per frame
+	float speed = 5; //world units per frame
 	
 	Path path;
 	
@@ -60,13 +60,16 @@ public class Unit {
 				float sin = dy/dist;
 				float cos = dx/dist;
 				
-				this.vx = cos * speed / dist;
-				this.vy = sin * speed / dist;
+				this.vx = cos * speed;
+				this.vy = sin * speed;
 			}else{
 				this.vx = dx;
 				this.vy = dy;
 			}
 			
+		}else{
+			vx=0;
+			vy=0;
 		}
 	}
 	public void move(){

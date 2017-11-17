@@ -19,10 +19,10 @@ public class Node {
 	public Node(int ID, float costToGetHere, float hSquared, int graphWidth){
 		this.vertexID = ID;
 		this.costToGetHere = costToGetHere;
-		this.h = costToGetHere + hSquared/2;		
+		this.h = hSquared;		
 		this.coordinates = ID%graphWidth + ", " + ID/graphWidth; 
 		
-		f = h+costToGetHere;
+		f = h+costToGetHere *costToGetHere;
 	}
 	
 	

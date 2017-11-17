@@ -1,13 +1,16 @@
 package com.mygdx.holowyth.pathfinding;
 
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.PriorityQueue;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.util.Pair;
 
 /**
@@ -55,6 +58,7 @@ public class AStarSearch {
 	private final float SQRT2 = 1.414214f; // rounded up slightly so that h is valid
 
 	public void doAStar(int startVertex, int goalVertex) {
+		coordinateSearchUsed = false;
 		q.add(new Node(startVertex, 0, calculateDistSquared(startVertex, goalVertex), graphWidth));
 		minCost[startVertex] = 0;
 
@@ -110,6 +114,78 @@ public class AStarSearch {
 		if (q.isEmpty()) {
 			System.out.println("Warning: A-star search completed without finding the goalNode");
 			searchDone = true;
+			searchFailed = true;
+		}
+	}
+
+	boolean coordinateSearchUsed = false;
+	float goalX, goalY;
+	float startX, startY;
+	boolean searchFailed;
+
+	/**
+	 * Takes in starting and goal locations instead of graph vertexes.
+	 */
+	public void doAStar(float sx, float sy, float dx, float dy, ArrayList<Polygon> polys) {
+
+		
+
+		int startVertex = findClosestPathableVertex(sx, sy, polys);
+		int goalVertex = findClosestPathableVertex(dx, dy, polys);
+		
+		doAStar(startVertex, goalVertex);
+		
+		startX = sx;
+		startY = sy;
+		goalX = dx;
+		goalY = dy;
+		coordinateSearchUsed = true;
+	}
+	/**
+	 * Out of the 4 closest points, returns the closest one that is pathable;
+	 */
+	private int findClosestPathableVertex(float sx, float sy, ArrayList<Polygon> polys){
+		int ix = (int) (sx / CELL_SIZE);
+		int iy = (int) (sy / CELL_SIZE);
+		
+		PointData dNW, dNE, dSE, dSW;
+		dNW = new PointData(ix, iy + 1, sx, sy);
+		dNE = new PointData(ix + 1, iy + 1, sx, sy);
+		dSW = new PointData(ix, iy, sx, sy);
+		dSE = new PointData(ix + 1, iy, sx, sy);
+
+		List<PointData> points = new ArrayList<PointData>(Arrays.asList(dNW, dNE, dSW, dSE));
+
+		points.sort((PointData p1, PointData p2) -> ((int) (p1.dist - p2.dist)));
+
+		int startIx = 0, startIy = 0;
+		boolean found = false;
+		for (int i = 0; i < 4; i++) {
+			PointData p = points.get(i);
+			if (this.edgePathable(sx, sy, p.ix * CELL_SIZE, p.iy * CELL_SIZE, polys)) {
+				startIx = p.ix;
+				startIy = p.iy;
+				found = true;
+				break;
+			}
+		}
+
+		assert (found); // ("None of the 4 closest points were reachable");
+		return startIy * graphWidth + startIx;
+	}
+	
+	class PointData {
+		public int ix;
+		public int iy;
+		public float dist;
+
+		PointData(int ix, int iy, float ux, float uy) {
+			this.ix = ix;
+			this.iy = iy;
+
+			float x = ix * CELL_SIZE;
+			float y = iy * CELL_SIZE;
+			this.dist = (float) Math.sqrt((ux - x) * (ux - x) + (uy - y) * (uy - y));
 		}
 	}
 
@@ -215,21 +291,48 @@ public class AStarSearch {
 	}
 
 	public Path retrievePath() {
+		
+		if(searchFailed){
+			return null;
+		}
+		
 		Path path = new Path();
+		
+		if(coordinateSearchUsed){ //if using coordinate based search, the goalVertex != goal point
+			path.add(new Pair<Float, Float> (goalX, goalY));
+		}
+		
 		int curVertex = goalVertex;
 		path.add(new Pair<Float, Float>((float) curVertex % graphWidth * CELL_SIZE,
-				(float) curVertex / graphWidth * CELL_SIZE));
+				(float) (curVertex / graphWidth * CELL_SIZE)));
 
 		while (ancestor[curVertex] >= 0) {
 			curVertex = ancestor[curVertex];
 			path.add(new Pair<Float, Float>((float) curVertex % graphWidth * CELL_SIZE,
-					(float) curVertex / graphWidth * CELL_SIZE));
+					(float) (curVertex / graphWidth * CELL_SIZE)));
+		}
+		
+		if(coordinateSearchUsed){ //if using coordinate based search, the goalVertex != goal point
+			path.add(new Pair<Float, Float> (startX, startY));
 		}
 		Collections.reverse(path);
 
 		// assert that backwards track lead back to the startVertex
 		assert (path.get(0).second() * graphWidth + path.get(0).first() == startVertex);
 		return path;
+	}
+
+	private boolean edgePathable(float x, float y, float x2, float y2, ArrayList<Polygon> polys) {
+		boolean intersects = false;
+		for (Polygon polygon : polys) {
+			for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
+				if (Line2D.linesIntersect(x, y, x2, y2, polygon.vertexes[i], polygon.vertexes[i + 1],
+						polygon.vertexes[(i + 2) % polygon.count], polygon.vertexes[(i + 3) % polygon.count])) {
+					intersects = true;
+				}
+			}
+		}
+		return !intersects;
 	}
 
 }

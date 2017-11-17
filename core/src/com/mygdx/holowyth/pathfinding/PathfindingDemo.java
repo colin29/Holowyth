@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
@@ -18,6 +19,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -37,6 +39,7 @@ import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.KeyTracker;
 import com.mygdx.holowyth.util.Pair;
+import com.mygdx.holowyth.util.Timer;
 import com.mygdx.holowyth.util.constants.Holo;
 
 public class PathfindingDemo implements Screen, InputProcessor {
@@ -66,6 +69,9 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	Color clearColor = defaultClearColor;
 
+	// Logic
+	Timer timer = new Timer();
+
 	public PathfindingDemo(final Holowyth game) {
 		this.game = game;
 		this.camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -85,13 +91,13 @@ public class PathfindingDemo implements Screen, InputProcessor {
 				| (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
 		camera.update();
 
-		// renderGraph();
+		renderGraph();
 
 		if (this.map != null) {
 			renderMapPolygons();
 			renderMapBoundaries();
 		}
-		
+
 		// Rendering Test area;
 		renderSearchResult();
 		renderUnits();
@@ -107,12 +113,20 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		// User Controls
 
 		// Testing area
-//		pathing.stepAStar();
-		
+		// pathing.stepAStar();
 
 		int blank = 1;
 		blank = blank + 1;
-		
+
+		timer.start(1000 / 60);
+
+		if (timer.taskReady()) {
+			doOnFrame();
+		}
+
+	}
+
+	private void doOnFrame() {
 		tickLogicForUnits();
 		moveUnits();
 	}
@@ -137,8 +151,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		Gdx.input.setInputProcessor(multiplexer);
 
 		// openFileChooserToLoadMap();
-		System.out.println(Holo.mapsDirectory + "singleObstacle.map");
-		loadMap(HoloIO.getMapFromDisk(Holo.mapsDirectory + "/singleObstacle.map"));
+		loadMap(HoloIO.getMapFromDisk(Holo.mapsDirectory + "/complexMap.map"));
 	}
 
 	@Override
@@ -174,7 +187,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	// Pathfinding
 
-	private int CELL_SIZE = 15;// 15; // size in pixels
+	private int CELL_SIZE = 30;// 15; // size in pixels
 
 	Vertex[][] graph;
 	int graphWidth, graphHeight;
@@ -219,7 +232,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 			v.N = v.NW = v.NE = false;
 	}
 
-	private boolean edgePathable(int x, int y, int x2, int y2) {
+	private boolean edgePathable(float x, float y, float x2, float y2) {
 		boolean intersects = false;
 		for (Polygon polygon : map.polys) {
 			for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
@@ -238,32 +251,32 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	}
 
 	private void renderGraph() {
-		// Draw Edges
-		shapeRenderer.setColor(Color.CORAL);
-		shapeRenderer.begin(ShapeType.Line);
-		for (int y = 0; y < graphHeight; y++) {
-			for (int x = 0; x < graphWidth; x++) {
-				Vertex v = graph[y][x];
-				if (v.N)
-					drawLine(x, y, x, y + 1);
-				if (v.S)
-					drawLine(x, y, x, y - 1);
-				if (v.W)
-					drawLine(x, y, x - 1, y);
-				if (v.E)
-					drawLine(x, y, x + 1, y);
-
-				if (v.NW)
-					drawLine(x, y, x - 1, y + 1);
-				if (v.NE)
-					drawLine(x, y, x + 1, y + 1);
-				if (v.SW)
-					drawLine(x, y, x - 1, y - 1);
-				if (v.SE)
-					drawLine(x, y, x + 1, y - 1);
-			}
-		}
-		shapeRenderer.end();
+		 // Draw Edges
+		 shapeRenderer.setColor(Color.CORAL);
+		 shapeRenderer.begin(ShapeType.Line);
+		 for (int y = 0; y < graphHeight; y++) {
+		 for (int x = 0; x < graphWidth; x++) {
+		 Vertex v = graph[y][x];
+		 if (v.N)
+		 drawLine(x, y, x, y + 1);
+		 if (v.S)
+		 drawLine(x, y, x, y - 1);
+		 if (v.W)
+		 drawLine(x, y, x - 1, y);
+		 if (v.E)
+		 drawLine(x, y, x + 1, y);
+		
+		 if (v.NW)
+		 drawLine(x, y, x - 1, y + 1);
+		 if (v.NE)
+		 drawLine(x, y, x + 1, y + 1);
+		 if (v.SW)
+		 drawLine(x, y, x - 1, y - 1);
+		 if (v.SE)
+		 drawLine(x, y, x + 1, y - 1);
+		 }
+		 }
+		 shapeRenderer.end();
 
 		// Draw vertexes as points
 		shapeRenderer.setColor(Color.BLACK);
@@ -296,27 +309,39 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	}
 
 	private void renderSearchResult() {
-		shapeRenderer.begin(ShapeType.Line);
-		shapeRenderer.setColor(Color.BLACK);
-		for (int i = 0; i < graphHeight; i++) {
-			for (int j = 0; j < graphWidth; j++) {
-				int vertexId = i * graphWidth + j;
-				if (pathing.ancestor[vertexId] >= 0) {
-					int ancestorId = pathing.ancestor[vertexId];
-					int prevIx = ancestorId % graphWidth;
-					int prevIy = ancestorId / graphWidth;
-					drawLine(prevIx, prevIy, j, i);
-				}
-			}
-		}
-		shapeRenderer.end();
+		// shapeRenderer.begin(ShapeType.Line);
+		// shapeRenderer.setColor(Color.BLACK);
+		// for (int i = 0; i < graphHeight; i++) {
+		// for (int j = 0; j < graphWidth; j++) {
+		// int vertexId = i * graphWidth + j;
+		// if (pathing.ancestor[vertexId] >= 0) {
+		// int ancestorId = pathing.ancestor[vertexId];
+		// int prevIx = ancestorId % graphWidth;
+		// int prevIy = ancestorId / graphWidth;
+		// drawLine(prevIx, prevIy, j, i);
+		// }
+		// }
+		// }
+		// shapeRenderer.end();
 
-		shapeRenderer.begin(ShapeType.Line);
-		shapeRenderer.setColor(Color.BLUE);
+		// Render Path
+
+		float thickness = 1.5f;
+
+		shapeRenderer.begin(ShapeType.Filled);
+		shapeRenderer.setColor(Color.FOREST);
 		for (int i = 0; i < path.size() - 1; i++) {
+			
+			if(i == 1){
+				shapeRenderer.setColor(Color.BLUE);
+			}
+			
+			if (i == path.size() - 2) {
+				shapeRenderer.setColor(Color.FOREST);
+			}
 			Pair<Float, Float> v = path.get(i);
 			Pair<Float, Float> next = path.get(i + 1);
-			shapeRenderer.rectLine(v.first(), v.second(), next.first(), next.second(), 2);
+			shapeRenderer.rectLine(v.first(), v.second(), next.first(), next.second(), thickness);
 
 		}
 		shapeRenderer.end();
@@ -409,41 +434,47 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		camera.position.set(map.width() / 2, map.height() / 2, 0);
 
 		// Create pathing graph
-		
+
 		createGraph();
 		long startTime = System.nanoTime();
 		linearFillGraph();
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime); // divide by 1000000 to get milliseconds.
 		System.out.format("Time elapsed: %d mililseconds%n", duration / 1000000);
-		
+
 		onMapLoad();
 	}
-	
-	private void onMapLoad(){
+
+	Unit u; //the main unit we are using to demo pathfinding
+	private void onMapLoad() {
+		
+		// Create a unit
+		u = new Unit(35, 20);
+		units.add(u);
 		
 		// Search a path between two points
-		
+
 		pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE);
 
-		pathing.doAStar(0, 40 * 40);
+		// pathing.doAStar(0, 20 * 20);
+
+		
+		pathing.doAStar(u.x, u.y, 22 * CELL_SIZE+10, 15 * CELL_SIZE+20, map.polys);
+
 		path = pathing.retrievePath();
 		scalePath(path);
-
-		// Create a unit
-		
-		Unit u = new Unit(0, 50);
 		u.setPath(path);
-		units.add(u);
+
 	}
-	
-	private void tickLogicForUnits(){
-		for(Unit u: units){
+
+	private void tickLogicForUnits() {
+		for (Unit u : units) {
 			u.tickLogic();
 		}
 	}
-	private void moveUnits(){
-		for(Unit u: units){
+
+	private void moveUnits() {
+		for (Unit u : units) {
 			u.x += u.vx;
 			u.y += u.vy;
 		}
@@ -476,9 +507,25 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		// TODO Auto-generated method stub
+		System.out.println(screenX + " " + screenY);
+		if (button == Input.Buttons.LEFT && pointer == 0) {
+			Vector3 vec = new Vector3();
+			vec = camera.unproject(vec.set(screenX, screenY, 0));
+			
+			System.out.println(vec.x + " " + vec.y);
+			AStarSearch pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE);
+			pathing.doAStar(u.x, u.y, vec.x, vec.y, map.polys);
+			Path newPath = pathing.retrievePath();
+			if(newPath!=null){
+				path = newPath;
+				u.setPath(newPath);
+			}
+			
+			return true;
+		}
 		return false;
 	}
+	
 
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
