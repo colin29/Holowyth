@@ -1,11 +1,14 @@
 package com.mygdx.holowyth.pathfinding;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.mygdx.holowyth.util.Pair;
 
 /**
  * Currently the result of an AStarSearch can be extracted from ancestor.
@@ -21,7 +24,9 @@ public class AStarSearch {
 	int graphWidth, graphHeight;
 	Vertex[][] graph;
 
-	AStarSearch(int graphWidth, int graphHeight, Vertex[][] graph) {
+	int CELL_SIZE;
+
+	AStarSearch(int graphWidth, int graphHeight, Vertex[][] graph, int cellSize) {
 
 		this.graph = graph;
 		this.graphWidth = graphWidth;
@@ -31,7 +36,9 @@ public class AStarSearch {
 		ancestor = new int[graphWidth * graphHeight];
 		Arrays.fill(ancestor, -1);
 		minCost = new float[graphWidth * graphHeight];
-		Arrays.fill(minCost, 99999999);		
+		Arrays.fill(minCost, 99999999);
+
+		this.CELL_SIZE = cellSize;
 	}
 
 	PriorityQueue<Node> q = new PriorityQueue<Node>(new Comparator<Node>() {
@@ -50,6 +57,9 @@ public class AStarSearch {
 	public void doAStar(int startVertex, int goalVertex) {
 		q.add(new Node(startVertex, 0, calculateDistSquared(startVertex, goalVertex), graphWidth));
 		minCost[startVertex] = 0;
+
+		this.startVertex = startVertex;
+		this.goalVertex = goalVertex;
 
 		while (!q.isEmpty()) {
 			Node curNode = q.remove();
@@ -202,6 +212,24 @@ public class AStarSearch {
 		int sx = startVertex % graphWidth;
 
 		return (gx - sx) * (gx - sx) + (gy - sy) * (gy - sy);
+	}
+
+	public Path retrievePath() {
+		Path path = new Path();
+		int curVertex = goalVertex;
+		path.add(new Pair<Float, Float>((float) curVertex % graphWidth * CELL_SIZE,
+				(float) curVertex / graphWidth * CELL_SIZE));
+
+		while (ancestor[curVertex] >= 0) {
+			curVertex = ancestor[curVertex];
+			path.add(new Pair<Float, Float>((float) curVertex % graphWidth * CELL_SIZE,
+					(float) curVertex / graphWidth * CELL_SIZE));
+		}
+		Collections.reverse(path);
+
+		// assert that backwards track lead back to the startVertex
+		assert (path.get(0).second() * graphWidth + path.get(0).first() == startVertex);
+		return path;
 	}
 
 }

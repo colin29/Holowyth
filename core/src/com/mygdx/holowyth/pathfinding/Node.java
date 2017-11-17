@@ -22,7 +22,6 @@ public class Node {
 		this.h = costToGetHere + hSquared/2;		
 		this.coordinates = ID%graphWidth + ", " + ID/graphWidth; 
 		
-		
 		f = h+costToGetHere;
 	}
 	

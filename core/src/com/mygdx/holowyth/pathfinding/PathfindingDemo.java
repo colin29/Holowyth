@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.pathfinding;
 
 import java.awt.geom.Line2D;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -35,6 +36,7 @@ import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.KeyTracker;
+import com.mygdx.holowyth.util.Pair;
 import com.mygdx.holowyth.util.constants.Holo;
 
 public class PathfindingDemo implements Screen, InputProcessor {
@@ -87,8 +89,12 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		if (this.map != null) {
 			renderMapPolygons();
-			// renderMapBoundaries();
+			renderMapBoundaries();
 		}
+		
+		// Rendering Test area;
+		renderSearchResult();
+		renderUnits();
 
 		// UI
 		stage.act(delta);
@@ -101,11 +107,14 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		// User Controls
 
 		// Testing area
-		pathing.stepAStar();
-		renderSearchResult();
+//		pathing.stepAStar();
+		
 
 		int blank = 1;
 		blank = blank + 1;
+		
+		tickLogicForUnits();
+		moveUnits();
 	}
 
 	private void renderMapPolygons() {
@@ -269,8 +278,21 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	}
 
+	/**
+	 * Converts a path from cell indexes to coordinates;
+	 */
+	private void scalePath(Path path) {
+		for (Pair<Float, Float> p : path) {
+			p = new Pair<Float, Float>(p.first() * CELL_SIZE, p.second() * CELL_SIZE);
+		}
+	}
+
 	private void drawLine(int ix, int iy, int ix2, int iy2) {
 		shapeRenderer.line(ix * CELL_SIZE, iy * CELL_SIZE, 0, ix2 * CELL_SIZE, iy2 * CELL_SIZE, 0);
+	}
+
+	private void drawRectLine(int ix, int iy, int ix2, int iy2, float width) {
+		shapeRenderer.rectLine(ix * CELL_SIZE, iy * CELL_SIZE, ix2 * CELL_SIZE, iy2 * CELL_SIZE, width);
 	}
 
 	private void renderSearchResult() {
@@ -288,10 +310,30 @@ public class PathfindingDemo implements Screen, InputProcessor {
 			}
 		}
 		shapeRenderer.end();
+
+		shapeRenderer.begin(ShapeType.Line);
+		shapeRenderer.setColor(Color.BLUE);
+		for (int i = 0; i < path.size() - 1; i++) {
+			Pair<Float, Float> v = path.get(i);
+			Pair<Float, Float> next = path.get(i + 1);
+			shapeRenderer.rectLine(v.first(), v.second(), next.first(), next.second(), 2);
+
+		}
+		shapeRenderer.end();
 	}
 
-	private void retrievePath(int goalVertex) {
-		// TODO: stub
+	ArrayList<Unit> units = new ArrayList<Unit>();
+
+	private void renderUnits() {
+		for (Unit unit : units) {
+			shapeRenderer.begin(ShapeType.Filled);
+			shapeRenderer.setColor(Color.PURPLE);
+
+			shapeRenderer.circle(unit.x, unit.y, 10);
+
+			shapeRenderer.end();
+		}
+
 	}
 
 	// UI and Disk
@@ -357,6 +399,8 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	AStarSearch pathing;
 
+	Path path;
+
 	private void loadMap(Field map) {
 		System.out.println("New map loaded");
 		this.map = map;
@@ -364,20 +408,47 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		camera.position.set(map.width() / 2, map.height() / 2, 0);
 
+		// Create pathing graph
+		
 		createGraph();
-
 		long startTime = System.nanoTime();
 		linearFillGraph();
 		long endTime = System.nanoTime();
 		long duration = (endTime - startTime); // divide by 1000000 to get milliseconds.
 		System.out.format("Time elapsed: %d mililseconds%n", duration / 1000000);
-
-		pathing = new AStarSearch(graphWidth, graphHeight, graph);
-//		pathing.initStepAStar(0, 40 * 40);
+		
+		onMapLoad();
+	}
+	
+	private void onMapLoad(){
+		
+		// Search a path between two points
+		
+		pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE);
 
 		pathing.doAStar(0, 40 * 40);
+		path = pathing.retrievePath();
+		scalePath(path);
 
+		// Create a unit
+		
+		Unit u = new Unit(0, 50);
+		u.setPath(path);
+		units.add(u);
 	}
+	
+	private void tickLogicForUnits(){
+		for(Unit u: units){
+			u.tickLogic();
+		}
+	}
+	private void moveUnits(){
+		for(Unit u: units){
+			u.x += u.vx;
+			u.y += u.vy;
+		}
+	}
+
 	// Input Related
 
 	final int[] TRACKED_KEYS = new int[] { Keys.LEFT, Keys.RIGHT, Keys.UP, Keys.DOWN };
