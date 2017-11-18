@@ -14,7 +14,7 @@ public class Node {
 	 */
 	public float h;  
 	public String coordinates;
-	public float f;
+	public float f; //Parameter used by A*
 	
 	public Node(int ID, float costToGetHere, float hSquared, int graphWidth){
 		this.vertexID = ID;

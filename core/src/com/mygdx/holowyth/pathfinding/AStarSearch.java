@@ -29,7 +29,12 @@ public class AStarSearch {
 
 	int CELL_SIZE;
 
-	AStarSearch(int graphWidth, int graphHeight, Vertex[][] graph, int cellSize) {
+	/**
+	 * 
+	 * Graph is assumed to be a rectangular grid. 
+	 * @Usage Initialize the AStarSearch object. Then you can run arbitrary number of searches with the same object.
+	 */
+	public AStarSearch(int graphWidth, int graphHeight, Vertex[][] graph, int cellSize) {
 
 		this.graph = graph;
 		this.graphWidth = graphWidth;
@@ -37,9 +42,7 @@ public class AStarSearch {
 
 		visited = new boolean[graphWidth * graphHeight];
 		ancestor = new int[graphWidth * graphHeight];
-		Arrays.fill(ancestor, -1);
 		minCost = new float[graphWidth * graphHeight];
-		Arrays.fill(minCost, 99999999);
 
 		this.CELL_SIZE = cellSize;
 	}
@@ -57,7 +60,9 @@ public class AStarSearch {
 
 	private final float SQRT2 = 1.414214f; // rounded up slightly so that h is valid
 
-	public void doAStar(int startVertex, int goalVertex) {
+	public Path doAStar(int startVertex, int goalVertex) {
+		clearSearch();
+
 		coordinateSearchUsed = false;
 		q.add(new Node(startVertex, 0, calculateDistSquared(startVertex, goalVertex), graphWidth));
 		minCost[startVertex] = 0;
@@ -72,7 +77,7 @@ public class AStarSearch {
 			if (curNode.vertexID == goalVertex) {
 				searchDone = true;
 				System.out.println("Goal Reached (A* search)");
-				return;
+				return this.retrievePath();
 			}
 
 			// visit this node
@@ -83,7 +88,6 @@ public class AStarSearch {
 
 			// Create the 8 successors of curNode, if the edges are pathable
 			Vertex curVertex = graph[curNode.vertexID / graphWidth][curNode.vertexID % graphWidth];
-			int sucId;
 			if (curVertex.N) {
 				addNodeIfNoCheaperExists(curNode, curNode.vertexID + graphWidth, 1, goalVertex);
 			}
@@ -91,7 +95,6 @@ public class AStarSearch {
 				addNodeIfNoCheaperExists(curNode, curNode.vertexID - graphWidth, 1, goalVertex);
 			}
 			if (curVertex.W) {
-				sucId = curNode.vertexID - 1;
 				addNodeIfNoCheaperExists(curNode, curNode.vertexID - 1, 1, goalVertex);
 			}
 			if (curVertex.E) {
@@ -111,11 +114,10 @@ public class AStarSearch {
 				addNodeIfNoCheaperExists(curNode, curNode.vertexID - graphWidth + 1, SQRT2, goalVertex);
 			}
 		}
-		if (q.isEmpty()) {
-			System.out.println("Warning: A-star search completed without finding the goalNode");
-			searchDone = true;
-			searchFailed = true;
-		}
+		System.out.println("Warning: A-star search completed without finding the goalNode");
+		searchDone = true;
+		searchFailed = true;
+		return null;
 	}
 
 	boolean coordinateSearchUsed = false;
@@ -126,28 +128,89 @@ public class AStarSearch {
 	/**
 	 * Takes in starting and goal locations instead of graph vertexes.
 	 */
-	public void doAStar(float sx, float sy, float dx, float dy, ArrayList<Polygon> polys) {
-
-		
+	public Path doAStar(float sx, float sy, float dx, float dy, ArrayList<Polygon> polys) {
 
 		int startVertex = findClosestPathableVertex(sx, sy, polys);
 		int goalVertex = findClosestPathableVertex(dx, dy, polys);
-		
+
 		doAStar(startVertex, goalVertex);
-		
+
 		startX = sx;
 		startY = sy;
 		goalX = dx;
 		goalY = dy;
 		coordinateSearchUsed = true;
+		return this.retrievePath();
 	}
+
+	private Path retrievePath() {
+
+		if (searchFailed) {
+			return null;
+		}
+
+		Path path = new Path();
+
+		if (coordinateSearchUsed) { // if using coordinate based search, the goalVertex != goal point
+			path.add(new Pair<Float, Float>(goalX, goalY));
+		}
+
+		int curVertex = goalVertex;
+		path.add(new Pair<Float, Float>((float) curVertex % graphWidth * CELL_SIZE,
+				(float) (curVertex / graphWidth * CELL_SIZE)));
+
+		while (ancestor[curVertex] >= 0) {
+			curVertex = ancestor[curVertex];
+			path.add(new Pair<Float, Float>((float) curVertex % graphWidth * CELL_SIZE,
+					(float) (curVertex / graphWidth * CELL_SIZE)));
+		}
+
+		if (coordinateSearchUsed) { // if using coordinate based search, the goalVertex != goal point
+			path.add(new Pair<Float, Float>(startX, startY));
+		}
+		Collections.reverse(path);
+
+		// assert that backwards track lead back to the startVertex
+		assert (path.get(0).second() * graphWidth + path.get(0).first() == startVertex);
+		return path;
+	}
+
+	private void clearSearch() {
+		Arrays.fill(visited, false);
+		Arrays.fill(ancestor, -1);
+		Arrays.fill(minCost, 10e10f);
+		q.clear();
+	}
+
+	class PointData {
+		public int ix;
+		public int iy;
+		public float dist;
+
+		PointData(int ix, int iy, float ux, float uy) {
+			this.ix = ix;
+			this.iy = iy;
+
+			float x = ix * CELL_SIZE;
+			float y = iy * CELL_SIZE;
+			this.dist = (float) Math.sqrt((ux - x) * (ux - x) + (uy - y) * (uy - y));
+		}
+	}
+
+	boolean searchStarted;
+	boolean searchDone;
+	int startVertex = -1;
+	int goalVertex = -1;
+
+	private float cost;
+
 	/**
 	 * Out of the 4 closest points, returns the closest one that is pathable;
 	 */
-	private int findClosestPathableVertex(float sx, float sy, ArrayList<Polygon> polys){
+	private int findClosestPathableVertex(float sx, float sy, ArrayList<Polygon> polys) {
 		int ix = (int) (sx / CELL_SIZE);
 		int iy = (int) (sy / CELL_SIZE);
-		
+
 		PointData dNW, dNE, dSE, dSW;
 		dNW = new PointData(ix, iy + 1, sx, sy);
 		dNE = new PointData(ix + 1, iy + 1, sx, sy);
@@ -173,98 +236,6 @@ public class AStarSearch {
 		assert (found); // ("None of the 4 closest points were reachable");
 		return startIy * graphWidth + startIx;
 	}
-	
-	class PointData {
-		public int ix;
-		public int iy;
-		public float dist;
-
-		PointData(int ix, int iy, float ux, float uy) {
-			this.ix = ix;
-			this.iy = iy;
-
-			float x = ix * CELL_SIZE;
-			float y = iy * CELL_SIZE;
-			this.dist = (float) Math.sqrt((ux - x) * (ux - x) + (uy - y) * (uy - y));
-		}
-	}
-
-	boolean searchStarted;
-	boolean searchDone;
-	int startVertex = -1;
-	int goalVertex = -1;
-
-	public void initStepAStar(int startVertex, int goalVertex) {
-		q.add(new Node(startVertex, 0, calculateDistSquared(startVertex, goalVertex), graphWidth));
-		minCost[startVertex] = 0;
-		searchStarted = true;
-		searchDone = false;
-
-		this.startVertex = startVertex;
-		this.goalVertex = goalVertex;
-	}
-
-	public void stepAStar() {
-		if (!searchStarted || searchDone) {
-			return;
-		}
-		if (!q.isEmpty()) {
-			Node curNode = q.remove();
-
-			// terminate if this node is the goal
-			if (curNode.vertexID == goalVertex) {
-				searchDone = true;
-				System.out.println("Goal Reached (A* search)");
-				return;
-			}
-
-			// visit this node
-			visited[curNode.vertexID] = true;
-
-			System.out.format("Current Node: (%s, %s) %s %s %n", (curNode.vertexID % graphWidth),
-					(curNode.vertexID / graphWidth), curNode.costToGetHere, curNode.h);
-
-			// Create the 8 successors of curNode, if the edges are pathable
-			Vertex curVertex = graph[curNode.vertexID / graphWidth][curNode.vertexID % graphWidth];
-			int sucId;
-			if (curVertex.N) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID + graphWidth, 1, goalVertex);
-			}
-			if (curVertex.S) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID - graphWidth, 1, goalVertex);
-			}
-			if (curVertex.W) {
-				sucId = curNode.vertexID - 1;
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID - 1, 1, goalVertex);
-			}
-			if (curVertex.E) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID + 1, 1, goalVertex);
-			}
-
-			if (curVertex.NW) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID + graphWidth - 1, SQRT2, goalVertex);
-			}
-			if (curVertex.NE) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID + graphWidth + 1, SQRT2, goalVertex);
-			}
-			if (curVertex.SW) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID - graphWidth - 1, SQRT2, goalVertex);
-			}
-			if (curVertex.SE) {
-				addNodeIfNoCheaperExists(curNode, curNode.vertexID - graphWidth + 1, SQRT2, goalVertex);
-			}
-		}
-
-		System.out.format("Next Node in Queue:  (%s) %s %s %n", q.peek().coordinates, q.peek().f,
-				q.peek().costToGetHere);
-
-		if (q.isEmpty()) {
-			System.out.println("Warning: A-star search completed without finding the goalNode");
-			searchDone = true;
-		}
-	}
-
-	private float cost;
 
 	private void addNodeIfNoCheaperExists(Node curNode, int sucId, float edgeCost, int goalVertex) {
 		cost = curNode.costToGetHere + edgeCost;
@@ -276,11 +247,6 @@ public class AStarSearch {
 		}
 	}
 
-	/**
-	 * @param startVertex
-	 * @param goalVertex
-	 * @return the square of the distance from current to goal vertex, in cells;
-	 */
 	private float calculateDistSquared(int startVertex, int goalVertex) {
 		int gy = goalVertex / graphWidth;
 		int gx = goalVertex % graphWidth;
@@ -288,38 +254,6 @@ public class AStarSearch {
 		int sx = startVertex % graphWidth;
 
 		return (gx - sx) * (gx - sx) + (gy - sy) * (gy - sy);
-	}
-
-	public Path retrievePath() {
-		
-		if(searchFailed){
-			return null;
-		}
-		
-		Path path = new Path();
-		
-		if(coordinateSearchUsed){ //if using coordinate based search, the goalVertex != goal point
-			path.add(new Pair<Float, Float> (goalX, goalY));
-		}
-		
-		int curVertex = goalVertex;
-		path.add(new Pair<Float, Float>((float) curVertex % graphWidth * CELL_SIZE,
-				(float) (curVertex / graphWidth * CELL_SIZE)));
-
-		while (ancestor[curVertex] >= 0) {
-			curVertex = ancestor[curVertex];
-			path.add(new Pair<Float, Float>((float) curVertex % graphWidth * CELL_SIZE,
-					(float) (curVertex / graphWidth * CELL_SIZE)));
-		}
-		
-		if(coordinateSearchUsed){ //if using coordinate based search, the goalVertex != goal point
-			path.add(new Pair<Float, Float> (startX, startY));
-		}
-		Collections.reverse(path);
-
-		// assert that backwards track lead back to the startVertex
-		assert (path.get(0).second() * graphWidth + path.get(0).first() == startVertex);
-		return path;
 	}
 
 	private boolean edgePathable(float x, float y, float x2, float y2, ArrayList<Polygon> polys) {

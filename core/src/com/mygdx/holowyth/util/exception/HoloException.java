@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.exception;
+package com.mygdx.holowyth.util.exception;
 
 public class HoloException extends RuntimeException {
 

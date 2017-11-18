@@ -9,10 +9,10 @@ import java.io.ObjectOutputStream;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.exception.ErrorCode;
-import com.mygdx.holowyth.exception.HoloException;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.polygon.Polygon;
+import com.mygdx.holowyth.util.exception.ErrorCode;
+import com.mygdx.holowyth.util.exception.HoloException;
 
 public class HoloIO {
 

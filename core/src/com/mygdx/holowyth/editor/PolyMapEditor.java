@@ -1,4 +1,4 @@
-package com.mygdx.holowyth;
+package com.mygdx.holowyth.editor;
 
 import java.io.IOException;
 import com.badlogic.gdx.Gdx;
@@ -34,16 +34,16 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
-import com.mygdx.holowyth.exception.ErrorCode;
-import com.mygdx.holowyth.exception.HoloException;
+import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.map.Field;
-import com.mygdx.holowyth.polygon.MapPolygonDrawer;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.KeyTracker;
 import com.mygdx.holowyth.util.Pair;
 import com.mygdx.holowyth.util.constants.Holo;
+import com.mygdx.holowyth.util.exception.ErrorCode;
+import com.mygdx.holowyth.util.exception.HoloException;
 
 import java.util.ArrayList;
 import java.util.HashMap;

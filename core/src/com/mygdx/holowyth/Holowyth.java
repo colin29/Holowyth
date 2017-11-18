@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
+import com.mygdx.holowyth.editor.PolyMapEditor;
 import com.mygdx.holowyth.util.HoloUI;
 
 public class Holowyth extends Game {

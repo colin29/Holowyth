@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.template;
+package com.mygdx.holowyth.util.template;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;

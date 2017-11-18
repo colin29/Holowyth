@@ -3,9 +3,9 @@ package com.mygdx.holowyth.map;
 import java.io.Serializable;
 import java.util.ArrayList;
 
-import com.mygdx.holowyth.exception.ErrorCode;
-import com.mygdx.holowyth.exception.HoloException;
 import com.mygdx.holowyth.polygon.Polygon;
+import com.mygdx.holowyth.util.exception.ErrorCode;
+import com.mygdx.holowyth.util.exception.HoloException;
 
 public class Field implements Serializable {
 

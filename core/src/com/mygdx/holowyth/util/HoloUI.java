@@ -54,6 +54,8 @@ public class HoloUI {
 		return new Color((float) r / 256, (float) g / 256, (float) b / 256, 1);
 	}
 
+	
+	
 	// Widget Functions
 	public static Cell<TextButton> textButton(Table table, String text, Skin skin, VoidInterface action) {
 		return textButton(table, text, skin, new ChangeListener() {

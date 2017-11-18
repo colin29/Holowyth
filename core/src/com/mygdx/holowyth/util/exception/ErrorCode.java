@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.exception;
+package com.mygdx.holowyth.util.exception;
 
 public enum ErrorCode {
 	INVALID_DIMENSIONS(100), INVALID_INPUT(101), IO_EXCEPTION(102);

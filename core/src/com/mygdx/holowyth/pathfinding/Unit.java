@@ -6,8 +6,8 @@ public class Unit {
 
 	public static float waypointMinDistance = 0.01f;
 	
-	float x, y;
-	float vx, vy;
+	public float x, y;
+	public float vx, vy;
 	float speed = 5; //world units per frame
 	
 	Path path;
@@ -15,7 +15,7 @@ public class Unit {
 	Unit(){
 	}
 	
-	Unit(float x, float y){
+	public Unit(float x, float y){
 		this();
 		this.x = x;
 		this.y = y;
@@ -50,6 +50,7 @@ public class Unit {
 				waypointIndex +=1;
 				//check if completed path
 				if(waypointIndex == path.size()){
+					path.clear();
 					path = null;
 					waypointIndex = -1;
 				}
