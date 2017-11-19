@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.util.data.Pair;

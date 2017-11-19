@@ -109,6 +109,8 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		// Rendering Test area;
 		renderSearchResult();
 		renderUnits();
+		smoother.render(shapeRenderer);
+		renderPath(smoother.path2s, Color.PINK, false);
 
 		// UI
 		stage.act(delta);
@@ -331,6 +333,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		renderPath(path, Color.FIREBRICK, false);
 		renderPath(pathS1, Color.BLUE, true);
+		
 
 	}
 
