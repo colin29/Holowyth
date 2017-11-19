@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.util;
+package com.mygdx.holowyth.util.tools;
 
 public class Timer {
 

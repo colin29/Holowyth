@@ -15,9 +15,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.polygon.Point;
 import com.mygdx.holowyth.polygon.Polygon;
-import com.mygdx.holowyth.polygon.Segment;
+import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.util.data.Segment;
 
 public class PolygonDemo implements Screen, InputProcessor {
 

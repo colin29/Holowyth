@@ -39,11 +39,11 @@ import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
-import com.mygdx.holowyth.util.KeyTracker;
-import com.mygdx.holowyth.util.Pair;
 import com.mygdx.holowyth.util.constants.Holo;
+import com.mygdx.holowyth.util.data.Pair;
 import com.mygdx.holowyth.util.exception.ErrorCode;
 import com.mygdx.holowyth.util.exception.HoloException;
+import com.mygdx.holowyth.util.tools.KeyTracker;
 
 import java.util.ArrayList;
 import java.util.HashMap;

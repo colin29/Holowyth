@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.util;
+package com.mygdx.holowyth.util.tools;
 
 import java.util.HashMap;
 import java.util.Map;

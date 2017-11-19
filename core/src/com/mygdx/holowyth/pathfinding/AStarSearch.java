@@ -1,6 +1,5 @@
 package com.mygdx.holowyth.pathfinding;
 
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,7 +10,8 @@ import java.util.PriorityQueue;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.mygdx.holowyth.polygon.Polygon;
-import com.mygdx.holowyth.util.Pair;
+import com.mygdx.holowyth.util.data.Pair;
+import com.mygdx.holowyth.util.data.Point;
 
 /**
  * Currently the result of an AStarSearch can be extracted from ancestor.
@@ -31,7 +31,8 @@ public class AStarSearch {
 
 	/**
 	 * 
-	 * Graph is assumed to be a rectangular grid. 
+	 * Graph is assumed to be a rectangular grid.
+	 * 
 	 * @Usage Initialize the AStarSearch object. Then you can run arbitrary number of searches with the same object.
 	 */
 	public AStarSearch(int graphWidth, int graphHeight, Vertex[][] graph, int cellSize) {
@@ -61,6 +62,41 @@ public class AStarSearch {
 	private final float SQRT2 = 1.414214f; // rounded up slightly so that h is valid
 
 	public Path doAStar(int startVertex, int goalVertex) {
+		runAStar(startVertex, goalVertex);
+		return this.retrievePath();
+	}
+
+	/**
+	 * Takes in starting and goal locations instead of graph vertexes.
+	 */
+	public Path doAStar(float sx, float sy, float dx, float dy, ArrayList<Polygon> polys) {
+
+		if (outsideMapBounds(dx, dy)) {
+			System.out.println("AStar input: Point is outside map bounds");
+			return null;
+		}
+
+		int startVertex = findClosestPathableVertex(sx, sy, polys);
+		int goalVertex = findClosestPathableVertex(dx, dy, polys);
+		
+		//TODO: need a check to ensure that goalVertex is on a reachable vertex (found via floodfil)
+
+		runAStar(startVertex, goalVertex);
+
+		startX = sx;
+		startY = sy;
+		goalX = dx;
+		goalY = dy;
+		coordinateSearchUsed = true;
+		return this.retrievePath();
+	}
+
+	boolean coordinateSearchUsed = false;
+	float goalX, goalY;
+	float startX, startY;
+	boolean searchFailed;
+
+	private void runAStar(int startVertex, int goalVertex) {
 		clearSearch();
 
 		coordinateSearchUsed = false;
@@ -77,7 +113,7 @@ public class AStarSearch {
 			if (curNode.vertexID == goalVertex) {
 				searchDone = true;
 				System.out.println("Goal Reached (A* search)");
-				return this.retrievePath();
+				return;
 			}
 
 			// visit this node
@@ -117,30 +153,6 @@ public class AStarSearch {
 		System.out.println("Warning: A-star search completed without finding the goalNode");
 		searchDone = true;
 		searchFailed = true;
-		return null;
-	}
-
-	boolean coordinateSearchUsed = false;
-	float goalX, goalY;
-	float startX, startY;
-	boolean searchFailed;
-
-	/**
-	 * Takes in starting and goal locations instead of graph vertexes.
-	 */
-	public Path doAStar(float sx, float sy, float dx, float dy, ArrayList<Polygon> polys) {
-
-		int startVertex = findClosestPathableVertex(sx, sy, polys);
-		int goalVertex = findClosestPathableVertex(dx, dy, polys);
-
-		doAStar(startVertex, goalVertex);
-
-		startX = sx;
-		startY = sy;
-		goalX = dx;
-		goalY = dy;
-		coordinateSearchUsed = true;
-		return this.retrievePath();
 	}
 
 	private Path retrievePath() {
@@ -152,26 +164,26 @@ public class AStarSearch {
 		Path path = new Path();
 
 		if (coordinateSearchUsed) { // if using coordinate based search, the goalVertex != goal point
-			path.add(new Pair<Float, Float>(goalX, goalY));
+			path.add(new Point(goalX, goalY));
 		}
 
 		int curVertex = goalVertex;
-		path.add(new Pair<Float, Float>((float) curVertex % graphWidth * CELL_SIZE,
+		path.add(new Point((float) curVertex % graphWidth * CELL_SIZE,
 				(float) (curVertex / graphWidth * CELL_SIZE)));
 
 		while (ancestor[curVertex] >= 0) {
 			curVertex = ancestor[curVertex];
-			path.add(new Pair<Float, Float>((float) curVertex % graphWidth * CELL_SIZE,
+			path.add(new Point((float) curVertex % graphWidth * CELL_SIZE,
 					(float) (curVertex / graphWidth * CELL_SIZE)));
 		}
 
 		if (coordinateSearchUsed) { // if using coordinate based search, the goalVertex != goal point
-			path.add(new Pair<Float, Float>(startX, startY));
+			path.add(new Point(startX, startY));
 		}
 		Collections.reverse(path);
 
 		// assert that backwards track lead back to the startVertex
-		assert (path.get(0).second() * graphWidth + path.get(0).first() == startVertex);
+		assert (path.get(0).y * graphWidth + path.get(0).x == startVertex);
 		return path;
 	}
 
@@ -205,7 +217,8 @@ public class AStarSearch {
 	private float cost;
 
 	/**
-	 * Out of the 4 closest points, returns the closest one that is pathable;
+	 * Out of the 4 closest points, returns the closest one that is pathable
+	 * Assumes that the point given is within map boundaries
 	 */
 	private int findClosestPathableVertex(float sx, float sy, ArrayList<Polygon> polys) {
 		int ix = (int) (sx / CELL_SIZE);
@@ -225,7 +238,7 @@ public class AStarSearch {
 		boolean found = false;
 		for (int i = 0; i < 4; i++) {
 			PointData p = points.get(i);
-			if (this.edgePathable(sx, sy, p.ix * CELL_SIZE, p.iy * CELL_SIZE, polys)) {
+			if (HoloPF.isEdgePathable(sx, sy, p.ix * CELL_SIZE, p.iy * CELL_SIZE, polys)) {
 				startIx = p.ix;
 				startIy = p.iy;
 				found = true;
@@ -256,17 +269,10 @@ public class AStarSearch {
 		return (gx - sx) * (gx - sx) + (gy - sy) * (gy - sy);
 	}
 
-	private boolean edgePathable(float x, float y, float x2, float y2, ArrayList<Polygon> polys) {
-		boolean intersects = false;
-		for (Polygon polygon : polys) {
-			for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
-				if (Line2D.linesIntersect(x, y, x2, y2, polygon.vertexes[i], polygon.vertexes[i + 1],
-						polygon.vertexes[(i + 2) % polygon.count], polygon.vertexes[(i + 3) % polygon.count])) {
-					intersects = true;
-				}
-			}
-		}
-		return !intersects;
+	private boolean outsideMapBounds(float x, float y) {
+		int mapWidth = (graphWidth - 1) * CELL_SIZE;
+		int mapHeight = (graphHeight - 1) * CELL_SIZE;
+		return (x < 0 || x > mapWidth || y < 0 || y > mapHeight);
 	}
 
 }

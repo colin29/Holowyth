@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.polygon;
+package com.mygdx.holowyth.util.data;
 
 public class Segment {
 	public float sx, sy, dx, dy;

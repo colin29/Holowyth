@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.pathfinding;
 
-import com.mygdx.holowyth.util.Pair;
+import com.mygdx.holowyth.util.data.Pair;
+import com.mygdx.holowyth.util.data.Point;
 
 public class Unit {
 
@@ -8,7 +9,7 @@ public class Unit {
 	
 	public float x, y;
 	public float vx, vy;
-	float speed = 5; //world units per frame
+	float speed = 3; //world units per frame
 	
 	Path path;
 	
@@ -35,10 +36,10 @@ public class Unit {
 	private void setMovement(){
 		if(path != null){
 
-			Pair<Float, Float> curWaypoint = path.get(waypointIndex);
+			Point curWaypoint = path.get(waypointIndex);
 
-			float wx = curWaypoint.first();
-			float wy = curWaypoint.second();
+			float wx = curWaypoint.x;
+			float wy = curWaypoint.y;
 			
 			float dx = wx-x;
 			float dy = wy-y;
@@ -50,7 +51,6 @@ public class Unit {
 				waypointIndex +=1;
 				//check if completed path
 				if(waypointIndex == path.size()){
-					path.clear();
 					path = null;
 					waypointIndex = -1;
 				}

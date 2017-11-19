@@ -31,17 +31,20 @@ import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.AStarSearch;
 import com.mygdx.holowyth.pathfinding.Path;
+import com.mygdx.holowyth.pathfinding.PathSmoother;
+import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Unit;
 import com.mygdx.holowyth.pathfinding.Vertex;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
-import com.mygdx.holowyth.util.KeyTracker;
-import com.mygdx.holowyth.util.Pair;
-import com.mygdx.holowyth.util.Timer;
 import com.mygdx.holowyth.util.constants.Holo;
+import com.mygdx.holowyth.util.data.Pair;
+import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.exception.ErrorCode;
 import com.mygdx.holowyth.util.exception.HoloException;
+import com.mygdx.holowyth.util.tools.KeyTracker;
+import com.mygdx.holowyth.util.tools.Timer;
 
 public class PathfindingDemo implements Screen, InputProcessor {
 
@@ -86,8 +89,9 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		createUI();
 	}
-	
+
 	FPSLogger fps = new FPSLogger();
+
 	@Override
 	public void render(float delta) {
 		Gdx.gl.glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
@@ -190,7 +194,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	}
 
 	/* vvvvvvv User Methods vvvvvvv */
-	
+
 	// UI
 	private void createUI() {
 		stage = new Stage(new ScreenViewport());
@@ -229,7 +233,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	}
 
 	/**
-	 *	Calculates the pathing information for a single vertex 
+	 * Calculates the pathing information for a single vertex
 	 */
 	private void fillInVertex(Vertex v, int ix, int iy) {
 		int x = ix * CELL_SIZE;
@@ -254,50 +258,41 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		if (iy == graphHeight - 1)
 			v.N = v.NW = v.NE = false;
 	}
-	
+
 	/**
-	 * @return Whether the given line segment is pathable or not. 
+	 * @return Whether the given line segment is pathable or not.
 	 */
 	private boolean isEdgePathable(float x, float y, float x2, float y2) {
-		boolean intersects = false;
-		for (Polygon polygon : map.polys) {
-			for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
-				if (Line2D.linesIntersect(x, y, x2, y2, polygon.vertexes[i], polygon.vertexes[i + 1],
-						polygon.vertexes[(i + 2) % polygon.count], polygon.vertexes[(i + 3) % polygon.count])) {
-					intersects = true;
-				}
-			}
-		}
-		return !intersects;
+		return HoloPF.isEdgePathable(x, y, x2, y2, map.polys);
 	}
 
 	private void renderGraph() {
-		// Draw Edges
-		shapeRenderer.setColor(Color.CORAL);
-		shapeRenderer.begin(ShapeType.Line);
-		for (int y = 0; y < graphHeight; y++) {
-			for (int x = 0; x < graphWidth; x++) {
-				Vertex v = graph[y][x];
-				if (v.N)
-					drawLine(x, y, x, y + 1);
-				if (v.S)
-					drawLine(x, y, x, y - 1);
-				if (v.W)
-					drawLine(x, y, x - 1, y);
-				if (v.E)
-					drawLine(x, y, x + 1, y);
-
-				if (v.NW)
-					drawLine(x, y, x - 1, y + 1);
-				if (v.NE)
-					drawLine(x, y, x + 1, y + 1);
-				if (v.SW)
-					drawLine(x, y, x - 1, y - 1);
-				if (v.SE)
-					drawLine(x, y, x + 1, y - 1);
-			}
-		}
-		shapeRenderer.end();
+		// // Draw Edges
+		// shapeRenderer.setColor(Color.CORAL);
+		// shapeRenderer.begin(ShapeType.Line);
+		// for (int y = 0; y < graphHeight; y++) {
+		// for (int x = 0; x < graphWidth; x++) {
+		// Vertex v = graph[y][x];
+		// if (v.N)
+		// drawLine(x, y, x, y + 1);
+		// if (v.S)
+		// drawLine(x, y, x, y - 1);
+		// if (v.W)
+		// drawLine(x, y, x - 1, y);
+		// if (v.E)
+		// drawLine(x, y, x + 1, y);
+		//
+		// if (v.NW)
+		// drawLine(x, y, x - 1, y + 1);
+		// if (v.NE)
+		// drawLine(x, y, x + 1, y + 1);
+		// if (v.SW)
+		// drawLine(x, y, x - 1, y - 1);
+		// if (v.SE)
+		// drawLine(x, y, x + 1, y - 1);
+		// }
+		// }
+		// shapeRenderer.end();
 
 		// Draw vertexes as points
 		shapeRenderer.setColor(Color.BLACK);
@@ -310,15 +305,6 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		}
 		shapeRenderer.end();
 
-	}
-
-	/**
-	 * Converts a path from cell indexes to coordinates;
-	 */
-	private void scalePath(Path path) {
-		for (Pair<Float, Float> p : path) {
-			p = new Pair<Float, Float>(p.first() * CELL_SIZE, p.second() * CELL_SIZE);
-		}
 	}
 
 	private void drawLine(int ix, int iy, int ix2, int iy2) {
@@ -343,24 +329,52 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		// Render Path
 
-		float thickness = 1.5f;
+		renderPath(path, Color.FIREBRICK, false);
+		renderPath(pathS1, Color.BLUE, true);
 
+	}
+
+	private void renderPath(Path path, Color color, boolean renderPoints) {
+		float thickness = 2f;
 		if (path != null) {
 			shapeRenderer.begin(ShapeType.Filled);
-			shapeRenderer.setColor(Color.FOREST);
+			shapeRenderer.setColor(color);
 			for (int i = 0; i < path.size() - 1; i++) {
 
 				if (i == 1) {
-					shapeRenderer.setColor(Color.BLUE);
+					shapeRenderer.setColor(color);
 				}
 
 				if (i == path.size() - 2) {
-					shapeRenderer.setColor(Color.FOREST);
+					shapeRenderer.setColor(color);
 				}
-				Pair<Float, Float> v = path.get(i);
-				Pair<Float, Float> next = path.get(i + 1);
-				shapeRenderer.rectLine(v.first(), v.second(), next.first(), next.second(), thickness);
+				Point v = path.get(i);
+				Point next = path.get(i + 1);
+				shapeRenderer.rectLine(v.x, v.y, next.x, next.y, thickness);
 
+			}
+			shapeRenderer.end();
+
+			// Draw points
+			float pointSize = 4f;
+			shapeRenderer.setColor(Color.GREEN);
+			shapeRenderer.begin(ShapeType.Filled);
+			if (renderPoints) {
+				for (Point p : path) {
+
+					shapeRenderer.circle(p.x, p.y, pointSize);
+
+				}
+			}
+			shapeRenderer.end();
+			shapeRenderer.setColor(Color.BLACK);
+			shapeRenderer.begin(ShapeType.Line);
+			if (renderPoints) {
+				for (Point p : path) {
+
+					shapeRenderer.circle(p.x, p.y, pointSize);
+
+				}
 			}
 			shapeRenderer.end();
 
@@ -368,9 +382,12 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	}
 
 	// Run on Map Load
-	
+
 	AStarSearch pathing;
 	Path path;
+	Path pathS1;
+	PathSmoother smoother = new PathSmoother();
+
 	private void onMapLoad() {
 
 		// Create a unit
@@ -381,19 +398,28 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE);
 
-		// pathing.doAStar(0, 20 * 20);
-
-		path = pathing.doAStar(u.x, u.y, 22 * CELL_SIZE + 10, 15 * CELL_SIZE + 20, map.polys);
-		scalePath(path);
-		u.setPath(path);
+		path = orderUnit(u, CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20, map.polys);
 
 	}
 
+	private Path orderUnit(Unit u, float dx, float dy, ArrayList<Polygon> polys) {
+		Path newPath = pathing.doAStar(u.x, u.y, dx, dy, polys);
+		path = newPath;
+
+		if (newPath != null) {
+			newPath = smoother.smoothPath(newPath, polys);
+			pathS1 = newPath;
+			u.setPath(newPath);
+		}
+		return newPath;
+	}
+
 	// Unit Related
-	
+
 	ArrayList<Unit> units = new ArrayList<Unit>();
-	
+
 	Unit u; // the main unit we are using to demo pathfinding
+
 	private void tickLogicForUnits() {
 		for (Unit u : units) {
 			u.tickLogic();
@@ -419,9 +445,8 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	}
 
-	
 	/* vvvvvvv Boilerplate code vvvvvvv */
-	
+
 	// UI and Disk
 
 	private void displayTitleBarInformation() {
@@ -488,7 +513,6 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		onMapLoad();
 	}
 
-	
 	// Cursor Related
 	private void renderCursor() {
 		batch.setProjectionMatrix(fixedCam.combined);
@@ -532,18 +556,14 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		System.out.println(screenX + " " + screenY);
 		if (button == Input.Buttons.LEFT && pointer == 0) {
-			
+
 			// Order the unit to move to the location using the path from A*
 			Vector3 vec = new Vector3();
 			vec = camera.unproject(vec.set(screenX, screenY, 0));
-			
+
 			System.out.println(vec.x + " " + vec.y);
-			AStarSearch pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE);
-			Path newPath = pathing.doAStar(u.x, u.y, vec.x, vec.y, map.polys);
-			if (newPath != null) {
-				path = newPath;
-				u.setPath(newPath);
-			}
+
+			Path newPath = orderUnit(u, vec.x, vec.y, map.polys);
 
 			return true;
 		}
@@ -573,6 +593,5 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		// TODO Auto-generated method stub
 		return false;
 	}
-
 
 }
