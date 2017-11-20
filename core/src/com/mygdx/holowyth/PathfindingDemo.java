@@ -109,8 +109,6 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		// Rendering Test area;
 		renderSearchResult();
 		renderUnits();
-		smoother.render(shapeRenderer);
-		renderPath(smoother.path2s, Color.PINK, false);
 
 		// UI
 		stage.act(delta);
@@ -331,64 +329,23 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		// Render Path
 
-		renderPath(path, Color.FIREBRICK, false);
-		renderPath(pathS1, Color.BLUE, true);
+		renderPath(path, Color.PINK, false);
+		smoother.render(shapeRenderer);
+		renderPath(pathSmoothed, Color.BLUE, false);
 		
 
 	}
 
+	float pathThickness = 2f;
 	private void renderPath(Path path, Color color, boolean renderPoints) {
-		float thickness = 2f;
-		if (path != null) {
-			shapeRenderer.begin(ShapeType.Filled);
-			shapeRenderer.setColor(color);
-			for (int i = 0; i < path.size() - 1; i++) {
-
-				if (i == 1) {
-					shapeRenderer.setColor(color);
-				}
-
-				if (i == path.size() - 2) {
-					shapeRenderer.setColor(color);
-				}
-				Point v = path.get(i);
-				Point next = path.get(i + 1);
-				shapeRenderer.rectLine(v.x, v.y, next.x, next.y, thickness);
-
-			}
-			shapeRenderer.end();
-
-			// Draw points
-			float pointSize = 4f;
-			shapeRenderer.setColor(Color.GREEN);
-			shapeRenderer.begin(ShapeType.Filled);
-			if (renderPoints) {
-				for (Point p : path) {
-
-					shapeRenderer.circle(p.x, p.y, pointSize);
-
-				}
-			}
-			shapeRenderer.end();
-			shapeRenderer.setColor(Color.BLACK);
-			shapeRenderer.begin(ShapeType.Line);
-			if (renderPoints) {
-				for (Point p : path) {
-
-					shapeRenderer.circle(p.x, p.y, pointSize);
-
-				}
-			}
-			shapeRenderer.end();
-
-		}
+		HoloPF.renderPath(path, color, renderPoints, pathThickness, shapeRenderer);
 	}
 
 	// Run on Map Load
 
 	AStarSearch pathing;
 	Path path;
-	Path pathS1;
+	Path pathSmoothed;
 	PathSmoother smoother = new PathSmoother();
 
 	private void onMapLoad() {
@@ -407,12 +364,11 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	private Path orderUnit(Unit u, float dx, float dy, ArrayList<Polygon> polys) {
 		Path newPath = pathing.doAStar(u.x, u.y, dx, dy, polys);
-		path = newPath;
-
+		
 		if (newPath != null) {
-			//newPath = smoother.smoothPath(newPath, polys);
-			pathS1 = newPath;
-			u.setPath(newPath);
+			this.path = newPath;
+			this.pathSmoothed = smoother.smoothPath(newPath, polys);
+			u.setPath(pathSmoothed);
 		}
 		return newPath;
 	}
