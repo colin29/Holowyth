@@ -99,6 +99,7 @@ public class AStarSearch {
 
 	private void runAStar(int startVertex, int goalVertex) {
 		clearSearch();
+		searchFailed = false;
 
 		coordinateSearchUsed = false;
 		q.add(new Node(startVertex, 0, calculateDistSquared(startVertex, goalVertex), graphWidth));

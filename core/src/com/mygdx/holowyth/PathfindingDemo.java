@@ -410,7 +410,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		path = newPath;
 
 		if (newPath != null) {
-			newPath = smoother.smoothPath(newPath, polys);
+			//newPath = smoother.smoothPath(newPath, polys);
 			pathS1 = newPath;
 			u.setPath(newPath);
 		}

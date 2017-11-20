@@ -1,13 +1,9 @@
 package com.mygdx.holowyth.pathfinding;
 
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.ListIterator;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
@@ -78,8 +74,8 @@ public class PathSmoother {
 		return path;
 	}
 
-	private float threshold = 100; // in world units
-	private float minSubDivision = 10;
+	private float threshold = 70; // in world units
+	private float minSubDivision = 15;
 	private float ratio = 2.0f / 3;
 
 	ArrayList<Point> segPoints = new ArrayList<Point>();
@@ -102,7 +98,6 @@ public class PathSmoother {
 		c = iter.next();
 
 		while (true) {
-
 			Segment seg = new Segment(a.x, a.y, b.x, b.y);
 			Segment next = new Segment(b.x, b.y, c.x, c.y);
 
@@ -173,14 +168,9 @@ public class PathSmoother {
 				}
 				if (maxScore > 0) {
 					// If there was a legal best cut, make that cut:
-
 					System.out.format("Make the cut with points %s and %s %n", bestSeg, bestNext);
 					bestCut = new Segment(segPoints.get(bestSeg).x, segPoints.get(bestSeg).y,
 							nextPoints.get(bestNext).x, nextPoints.get(bestNext).y);
-
-					int netVertexes = -1; // net change in number of vertexes in the path. If a successful cut was made
-											// with
-					// 0,0, that means 1 vertex was removed and none added
 
 					// Remove b. The iterator is currently at the end of c.
 					iter.previous();
@@ -190,11 +180,9 @@ public class PathSmoother {
 					// Insert the new vertices. Iterator is currently between "a" and "c".
 					if (bestSeg > 0) {
 						iter.add(new Point(segPoints.get(bestSeg)));
-						netVertexes += 1;
 					}
 					if (bestNext > 0) {
 						iter.add(new Point(nextPoints.get(bestNext)));
-						netVertexes += 1;
 					}
 
 					// Iterator is currently before "c". We wish to have a,b,c = {previous vertex}, c, c.next();
@@ -203,6 +191,14 @@ public class PathSmoother {
 					iter.next();
 					b = iter.next();
 					if (iter.hasNext()) {
+						c = iter.next();
+					} else {
+						return path;
+					}
+				}else{ //if no legal cut was found, advance by one
+					if (iter.hasNext()) {
+						a = b;
+						b = c;
 						c = iter.next();
 					} else {
 						return path;
@@ -226,23 +222,23 @@ public class PathSmoother {
 	 * Render some points for debugging
 	 */
 	public void render(ShapeRenderer shapeRenderer) {
-		shapeRenderer.setColor(Color.MAGENTA);
-		shapeRenderer.begin(ShapeType.Filled);
-		for (Point p : segPoints) {
-			shapeRenderer.circle(p.x, p.y, 3f);
-		}
-		shapeRenderer.end();
-		shapeRenderer.setColor(Color.GREEN);
-		shapeRenderer.begin(ShapeType.Filled);
-		for (Point p : nextPoints) {
-			shapeRenderer.circle(p.x, p.y, 3f);
-		}
-		shapeRenderer.end();
-
-		shapeRenderer.setColor(Color.BLACK);
-		shapeRenderer.begin(ShapeType.Filled);
-		shapeRenderer.rectLine(bestCut.sx, bestCut.sy, bestCut.dx, bestCut.dy, 3f);
-		shapeRenderer.end();
+//		shapeRenderer.setColor(Color.MAGENTA);
+//		shapeRenderer.begin(ShapeType.Filled);
+//		for (Point p : segPoints) {
+//			shapeRenderer.circle(p.x, p.y, 3f);
+//		}
+//		shapeRenderer.end();
+//		shapeRenderer.setColor(Color.GREEN);
+//		shapeRenderer.begin(ShapeType.Filled);
+//		for (Point p : nextPoints) {
+//			shapeRenderer.circle(p.x, p.y, 3f);
+//		}
+//		shapeRenderer.end();
+//
+//		shapeRenderer.setColor(Color.BLACK);
+//		shapeRenderer.begin(ShapeType.Filled);
+//		shapeRenderer.rectLine(bestCut.sx, bestCut.sy, bestCut.dx, bestCut.dy, 3f);
+//		shapeRenderer.end();
 
 	}
 
