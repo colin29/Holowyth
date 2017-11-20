@@ -23,6 +23,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
@@ -39,6 +40,7 @@ import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.constants.Holo;
+import com.mygdx.holowyth.util.data.Coord;
 import com.mygdx.holowyth.util.data.Pair;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.exception.ErrorCode;
@@ -212,7 +214,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	// Pathfinding
 
-	private int CELL_SIZE = 30;// 15; // size in pixels
+	private int CELL_SIZE = 15;// 15; // size in pixels
 	Vertex[][] graph;
 	int graphWidth, graphHeight;
 
@@ -228,6 +230,76 @@ public class PathfindingDemo implements Screen, InputProcessor {
 			for (int x = 0; x < graphWidth; x++) {
 				graph[y][x] = new Vertex();
 				fillInVertex(graph[y][x], x, y);
+			}
+		}
+	}
+
+	private void floodFillGraph() {
+		
+		//initialize graph first
+		for (int y = 0; y < graphHeight; y++) {
+			for (int x = 0; x < graphWidth; x++) {
+				graph[y][x] = new Vertex();
+			}
+		}
+		
+		// Start with 0,0
+
+		Queue<Coord> q = new Queue<Coord>();
+		q.ensureCapacity(graphWidth); // for a graph size x * y, you'd expect max entries on the order of max(x, y)
+
+		q.addLast(new Coord(0,0));
+
+		Coord c;
+		Vertex v;
+		Vertex suc;
+		while (q.size > 0) {
+			c = q.removeFirst();
+			v = graph[c.y][c.x];
+			
+			v.reachable =  true;
+			fillInVertex(v, c.x, c.y);
+
+			
+			if(v.N && !(suc = graph[c.y+1][c.x]).reachable){
+				q.addLast(new Coord(c.x, c.y+1));
+				suc.reachable = true;
+			}
+			
+			if(v.S && !(suc = graph[c.y-1][c.x]).reachable){ //really hate to do this formatting but...
+				q.addLast(new Coord(c.x, c.y-1));
+				suc.reachable = true;
+			}
+			
+			if(v.W && !(suc =graph[c.y][c.x-1]).reachable){
+				q.addLast(new Coord(c.x-1, c.y));
+				suc.reachable = true;
+			}
+			
+			if(v.E && !(suc =graph[c.y][c.x+1]).reachable){
+				q.addLast(new Coord(c.x+1, c.y));
+				suc.reachable = true;
+			}
+			
+			
+			if(v.NW && !(suc =graph[c.y+1][c.x-1]).reachable){
+				q.addLast(new Coord(c.x-1, c.y+1));
+				suc.reachable = true;
+			}
+			
+			if(v.NE && !(suc =graph[c.y+1][c.x+1]).reachable){
+				q.addLast(new Coord(c.x+1, c.y+1));
+				suc.reachable = true;
+			}
+			
+			if(v.SW && !(suc = graph[c.y-1][c.x-1]).reachable){
+				q.addLast(new Coord(c.x-1, c.y-1));
+				suc.reachable = true;
+			}
+			
+			if(v.SE && !(suc = graph[c.y-1][c.x+1]).reachable){
+				q.addLast(new Coord(c.x+1, c.y-1));
+				suc.reachable = true;
 			}
 		}
 	}
@@ -268,31 +340,31 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	private void renderGraph() {
 		// // Draw Edges
-		// shapeRenderer.setColor(Color.CORAL);
-		// shapeRenderer.begin(ShapeType.Line);
-		// for (int y = 0; y < graphHeight; y++) {
-		// for (int x = 0; x < graphWidth; x++) {
-		// Vertex v = graph[y][x];
-		// if (v.N)
-		// drawLine(x, y, x, y + 1);
-		// if (v.S)
-		// drawLine(x, y, x, y - 1);
-		// if (v.W)
-		// drawLine(x, y, x - 1, y);
-		// if (v.E)
-		// drawLine(x, y, x + 1, y);
-		//
-		// if (v.NW)
-		// drawLine(x, y, x - 1, y + 1);
-		// if (v.NE)
-		// drawLine(x, y, x + 1, y + 1);
-		// if (v.SW)
-		// drawLine(x, y, x - 1, y - 1);
-		// if (v.SE)
-		// drawLine(x, y, x + 1, y - 1);
-		// }
-		// }
-		// shapeRenderer.end();
+//		shapeRenderer.setColor(Color.CORAL);
+//		shapeRenderer.begin(ShapeType.Line);
+//		for (int y = 0; y < graphHeight; y++) {
+//			for (int x = 0; x < graphWidth; x++) {
+//				Vertex v = graph[y][x];
+//				if (v.N)
+//					drawLine(x, y, x, y + 1);
+//				if (v.S)
+//					drawLine(x, y, x, y - 1);
+//				if (v.W)
+//					drawLine(x, y, x - 1, y);
+//				if (v.E)
+//					drawLine(x, y, x + 1, y);
+//
+//				if (v.NW)
+//					drawLine(x, y, x - 1, y + 1);
+//				if (v.NE)
+//					drawLine(x, y, x + 1, y + 1);
+//				if (v.SW)
+//					drawLine(x, y, x - 1, y - 1);
+//				if (v.SE)
+//					drawLine(x, y, x + 1, y - 1);
+//			}
+//		}
+//		shapeRenderer.end();
 
 		// Draw vertexes as points
 		shapeRenderer.setColor(Color.BLACK);
@@ -300,7 +372,10 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		for (int y = 0; y < graphHeight; y++) {
 			for (int x = 0; x < graphWidth; x++) {
-				shapeRenderer.circle(x * CELL_SIZE, y * CELL_SIZE, 1.5f);
+				if(graph[y][x].reachable){
+					shapeRenderer.circle(x * CELL_SIZE, y * CELL_SIZE, 1f);
+				}
+				
 			}
 		}
 		shapeRenderer.end();
@@ -329,14 +404,13 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		// Render Path
 
-		renderPath(path, Color.PINK, false);
-		smoother.render(shapeRenderer);
+		// smoother.render(shapeRenderer);
 		renderPath(pathSmoothed, Color.BLUE, false);
-		
 
 	}
 
 	float pathThickness = 2f;
+
 	private void renderPath(Path path, Color color, boolean renderPoints) {
 		HoloPF.renderPath(path, color, renderPoints, pathThickness, shapeRenderer);
 	}
@@ -364,7 +438,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	private Path orderUnit(Unit u, float dx, float dy, ArrayList<Polygon> polys) {
 		Path newPath = pathing.doAStar(u.x, u.y, dx, dy, polys);
-		
+
 		if (newPath != null) {
 			this.path = newPath;
 			this.pathSmoothed = smoother.smoothPath(newPath, polys);
@@ -463,11 +537,12 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		// Create pathing graph
 
 		createGraph();
-		long startTime = System.nanoTime();
-		linearFillGraph();
-		long endTime = System.nanoTime();
-		long duration = (endTime - startTime); // divide by 1000000 to get milliseconds.
-		System.out.format("Time elapsed: %d mililseconds%n", duration / 1000000);
+		// long startTime = System.nanoTime();
+//		linearFillGraph();
+		floodFillGraph();
+		// long endTime = System.nanoTime();
+		// long duration = (endTime - startTime); // divide by 1000000 to get milliseconds.
+		// System.out.format("Time elapsed: %d mililseconds%n", duration / 1000000);
 
 		onMapLoad();
 	}
@@ -513,14 +588,12 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		System.out.println(screenX + " " + screenY);
+//		System.out.println("Touch: " + screenX + " " + screenY);
 		if (button == Input.Buttons.LEFT && pointer == 0) {
 
 			// Order the unit to move to the location using the path from A*
 			Vector3 vec = new Vector3();
 			vec = camera.unproject(vec.set(screenX, screenY, 0));
-
-			System.out.println(vec.x + " " + vec.y);
 
 			Path newPath = orderUnit(u, vec.x, vec.y, map.polys);
 

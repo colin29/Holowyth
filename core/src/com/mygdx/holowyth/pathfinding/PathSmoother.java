@@ -16,6 +16,7 @@ public class PathSmoother {
 
 	float SEGMENT_LENGTH = 5;
 
+	private Path path0s; // original Path
 	private Path path1s; // path after initial smoothing
 
 	/**
@@ -29,6 +30,7 @@ public class PathSmoother {
 			return origPath;
 		}
 
+		path0s = origPath.deepCopy();
 		path1s = origPath.deepCopy();
 
 		ListIterator<Point> iter = path1s.listIterator();
@@ -55,6 +57,7 @@ public class PathSmoother {
 		}
 
 		Path path2s = doSecondarySmoothing(path1s, polys);
+//		System.out.println("Number of isEdgePathableCalls: "  + testCount);
 		return path2s;
 	}
 
@@ -123,12 +126,16 @@ public class PathSmoother {
 
 	Segment bestCut;
 
+	
+	int testCount;
 	/**
 	 * 
 	 * @return A new path that is a smoothed version of the given path
 	 */
 	private Path doSecondarySmoothing(Path origPath, ArrayList<Polygon> polys) {
-
+		
+		testCount = 0;
+		
 		Path path = origPath.deepCopy();
 
 		if (path.size() < 3) {
@@ -155,7 +162,6 @@ public class PathSmoother {
 			segPoints.clear();
 			nextPoints.clear();
 
-			System.out.println(seg.getLength());
 
 			
 			//We smooth the first and last parts of the path more rigorously
@@ -167,11 +173,7 @@ public class PathSmoother {
 			
 			if(!iter.hasNext() || isFirstSeg){
 				threshold = thresholdLast;
-				if(seg.getLength() < 60){
-					minSubDivision = minSubDivisionLast;
-				}else{
-					minSubDivision = minSubDivisionRegular/2;
-				}
+				minSubDivision = minSubDivisionLast;
 				isFirstSeg = false;
 			}else{
 				threshold = thresholdRegular;
@@ -227,7 +229,7 @@ public class PathSmoother {
 
 			for (int i = 0; i < segLengths.size(); i++) {
 				for (int j = 0; j < nextLengths.size(); j++) {
-
+					testCount+=1;
 					if (HoloPF.isEdgePathable(segPoints.get(i).x, segPoints.get(i).y, nextPoints.get(j).x,
 							nextPoints.get(j).y, polys)) {
 						score = segLengths.get(i) * nextLengths.get(j);
@@ -286,7 +288,8 @@ public class PathSmoother {
 	 */
 	public void render(ShapeRenderer shapeRenderer) {
 
-		// Render the intermediate lines
+		// Render the initial and intermediate lines
+		HoloPF.renderPath(this.path0s, Color.PINK, false, 2f, shapeRenderer);
 		HoloPF.renderPath(this.path1s, Color.FIREBRICK, true, 2f, shapeRenderer);
 
 		// Render some of the points used in secondary smoothing

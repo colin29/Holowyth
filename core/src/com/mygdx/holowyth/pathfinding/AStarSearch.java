@@ -82,6 +82,7 @@ public class AStarSearch {
 		
 		//TODO: need a check to ensure that goalVertex is on a reachable vertex (found via floodfil)
 
+
 		runAStar(startVertex, goalVertex);
 
 		startX = sx;
@@ -98,6 +99,14 @@ public class AStarSearch {
 	boolean searchFailed;
 
 	private void runAStar(int startVertex, int goalVertex) {
+		
+		Vertex gv = graph[goalVertex/graphWidth][goalVertex%graphWidth];
+		if(!gv.reachable){
+			System.out.println("Detected goal was an unreachable vertex, short-circuting:");
+			searchFailed = true;
+			return;
+		}
+		
 		clearSearch();
 		searchFailed = false;
 
@@ -121,8 +130,8 @@ public class AStarSearch {
 			// visit this node
 			visited[curNode.vertexID] = true;
 
-			System.out.format("Current Node: (%s, %s) %s %s %n", (curNode.vertexID % graphWidth),
-					(curNode.vertexID / graphWidth), curNode.costToGetHere, curNode.h);
+//			System.out.format("Current Node: (%s, %s) %s %s %n", (curNode.vertexID % graphWidth),
+//					(curNode.vertexID / graphWidth), curNode.costToGetHere, curNode.h);
 
 			// Create the 8 successors of curNode, if the edges are pathable
 			Vertex curVertex = graph[curNode.vertexID / graphWidth][curNode.vertexID % graphWidth];
@@ -254,7 +263,7 @@ public class AStarSearch {
 
 	private void addNodeIfNoCheaperExists(Node curNode, int sucId, float edgeCost, int goalVertex) {
 		cost = curNode.costToGetHere + edgeCost;
-		System.out.format("SucNode ID: %s %s %s %n", sucId, cost, minCost[sucId]);
+		//System.out.format("SucNode ID: %s %s %s %n", sucId, cost, minCost[sucId]);
 		if (cost < minCost[sucId]) {
 			minCost[sucId] = cost;
 			ancestor[sucId] = curNode.vertexID;
