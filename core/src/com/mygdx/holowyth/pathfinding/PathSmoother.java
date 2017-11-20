@@ -31,7 +31,6 @@ public class PathSmoother {
 
 		path1s = origPath.deepCopy();
 
-		// TODO: create a more sectioned version of the path.
 		ListIterator<Point> iter = path1s.listIterator();
 		Point prev, cur, next;
 
@@ -59,10 +58,66 @@ public class PathSmoother {
 		return path2s;
 	}
 
-	private float threshold = 70; // in world units
-	private float minSubDivision = 15;
+	private float s1SegLength = 15f;
+
+	/**
+	 * @param path
+	 *            Assumes path is at least length 2
+	 * @return A path that has been further broken up into segments no more than a set length.
+	 */
+	@SuppressWarnings("unused")
+	private Path segmentPath(Path origPath) {
+
+		Path path = origPath.deepCopy();
+
+		ListIterator<Point> iter = path.listIterator();
+		Point a, b;
+		a = iter.next();
+		b = iter.next();
+		
+		float dx, dy;
+		int numParts;
+		Point p;
+		
+		while (true) {
+			dx = b.x - a.x;
+			dy = b.y - a.y;
+
+			Segment seg = new Segment(a, b);
+			
+			float len = seg.getLength();
+			if (len > s1SegLength) {
+				numParts = (int) Math.ceil((len / s1SegLength));
+				
+				//need to insert n-1 parts in between "a" and "b"
+				//iterator is currently after "b"
+				iter.previous();
+				for(int i=1; i<numParts; i++){
+					p = new Point(a.x + dx*i/numParts, a.y + dy*i/numParts); 
+					iter.add(p);
+				}
+				//iterator is currently before "b". We want it after "b".
+				iter.next();
+			}
+			
+			if(iter.hasNext()){
+				a = b;
+				b = iter.next();
+			}else{
+				System.out.format("Slicer: returned a path with length %s %n", path.size());
+				return path;
+			}
+		}
+
+	}
+
+	private float thresholdRegular = 70;//70; // in world units
+	private float minSubDivisionRegular = 15;
 	private float ratio = 2.0f / 3;
 
+	private float thresholdLast = 4; //the last part (2 segements) of a path is always smoothed. (The first part is too)
+	private float minSubDivisionLast = 2;
+	
 	ArrayList<Point> segPoints = new ArrayList<Point>();
 	ArrayList<Point> nextPoints = new ArrayList<Point>();
 
@@ -87,9 +142,12 @@ public class PathSmoother {
 		b = iter.next();
 		c = iter.next();
 
+		boolean isFirstSeg = true;
+		
 		while (true) {
 			Segment seg = new Segment(a.x, a.y, b.x, b.y);
 			Segment next = new Segment(b.x, b.y, c.x, c.y);
+
 
 			ArrayList<Float> segLengths = new ArrayList<Float>();
 			ArrayList<Float> nextLengths = new ArrayList<Float>();
@@ -99,8 +157,31 @@ public class PathSmoother {
 
 			System.out.println(seg.getLength());
 
-			// Consider every segment that is longer than the threshold:
 			
+			//We smooth the first and last parts of the path more rigorously
+			
+			//iterator is after "c". If this is the last part, iter.next() should return false;
+			
+			float threshold;
+			float minSubDivision;
+			
+			if(!iter.hasNext() || isFirstSeg){
+				threshold = thresholdLast;
+				if(seg.getLength() < 60){
+					minSubDivision = minSubDivisionLast;
+				}else{
+					minSubDivision = minSubDivisionRegular/2;
+				}
+				isFirstSeg = false;
+			}else{
+				threshold = thresholdRegular;
+				minSubDivision = minSubDivisionRegular;
+			}
+			
+			 
+			
+			// Consider every segment that is longer than the threshold:
+
 			// If the segment is not longer than the threshold, move on to the next segment
 			if (seg.getLength() < threshold)
 				if (iter.hasNext()) {
@@ -111,7 +192,6 @@ public class PathSmoother {
 				} else {
 					return path;
 				}
-			
 
 			float len = seg.getLength();
 			while (len > minSubDivision) {
@@ -138,12 +218,6 @@ public class PathSmoother {
 				nextPoints.add(new Point(b.x + dx * segLen / next.getLength(), b.y + dy * segLen / next.getLength()));
 			}
 
-			System.out.println(segPoints.size());
-			System.out.println(nextPoints.size());
-
-			System.out.println(segLengths.size());
-			System.out.println(nextLengths.size());
-
 			float maxScore = 0;
 			float score;
 			int bestSeg = -1, bestNext = -1;
@@ -167,7 +241,7 @@ public class PathSmoother {
 			}
 			if (maxScore > 0) {
 				// If there was a legal best cut, make that cut:
-				System.out.format("Make the cut with points %s and %s %n", bestSeg, bestNext);
+//				System.out.format("Make the cut with points %s and %s %n", bestSeg, bestNext);
 				bestCut = new Segment(segPoints.get(bestSeg).x, segPoints.get(bestSeg).y, nextPoints.get(bestNext).x,
 						nextPoints.get(bestNext).y);
 

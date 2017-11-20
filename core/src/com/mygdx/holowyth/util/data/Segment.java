@@ -8,6 +8,14 @@ public class Segment {
 		this.dx = dx;
 		this.dy = dy;
 	}
+	
+	public Segment(Point a, Point b){
+		this.sx = a.x;
+		this.sy = a.y;
+		this.dx = b.x;
+		this.dy = b.y;
+	}
+	
 	public float getLength(){
 		return (float) Math.sqrt((dx-sx)*(dx-sx) + (dy-sy)*(dy-sy));
 	}
