@@ -208,7 +208,7 @@ public class PolyMapEditor implements Screen, InputProcessor {
 	private void renderMapPolygons() {
 		shapeRenderer.setProjectionMatrix(camera.combined); // Render as seen by the main camera
 		shapeRenderer.setColor(0, 0, 0, 1);
-		HoloIO.renderMapPolygons(map, shapeRenderer);
+		HoloIO.renderPolygons(map.polys, shapeRenderer);
 		if (this.current_mode == MODE.DRAWING) {
 			this.drawer.render(shapeRenderer);
 		}

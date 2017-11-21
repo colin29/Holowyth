@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.polygon.Polygon;
+import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.exception.ErrorCode;
 import com.mygdx.holowyth.util.exception.HoloException;
 
@@ -71,10 +72,10 @@ public class HoloIO {
 	/**
 	 * Make sure to set the renderer's matrixes before calling these and similar methods. 
 	 */
-	public static void renderMapPolygons(Field map, ShapeRenderer shapeRenderer){
+	public static void renderPolygons(Polygons polys, ShapeRenderer shapeRenderer){
 		shapeRenderer.begin(ShapeType.Line);
-		for (Polygon p : map.polys) {
-			shapeRenderer.polygon(p.vertexes, 0, p.count);
+		for (Polygon p : polys) {
+			shapeRenderer.polygon(p.floats, 0, p.count);
 		}
 		shapeRenderer.end();
 	}

@@ -3,11 +3,19 @@ package com.mygdx.holowyth.polygon;
 public class Polygon implements java.io.Serializable {
 	
 	private static final long serialVersionUID = 1;
-	public int count;
-	public float[] vertexes;
+	/**
+	 * Number of floats, to get number of vertexes, divide by 2
+	 */
+	public int count; 
+	public float[] floats;
 	
-	public Polygon(float[] vertexes, int count){
+	/**
+	 * 
+	 * @param floats
+	 * @param count The number of float points
+	 */
+	public Polygon(float[] floats, int count){
 		this.count = count;
-		this.vertexes = vertexes.clone();
+		this.floats = floats.clone();
 	}	
 }

@@ -7,12 +7,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.mygdx.holowyth.polygon.Polygon;
-import com.mygdx.holowyth.util.data.Pair;
+import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.util.data.Segment;
 
 /**
  * Currently the result of an AStarSearch can be extracted from ancestor.
@@ -69,26 +66,38 @@ public class AStarSearch {
 
 	/**
 	 * Takes in starting and goal locations instead of graph vertexes.
+	 * 
+	 * @param origPolys
+	 *            the original non-expanded polygons, if expanded geometry was used.
 	 */
-	public Path doAStar(float sx, float sy, float dx, float dy, ArrayList<Polygon> polys) {
+	public Path doAStar(float sx, float sy, float dx, float dy, Polygons polys) {
 
+		startX = sx;
+		startY = sy;
+		goalX = dx;
+		goalY = dy;
+		
 		if (outsideMapBounds(dx, dy)) {
 			System.out.println("AStar input: Point is outside map bounds");
 			return null;
 		}
 
 		int startVertex = findClosestPathableVertex(sx, sy, polys);
-		int goalVertex = findClosestPathableVertex(dx, dy, polys);
+		Point substitutePoint = new Point(0, 0);
+		int goalVertex = findClosestPathableVertexWithCorrection(dx, dy, polys, substitutePoint);
+		if (goalVertex < 0) {
+			System.out.println("None of the 4 closest vertexes to goal location were pathable. Aborting search.");
+			return null;
+		}
 		
-		//TODO: need a check to ensure that goalVertex is on a reachable vertex (found via floodfil)
+		if (substituteLocationFound) {
+			goalX = substitutePoint.x;
+			goalY = substitutePoint.y;
+		}
+		
 
+		runAStar(startVertex, goalVertex);  //note AStar only is operating on vertexes, and not coordinates
 
-		runAStar(startVertex, goalVertex);
-
-		startX = sx;
-		startY = sy;
-		goalX = dx;
-		goalY = dy;
 		coordinateSearchUsed = true;
 		return this.retrievePath();
 	}
@@ -99,14 +108,14 @@ public class AStarSearch {
 	boolean searchFailed;
 
 	private void runAStar(int startVertex, int goalVertex) {
-		
-		Vertex gv = graph[goalVertex/graphWidth][goalVertex%graphWidth];
-		if(!gv.reachable){
+
+		Vertex gv = graph[goalVertex / graphWidth][goalVertex % graphWidth];
+		if (!gv.reachable) {
 			System.out.println("Detected goal was an unreachable vertex, short-circuting:");
 			searchFailed = true;
 			return;
 		}
-		
+
 		clearSearch();
 		searchFailed = false;
 
@@ -130,8 +139,8 @@ public class AStarSearch {
 			// visit this node
 			visited[curNode.vertexID] = true;
 
-//			System.out.format("Current Node: (%s, %s) %s %s %n", (curNode.vertexID % graphWidth),
-//					(curNode.vertexID / graphWidth), curNode.costToGetHere, curNode.h);
+			// System.out.format("Current Node: (%s, %s) %s %s %n", (curNode.vertexID % graphWidth),
+			// (curNode.vertexID / graphWidth), curNode.costToGetHere, curNode.h);
 
 			// Create the 8 successors of curNode, if the edges are pathable
 			Vertex curVertex = graph[curNode.vertexID / graphWidth][curNode.vertexID % graphWidth];
@@ -179,8 +188,7 @@ public class AStarSearch {
 		}
 
 		int curVertex = goalVertex;
-		path.add(new Point((float) curVertex % graphWidth * CELL_SIZE,
-				(float) (curVertex / graphWidth * CELL_SIZE)));
+		path.add(new Point((float) curVertex % graphWidth * CELL_SIZE, (float) (curVertex / graphWidth * CELL_SIZE)));
 
 		while (ancestor[curVertex] >= 0) {
 			curVertex = ancestor[curVertex];
@@ -228,10 +236,15 @@ public class AStarSearch {
 	private float cost;
 
 	/**
-	 * Out of the 4 closest points, returns the closest one that is pathable
-	 * Assumes that the point given is within map boundaries
+	 * Out of the 4 closest points, returns the closest one that is pathable Assumes that the point given is within map
+	 * boundaries
+	 * 
+	 * @param polys
+	 *            Note, unlike most of the other pathfinding functions, this should be called with the original,
+	 *            non-expanded polygons
+	 * @return -1 if there is no valid vertex
 	 */
-	private int findClosestPathableVertex(float sx, float sy, ArrayList<Polygon> polys) {
+	private int findClosestPathableVertex(float sx, float sy, Polygons polys) {
 		int ix = (int) (sx / CELL_SIZE);
 		int iy = (int) (sy / CELL_SIZE);
 
@@ -249,7 +262,55 @@ public class AStarSearch {
 		boolean found = false;
 		for (int i = 0; i < 4; i++) {
 			PointData p = points.get(i);
-			if (HoloPF.isEdgePathable(sx, sy, p.ix * CELL_SIZE, p.iy * CELL_SIZE, polys)) {
+
+			// there must be a pathable line from the target destination to the vertex, AND that vertex must be a
+			// reachable one
+			if (HoloPF.isEdgePathable(sx, sy, p.ix * CELL_SIZE, p.iy * CELL_SIZE, polys)
+					&& graph[p.iy][p.ix].reachable) {
+				startIx = p.ix;
+				startIy = p.iy;
+				found = true;
+				break;
+			}
+		}
+		if (!found) {
+			return -1;
+		}
+		return startIy * graphWidth + startIx;
+	}
+
+	private boolean substituteLocationFound = false;
+
+	/**
+	 * Same as findClosestPathableVertex but will attempt to correct the location.
+	 * 
+	 * @return -1 if the location cannot be found and search should be aborted. If if substituteLocationFound is set to
+	 *         true, the original location was invalid but a substitute has been found.
+	 */
+	private int findClosestPathableVertexWithCorrection(float sx, float sy, Polygons polys, Point adjustedLocation) {
+		substituteLocationFound = false;
+		int ix = (int) (sx / CELL_SIZE);
+		int iy = (int) (sy / CELL_SIZE);
+
+		PointData dNW, dNE, dSE, dSW;
+		dNW = new PointData(ix, iy + 1, sx, sy);
+		dNE = new PointData(ix + 1, iy + 1, sx, sy);
+		dSW = new PointData(ix, iy, sx, sy);
+		dSE = new PointData(ix + 1, iy, sx, sy);
+
+		List<PointData> points = new ArrayList<PointData>(Arrays.asList(dNW, dNE, dSW, dSE));
+
+		points.sort((PointData p1, PointData p2) -> ((int) (p1.dist - p2.dist)));
+
+		int startIx = 0, startIy = 0;
+		boolean found = false;
+		for (int i = 0; i < 4; i++) {
+			PointData p = points.get(i);
+
+			// there must be a pathable line from the target destination to the vertex, AND that vertex must be a
+			// reachable one
+			if (HoloPF.isEdgePathable(sx, sy, p.ix * CELL_SIZE, p.iy * CELL_SIZE, polys)
+					&& graph[p.iy][p.ix].reachable) {
 				startIx = p.ix;
 				startIy = p.iy;
 				found = true;
@@ -257,13 +318,33 @@ public class AStarSearch {
 			}
 		}
 
-		assert (found); // ("None of the 4 closest points were reachable");
+		// If nothing is found, search some more locations;
+		
+		
+		if (!found) {
+			for (int i = 0; i < 4; i++) {
+				PointData p = points.get(i);
+				if (graph[p.iy][p.ix].reachable) {
+					startIx = p.ix;
+					startIy = p.iy;
+					found = true;
+					substituteLocationFound = true;
+					adjustedLocation.x = p.ix * CELL_SIZE;
+					adjustedLocation.y = p.iy * CELL_SIZE;
+					break;
+				}
+			}
+		}
+
+		if (!found) {
+			return -1;
+		}
 		return startIy * graphWidth + startIx;
 	}
 
 	private void addNodeIfNoCheaperExists(Node curNode, int sucId, float edgeCost, int goalVertex) {
 		cost = curNode.costToGetHere + edgeCost;
-		//System.out.format("SucNode ID: %s %s %s %n", sucId, cost, minCost[sucId]);
+		// System.out.format("SucNode ID: %s %s %s %n", sucId, cost, minCost[sucId]);
 		if (cost < minCost[sucId]) {
 			minCost[sucId] = cost;
 			ancestor[sucId] = curNode.vertexID;

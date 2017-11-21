@@ -4,17 +4,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.mygdx.holowyth.polygon.Polygon;
+import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.exception.ErrorCode;
 import com.mygdx.holowyth.util.exception.HoloException;
 
 public class Field implements Serializable {
 
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	
 	public String name; //blank string okay, null is not okay.
 	private int width, height;
-	public final ArrayList<Polygon> polys = new ArrayList<Polygon>();
+	public final Polygons polys = new Polygons();
 	
 	public transient boolean hasUnsavedChanges;
 

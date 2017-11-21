@@ -18,6 +18,11 @@ public class Holo {
 	public static int defaultMapHeight = 600;
 	
 	
+	//Parameters for testing
+	public static float defaultUnitMoveSpeed = 1.2f; //world units per frame
+	public static int CELL_SIZE = 15; //size in world units
+	
+	
 	private static String getCanonicalPath(String string){
 		try {
 			return Paths.get(string).toRealPath().toString();

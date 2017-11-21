@@ -1,5 +1,6 @@
 package com.mygdx.holowyth.pathfinding;
 
+import com.mygdx.holowyth.util.constants.Holo;
 import com.mygdx.holowyth.util.data.Pair;
 import com.mygdx.holowyth.util.data.Point;
 
@@ -9,7 +10,7 @@ public class Unit {
 	
 	public float x, y;
 	public float vx, vy;
-	float speed = 3; //world units per frame
+	float speed = Holo.defaultUnitMoveSpeed;
 	
 	Path path;
 	

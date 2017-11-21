@@ -32,7 +32,7 @@ public class PolygonDrawerScreen implements Screen, InputProcessor {
 	Screen parentScreen;
 
 	// Polygons
-	public ArrayList<Polygon> polys = new ArrayList<Polygon>();
+	public Polygons polys = new Polygons();
 
 	public PolygonDrawerScreen(final Holowyth game, Screen parentScreen) {
 		this.game = game;
@@ -108,7 +108,7 @@ public class PolygonDrawerScreen implements Screen, InputProcessor {
 
 		shapeRenderer.begin(ShapeType.Line);
 		for (Polygon p : polys) {
-			shapeRenderer.polygon(p.vertexes, 0, p.count);
+			shapeRenderer.polygon(p.floats, 0, p.count);
 		}
 		shapeRenderer.end();
 

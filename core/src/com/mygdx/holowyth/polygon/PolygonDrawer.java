@@ -19,7 +19,7 @@ public class PolygonDrawer implements InputProcessor {
 	public Camera parentCamera;
 
 	// Polygons
-	public ArrayList<Polygon> polys;
+	public Polygons polys;
 
 	public PolygonDrawer(Camera parentCamera) {
 		//this.polys = polys;

@@ -24,5 +24,6 @@ public class MapPolygonDrawer extends PolygonDrawer {
 	public void setMap(Field map){
 		this.map = map;
 		this.polys = map.polys;
+		
 	}
 }

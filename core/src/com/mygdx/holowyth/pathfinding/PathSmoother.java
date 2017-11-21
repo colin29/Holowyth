@@ -6,6 +6,7 @@ import java.util.ListIterator;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.mygdx.holowyth.polygon.Polygon;
+import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 
@@ -23,7 +24,7 @@ public class PathSmoother {
 	 * 
 	 * @return A new path that is a smoothed version of the given path
 	 */
-	public Path smoothPath(Path origPath, ArrayList<Polygon> polys) {
+	public Path smoothPath(Path origPath, Polygons polys) {
 
 		// Path is at least length 3
 		if (origPath.size() <= 1) {
@@ -132,7 +133,7 @@ public class PathSmoother {
 	 * 
 	 * @return A new path that is a smoothed version of the given path
 	 */
-	private Path doSecondarySmoothing(Path origPath, ArrayList<Polygon> polys) {
+	private Path doSecondarySmoothing(Path origPath, Polygons polys) {
 		
 		testCount = 0;
 		

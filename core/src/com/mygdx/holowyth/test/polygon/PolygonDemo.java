@@ -16,6 +16,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.polygon.Polygon;
+import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 
@@ -65,7 +66,7 @@ public class PolygonDemo implements Screen, InputProcessor {
 		
 		shapeRenderer.begin(ShapeType.Line);
 		for (Polygon p : polys) {
-			shapeRenderer.polygon(p.vertexes, 0, p.count);
+			shapeRenderer.polygon(p.floats, 0, p.count);
 		}
 		shapeRenderer.end();
 		
@@ -84,7 +85,7 @@ public class PolygonDemo implements Screen, InputProcessor {
 
 	}
 
-	ArrayList<Polygon> polys = new ArrayList<Polygon>();
+	Polygons polys = new Polygons();
 	ArrayList<Segment> segs = new ArrayList<Segment>();
 	ArrayList<Point> points = new ArrayList<Point>();
 	Vector3 vec = new Vector3();
