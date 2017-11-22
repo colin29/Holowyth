@@ -18,9 +18,16 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -36,10 +43,12 @@ import com.mygdx.holowyth.pathfinding.PathSmoother;
 import com.mygdx.holowyth.pathfinding.Unit;
 import com.mygdx.holowyth.pathfinding.Vertex;
 import com.mygdx.holowyth.polygon.Polygons;
+import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.constants.Holo;
 import com.mygdx.holowyth.util.data.Coord;
+import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 import com.mygdx.holowyth.util.exception.ErrorCode;
 import com.mygdx.holowyth.util.exception.HoloException;
@@ -112,7 +121,8 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		}
 
 		// Rendering Test area;
-		renderPaths();
+//		renderPaths();
+		renderPathEndPoint(pathSmoothed, Color.GREEN);
 		renderUnits();
 
 		// UI
@@ -141,35 +151,31 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	}
 
-	private static void renderSegment(Segment s, ShapeRenderer shapeRenderer, Color color){
-		if(s != null){
-			shapeRenderer.begin(ShapeType.Filled);
-			shapeRenderer.setColor(color);
-			shapeRenderer.rectLine(s.sx, s.sy, s.dx, s.dy, 1.5f);
-			shapeRenderer.end();
-		}
-	}
 
 	private void doOnFrame() {
 		tickLogicForUnits();
 		moveUnits();
+		
+		//Testing area
+		
+//		System.out.format("Unit xy: (%s, %s) %s %n", playerUnit.x, playerUnit.y, playerUnit.curSpeed);
 	}
 
 	private void renderMapPolygons() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.setColor(Color.BLACK);
-		HoloIO.renderPolygons(map.polys, shapeRenderer);
+		HoloGL.renderPolygons(map.polys, shapeRenderer);
 	}
 	private void renderExpandedPolygons() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.setColor(Color.GRAY);
-		HoloIO.renderPolygons(expandedPolys, shapeRenderer);
+		HoloGL.renderPolygons(expandedPolys, shapeRenderer);
 	}
 	
 
 	private void renderMapBoundaries() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
-		HoloIO.renderMapBoundaries(map, shapeRenderer);
+		HoloGL.renderMapBoundaries(map, shapeRenderer);
 	}
 
 	@Override
@@ -216,6 +222,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	/* vvvvvvv User Methods vvvvvvv */
 
 	// UI
+	Window testing;
 	private void createUI() {
 		stage = new Stage(new ScreenViewport());
 
@@ -227,7 +234,22 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		// Add Widgets here
 
 		root.debug();
+		
+		// Create a table for adjusting parameters
+		
+		testing = new Window("Parameters", skin);
+		testing.setPosition(700, 400);
 
+		
+//		root.add(new TextButton("test", skin));
+		stage.addActor(testing);
+		
+		
+		HoloUI.parameterSlider(0, 0.04f, "linearAccel", testing, skin, (Float f) -> playerUnit.linearAccelRate = f);
+		HoloUI.parameterSlider(0, Holo.defaultUnitMoveSpeed, "initialMoveSpeed", testing, skin, (Float f) -> playerUnit.initialMoveSpeed = f);
+		testing.pack();
+		
+		
 	}
 
 	// Graph Construction (For pathfinding)
@@ -403,12 +425,24 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		// Render Path
 		// smoother.render(shapeRenderer);
 		renderPath(pathSmoothed, Color.BLUE, false);
-
 	}
 
 	float pathThickness = 2f;
 	private void renderPath(Path path, Color color, boolean renderPoints) {
 		HoloPF.renderPath(path, color, renderPoints, pathThickness, shapeRenderer);
+	}
+	
+	private void renderPathEndPoint(Path path, Color color){
+		Point finalPoint = pathSmoothed.get(pathSmoothed.size()-1); 
+		shapeRenderer.begin(ShapeType.Filled);
+		shapeRenderer.setColor(color);
+		shapeRenderer.circle(finalPoint.x, finalPoint.y, 4f);
+		shapeRenderer.end();
+		
+		shapeRenderer.begin(ShapeType.Line);
+		shapeRenderer.setColor(Color.BLACK);
+		shapeRenderer.circle(finalPoint.x, finalPoint.y, 4f);
+		shapeRenderer.end();
 	}
 
 	//*** Run on Map Load (Important!) ***//
@@ -426,14 +460,14 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		// System.out.format("Time elapsed: %d mililseconds%n", duration / 1000000);
 		
 		// Create a unit
-		u = new Unit(35, 20);
-		units.add(u);
+		playerUnit = new Unit(35, 20);
+		units.add(playerUnit);
 
 		// Search a path between two points
 
 		pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE);
 
-		orderUnit(u, CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
+		orderUnit(playerUnit, CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
 
 	}
 
@@ -441,7 +475,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	// Unit Related
 
 	ArrayList<Unit> units = new ArrayList<Unit>();
-	Unit u; // the main unit we are using to demo pathfinding
+	Unit playerUnit; // the main unit we are using to demo pathfinding
 
 	private Path orderUnit(Unit u, float dx, float dy) {
 		Path newPath = pathing.doAStar(u.x, u.y, dx, dy, expandedPolys);
@@ -581,15 +615,22 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		
+		
 //		System.out.println("Touch: " + screenX + " " + screenY);
 		if (button == Input.Buttons.LEFT && pointer == 0) {
 
 			// Order the unit to move to the location using the path from A*
 			Vector3 vec = new Vector3();
+
+			
+			
 			vec = camera.unproject(vec.set(screenX, screenY, 0));
-
-			Path newPath = orderUnit(u, vec.x, vec.y);
-
+//			if(testing.hit(vec.x, vec.y, true) != null){// if this is the case, then some stage actor is blocking the click and we should act like that
+//				return false;
+//			}
+					
+			orderUnit(playerUnit, vec.x, vec.y);
 			return true;
 		}
 		return false;

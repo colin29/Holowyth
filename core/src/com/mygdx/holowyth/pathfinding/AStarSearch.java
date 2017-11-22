@@ -121,7 +121,7 @@ public class AStarSearch {
 
 		coordinateSearchUsed = false;
 		q.add(new Node(startVertex, 0, calculateDistSquared(startVertex, goalVertex), graphWidth));
-		minCost[startVertex] = 0;
+		minCost[startVertex] = 0; //if this throws an indexException, this is likely because the unit is out of map bounds
 
 		this.startVertex = startVertex;
 		this.goalVertex = goalVertex;

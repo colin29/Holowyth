@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -26,6 +27,9 @@ public class HoloUI {
 
 	public interface VoidInterface {
 		public void run();
+	}
+	public interface FloatConsumer {
+		public void accept(Float f);
 	}
 
 	public static void addJapaneseCharacters(FreeTypeFontParameter parameter) {
@@ -120,6 +124,27 @@ public class HoloUI {
 			originalAction.run();
 		}
 
+	}
+	/**
+	 * Creates a parameter slider for quickly adjusting the values of parameters
+	 * @param action This should be a lambda which takes in a float and sets the parameter
+	 */
+	public static void parameterSlider(float minVal, float maxVal, String parameterName, Table parent, Skin skin, FloatConsumer action){
+		Label vLabel = new Label("-", skin);
+		Label vName = new Label(parameterName, skin);
+		Slider vSlider = new Slider(minVal, maxVal, (maxVal-minVal)/30, false, skin);
+		vSlider.addListener(new ChangeListener(){
+			@Override
+			public void changed(ChangeEvent event, Actor actor) {
+				action.accept(vSlider.getValue());
+				vLabel.setText(String.valueOf(vSlider.getValue()));
+			}
+		});
+		parent.add();
+		parent.add(vSlider);
+		parent.row();
+		parent.add(vName, vLabel);
+		parent.row();
 	}
 
 	public static void centerOnStage(Actor actor) {

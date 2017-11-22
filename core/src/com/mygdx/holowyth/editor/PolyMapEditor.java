@@ -37,6 +37,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.polygon.Polygon;
+import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.constants.Holo;
@@ -208,7 +209,7 @@ public class PolyMapEditor implements Screen, InputProcessor {
 	private void renderMapPolygons() {
 		shapeRenderer.setProjectionMatrix(camera.combined); // Render as seen by the main camera
 		shapeRenderer.setColor(0, 0, 0, 1);
-		HoloIO.renderPolygons(map.polys, shapeRenderer);
+		HoloGL.renderPolygons(map.polys, shapeRenderer);
 		if (this.current_mode == MODE.DRAWING) {
 			this.drawer.render(shapeRenderer);
 		}
@@ -216,7 +217,7 @@ public class PolyMapEditor implements Screen, InputProcessor {
 
 	private void renderMapBoundaries() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
-		HoloIO.renderMapBoundaries(map, shapeRenderer);
+		HoloGL.renderMapBoundaries(map, shapeRenderer);
 	}
 
 	// Editor UI

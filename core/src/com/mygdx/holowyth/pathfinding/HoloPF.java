@@ -10,6 +10,7 @@ import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.util.data.Segment;
 
 import de.lighti.clipper.Point.LongPoint;
 import de.lighti.clipper.Clipper.EndType;
@@ -21,6 +22,7 @@ import de.lighti.clipper.ClipperOffset;
  *
  */
 public class HoloPF {
+	
 
 	public static boolean isEdgePathable(float x, float y, float x2, float y2, Polygons polys) {
 		boolean intersects = false;

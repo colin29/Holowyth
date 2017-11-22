@@ -19,7 +19,7 @@ public class Holo {
 	
 	
 	//Parameters for testing
-	public static float defaultUnitMoveSpeed = 1.2f; //world units per frame
+	public static float defaultUnitMoveSpeed = 0.8f; //world units per frame
 	public static int CELL_SIZE = 15; //size in world units
 	
 	
