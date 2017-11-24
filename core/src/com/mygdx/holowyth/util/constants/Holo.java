@@ -19,9 +19,9 @@ public class Holo {
 	
 	
 	//Parameters for testing
-	public static float defaultUnitMoveSpeed = 0.8f; //world units per frame
+	public static float defaultUnitMoveSpeed = 3f; //0.8f; //world units per frame
 	public static int CELL_SIZE = 15; //size in world units
-	
+	public static float UNIT_RADIUS = 13;
 	
 	private static String getCanonicalPath(String string){
 		try {
@@ -31,4 +31,7 @@ public class Holo {
 			return null;
 		}
 	}
+
+
+	
 }

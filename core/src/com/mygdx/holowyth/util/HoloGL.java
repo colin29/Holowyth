@@ -24,6 +24,16 @@ public class HoloGL {
 		}
 	}
 
+	
+	public static void renderPolygons(Polygons polys, ShapeRenderer shapeRenderer, Color color){
+		shapeRenderer.begin(ShapeType.Line);
+		shapeRenderer.setColor(color);
+		for (Polygon p : polys) {
+			shapeRenderer.polygon(p.floats, 0, p.count);
+		}
+		shapeRenderer.end();
+	}
+	
 	/**
 	 * Make sure to set the renderer's matrixes before calling these and similar methods. 
 	 */
@@ -32,6 +42,12 @@ public class HoloGL {
 		for (Polygon p : polys) {
 			shapeRenderer.polygon(p.floats, 0, p.count);
 		}
+		shapeRenderer.end();
+	}
+	public static void renderPolygon(Polygon poly, ShapeRenderer shapeRenderer, Color color){
+		shapeRenderer.begin(ShapeType.Line);
+		shapeRenderer.setColor(color);
+		shapeRenderer.polygon(poly.floats, 0, poly.count);
 		shapeRenderer.end();
 	}
 

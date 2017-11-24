@@ -18,16 +18,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -42,6 +37,7 @@ import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathSmoother;
 import com.mygdx.holowyth.pathfinding.Unit;
 import com.mygdx.holowyth.pathfinding.Vertex;
+import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.HoloIO;
@@ -49,7 +45,6 @@ import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.constants.Holo;
 import com.mygdx.holowyth.util.data.Coord;
 import com.mygdx.holowyth.util.data.Point;
-import com.mygdx.holowyth.util.data.Segment;
 import com.mygdx.holowyth.util.exception.ErrorCode;
 import com.mygdx.holowyth.util.exception.HoloException;
 import com.mygdx.holowyth.util.tools.KeyTracker;
@@ -76,7 +71,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	// App Fields
 	Field map;
-	
+
 	AStarSearch pathing;
 	PathSmoother smoother = new PathSmoother();
 
@@ -111,19 +106,23 @@ public class PathfindingDemo implements Screen, InputProcessor {
 				| (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
 		camera.update();
 
-		renderGraph();
+		// renderGraph();
+		renderDynamicGraph();
 
 		if (this.map != null) {
-			renderExpandedPolygons();
+			// renderExpandedPolygons();
 			renderMapPolygons();
-			
+
 			renderMapBoundaries();
 		}
 
 		// Rendering Test area;
-//		renderPaths();
+		renderPaths();
 		renderPathEndPoint(pathSmoothed, Color.GREEN);
 		renderUnits();
+		renderUnitCollisionBodies();
+
+		HoloGL.renderPolygons(expandedPolygons, shapeRenderer, Color.GRAY);
 
 		// UI
 		stage.act(delta);
@@ -137,7 +136,14 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		// User Controls
 
 		// Testing area
-		
+
+		shapeRenderer.begin(ShapeType.Filled);
+		shapeRenderer.setColor(Color.RED);
+		for (Vertex v : blocked) {
+			shapeRenderer.circle(v.ix * CELL_SIZE, v.iy * CELL_SIZE, 2);
+		}
+		shapeRenderer.end();
+
 		// pathing.stepAStar();
 
 		int blank = 1;
@@ -151,14 +157,13 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	}
 
-
 	private void doOnFrame() {
 		tickLogicForUnits();
 		moveUnits();
-		
-		//Testing area
-		
-//		System.out.format("Unit xy: (%s, %s) %s %n", playerUnit.x, playerUnit.y, playerUnit.curSpeed);
+
+		// Testing area
+
+		// System.out.format("Unit xy: (%s, %s) %s %n", playerUnit.x, playerUnit.y, playerUnit.curSpeed);
 	}
 
 	private void renderMapPolygons() {
@@ -166,12 +171,12 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		shapeRenderer.setColor(Color.BLACK);
 		HoloGL.renderPolygons(map.polys, shapeRenderer);
 	}
+
 	private void renderExpandedPolygons() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.setColor(Color.GRAY);
-		HoloGL.renderPolygons(expandedPolys, shapeRenderer);
+		HoloGL.renderPolygons(expandedMapPolys, shapeRenderer);
 	}
-	
 
 	private void renderMapBoundaries() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
@@ -187,7 +192,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		Gdx.input.setInputProcessor(multiplexer);
 
 		// openFileChooserToLoadMap();
-		loadMap(HoloIO.getMapFromDisk(Holo.mapsDirectory + "/complexMap.map"));
+		loadMap(HoloIO.getMapFromDisk(Holo.mapsDirectory + "/caveMap.map"));
 	}
 
 	@Override
@@ -223,6 +228,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	// UI
 	Window testing;
+
 	private void createUI() {
 		stage = new Stage(new ScreenViewport());
 
@@ -233,23 +239,34 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		// Add Widgets here
 
+		//createParameterWindow();
+		
 		root.debug();
-		
+
+		createCoordinateText();
+	}
+
+	Label coordInfo;
+
+	private void createParameterWindow() {
 		// Create a table for adjusting parameters
-		
+
 		testing = new Window("Parameters", skin);
 		testing.setPosition(700, 400);
 
-		
-//		root.add(new TextButton("test", skin));
+		// root.add(new TextButton("test", skin));
 		stage.addActor(testing);
-		
-		
 		HoloUI.parameterSlider(0, 0.04f, "linearAccel", testing, skin, (Float f) -> playerUnit.linearAccelRate = f);
-		HoloUI.parameterSlider(0, Holo.defaultUnitMoveSpeed, "initialMoveSpeed", testing, skin, (Float f) -> playerUnit.initialMoveSpeed = f);
+		HoloUI.parameterSlider(0, Holo.defaultUnitMoveSpeed, "initialMoveSpeed", testing, skin,
+				(Float f) -> playerUnit.initialMoveSpeed = f);
 		testing.pack();
-		
-		
+	}
+
+	private void createCoordinateText() {
+		coordInfo = new Label("(000, 000)\n", skin);
+		coordInfo.setColor(Color.BLACK);
+		stage.addActor(coordInfo);
+		coordInfo.setPosition(Gdx.graphics.getWidth() - coordInfo.getWidth() - 4, 4);
 	}
 
 	// Graph Construction (For pathfinding)
@@ -257,30 +274,35 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	private int CELL_SIZE = Holo.CELL_SIZE;
 	Vertex[][] graph;
 	int graphWidth, graphHeight;
+	Vertex[][] dynamicGraph;
 
 	private void createGraph() {
 		graphWidth = (int) Math.floor(map.width() / CELL_SIZE) + 1;
 		graphHeight = (int) Math.floor(map.height() / CELL_SIZE) + 1;
 
 		graph = new Vertex[graphHeight][graphWidth];
-	}
-
-
-	private void floodFillGraph() {
-		
-		//initialize graph first
 		for (int y = 0; y < graphHeight; y++) {
 			for (int x = 0; x < graphWidth; x++) {
-				graph[y][x] = new Vertex();
+				graph[y][x] = new Vertex(x, y);
 			}
 		}
-		
+		dynamicGraph = new Vertex[graphHeight][graphWidth];
+		for (int y = 0; y < graphHeight; y++) {
+			for (int x = 0; x < graphWidth; x++) {
+				dynamicGraph[y][x] = new Vertex(x, y);
+			}
+		}
+
+	}
+
+	private void floodFillGraph() {
+
 		// Start with 0,0
 
 		Queue<Coord> q = new Queue<Coord>();
 		q.ensureCapacity(graphWidth); // for a graph size x * y, you'd expect max entries on the order of max(x, y)
 
-		q.addLast(new Coord(0,0));
+		q.addLast(new Coord(0, 0));
 
 		Coord c;
 		Vertex v;
@@ -288,49 +310,47 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		while (q.size > 0) {
 			c = q.removeFirst();
 			v = graph[c.y][c.x];
-			
-			v.reachable =  true;
-			fillInVertex(v, c.x, c.y);
 
-			
-			if(v.N && !(suc = graph[c.y+1][c.x]).reachable){
-				q.addLast(new Coord(c.x, c.y+1));
+			v.reachable = true;
+			fillInVertex(v, c.x, c.y, expandedMapPolys);
+
+			if (v.N && !(suc = graph[c.y + 1][c.x]).reachable) {
+				q.addLast(new Coord(c.x, c.y + 1));
 				suc.reachable = true;
 			}
-			
-			if(v.S && !(suc = graph[c.y-1][c.x]).reachable){ //really hate to do this formatting but...
-				q.addLast(new Coord(c.x, c.y-1));
+
+			if (v.S && !(suc = graph[c.y - 1][c.x]).reachable) { // really hate to do this formatting but...
+				q.addLast(new Coord(c.x, c.y - 1));
 				suc.reachable = true;
 			}
-			
-			if(v.W && !(suc =graph[c.y][c.x-1]).reachable){
-				q.addLast(new Coord(c.x-1, c.y));
+
+			if (v.W && !(suc = graph[c.y][c.x - 1]).reachable) {
+				q.addLast(new Coord(c.x - 1, c.y));
 				suc.reachable = true;
 			}
-			
-			if(v.E && !(suc =graph[c.y][c.x+1]).reachable){
-				q.addLast(new Coord(c.x+1, c.y));
+
+			if (v.E && !(suc = graph[c.y][c.x + 1]).reachable) {
+				q.addLast(new Coord(c.x + 1, c.y));
 				suc.reachable = true;
 			}
-			
-			
-			if(v.NW && !(suc =graph[c.y+1][c.x-1]).reachable){
-				q.addLast(new Coord(c.x-1, c.y+1));
+
+			if (v.NW && !(suc = graph[c.y + 1][c.x - 1]).reachable) {
+				q.addLast(new Coord(c.x - 1, c.y + 1));
 				suc.reachable = true;
 			}
-			
-			if(v.NE && !(suc =graph[c.y+1][c.x+1]).reachable){
-				q.addLast(new Coord(c.x+1, c.y+1));
+
+			if (v.NE && !(suc = graph[c.y + 1][c.x + 1]).reachable) {
+				q.addLast(new Coord(c.x + 1, c.y + 1));
 				suc.reachable = true;
 			}
-			
-			if(v.SW && !(suc = graph[c.y-1][c.x-1]).reachable){
-				q.addLast(new Coord(c.x-1, c.y-1));
+
+			if (v.SW && !(suc = graph[c.y - 1][c.x - 1]).reachable) {
+				q.addLast(new Coord(c.x - 1, c.y - 1));
 				suc.reachable = true;
 			}
-			
-			if(v.SE && !(suc = graph[c.y-1][c.x+1]).reachable){
-				q.addLast(new Coord(c.x+1, c.y-1));
+
+			if (v.SE && !(suc = graph[c.y - 1][c.x + 1]).reachable) {
+				q.addLast(new Coord(c.x + 1, c.y - 1));
 				suc.reachable = true;
 			}
 		}
@@ -339,19 +359,19 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	/**
 	 * Calculates the pathing information for a single vertex
 	 */
-	private void fillInVertex(Vertex v, int ix, int iy) {
+	private void fillInVertex(Vertex v, int ix, int iy, Polygons polys) {
 		int x = ix * CELL_SIZE;
 		int y = iy * CELL_SIZE;
 		// v.N = isPointWithinMap(ix+CELL_SIZE + );
-		v.N = isEdgePathable(x, y, x, y + CELL_SIZE);
-		v.S = isEdgePathable(x, y, x, y - CELL_SIZE);
-		v.W = isEdgePathable(x, y, x - CELL_SIZE, y);
-		v.E = isEdgePathable(x, y, x + CELL_SIZE, y);
+		v.N = isEdgePathable(x, y, x, y + CELL_SIZE, polys);
+		v.S = isEdgePathable(x, y, x, y - CELL_SIZE, polys);
+		v.W = isEdgePathable(x, y, x - CELL_SIZE, y, polys);
+		v.E = isEdgePathable(x, y, x + CELL_SIZE, y, polys);
 
-		v.NW = isEdgePathable(x, y, x - CELL_SIZE, y + CELL_SIZE);
-		v.NE = isEdgePathable(x, y, x + CELL_SIZE, y + CELL_SIZE);
-		v.SW = isEdgePathable(x, y, x - CELL_SIZE, y - CELL_SIZE);
-		v.SE = isEdgePathable(x, y, x + CELL_SIZE, y - CELL_SIZE);
+		v.NW = isEdgePathable(x, y, x - CELL_SIZE, y + CELL_SIZE, polys);
+		v.NE = isEdgePathable(x, y, x + CELL_SIZE, y + CELL_SIZE, polys);
+		v.SW = isEdgePathable(x, y, x - CELL_SIZE, y - CELL_SIZE, polys);
+		v.SE = isEdgePathable(x, y, x + CELL_SIZE, y - CELL_SIZE, polys);
 
 		if (ix == 0)
 			v.W = v.NW = v.SW = false;
@@ -364,39 +384,55 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	}
 
 	/**
-	 * @return Whether the given line segment is pathable or not.
+	 * Given a vertex, restrict it's pathability based upon the new Polygon given
 	 */
-	private boolean isEdgePathable(float x, float y, float x2, float y2) {
-		return HoloPF.isEdgePathable(x, y, x2, y2, expandedPolys);
+	public void restrictVertex(Vertex v, Polygon poly) {
+		int x = v.ix * CELL_SIZE;
+		int y = v.iy * CELL_SIZE;
+		v.N = v.N && HoloPF.isEdgePathable(x, y, x, y + CELL_SIZE, poly);
+		v.S = v.S && HoloPF.isEdgePathable(x, y, x, y - CELL_SIZE, poly);
+		v.W = v.W && HoloPF.isEdgePathable(x, y, x - CELL_SIZE, y, poly);
+		v.E = v.E && HoloPF.isEdgePathable(x, y, x + CELL_SIZE, y, poly);
+
+		v.NW = v.NW && HoloPF.isEdgePathable(x, y, x - CELL_SIZE, y + CELL_SIZE, poly);
+		v.NE = v.NE && HoloPF.isEdgePathable(x, y, x + CELL_SIZE, y + CELL_SIZE, poly);
+		v.SW = v.SW && HoloPF.isEdgePathable(x, y, x - CELL_SIZE, y - CELL_SIZE, poly);
+		v.SE = v.SE && HoloPF.isEdgePathable(x, y, x + CELL_SIZE, y - CELL_SIZE, poly);
 	}
 
-	private void renderGraph() {
-		// // Draw Edges
-//		shapeRenderer.setColor(Color.CORAL);
-//		shapeRenderer.begin(ShapeType.Line);
-//		for (int y = 0; y < graphHeight; y++) {
-//			for (int x = 0; x < graphWidth; x++) {
-//				Vertex v = graph[y][x];
-//				if (v.N)
-//					drawLine(x, y, x, y + 1);
-//				if (v.S)
-//					drawLine(x, y, x, y - 1);
-//				if (v.W)
-//					drawLine(x, y, x - 1, y);
-//				if (v.E)
-//					drawLine(x, y, x + 1, y);
-//
-//				if (v.NW)
-//					drawLine(x, y, x - 1, y + 1);
-//				if (v.NE)
-//					drawLine(x, y, x + 1, y + 1);
-//				if (v.SW)
-//					drawLine(x, y, x - 1, y - 1);
-//				if (v.SE)
-//					drawLine(x, y, x + 1, y - 1);
-//			}
-//		}
-//		shapeRenderer.end();
+	/**
+	 * @return Whether the given line segment is pathable or not.
+	 */
+	private boolean isEdgePathable(float x, float y, float x2, float y2, Polygons polys) {
+		return HoloPF.isEdgePathable(x, y, x2, y2, polys);
+	}
+
+	private void renderGraph() { // Draw Edges
+		// shapeRenderer.setColor(Color.CORAL);
+		// shapeRenderer.begin(ShapeType.Line);
+		// for (int y = 0; y < graphHeight; y++) {
+		// for (int x = 0; x < graphWidth; x++) {
+		// Vertex v = graph[y][x];
+		// if (v.N)
+		// drawLine(x, y, x, y + 1);
+		// if (v.S)
+		// drawLine(x, y, x, y - 1);
+		// if (v.W)
+		// drawLine(x, y, x - 1, y);
+		// if (v.E)
+		// drawLine(x, y, x + 1, y);
+		//
+		// if (v.NW)
+		// drawLine(x, y, x - 1, y + 1);
+		// if (v.NE)
+		// drawLine(x, y, x + 1, y + 1);
+		// if (v.SW)
+		// drawLine(x, y, x - 1, y - 1);
+		// if (v.SE)
+		// drawLine(x, y, x + 1, y - 1);
+		// }
+		// }
+		// shapeRenderer.end();
 
 		// Draw vertexes as points
 		shapeRenderer.setColor(Color.BLACK);
@@ -404,53 +440,103 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		for (int y = 0; y < graphHeight; y++) {
 			for (int x = 0; x < graphWidth; x++) {
-				if(graph[y][x].reachable){
+				if (graph[y][x].reachable) {
 					shapeRenderer.circle(x * CELL_SIZE, y * CELL_SIZE, 1f);
 				}
-				
+
 			}
 		}
 		shapeRenderer.end();
 
 	}
-	
-	// Expanded Geometry
-	
-	private Polygons expandPolygons(Polygons polys){
-		return HoloPF.expandPolygons(polys, UNIT_RADIUS);
+
+	private void renderDynamicGraph() {
+		// Draw Edges
+		shapeRenderer.setColor(Color.CORAL);
+		shapeRenderer.begin(ShapeType.Line);
+		for (int y = 0; y < graphHeight; y++) {
+			for (int x = 0; x < graphWidth; x++) {
+				Vertex v = dynamicGraph[y][x];
+				if (v.N)
+					drawLine(x, y, x, y + 1);
+				if (v.S)
+					drawLine(x, y, x, y - 1);
+				if (v.W)
+					drawLine(x, y, x - 1, y);
+				if (v.E)
+					drawLine(x, y, x + 1, y);
+
+				if (v.NW)
+					drawLine(x, y, x - 1, y + 1);
+				if (v.NE)
+					drawLine(x, y, x + 1, y + 1);
+				if (v.SW)
+					drawLine(x, y, x - 1, y - 1);
+				if (v.SE)
+					drawLine(x, y, x + 1, y - 1);
+			}
+		}
+		shapeRenderer.end();
+
+		// Draw vertexes as points
+		shapeRenderer.setColor(Color.BLACK);
+		shapeRenderer.begin(ShapeType.Filled);
+
+		for (int y = 0; y < graphHeight; y++) {
+			for (int x = 0; x < graphWidth; x++) {
+				if (graph[y][x].reachable) {
+					shapeRenderer.circle(x * CELL_SIZE, y * CELL_SIZE, 1f);
+				}
+
+			}
+		}
+		shapeRenderer.end();
+
 	}
-	
+
+	private void drawLine(int ix, int iy, int ix2, int iy2) {
+		shapeRenderer.line(ix * CELL_SIZE, iy * CELL_SIZE, 0, ix2 * CELL_SIZE, iy2 * CELL_SIZE, 0);
+	}
+
+	// Expanded Geometry
+
+	private Polygons expandPolygons(Polygons polys) {
+		return HoloPF.expandPolygons(polys, Holo.UNIT_RADIUS);
+	}
+
 	// Rendering Paths
 	private void renderPaths() {
 		// Render Path
-		// smoother.render(shapeRenderer);
+//		smoother.render(shapeRenderer);
 		renderPath(pathSmoothed, Color.BLUE, false);
 	}
 
 	float pathThickness = 2f;
+
 	private void renderPath(Path path, Color color, boolean renderPoints) {
 		HoloPF.renderPath(path, color, renderPoints, pathThickness, shapeRenderer);
 	}
-	
-	private void renderPathEndPoint(Path path, Color color){
-		Point finalPoint = pathSmoothed.get(pathSmoothed.size()-1); 
+
+	private void renderPathEndPoint(Path path, Color color) {
+		Point finalPoint = pathSmoothed.get(pathSmoothed.size() - 1);
 		shapeRenderer.begin(ShapeType.Filled);
 		shapeRenderer.setColor(color);
 		shapeRenderer.circle(finalPoint.x, finalPoint.y, 4f);
 		shapeRenderer.end();
-		
+
 		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setColor(Color.BLACK);
 		shapeRenderer.circle(finalPoint.x, finalPoint.y, 4f);
 		shapeRenderer.end();
 	}
 
-	//*** Run on Map Load (Important!) ***//
+	// *** Run on Map Load (Important!) ***//
 
-	Path pathSmoothed;
-	Polygons expandedPolys = new Polygons();
+	Path pathSmoothed; // for demo use
+	Polygons expandedMapPolys = new Polygons();
+
 	private void mapStartup() {
-		expandedPolys = expandPolygons(map.polys);
+		expandedMapPolys = expandPolygons(map.polys);
 		// Create pathing graph
 		createGraph();
 		// long startTime = System.nanoTime();
@@ -458,33 +544,158 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		// long endTime = System.nanoTime();
 		// long duration = (endTime - startTime); // divide by 1000000 to get milliseconds.
 		// System.out.format("Time elapsed: %d mililseconds%n", duration / 1000000);
-		
-		// Create a unit
+
+		// Create units
 		playerUnit = new Unit(35, 20);
 		units.add(playerUnit);
+
+		createTestUnits();
 
 		// Search a path between two points
 
 		pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE);
 
-		orderUnit(playerUnit, CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
+		orderMoveTo(playerUnit, CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
 
 	}
 
-	
 	// Unit Related
 
 	ArrayList<Unit> units = new ArrayList<Unit>();
 	Unit playerUnit; // the main unit we are using to demo pathfinding
 
-	private Path orderUnit(Unit u, float dx, float dy) {
-		Path newPath = pathing.doAStar(u.x, u.y, dx, dy, expandedPolys);
+	private void createTestUnits() {
+		units.add(new Unit(400, 250));
+		units.add(new Unit(650, 178));
+		units.add(new Unit(750, 450));
+	}
+
+	private void orderMoveTo(Unit u, float dx, float dy) {
+		Path path = findPathForUnit(u, dx, dy);
+		if (path != null) {
+			u.setPath(path);
+			if (u == playerUnit) {
+				this.pathSmoothed = path;
+			}
+		}
+	}
+
+	Polygons expandedPolygons;
+
+	/**
+	 * Pure data class Collision Body Info. Is a polygon with some extra information.
+	 */
+	class CBInfo {
+		Polygon poly;
+		float x, y;
+		float unitRadius;
+	}
+
+	private Path findPathForUnit(Unit u, float dx, float dy) {
+
+		// For pathfinding, need to get expanded geometry of unit collision bodies as well
+
+		Polygons unitPolygons = new Polygons();
+		ArrayList<CBInfo> cbInfos = new ArrayList<CBInfo>();
+
+		for (Unit a : units) {
+			if (u.equals(a)) { // don't consider the unit's own collision body
+				continue;
+			}
+			unitPolygons.add(a.collidingBody());
+
+			CBInfo c = new CBInfo();
+			c.x = a.x;
+			c.y = a.y;
+			c.unitRadius = Holo.UNIT_RADIUS;
+			cbInfos.add(c);
+
+		}
+
+		Polygons expandedUnitPolygons = expandPolygons(unitPolygons);
+		for (int i = 0; i < cbInfos.size(); i++) { // both lists are the same size and elements correspond
+			cbInfos.get(i).poly = expandedUnitPolygons.get(i);
+		}
+
+		expandedPolygons = new Polygons();
+		expandedPolygons.addAll(expandedUnitPolygons);
+		expandedPolygons.addAll(expandedMapPolys);
+
+		// Generate dynamic graph;
+
+		// Start with the base graph
+		for (int y = 0; y < graphHeight; y++) {
+			for (int x = 0; x < graphWidth; x++) {
+				dynamicGraph[y][x].set(graph[y][x]);
+			}
+		}
+
+		// modify it for every unit
+		for (int y = 0; y < graphHeight; y++) {
+			for (int x = 0; x < graphWidth; x++) {
+				dynamicGraph[y][x].set(graph[y][x]);
+			}
+		}
+
+		revertDynamicGraph();
+		setDynamicGraph(cbInfos, u);
+		Path newPath = pathing.doAStar(u.x, u.y, dx, dy, expandedPolygons, dynamicGraph); // use the dynamic graph
 
 		if (newPath != null) {
-			this.pathSmoothed = smoother.smoothPath(newPath, expandedPolys);
-			u.setPath(pathSmoothed);
+			return smoother.smoothPath(newPath, expandedPolygons);
 		}
 		return newPath;
+	}
+
+	ArrayList<Vertex> prospects;
+	ArrayList<Vertex> blocked = new ArrayList<Vertex>();
+
+	/**
+	 * Modifies the graph by blocking Vertexes which are covered by units
+	 */
+	private void setDynamicGraph(ArrayList<CBInfo> infos, Unit u) {
+
+		for (CBInfo cb : infos) {
+			prospects = new ArrayList<Vertex>();
+			float x1, x2, y1, y2; // boundaries of the bounding box of the unit
+			x1 = cb.x - cb.unitRadius - u.getRadius();
+			x2 = cb.x + cb.unitRadius + u.getRadius();
+			y1 = cb.y - cb.unitRadius - u.getRadius();
+			y2 = cb.y + cb.unitRadius + u.getRadius();
+
+			for (int x = (int) Math.floor(x1 - x1 % CELL_SIZE - CELL_SIZE); x <= x2 + CELL_SIZE; x += CELL_SIZE) {
+				for (int y = (int) Math.floor(y1 - y1 % CELL_SIZE - CELL_SIZE); y <= y2 + CELL_SIZE; y += CELL_SIZE) {
+					prospects.add(dynamicGraph[y / CELL_SIZE][x / CELL_SIZE]);
+				}
+			}
+			
+//			System.out.println("prospects: " + prospects.size());
+			
+			for (Vertex v : prospects) {
+				restrictVertex(v, cb.poly);
+			}
+
+		}
+
+	}
+
+	/**
+	 * Reverts the dynamic graph back to the orignal graph. The current method is simple brute-force.
+	 */
+	private void revertDynamicGraph() {
+		for (int y = 0; y < graphHeight; y++) { // change later to use a stack of modifications or something.
+			for (int x = 0; x < graphWidth; x++) {
+				dynamicGraph[y][x].set(graph[y][x]);
+			}
+		}
+	}
+	
+	/**
+	 * When a unit's collision body is factored in to the dynamic graph, any points within the expanded geometry need to be blocked. We use floodfill.
+	 * For simplicity in finding a first vertex, we assumes that minimum unit radius * SQRT2 > cell_width, that the vertex to the left and down will be inside the unit's expanded geometry
+	 */
+	private void blockVertexesWithinUnit(){
+		//TODO:
 	}
 
 	private void tickLogicForUnits() {
@@ -495,22 +706,39 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	private void moveUnits() {
 		for (Unit u : units) {
-			u.x += u.vx;
-			u.y += u.vy;
+			u.move();
 		}
 	}
 
-	private float UNIT_RADIUS = 10;
 	private void renderUnits() {
 		for (Unit unit : units) {
 			shapeRenderer.begin(ShapeType.Filled);
-			shapeRenderer.setColor(Color.PURPLE);
 
-			shapeRenderer.circle(unit.x, unit.y, UNIT_RADIUS);
+			if (unit == playerUnit) {
+				shapeRenderer.setColor(Color.PURPLE);
+			} else {
+				shapeRenderer.setColor(Color.YELLOW);
+			}
+
+			shapeRenderer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
 
 			shapeRenderer.end();
 		}
 
+		// Render an outline around the unit
+		for (Unit unit : units) {
+			shapeRenderer.begin(ShapeType.Line);
+			shapeRenderer.setColor(Color.BLACK);
+			shapeRenderer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
+			shapeRenderer.end();
+		}
+
+	}
+
+	private void renderUnitCollisionBodies() {
+		for (Unit unit : units) {
+			HoloGL.renderPolygon(unit.collidingBody(), shapeRenderer, Color.RED);
+		}
 	}
 
 	/* vvvvvvv Boilerplate code vvvvvvv */
@@ -569,8 +797,6 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		camera.position.set(map.width() / 2, map.height() / 2, 0);
 
-
-
 		mapStartup();
 	}
 
@@ -615,22 +841,20 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		
-		
-//		System.out.println("Touch: " + screenX + " " + screenY);
+
+		// System.out.println("Touch: " + screenX + " " + screenY);
 		if (button == Input.Buttons.LEFT && pointer == 0) {
 
 			// Order the unit to move to the location using the path from A*
 			Vector3 vec = new Vector3();
 
-			
-			
 			vec = camera.unproject(vec.set(screenX, screenY, 0));
-//			if(testing.hit(vec.x, vec.y, true) != null){// if this is the case, then some stage actor is blocking the click and we should act like that
-//				return false;
-//			}
-					
-			orderUnit(playerUnit, vec.x, vec.y);
+			// if(testing.hit(vec.x, vec.y, true) != null){// if this is the case, then some stage actor is blocking the
+			// click and we should act like that
+			// return false;
+			// }
+
+			orderMoveTo(playerUnit, vec.x, vec.y);
 			return true;
 		}
 		return false;
@@ -650,7 +874,12 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
-		// TODO Auto-generated method stub
+
+		// update coordInfo
+		Vector3 vec = new Vector3();
+		vec = camera.unproject(vec.set(screenX, screenY, 0));
+		coordInfo.setText("(" + (int) (vec.x) + ", " + (int) (vec.y) + ")\n"
+				+ "(" + (int) (vec.x)/CELL_SIZE + ", " + (int) (vec.y)/CELL_SIZE + ")");
 		return false;
 	}
 

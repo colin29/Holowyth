@@ -29,7 +29,7 @@ public class AStarSearch {
 
 	/**
 	 * 
-	 * Graph is assumed to be a rectangular grid.
+	 * @param graph The search graph to be used by default. Graph is assumed to be a rectangular grid.
 	 * 
 	 * @Usage Initialize the AStarSearch object. Then you can run arbitrary number of searches with the same object.
 	 */
@@ -60,17 +60,23 @@ public class AStarSearch {
 	private final float SQRT2 = 1.414214f; // rounded up slightly so that h is valid
 
 	public Path doAStar(int startVertex, int goalVertex) {
-		runAStar(startVertex, goalVertex);
+		runAStar(startVertex, goalVertex, this.graph);
 		return this.retrievePath();
 	}
 
 	/**
 	 * Takes in starting and goal locations instead of graph vertexes.
-	 * 
-	 * @param origPolys
-	 *            the original non-expanded polygons, if expanded geometry was used.
+	 * Searches on the default (initial) graph
 	 */
-	public Path doAStar(float sx, float sy, float dx, float dy, Polygons polys) {
+	public Path doAStar(float sx, float sy, float dx, float dy, Polygons polys){
+		return doAStar(sx, sy, dx, dy, polys, this.graph);
+	}
+	
+	/**
+	 * Like method above but takes in a modified graph. Used for dynamic pathfinding. 
+	 * @return
+	 */
+	public Path doAStar(float sx, float sy, float dx, float dy, Polygons polys, Vertex[][] graph) {
 
 		startX = sx;
 		startY = sy;
@@ -96,7 +102,7 @@ public class AStarSearch {
 		}
 		
 
-		runAStar(startVertex, goalVertex);  //note AStar only is operating on vertexes, and not coordinates
+		runAStar(startVertex, goalVertex, graph);  //note AStar only is operating on vertexes, and not coordinates
 
 		coordinateSearchUsed = true;
 		return this.retrievePath();
@@ -107,7 +113,7 @@ public class AStarSearch {
 	float startX, startY;
 	boolean searchFailed;
 
-	private void runAStar(int startVertex, int goalVertex) {
+	private void runAStar(int startVertex, int goalVertex, Vertex[][] graph) {
 
 		Vertex gv = graph[goalVertex / graphWidth][goalVertex % graphWidth];
 		if (!gv.reachable) {

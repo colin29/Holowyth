@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.pathfinding;
 
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.util.constants.Holo;
 import com.mygdx.holowyth.util.data.Pair;
 import com.mygdx.holowyth.util.data.Point;
@@ -15,14 +16,19 @@ public class Unit {
 	public float curSpeed;
 	public float linearAccelRate = 0.08f;
 	public float factorAccel = 0.01f;
-	public float initialMoveSpeed = 0.32f;
+	public float initialMoveSpeed = Holo.defaultUnitMoveSpeed; //0.32f;
 
 	public float quadAccelNormSpeed = 1f;
 	public float quadraticAccelRate = 0.02f;
 	public float maxAccelFactor = 5;
-
+	private Polygon collisionProfile;
+	private Polygon collidingBody;
 	Path path;
 
+	private static final float SQRT2 = 1.414214f;
+	
+	private float radius = Holo.UNIT_RADIUS;
+	
 	Unit() {
 	}
 
@@ -30,6 +36,8 @@ public class Unit {
 		this();
 		this.x = x;
 		this.y = y;
+		
+		initCollisionProfile();
 	}
 
 	// ** Main function **/
@@ -175,7 +183,7 @@ public class Unit {
 //				distanceToGoal, distanceToDecel);
 
 		if (distanceToGoal < distanceToDecel) {
-			System.out.println("Decelling");
+//			System.out.println("Decelling");
 			curSpeed = Math.max(curSpeed + dSpeed, targetFinalSpeed);
 			isDecelerating = true;
 		}
@@ -184,6 +192,61 @@ public class Unit {
 	}
 
 	public void move() {
-
+		this.x += vx;
+		this.y += vy;
+		updateCollidingBody();
 	}
+	
+	public Polygon collidingBody(){
+		return this.collidingBody;
+	}
+	
+	//Pathing
+	private void initCollisionProfile(){
+		//units have an octogonal collision profile
+		float[] floats = new float[16];
+		
+		//starting from N, and going counter clockwise
+		
+		floats[0] = 0;
+		floats[1] = Holo.UNIT_RADIUS;
+		
+		floats[2] = Holo.UNIT_RADIUS/SQRT2;
+		floats[3] = Holo.UNIT_RADIUS/SQRT2;
+		
+		floats[4] = Holo.UNIT_RADIUS;
+		floats[5] = 0;
+		
+		floats[6] = Holo.UNIT_RADIUS/SQRT2;
+		floats[7] = -Holo.UNIT_RADIUS/SQRT2;
+		
+		// S
+		floats[8] = 0;
+		floats[9] = -Holo.UNIT_RADIUS;
+		
+		floats[10] = -Holo.UNIT_RADIUS/SQRT2;
+		floats[11] = -Holo.UNIT_RADIUS/SQRT2;
+		
+		floats[12] = -Holo.UNIT_RADIUS;
+		floats[13] = 0;
+		
+		floats[14] = -Holo.UNIT_RADIUS/SQRT2;
+		floats[15] = Holo.UNIT_RADIUS/SQRT2;
+		
+		this.collisionProfile = new Polygon(floats, 16); 
+		this.collidingBody = new Polygon(floats, 16);
+		updateCollidingBody();
+	}
+	
+	private void updateCollidingBody(){
+		for(int i=0; i<collidingBody.floats.length-1;i+=2){
+			collidingBody.floats[i] = collisionProfile.floats[i] + this.x;
+			collidingBody.floats[i+1] = collisionProfile.floats[i+1] + this.y;
+		}
+	}
+	
+	public float getRadius(){
+		return radius;
+	}
+
 }

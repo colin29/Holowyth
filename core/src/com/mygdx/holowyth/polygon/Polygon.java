@@ -17,5 +17,5 @@ public class Polygon implements java.io.Serializable {
 	public Polygon(float[] floats, int count){
 		this.count = count;
 		this.floats = floats.clone();
-	}	
+	}
 }
