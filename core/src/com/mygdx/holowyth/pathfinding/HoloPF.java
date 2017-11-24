@@ -2,13 +2,16 @@ package com.mygdx.holowyth.pathfinding;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.PriorityQueue;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.utils.Queue;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.pathfinding.Path;
+import com.mygdx.holowyth.util.constants.Holo;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 
@@ -134,5 +137,86 @@ public class HoloPF {
 
 		return polys;
 
+	}
+
+	/**
+	 * @param maxCellDistance how many cells away to draw from (e.g. distance 1 would consider 9 cells)
+	 * @return A list of the nearest reachable vertexes, sorted in order of distance. (Note these vertexes are live references to the graph's vertexes)
+	 */
+	public static ArrayList<Vertex> findNearbyReachableVertexes(Point p, Vertex[][] graph, int graphWidth, int graphHeight,
+			int maxCellDistance) {
+
+		int ix = (int) (p.x / Holo.CELL_SIZE); ; // corresponds to the closest lower left vertex
+		int iy = (int) (p.y /  Holo.CELL_SIZE);
+
+		ArrayList<Vertex> prospects = new ArrayList<Vertex>();
+		
+		//Only consider vertexes inside the graph
+		for (int cx = ix - maxCellDistance; cx <= ix + maxCellDistance; cx++) { // cx "current x"
+			for(int cy = iy - maxCellDistance; cy <= iy + maxCellDistance; cy++){
+				Vertex v = new Vertex(cx, cy);
+				if(isVertexInMap(v, graphWidth, graphHeight)){
+					prospects.add(v);
+				}
+			}
+		}
+		
+		ArrayList<VertexDist> vds = new ArrayList<VertexDist>();
+		for(Vertex v: prospects){
+			if(graph[v.iy][v.ix].reachable){
+				vds.add(new VertexDist(graph[v.iy][v.ix], p.x, p.y, Holo.CELL_SIZE));
+			}
+		}
+		vds.sort((VertexDist vd1, VertexDist vd2) ->  (vd1.dist - vd2.dist >= 0) ? 1 : -1);
+		
+		ArrayList<Vertex> vertexes = new ArrayList<Vertex>();
+		for(VertexDist vd: vds){
+			vertexes.add(vd.vertex); // note these are live references
+		}
+		System.out.println("Vertexes: "  + vertexes.size());
+		return vertexes;
+	}
+	
+
+
+	public static Vertex findClosestReachableVertex(Point p, Vertex[][] graph, int graphWidth, int graphHeight,
+			int maxCellDistance, int CELL_SIZE) {
+		return null; //TODO:
+	}
+	
+	
+	public static boolean isPointInMap(Point p, int mapWidth, int mapHeight){
+		if(p.x <0 || p.x> mapWidth)
+			return false;
+		if(p.y <0 || p.y > mapHeight)
+			return false;
+		return true;
+	}
+	
+	/**
+	 * @return true if the vertex is within the map's graph 
+	 */
+	public static boolean isVertexInMap(Vertex v, int graphWidth, int graphHeight){
+		if(v.ix <0 || v.ix>=graphWidth)
+			return false;
+		if(v.iy <0 || v.iy >= graphHeight)
+			return false;
+		return true;
+	}
+
+	/**
+	 * 
+	 * Small data class for assisting with sorting vertexes via distance
+	 */
+	private static class VertexDist {
+		public Vertex vertex;
+		public float dist;
+
+		VertexDist(Vertex v, float ux, float uy, int CELL_SIZE) {
+			this.vertex = v;
+			float x = v.ix * CELL_SIZE;
+			float y = v.iy * CELL_SIZE;
+			this.dist = (float) Math.sqrt((ux - x) * (ux - x) + (uy - y) * (uy - y));
+		}
 	}
 }

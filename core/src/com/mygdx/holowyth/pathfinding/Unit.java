@@ -78,7 +78,7 @@ public class Unit {
 		
 		float s = Math.min(initialMoveSpeed + curSpeed*cross, curSpeed);
 		s = Math.max(s, initialMoveSpeed);
-		System.out.println("initial  move speed: " + s);
+//		System.out.println("initial  move speed: " + s);
 		
 		return s;
 		

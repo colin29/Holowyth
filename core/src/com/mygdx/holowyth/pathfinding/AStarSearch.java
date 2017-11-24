@@ -23,17 +23,19 @@ public class AStarSearch {
 	public float[] minCost; // Mininum cost found to get here from the start
 
 	int graphWidth, graphHeight;
+	int mapWidth, mapHeight;
 	Vertex[][] graph;
 
 	int CELL_SIZE;
 
 	/**
 	 * 
-	 * @param graph The search graph to be used by default. Graph is assumed to be a rectangular grid.
+	 * @param graph
+	 *            The search graph to be used by default. Graph is assumed to be a rectangular grid.
 	 * 
 	 * @Usage Initialize the AStarSearch object. Then you can run arbitrary number of searches with the same object.
 	 */
-	public AStarSearch(int graphWidth, int graphHeight, Vertex[][] graph, int cellSize) {
+	public AStarSearch(int graphWidth, int graphHeight, Vertex[][] graph, int cellSize, int mapWidth, int mapHeight) {
 
 		this.graph = graph;
 		this.graphWidth = graphWidth;
@@ -44,6 +46,9 @@ public class AStarSearch {
 		minCost = new float[graphWidth * graphHeight];
 
 		this.CELL_SIZE = cellSize;
+
+		this.mapWidth = mapWidth;
+		this.mapHeight = mapHeight;
 	}
 
 	PriorityQueue<Node> q = new PriorityQueue<Node>(new Comparator<Node>() {
@@ -65,15 +70,15 @@ public class AStarSearch {
 	}
 
 	/**
-	 * Takes in starting and goal locations instead of graph vertexes.
-	 * Searches on the default (initial) graph
+	 * Takes in starting and goal locations instead of graph vertexes. Searches on the default (initial) graph
 	 */
-	public Path doAStar(float sx, float sy, float dx, float dy, Polygons polys){
+	public Path doAStar(float sx, float sy, float dx, float dy, Polygons polys) {
 		return doAStar(sx, sy, dx, dy, polys, this.graph);
 	}
-	
+
 	/**
-	 * Like method above but takes in a modified graph. Used for dynamic pathfinding. 
+	 * Like method above but takes in a modified graph. Used for dynamic pathfinding.
+	 * 
 	 * @return
 	 */
 	public Path doAStar(float sx, float sy, float dx, float dy, Polygons polys, Vertex[][] graph) {
@@ -82,9 +87,9 @@ public class AStarSearch {
 		startY = sy;
 		goalX = dx;
 		goalY = dy;
-		
-		if (outsideMapBounds(dx, dy)) {
-			System.out.println("AStar input: Point is outside map bounds");
+
+		if (isOutsideMapBounds(dx, dy)) {
+			System.out.println("AStar input: Goal point is outside map bounds");
 			return null;
 		}
 
@@ -95,14 +100,13 @@ public class AStarSearch {
 			System.out.println("None of the 4 closest vertexes to goal location were pathable. Aborting search.");
 			return null;
 		}
-		
+
 		if (substituteLocationFound) {
 			goalX = substitutePoint.x;
 			goalY = substitutePoint.y;
 		}
-		
 
-		runAStar(startVertex, goalVertex, graph);  //note AStar only is operating on vertexes, and not coordinates
+		runAStar(startVertex, goalVertex, graph); // note AStar only is operating on vertexes, and not coordinates
 
 		coordinateSearchUsed = true;
 		return this.retrievePath();
@@ -127,7 +131,8 @@ public class AStarSearch {
 
 		coordinateSearchUsed = false;
 		q.add(new Node(startVertex, 0, calculateDistSquared(startVertex, goalVertex), graphWidth));
-		minCost[startVertex] = 0; //if this throws an indexException, this is likely because the unit is out of map bounds
+		minCost[startVertex] = 0; // if this throws an indexException, this is likely because the unit is out of map
+									// bounds
 
 		this.startVertex = startVertex;
 		this.goalVertex = goalVertex;
@@ -293,52 +298,39 @@ public class AStarSearch {
 	 * @return -1 if the location cannot be found and search should be aborted. If if substituteLocationFound is set to
 	 *         true, the original location was invalid but a substitute has been found.
 	 */
-	private int findClosestPathableVertexWithCorrection(float sx, float sy, Polygons polys, Point adjustedLocation) {
+	private int findClosestPathableVertexWithCorrection(float gx, float gy, Polygons polys, Point adjustedLocation) {
 		substituteLocationFound = false;
-		int ix = (int) (sx / CELL_SIZE);
-		int iy = (int) (sy / CELL_SIZE);
+		Point goalPoint = new Point(gx, gy);
 
-		PointData dNW, dNE, dSE, dSW;
-		dNW = new PointData(ix, iy + 1, sx, sy);
-		dNE = new PointData(ix + 1, iy + 1, sx, sy);
-		dSW = new PointData(ix, iy, sx, sy);
-		dSE = new PointData(ix + 1, iy, sx, sy);
-
-		List<PointData> points = new ArrayList<PointData>(Arrays.asList(dNW, dNE, dSW, dSE));
-
-		points.sort((PointData p1, PointData p2) -> ((int) (p1.dist - p2.dist)));
+		ArrayList<Vertex> reachable = HoloPF.findNearbyReachableVertexes(goalPoint, graph, graphWidth, graphHeight, 2);
 
 		int startIx = 0, startIy = 0;
 		boolean found = false;
-		for (int i = 0; i < 4; i++) {
-			PointData p = points.get(i);
 
+		for (Vertex v : reachable) {
 			// there must be a pathable line from the target destination to the vertex, AND that vertex must be a
 			// reachable one
-			if (HoloPF.isEdgePathable(sx, sy, p.ix * CELL_SIZE, p.iy * CELL_SIZE, polys)
-					&& graph[p.iy][p.ix].reachable) {
-				startIx = p.ix;
-				startIy = p.iy;
+			if (HoloPF.isEdgePathable(gx, gy, v.ix * CELL_SIZE, v.iy * CELL_SIZE, polys) && v.reachable) {
+				startIx = v.ix;
+				startIy = v.iy;
 				found = true;
 				break;
 			}
 		}
 
-		// If nothing is found, search some more locations;
-		
-		
+		// If there is no path to a reachable vertex, substitute the goal destination with the closest reachable
+		// vertex.
+
 		if (!found) {
-			for (int i = 0; i < 4; i++) {
-				PointData p = points.get(i);
-				if (graph[p.iy][p.ix].reachable) {
-					startIx = p.ix;
-					startIy = p.iy;
-					found = true;
-					substituteLocationFound = true;
-					adjustedLocation.x = p.ix * CELL_SIZE;
-					adjustedLocation.y = p.iy * CELL_SIZE;
-					break;
-				}
+			if(reachable.size() > 0){
+				Vertex v = reachable.get(0);
+				startIx = v.ix;
+				startIy = v.iy;
+				adjustedLocation.x = v.ix * CELL_SIZE;
+				adjustedLocation.y = v.iy * CELL_SIZE;
+				
+				found = true;
+				substituteLocationFound = true;
 			}
 		}
 
@@ -367,10 +359,8 @@ public class AStarSearch {
 		return (gx - sx) * (gx - sx) + (gy - sy) * (gy - sy);
 	}
 
-	private boolean outsideMapBounds(float x, float y) {
-		int mapWidth = (graphWidth - 1) * CELL_SIZE;
-		int mapHeight = (graphHeight - 1) * CELL_SIZE;
-		return (x < 0 || x > mapWidth || y < 0 || y > mapHeight);
+	private boolean isOutsideMapBounds(float x, float y) {
+		return !HoloPF.isPointInMap(new Point(x, y), mapWidth, mapHeight);
 	}
 
 }

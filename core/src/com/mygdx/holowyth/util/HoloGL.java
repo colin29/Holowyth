@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
+import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 
 /**
@@ -24,8 +25,7 @@ public class HoloGL {
 		}
 	}
 
-	
-	public static void renderPolygons(Polygons polys, ShapeRenderer shapeRenderer, Color color){
+	public static void renderPolygons(Polygons polys, ShapeRenderer shapeRenderer, Color color) {
 		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setColor(color);
 		for (Polygon p : polys) {
@@ -33,28 +33,29 @@ public class HoloGL {
 		}
 		shapeRenderer.end();
 	}
-	
+
 	/**
-	 * Make sure to set the renderer's matrixes before calling these and similar methods. 
+	 * Make sure to set the renderer's matrixes before calling these and similar methods.
 	 */
-	public static void renderPolygons(Polygons polys, ShapeRenderer shapeRenderer){
+	public static void renderPolygons(Polygons polys, ShapeRenderer shapeRenderer) {
 		shapeRenderer.begin(ShapeType.Line);
 		for (Polygon p : polys) {
 			shapeRenderer.polygon(p.floats, 0, p.count);
 		}
 		shapeRenderer.end();
 	}
-	public static void renderPolygon(Polygon poly, ShapeRenderer shapeRenderer, Color color){
+
+	public static void renderPolygon(Polygon poly, ShapeRenderer shapeRenderer, Color color) {
 		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setColor(color);
 		shapeRenderer.polygon(poly.floats, 0, poly.count);
 		shapeRenderer.end();
 	}
 
-	public static void renderMapBoundaries(Field map, ShapeRenderer shapeRenderer){
+	public static void renderMapBoundaries(Field map, ShapeRenderer shapeRenderer) {
 		shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1);
 		shapeRenderer.begin(ShapeType.Line);
-	
+
 		Vector2 topRight = new Vector2(map.width(), map.height());
 		Vector2 topLeft = new Vector2(0, map.height());
 		Vector2 botRight = new Vector2(map.width(), 0);
@@ -63,9 +64,27 @@ public class HoloGL {
 		shapeRenderer.line(botLeft, botRight);
 		shapeRenderer.line(topLeft, botLeft);
 		shapeRenderer.line(topRight, botRight);
-	
+
 		shapeRenderer.end();
 	}
 
+	/**
+	 * Often used function for debugging purposes.
+	 */
+	public static void renderCircle(float x, float y, ShapeRenderer shapeRenderer, Color color) {
+
+		
+		float pointSize = 3f;
+		shapeRenderer.begin(ShapeType.Filled);
+		shapeRenderer.setColor(color);
+		shapeRenderer.circle(x, y, pointSize);
+		shapeRenderer.end();
+
+		//Draw outline
+		shapeRenderer.setColor(Color.BLACK);
+		shapeRenderer.begin(ShapeType.Line);
+		shapeRenderer.circle(x, y, pointSize);
+		shapeRenderer.end();
+	}
 
 }
