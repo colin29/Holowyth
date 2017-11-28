@@ -22,9 +22,10 @@ public class PathSmoother {
 
 	/**
 	 * 
+	 * @param unitRadius Radius of the pathing unit
 	 * @return A new path that is a smoothed version of the given path
 	 */
-	public Path smoothPath(Path origPath, Polygons polys) {
+	public Path smoothPath(Path origPath, Polygons polys, ArrayList<CBInfo> cbs, float unitRadius) {
 
 		// Path is at least length 3
 		if (origPath.size() <= 1) {
@@ -43,7 +44,7 @@ public class PathSmoother {
 		while (iter.hasNext()) {
 			next = iter.next();
 
-			if (HoloPF.isEdgePathable(prev.x, prev.y, next.x, next.y, polys)) {
+			if (HoloPF.isEdgePathable(prev.x, prev.y, next.x, next.y, polys, cbs, unitRadius)) {
 
 				iter.previous();
 				iter.previous();
@@ -57,7 +58,7 @@ public class PathSmoother {
 			}
 		}
 
-		Path path2s = doSecondarySmoothing(path1s, polys);
+		Path path2s = doSecondarySmoothing(path1s, polys, cbs, unitRadius);
 //		System.out.println("Number of isEdgePathableCalls: "  + testCount);
 		return path2s;
 	}
@@ -133,7 +134,7 @@ public class PathSmoother {
 	 * 
 	 * @return A new path that is a smoothed version of the given path
 	 */
-	private Path doSecondarySmoothing(Path origPath, Polygons polys) {
+	private Path doSecondarySmoothing(Path origPath, Polygons polys, ArrayList<CBInfo> cbs, float unitRadius) {
 		
 		testCount = 0;
 		
@@ -232,7 +233,7 @@ public class PathSmoother {
 				for (int j = 0; j < nextLengths.size(); j++) {
 					testCount+=1;
 					if (HoloPF.isEdgePathable(segPoints.get(i).x, segPoints.get(i).y, nextPoints.get(j).x,
-							nextPoints.get(j).y, polys)) {
+							nextPoints.get(j).y, polys, cbs, unitRadius)) {
 						score = segLengths.get(i) * nextLengths.get(j);
 						if (score > maxScore) {
 							maxScore = score;

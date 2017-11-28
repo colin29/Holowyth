@@ -21,8 +21,6 @@ public class Unit {
 	public float quadAccelNormSpeed = 1f;
 	public float quadraticAccelRate = 0.02f;
 	public float maxAccelFactor = 5;
-	private Polygon collisionProfile;
-	private Polygon collidingBody;
 	Path path;
 
 	private static final float SQRT2 = 1.414214f;
@@ -37,7 +35,6 @@ public class Unit {
 		this.x = x;
 		this.y = y;
 		
-		initCollisionProfile();
 	}
 
 	// ** Main function **/
@@ -194,55 +191,6 @@ public class Unit {
 	public void move() {
 		this.x += vx;
 		this.y += vy;
-		updateCollidingBody();
-	}
-	
-	public Polygon collidingBody(){
-		return this.collidingBody;
-	}
-	
-	//Pathing
-	private void initCollisionProfile(){
-		//units have an octogonal collision profile
-		float[] floats = new float[16];
-		
-		//starting from N, and going counter clockwise
-		
-		floats[0] = 0;
-		floats[1] = Holo.UNIT_RADIUS;
-		
-		floats[2] = Holo.UNIT_RADIUS/SQRT2;
-		floats[3] = Holo.UNIT_RADIUS/SQRT2;
-		
-		floats[4] = Holo.UNIT_RADIUS;
-		floats[5] = 0;
-		
-		floats[6] = Holo.UNIT_RADIUS/SQRT2;
-		floats[7] = -Holo.UNIT_RADIUS/SQRT2;
-		
-		// S
-		floats[8] = 0;
-		floats[9] = -Holo.UNIT_RADIUS;
-		
-		floats[10] = -Holo.UNIT_RADIUS/SQRT2;
-		floats[11] = -Holo.UNIT_RADIUS/SQRT2;
-		
-		floats[12] = -Holo.UNIT_RADIUS;
-		floats[13] = 0;
-		
-		floats[14] = -Holo.UNIT_RADIUS/SQRT2;
-		floats[15] = Holo.UNIT_RADIUS/SQRT2;
-		
-		this.collisionProfile = new Polygon(floats, 16); 
-		this.collidingBody = new Polygon(floats, 16);
-		updateCollidingBody();
-	}
-	
-	private void updateCollidingBody(){
-		for(int i=0; i<collidingBody.floats.length-1;i+=2){
-			collidingBody.floats[i] = collisionProfile.floats[i] + this.x;
-			collidingBody.floats[i+1] = collisionProfile.floats[i+1] + this.y;
-		}
 	}
 	
 	public float getRadius(){

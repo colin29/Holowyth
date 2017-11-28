@@ -23,6 +23,9 @@ public class Holo {
 	public static int CELL_SIZE = 15; //size in world units
 	public static float UNIT_RADIUS = 13;
 	
+	//Editor
+	public static String editorInitialMap = "/complexMap.map";
+	
 	private static String getCanonicalPath(String string){
 		try {
 			return Paths.get(string).toRealPath().toString();

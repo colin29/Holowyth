@@ -1,5 +1,6 @@
-package com.mygdx.holowyth;
+package com.mygdx.holowyth.pathfinding;
 
+import java.awt.geom.Line2D;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
@@ -30,14 +31,8 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
+import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.map.Field;
-import com.mygdx.holowyth.pathfinding.AStarSearch;
-import com.mygdx.holowyth.pathfinding.HoloPF;
-import com.mygdx.holowyth.pathfinding.Path;
-import com.mygdx.holowyth.pathfinding.PathSmoother;
-import com.mygdx.holowyth.pathfinding.Unit;
-import com.mygdx.holowyth.pathfinding.Vertex;
-import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.HoloIO;
@@ -120,9 +115,8 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		renderPaths();
 		renderPathEndPoint(pathSmoothed, Color.GREEN);
 		renderUnits();
-		renderUnitCollisionBodies();
 
-		HoloGL.renderPolygons(expandedPolygons, shapeRenderer, Color.GRAY);
+		HoloGL.renderPolygons(expandedMapPolys, shapeRenderer, Color.GRAY);
 
 		// UI
 		stage.act(delta);
@@ -137,9 +131,15 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		// Testing area
 
-		for(Vertex v: nearbyPathable){
-			HoloGL.renderCircle(v.ix * CELL_SIZE, v.iy*CELL_SIZE, shapeRenderer, Color.RED);
+//		 for (Vertex v : nearbyPathable) {
+//		 HoloGL.renderCircle(v.ix * CELL_SIZE, v.iy * CELL_SIZE, shapeRenderer, Color.RED);
+//		 }
+		
+		//render expanded hit bodies
+		for (Unit u: units){
+			HoloGL.renderEmptyCircle(u.x, u.y, u.getRadius() + Holo.UNIT_RADIUS, shapeRenderer, Color.GRAY);
 		}
+		 
 
 		// pathing.stepAStar();
 
@@ -189,7 +189,9 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		Gdx.input.setInputProcessor(multiplexer);
 
 		// openFileChooserToLoadMap();
-		loadMap(HoloIO.getMapFromDisk(Holo.mapsDirectory + "/caveMap.map"));
+		if (Holo.editorInitialMap != null) {
+			loadMap(HoloIO.getMapFromDisk(Holo.mapsDirectory + Holo.editorInitialMap));
+		}
 	}
 
 	@Override
@@ -381,20 +383,40 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	}
 
 	/**
-	 * Given a vertex, restrict it's pathability based upon the new Polygon given
+	 * Given a vertex, restrict it's pathability based on the expanded collision circle of the unit
+	 * @param unit Radius of the radius of the unit which is pathing. Used to get expanded geometry. 
 	 */
-	public void restrictVertex(Vertex v, Polygon poly) {
-		int x = v.ix * CELL_SIZE;
-		int y = v.iy * CELL_SIZE;
-		v.N = v.N && HoloPF.isEdgePathable(x, y, x, y + CELL_SIZE, poly);
-		v.S = v.S && HoloPF.isEdgePathable(x, y, x, y - CELL_SIZE, poly);
-		v.W = v.W && HoloPF.isEdgePathable(x, y, x - CELL_SIZE, y, poly);
-		v.E = v.E && HoloPF.isEdgePathable(x, y, x + CELL_SIZE, y, poly);
+	public void restrictVertex(Vertex v, CBInfo cb, float unitRadius) {
+		float x = v.ix * CELL_SIZE;
+		float y = v.iy * CELL_SIZE;
+		
+		//if the vertex is inside the unit's expanded pathing body, we can immediately block it.
+		
+		Point p1 = new Point(x, y);
+		Point p2 = new Point(cb.x, cb.y);
+		float dist = Point.calcDistance(p1, p2);
+		
+		float expandedRadius = cb.unitRadius + unitRadius;
+		float radSquared = expandedRadius * expandedRadius;
+		
+		if(dist < expandedRadius){
+			v.block();
+			return;
+		}
+		
+		//If it's outside, we still have to check its edges to block the right ones.
+		
+		//an edge is pathable if it's closest distance to the center of the circle is equal or greater to than the expanded radius
 
-		v.NW = v.NW && HoloPF.isEdgePathable(x, y, x - CELL_SIZE, y + CELL_SIZE, poly);
-		v.NE = v.NE && HoloPF.isEdgePathable(x, y, x + CELL_SIZE, y + CELL_SIZE, poly);
-		v.SW = v.SW && HoloPF.isEdgePathable(x, y, x - CELL_SIZE, y - CELL_SIZE, poly);
-		v.SE = v.SE && HoloPF.isEdgePathable(x, y, x + CELL_SIZE, y - CELL_SIZE, poly);
+		v.N = v.N && (Line2D.ptSegDistSq(x, y, x, y + CELL_SIZE, cb.x, cb.y) >= radSquared);
+		v.S = v.S && (Line2D.ptSegDistSq(x, y, x, y - CELL_SIZE, cb.x, cb.y) >= radSquared);
+		v.W = v.W && (Line2D.ptSegDistSq(x, y, x - CELL_SIZE, y, cb.x, cb.y) >= radSquared);
+		v.E = v.E && (Line2D.ptSegDistSq(x, y, x + CELL_SIZE, y, cb.x, cb.y) >= radSquared);
+
+		v.NW = v.NW && (Line2D.ptSegDistSq(x, y, x - CELL_SIZE, y + CELL_SIZE, cb.x, cb.y) >= radSquared);
+		v.NE = v.NE && (Line2D.ptSegDistSq(x, y, x + CELL_SIZE, y + CELL_SIZE, cb.x, cb.y) >= radSquared);
+		v.SW = v.SW && (Line2D.ptSegDistSq(x, y, x - CELL_SIZE, y - CELL_SIZE, cb.x, cb.y) >= radSquared);
+		v.SE = v.SE && (Line2D.ptSegDistSq(x, y, x + CELL_SIZE, y - CELL_SIZE, cb.x, cb.y) >= radSquared);
 	}
 
 	/**
@@ -484,7 +506,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		for (int y = 0; y < graphHeight; y++) {
 			for (int x = 0; x < graphWidth; x++) {
-				if (graph[y][x].reachable) {
+				if (dynamicGraph[y][x].reachable) {
 					shapeRenderer.circle(x * CELL_SIZE, y * CELL_SIZE, 1f);
 				}
 
@@ -507,7 +529,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	// Rendering Paths
 	private void renderPaths() {
 		// Render Path
-		// smoother.render(shapeRenderer);
+		smoother.render(shapeRenderer);
 		renderPath(pathSmoothed, Color.BLUE, false);
 	}
 
@@ -567,8 +589,8 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	Unit playerUnit; // the main unit we are using to demo pathfinding
 
 	private void createTestUnits() {
-		units.add(new Unit(400, 250));
-		units.add(new Unit(650, 178));
+		units.add(new Unit(406, 253));
+		units.add(new Unit(550, 122 - Holo.UNIT_RADIUS));
 		units.add(new Unit(750, 450));
 	}
 
@@ -582,47 +604,24 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		}
 	}
 
-	Polygons expandedPolygons;
-
-	/**
-	 * Pure data class. Is a polygon with some extra information. (Collision Body Info)
-	 */
-	class CBInfo {
-		Polygon poly;
-		float x, y;
-		float unitRadius;
-	}
-
-	private Path findPathForUnit(Unit u, float dx, float dy) {
+	private Path findPathForUnit(Unit unit, float dx, float dy) {
 
 		// For pathfinding, need to get expanded geometry of unit collision bodies as well
 
-		Polygons unitPolygons = new Polygons();
-		ArrayList<CBInfo> cbInfos = new ArrayList<CBInfo>();
+		ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
 
 		for (Unit a : units) {
-			if (u.equals(a)) { // don't consider the unit's own collision body
+			if (unit.equals(a)) { // don't consider the unit's own collision body
 				continue;
 			}
-			unitPolygons.add(a.collidingBody());
 
 			CBInfo c = new CBInfo();
 			c.x = a.x;
 			c.y = a.y;
 			c.unitRadius = Holo.UNIT_RADIUS;
-			cbInfos.add(c);
-
+			colBodies.add(c);
 		}
-
-		Polygons expandedUnitPolygons = expandPolygons(unitPolygons);
-		for (int i = 0; i < cbInfos.size(); i++) { // both lists are the same size and elements correspond
-			cbInfos.get(i).poly = expandedUnitPolygons.get(i);
-		}
-
-		expandedPolygons = new Polygons();
-		expandedPolygons.addAll(expandedUnitPolygons);
-		expandedPolygons.addAll(expandedMapPolys);
-
+		
 		// Generate dynamic graph;
 
 		// Start with the base graph
@@ -640,11 +639,11 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		}
 
 		revertDynamicGraph();
-		setDynamicGraph(cbInfos, u);
-		Path newPath = pathing.doAStar(u.x, u.y, dx, dy, expandedPolygons, dynamicGraph); // use the dynamic graph
+		setDynamicGraph(colBodies, unit);
+		Path newPath = pathing.doAStar(unit.x, unit.y, dx, dy, expandedMapPolys, colBodies, dynamicGraph, unit.getRadius()); // use the dynamic graph
 
 		if (newPath != null) {
-			return smoother.smoothPath(newPath, expandedPolygons);
+			return smoother.smoothPath(newPath, expandedMapPolys, colBodies, unit.getRadius());
 		}
 		return newPath;
 	}
@@ -670,16 +669,20 @@ public class PathfindingDemo implements Screen, InputProcessor {
 			y1 = cb.y - cb.unitRadius - u.getRadius();
 			y2 = cb.y + cb.unitRadius + u.getRadius();
 
-			for (int x = (int) Math.floor(x1 - x1 % CELL_SIZE - CELL_SIZE); x <= x2 + CELL_SIZE; x += CELL_SIZE) {
-				for (int y = (int) Math.floor(y1 - y1 % CELL_SIZE - CELL_SIZE); y <= y2 + CELL_SIZE; y += CELL_SIZE) {
-					prospects.add(dynamicGraph[y / CELL_SIZE][x / CELL_SIZE]);
+			int upperIndexX = (int) Math.ceil(x2 / CELL_SIZE);
+			int upperIndexY = (int) Math.ceil(y2 / CELL_SIZE);
+
+			for (int ix = (int) (x1 / CELL_SIZE); ix <= upperIndexX; ix += 1) {
+				for (int iy = (int) (y1 / CELL_SIZE); iy <= upperIndexY; iy += 1) {
+					if (HoloPF.isIndexInMap(ix, iy, graphWidth, graphHeight))
+						prospects.add(dynamicGraph[iy][ix]);
 				}
 			}
 
 			// System.out.println("prospects: " + prospects.size());
 
 			for (Vertex v : prospects) {
-				restrictVertex(v, cb.poly);
+				restrictVertex(v, cb, u.getRadius());
 			}
 
 		}
@@ -741,12 +744,6 @@ public class PathfindingDemo implements Screen, InputProcessor {
 			shapeRenderer.end();
 		}
 
-	}
-
-	private void renderUnitCollisionBodies() {
-		for (Unit unit : units) {
-			HoloGL.renderPolygon(unit.collidingBody(), shapeRenderer, Color.RED);
-		}
 	}
 
 	/* vvvvvvv Boilerplate code vvvvvvv */
@@ -848,6 +845,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	}
 
 	ArrayList<Vertex> nearbyPathable = new ArrayList<Vertex>();
+
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 
@@ -864,10 +862,11 @@ public class PathfindingDemo implements Screen, InputProcessor {
 			// }
 
 			orderMoveTo(playerUnit, vec.x, vec.y);
-			
+
 			// Testing area
-			
-			nearbyPathable= HoloPF.findNearbyReachableVertexes(new Point(vec.x, vec.y), dynamicGraph, graphWidth, graphHeight, 2);
+
+			nearbyPathable = HoloPF.findNearbyReachableVertexes(new Point(vec.x, vec.y), dynamicGraph, graphWidth,
+					graphHeight, 2);
 			return true;
 		}
 		return false;

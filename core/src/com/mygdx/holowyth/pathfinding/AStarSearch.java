@@ -72,8 +72,8 @@ public class AStarSearch {
 	/**
 	 * Takes in starting and goal locations instead of graph vertexes. Searches on the default (initial) graph
 	 */
-	public Path doAStar(float sx, float sy, float dx, float dy, Polygons polys) {
-		return doAStar(sx, sy, dx, dy, polys, this.graph);
+	public Path doAStar(float sx, float sy, float dx, float dy, Polygons polys, float unitRadius) {
+		return doAStar(sx, sy, dx, dy, polys, null, this.graph, unitRadius);
 	}
 
 	/**
@@ -81,8 +81,8 @@ public class AStarSearch {
 	 * 
 	 * @return
 	 */
-	public Path doAStar(float sx, float sy, float dx, float dy, Polygons polys, Vertex[][] graph) {
-
+	public Path doAStar(float sx, float sy, float dx, float dy, Polygons polys, ArrayList<CBInfo> cbs, Vertex[][] graph, float unitRadius) {
+		
 		startX = sx;
 		startY = sy;
 		goalX = dx;
@@ -93,11 +93,11 @@ public class AStarSearch {
 			return null;
 		}
 
-		int startVertex = findClosestPathableVertex(sx, sy, polys);
+		int startVertex = findClosestPathableVertex(sx, sy,  polys, cbs, graph);
 		Point substitutePoint = new Point(0, 0);
-		int goalVertex = findClosestPathableVertexWithCorrection(dx, dy, polys, substitutePoint);
+		int goalVertex = findClosestPathableVertexWithCorrection(dx, dy, polys, cbs, substitutePoint, graph, unitRadius);
 		if (goalVertex < 0) {
-			System.out.println("None of the 4 closest vertexes to goal location were pathable. Aborting search.");
+			System.out.println("No valid goal substitute could be found. Aborting search.");
 			return null;
 		}
 
@@ -253,9 +253,10 @@ public class AStarSearch {
 	 * @param polys
 	 *            Note, unlike most of the other pathfinding functions, this should be called with the original,
 	 *            non-expanded polygons
+	 * @param cbs Can be null.
 	 * @return -1 if there is no valid vertex
 	 */
-	private int findClosestPathableVertex(float sx, float sy, Polygons polys) {
+	private int findClosestPathableVertex(float sx, float sy, Polygons polys, ArrayList<CBInfo> cbs, Vertex[][] graph) {
 		int ix = (int) (sx / CELL_SIZE);
 		int iy = (int) (sy / CELL_SIZE);
 
@@ -298,7 +299,8 @@ public class AStarSearch {
 	 * @return -1 if the location cannot be found and search should be aborted. If if substituteLocationFound is set to
 	 *         true, the original location was invalid but a substitute has been found.
 	 */
-	private int findClosestPathableVertexWithCorrection(float gx, float gy, Polygons polys, Point adjustedLocation) {
+	private int findClosestPathableVertexWithCorrection(float gx, float gy, Polygons polys, ArrayList<CBInfo> cbs, Point adjustedLocation,
+			Vertex[][] graph, float unitRadius) {
 		substituteLocationFound = false;
 		Point goalPoint = new Point(gx, gy);
 
@@ -310,7 +312,7 @@ public class AStarSearch {
 		for (Vertex v : reachable) {
 			// there must be a pathable line from the target destination to the vertex, AND that vertex must be a
 			// reachable one
-			if (HoloPF.isEdgePathable(gx, gy, v.ix * CELL_SIZE, v.iy * CELL_SIZE, polys) && v.reachable) {
+			if (HoloPF.isEdgePathable(gx, gy, v.ix * CELL_SIZE, v.iy * CELL_SIZE, polys, cbs, unitRadius) && v.reachable) {
 				startIx = v.ix;
 				startIy = v.iy;
 				found = true;
@@ -322,13 +324,13 @@ public class AStarSearch {
 		// vertex.
 
 		if (!found) {
-			if(reachable.size() > 0){
+			if (reachable.size() > 0) {
 				Vertex v = reachable.get(0);
 				startIx = v.ix;
 				startIy = v.iy;
 				adjustedLocation.x = v.ix * CELL_SIZE;
 				adjustedLocation.y = v.iy * CELL_SIZE;
-				
+
 				found = true;
 				substituteLocationFound = true;
 			}

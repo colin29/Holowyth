@@ -10,7 +10,6 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Queue;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
-import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.util.constants.Holo;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
@@ -26,6 +25,47 @@ import de.lighti.clipper.ClipperOffset;
  */
 public class HoloPF {
 
+	
+	
+	/**
+	 * Determines whether an edge is pathable against a set of collision bodies (map polygons and unit circles)
+	 * @param x
+	 * @param y
+	 * @param x2
+	 * @param y2
+	 * @param polys
+	 * @param cbs The collision bodies for units
+	 * @return
+	 */
+	public static boolean isEdgePathable(float x, float y, float x2, float y2, Polygons polys, ArrayList<CBInfo> cbs, float unitRadius) {
+		boolean intersects = false;
+		for (Polygon polygon : polys) {
+			for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
+				if (Line2D.linesIntersect(x, y, x2, y2, polygon.floats[i], polygon.floats[i + 1],
+						polygon.floats[(i + 2) % polygon.count], polygon.floats[(i + 3) % polygon.count])) {
+					intersects = true;
+				}
+			}
+		}
+		
+		// Check against unit circles
+		for(CBInfo cb: cbs){
+			if (Line2D.ptSegDistSq(x, y, x2, y2, cb.x, cb.y) < (cb.unitRadius+unitRadius) * (cb.unitRadius+unitRadius)){
+				intersects = true;
+			}
+		}
+		return !intersects;
+	}
+	
+	/**
+	 * Determines whether an edge is pathable against a set of collision bodies (just map polygons)
+	 * @param x
+	 * @param y
+	 * @param x2
+	 * @param y2
+	 * @param polys
+	 * @return
+	 */
 	public static boolean isEdgePathable(float x, float y, float x2, float y2, Polygons polys) {
 		boolean intersects = false;
 		for (Polygon polygon : polys) {
@@ -171,17 +211,17 @@ public class HoloPF {
 		
 		ArrayList<Vertex> vertexes = new ArrayList<Vertex>();
 		for(VertexDist vd: vds){
-			vertexes.add(vd.vertex); // note these are live references
+			vertexes.add(vd.vertex); // note these are live graph references
 		}
-		System.out.println("Vertexes: "  + vertexes.size());
 		return vertexes;
 	}
 	
 
 
 	public static Vertex findClosestReachableVertex(Point p, Vertex[][] graph, int graphWidth, int graphHeight,
-			int maxCellDistance, int CELL_SIZE) {
-		return null; //TODO:
+			int maxCellDistance) {
+		ArrayList<Vertex> result = findNearbyReachableVertexes(p, graph, graphWidth, graphHeight, maxCellDistance);
+		return result.size() > 0 ? result.get(0) : null;
 	}
 	
 	
@@ -200,6 +240,13 @@ public class HoloPF {
 		if(v.ix <0 || v.ix>=graphWidth)
 			return false;
 		if(v.iy <0 || v.iy >= graphHeight)
+			return false;
+		return true;
+	}
+	public static boolean isIndexInMap(int ix, int iy, int graphWidth, int graphHeight){
+		if(ix <0 || ix>=graphWidth)
+			return false;
+		if(iy <0 || iy >= graphHeight)
 			return false;
 		return true;
 	}
