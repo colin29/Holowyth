@@ -93,11 +93,16 @@ public class AStarSearch {
 			return null;
 		}
 
-		int startVertex = findClosestPathableVertex(sx, sy,  polys, cbs, graph);
+		int startVertex = findClosestPathableVertex(sx, sy,  polys, cbs, graph, unitRadius, false, null);
 		Point substitutePoint = new Point(0, 0);
-		int goalVertex = findClosestPathableVertexWithCorrection(dx, dy, polys, cbs, substitutePoint, graph, unitRadius);
+		int goalVertex = findClosestPathableVertex(dx, dy, polys, cbs, graph, unitRadius, true, substitutePoint);
 		if (goalVertex < 0) {
 			System.out.println("No valid goal substitute could be found. Aborting search.");
+			return null;
+		}
+		if(startVertex == -1){
+			System.out.println("Warning: Start position was unpathable (Improperly placed unit?). Aborting Search.");
+			searchFailed = true;
 			return null;
 		}
 
@@ -125,6 +130,12 @@ public class AStarSearch {
 			searchFailed = true;
 			return;
 		}
+		Vertex sv = graph[startVertex / graphWidth][startVertex % graphWidth];
+		if (!sv.reachable) {
+			System.out.println("Detected start was an unreachable vertex, short-circuting:");
+			searchFailed = true;
+			return;
+		}
 
 		clearSearch();
 		searchFailed = false;
@@ -133,7 +144,7 @@ public class AStarSearch {
 		q.add(new Node(startVertex, 0, calculateDistSquared(startVertex, goalVertex), graphWidth));
 		minCost[startVertex] = 0; // if this throws an indexException, this is likely because the unit is out of map
 									// bounds
-
+		
 		this.startVertex = startVertex;
 		this.goalVertex = goalVertex;
 
@@ -256,40 +267,69 @@ public class AStarSearch {
 	 * @param cbs Can be null.
 	 * @return -1 if there is no valid vertex
 	 */
-	private int findClosestPathableVertex(float sx, float sy, Polygons polys, ArrayList<CBInfo> cbs, Vertex[][] graph) {
-		int ix = (int) (sx / CELL_SIZE);
-		int iy = (int) (sy / CELL_SIZE);
+//	private int findClosestPathableVertex(float sx, float sy, Polygons polys, ArrayList<CBInfo> cbs, Vertex[][] graph) {
+//		int ix = (int) (sx / CELL_SIZE);
+//		int iy = (int) (sy / CELL_SIZE);
+//
+//		PointData dNW, dNE, dSE, dSW;
+//		dNW = new PointData(ix, iy + 1, sx, sy);
+//		dNE = new PointData(ix + 1, iy + 1, sx, sy);
+//		dSW = new PointData(ix, iy, sx, sy);
+//		dSE = new PointData(ix + 1, iy, sx, sy);
+//
+//		List<PointData> points = new ArrayList<PointData>(Arrays.asList(dNW, dNE, dSW, dSE));
+//
+//		points.sort((PointData p1, PointData p2) -> ((int) (p1.dist - p2.dist)));
+//
+//		int startIx = 0, startIy = 0;
+//		boolean found = false;
+//		for (int i = 0; i < 4; i++) {
+//			PointData p = points.get(i);
+//
+//			// there must be a pathable line from the target destination to the vertex, AND that vertex must be a
+//			// reachable one
+//			if (HoloPF.isEdgePathable(sx, sy, p.ix * CELL_SIZE, p.iy * CELL_SIZE, polys)
+//					&& graph[p.iy][p.ix].reachable) {
+//				startIx = p.ix;
+//				startIy = p.iy;
+//				found = true;
+//				break;
+//			}
+//		}
+//		if (!found) {
+//			return -1;
+//		}
+//		return startIy * graphWidth + startIx;
+//	}
+	
+	private int findClosestPathableVertex(float x, float y, Polygons polys, ArrayList<CBInfo> cbs,
+			Vertex[][] graph, float unitRadius) {
+		substituteLocationFound = false;
+		Point goalPoint = new Point(x, y);
 
-		PointData dNW, dNE, dSE, dSW;
-		dNW = new PointData(ix, iy + 1, sx, sy);
-		dNE = new PointData(ix + 1, iy + 1, sx, sy);
-		dSW = new PointData(ix, iy, sx, sy);
-		dSE = new PointData(ix + 1, iy, sx, sy);
-
-		List<PointData> points = new ArrayList<PointData>(Arrays.asList(dNW, dNE, dSW, dSE));
-
-		points.sort((PointData p1, PointData p2) -> ((int) (p1.dist - p2.dist)));
+		ArrayList<Vertex> reachable = HoloPF.findNearbyReachableVertexes(goalPoint, graph, graphWidth, graphHeight, 2);
 
 		int startIx = 0, startIy = 0;
 		boolean found = false;
-		for (int i = 0; i < 4; i++) {
-			PointData p = points.get(i);
 
+		for (Vertex v : reachable) {
 			// there must be a pathable line from the target destination to the vertex, AND that vertex must be a
 			// reachable one
-			if (HoloPF.isEdgePathable(sx, sy, p.ix * CELL_SIZE, p.iy * CELL_SIZE, polys)
-					&& graph[p.iy][p.ix].reachable) {
-				startIx = p.ix;
-				startIy = p.iy;
+			if (HoloPF.isEdgePathable(x, y, v.ix * CELL_SIZE, v.iy * CELL_SIZE, polys, cbs, unitRadius) && v.reachable) {
+				startIx = v.ix;
+				startIy = v.iy;
 				found = true;
 				break;
 			}
 		}
+
 		if (!found) {
 			return -1;
 		}
 		return startIy * graphWidth + startIx;
 	}
+	
+	
 
 	private boolean substituteLocationFound = false;
 
@@ -299,8 +339,8 @@ public class AStarSearch {
 	 * @return -1 if the location cannot be found and search should be aborted. If if substituteLocationFound is set to
 	 *         true, the original location was invalid but a substitute has been found.
 	 */
-	private int findClosestPathableVertexWithCorrection(float gx, float gy, Polygons polys, ArrayList<CBInfo> cbs, Point adjustedLocation,
-			Vertex[][] graph, float unitRadius) {
+	private int findClosestPathableVertex(float gx, float gy, Polygons polys, ArrayList<CBInfo> cbs,
+			Vertex[][] graph, float unitRadius, boolean allowCorrection, Point correctedLocation) {
 		substituteLocationFound = false;
 		Point goalPoint = new Point(gx, gy);
 
@@ -319,7 +359,11 @@ public class AStarSearch {
 				break;
 			}
 		}
-
+		
+		if(!found && !allowCorrection){
+			return -1;
+		}
+		
 		// If there is no path to a reachable vertex, substitute the goal destination with the closest reachable
 		// vertex.
 
@@ -328,8 +372,8 @@ public class AStarSearch {
 				Vertex v = reachable.get(0);
 				startIx = v.ix;
 				startIy = v.iy;
-				adjustedLocation.x = v.ix * CELL_SIZE;
-				adjustedLocation.y = v.iy * CELL_SIZE;
+				correctedLocation.x = v.ix * CELL_SIZE;
+				correctedLocation.y = v.iy * CELL_SIZE;
 
 				found = true;
 				substituteLocationFound = true;
