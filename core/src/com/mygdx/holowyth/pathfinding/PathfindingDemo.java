@@ -32,6 +32,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.UnitControls;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.HoloGL;
@@ -66,6 +67,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	// App Fields
 	Field map;
+	UnitControls unitControls;
 
 	AStarSearch pathing;
 	PathSmoother smoother = new PathSmoother();
@@ -111,11 +113,14 @@ public class PathfindingDemo implements Screen, InputProcessor {
 			renderMapBoundaries();
 		}
 
-		// Rendering Test area;
+
 		renderPaths();
 		renderPathEndPoint(pathSmoothed, Color.GREEN);
 		renderUnits();
+		
+		unitControls.renderCirclesOnSelectedUnits();
 
+		// Rendering Test area;
 		HoloGL.renderPolygons(expandedMapPolys, shapeRenderer, Color.GRAY);
 
 		// UI
@@ -137,7 +142,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		
 		//render expanded hit bodies
 		for (Unit u: units){
-			HoloGL.renderEmptyCircle(u.x, u.y, u.getRadius() + Holo.UNIT_RADIUS, shapeRenderer, Color.GRAY);
+			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + Holo.UNIT_RADIUS, shapeRenderer, Color.GRAY);
 		}
 		 
 
@@ -362,15 +367,15 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		int x = ix * CELL_SIZE;
 		int y = iy * CELL_SIZE;
 		// v.N = isPointWithinMap(ix+CELL_SIZE + );
-		v.N = isEdgePathable(x, y, x, y + CELL_SIZE, polys);
-		v.S = isEdgePathable(x, y, x, y - CELL_SIZE, polys);
-		v.W = isEdgePathable(x, y, x - CELL_SIZE, y, polys);
-		v.E = isEdgePathable(x, y, x + CELL_SIZE, y, polys);
+		v.N = HoloPF.isEdgePathable(x, y, x, y + CELL_SIZE, polys);
+		v.S = HoloPF.isEdgePathable(x, y, x, y - CELL_SIZE, polys);
+		v.W = HoloPF.isEdgePathable(x, y, x - CELL_SIZE, y, polys);
+		v.E = HoloPF.isEdgePathable(x, y, x + CELL_SIZE, y, polys);
 
-		v.NW = isEdgePathable(x, y, x - CELL_SIZE, y + CELL_SIZE, polys);
-		v.NE = isEdgePathable(x, y, x + CELL_SIZE, y + CELL_SIZE, polys);
-		v.SW = isEdgePathable(x, y, x - CELL_SIZE, y - CELL_SIZE, polys);
-		v.SE = isEdgePathable(x, y, x + CELL_SIZE, y - CELL_SIZE, polys);
+		v.NW = HoloPF.isEdgePathable(x, y, x - CELL_SIZE, y + CELL_SIZE, polys);
+		v.NE = HoloPF.isEdgePathable(x, y, x + CELL_SIZE, y + CELL_SIZE, polys);
+		v.SW = HoloPF.isEdgePathable(x, y, x - CELL_SIZE, y - CELL_SIZE, polys);
+		v.SE = HoloPF.isEdgePathable(x, y, x + CELL_SIZE, y - CELL_SIZE, polys);
 
 		if (ix == 0)
 			v.W = v.NW = v.SW = false;
@@ -417,13 +422,6 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		v.NE = v.NE && (Line2D.ptSegDistSq(x, y, x + CELL_SIZE, y + CELL_SIZE, cb.x, cb.y) >= radSquared);
 		v.SW = v.SW && (Line2D.ptSegDistSq(x, y, x - CELL_SIZE, y - CELL_SIZE, cb.x, cb.y) >= radSquared);
 		v.SE = v.SE && (Line2D.ptSegDistSq(x, y, x + CELL_SIZE, y - CELL_SIZE, cb.x, cb.y) >= radSquared);
-	}
-
-	/**
-	 * @return Whether the given line segment is pathable or not.
-	 */
-	private boolean isEdgePathable(float x, float y, float x2, float y2, Polygons polys) {
-		return HoloPF.isEdgePathable(x, y, x2, y2, polys);
 	}
 
 	private void renderGraph() { // Draw Edges
@@ -560,7 +558,14 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	Polygons expandedMapPolys = new Polygons();
 
 	private void mapStartup() {
-		expandedMapPolys = expandPolygons(map.polys);
+		
+		if(unitControls != null){
+			multiplexer.removeProcessor(unitControls);
+		}
+		unitControls = new UnitControls(camera, shapeRenderer, units);
+		multiplexer.addProcessor(unitControls);
+		
+		expandedMapPolys = expandPolygons(map.polys); //We require one set for each distinct size of unit, for now just one.
 		// Create pathing graph
 		createGraph();
 		// long startTime = System.nanoTime();
@@ -867,7 +872,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 			nearbyPathable = HoloPF.findNearbyReachableVertexes(new Point(vec.x, vec.y), dynamicGraph, graphWidth,
 					graphHeight, 2);
-			return true;
+			return false;
 		}
 		return false;
 	}

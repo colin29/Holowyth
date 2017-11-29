@@ -79,7 +79,11 @@ public class HoloPF {
 		return !intersects;
 	}
 
-	public static boolean isEdgePathable(float x, float y, float x2, float y2, Polygon polygon) {
+	/**
+	 * Determines whether an edge is pathable against a single polygon.
+	 * @return
+	 */
+	public static boolean isEdgePathableAgainstPoly(float x, float y, float x2, float y2, Polygon polygon) {
 		boolean intersects = false;
 		for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
 			if (Line2D.linesIntersect(x, y, x2, y2, polygon.floats[i], polygon.floats[i + 1],
@@ -181,7 +185,10 @@ public class HoloPF {
 
 	/**
 	 * @param maxCellDistance how many cells away to draw from (e.g. distance 1 would consider 9 cells)
-	 * @return A list of the nearest reachable vertexes, sorted in order of distance. (Note these vertexes are live references to the graph's vertexes)
+	 * @return A list of the nearest reachable vertexes, sorted in order of distance. (Note: these are live graph references)
+	 * 
+	 * @reachable reachable is a vertex property in the graph saying that the vertex was explored during floodfill after handling map polygons. 
+	 * It doesn't guarantee pathability in the dynamic context because the floodfill isn't redone each time the dynamic graph is set (against unit bodies). 
 	 */
 	public static ArrayList<Vertex> findNearbyReachableVertexes(Point p, Vertex[][] graph, int graphWidth, int graphHeight,
 			int maxCellDistance) {

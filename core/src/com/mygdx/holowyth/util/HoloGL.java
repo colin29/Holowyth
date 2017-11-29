@@ -87,7 +87,7 @@ public class HoloGL {
 		shapeRenderer.end();
 	}
 	
-	public static void renderEmptyCircle(float x, float y, float radius, ShapeRenderer shapeRenderer, Color color) {
+	public static void renderCircleOutline(float x, float y, float radius, ShapeRenderer shapeRenderer, Color color) {
 		
 		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setColor(color);
