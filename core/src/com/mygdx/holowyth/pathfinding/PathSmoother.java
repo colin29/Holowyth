@@ -5,6 +5,7 @@ import java.util.ListIterator;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.mygdx.holowyth.pathfinding.PathfindingDemo.PathsInfo;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.data.Point;
@@ -19,22 +20,25 @@ public class PathSmoother {
 
 	private Path path0s; // original Path
 	private Path path1s; // path after initial smoothing
+	private Path path2s;
 
 	/**
-	 * 
+	 * @param origPath Should not be null 
 	 * @param unitRadius Radius of the pathing unit
 	 * @return A new path that is a smoothed version of the given path
 	 */
 	public Path smoothPath(Path origPath, Polygons polys, ArrayList<CBInfo> cbs, float unitRadius) {
 
+		path0s = origPath.deepCopy();
+		path1s = null;
+		path2s = null;
+		
 		// Path is at least length 3
 		if (origPath.size() <= 1) {
 			return origPath;
 		}
 
-		path0s = origPath.deepCopy();
 		path1s = origPath.deepCopy();
-
 		ListIterator<Point> iter = path1s.listIterator();
 		Point prev, cur, next;
 
@@ -58,7 +62,7 @@ public class PathSmoother {
 			}
 		}
 
-		Path path2s = doSecondarySmoothing(path1s, polys, cbs, unitRadius);
+		path2s = doSecondarySmoothing(path1s, polys, cbs, unitRadius);
 //		System.out.println("Number of isEdgePathableCalls: "  + testCount);
 		return path2s;
 	}
@@ -314,6 +318,17 @@ public class PathSmoother {
 		// shapeRenderer.rectLine(bestCut.sx, bestCut.sy, bestCut.dx, bestCut.dy, 3f);
 		// shapeRenderer.end();
 
+	}
+	
+	/**
+	 * @return The unsmoothed and partially smoothed path of the last unit processed. The fields can be null if the pathfinding failed.
+	 */
+	public PathsInfo getPathInfo(){
+		PathsInfo paths = new PathsInfo();
+		paths.pathSmoothed0 = this.path0s;
+		paths.pathSmoothed1 = this.path1s;
+		paths.finalPath = this.path2s; 
+		return paths;
 	}
 
 }

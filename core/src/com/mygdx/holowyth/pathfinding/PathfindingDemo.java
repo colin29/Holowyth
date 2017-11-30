@@ -2,6 +2,7 @@ package com.mygdx.holowyth.pathfinding;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -79,6 +80,18 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 	// Logic
 	Timer timer = new Timer();
 
+	// Debug
+	HashMap<Unit, PathsInfo> intermediatePaths;
+
+	/**
+	 * Data class, stores the unsmoothed and partially smoothed paths of a unit.
+	 */
+	static class PathsInfo {
+		Path pathSmoothed0;
+		Path pathSmoothed1;
+		Path finalPath;
+	}
+
 	public PathfindingDemo(final Holowyth game) {
 		this.game = game;
 		this.camera = new OrthographicCamera();
@@ -113,8 +126,8 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 			renderMapBoundaries();
 		}
 
-		renderPaths();
-		renderPathEndPoint(pathSmoothed, Color.GREEN);
+		renderPaths(false);
+		renderUnitDestinations(Color.GREEN);
 		renderUnits();
 
 		unitControls.renderCirclesOnSelectedUnits();
@@ -526,65 +539,89 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 	}
 
 	// Rendering Paths
-	private void renderPaths() {
+	private void renderPaths(boolean renderIntermediatePaths) {
 		// Render Path
-		smoother.render(shapeRenderer);
-		renderPath(pathSmoothed, Color.BLUE, false);
+		
+		if(renderIntermediatePaths){
+			for(Unit unit: units){
+				PathsInfo info = intermediatePaths.get(unit);
+				if(info != null && (unit.path != null || Holo.continueShowingPathAfterArrival)){
+					if(info.finalPath != null){
+						renderPath(info.pathSmoothed0, Color.PINK, false);
+						renderPath(info.pathSmoothed1, Color.FIREBRICK, true);
+						renderPath(info.finalPath, Color.BLUE, false);
+					}
+				}
+			}
+		}
+		
+		for(Unit unit: units){
+			if(unit.path != null){
+				renderPath(unit.path, Color.BLUE, false);
+			}
+			
+		}
 	}
 
 	float pathThickness = 2f;
-
 	private void renderPath(Path path, Color color, boolean renderPoints) {
 		HoloPF.renderPath(path, color, renderPoints, pathThickness, shapeRenderer);
 	}
 
-	private void renderPathEndPoint(Path path, Color color) {
-		if (pathSmoothed != null) {
-			Point finalPoint = pathSmoothed.get(pathSmoothed.size() - 1);
-			shapeRenderer.begin(ShapeType.Filled);
-			shapeRenderer.setColor(color);
-			shapeRenderer.circle(finalPoint.x, finalPoint.y, 4f);
-			shapeRenderer.end();
-
-			shapeRenderer.begin(ShapeType.Line);
-			shapeRenderer.setColor(Color.BLACK);
-			shapeRenderer.circle(finalPoint.x, finalPoint.y, 4f);
-			shapeRenderer.end();
+	private void renderUnitDestinations(Color color) {
+		
+		for (Unit unit: units){
+			if(unit.path != null){
+				Point finalPoint = unit.path.get(unit.path.size() - 1);
+				shapeRenderer.begin(ShapeType.Filled);
+				shapeRenderer.setColor(color);
+				shapeRenderer.circle(finalPoint.x, finalPoint.y, 4f);
+				shapeRenderer.end();
+				
+				shapeRenderer.begin(ShapeType.Line);
+				shapeRenderer.setColor(Color.BLACK);
+				shapeRenderer.circle(finalPoint.x, finalPoint.y, 4f);
+				shapeRenderer.end();
+			}
+			
 		}
 	}
 
 	// *** Run on Map Load (Important!) ***//
 
-	Path pathSmoothed; // for demo use
 	Polygons expandedMapPolys = new Polygons();
 
+	/**
+	 * Logically initializes a bunch of components necessary to run the map
+	 */
 	private void mapStartup() {
-
+		// Unit Controls
 		if (unitControls != null) {
 			multiplexer.removeProcessor(unitControls);
 		}
 		unitControls = new UnitControls(camera, shapeRenderer, units, (UnitOrderer) this);
 		multiplexer.addProcessor(unitControls);
 
+		// Pathfinding Graph
 		expandedMapPolys = expandPolygons(map.polys); // We require one set for each distinct size of unit, for now just
 														// one.
-		// Create pathing graph
 		createGraph();
-		// long startTime = System.nanoTime();
 		floodFillGraph();
-		// long endTime = System.nanoTime();
-		// long duration = (endTime - startTime); // divide by 1000000 to get milliseconds.
-		// System.out.format("Time elapsed: %d mililseconds%n", duration / 1000000);
+
+		// Pathing
+		pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE, map.width(), map.height());
+
+		// Debug
+
+		intermediatePaths = new HashMap<Unit, PathsInfo>();
+
+		//// ---------Test Area---------////:
 
 		// Create units
 		playerUnit = new Unit(35, 20);
 		units.add(playerUnit);
-
+		unitControls.selectedUnits.add(playerUnit);
 		createTestUnits();
-
-		// Search a path between two points
-
-		pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE, map.width(), map.height());
 
 		orderMoveTo(playerUnit, CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
 
@@ -605,7 +642,6 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 		Path path = findPathForUnit(u, dx, dy);
 		if (path != null) {
 			u.setPath(path);
-			this.pathSmoothed = path;
 		}
 	}
 
@@ -649,7 +685,10 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 				unit.getRadius()); // use the dynamic graph
 
 		if (newPath != null) {
-			return smoother.smoothPath(newPath, expandedMapPolys, colBodies, unit.getRadius());
+			Path finalPath = smoother.smoothPath(newPath, expandedMapPolys, colBodies, unit.getRadius());
+			PathsInfo info = smoother.getPathInfo();
+			intermediatePaths.put(unit, info);
+			return finalPath;
 		}
 		return newPath;
 	}

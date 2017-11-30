@@ -26,6 +26,9 @@ public class Holo {
 	//Editor
 	public static String editorInitialMap = "/complexMap.map";
 	
+	//Debug settings
+	public static boolean continueShowingPathAfterArrival = true;
+	
 	private static String getCanonicalPath(String string){
 		try {
 			return Paths.get(string).toRealPath().toString();

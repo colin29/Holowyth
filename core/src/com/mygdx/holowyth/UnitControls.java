@@ -27,7 +27,7 @@ public class UnitControls implements InputProcessor {
 
 	ArrayList<Unit> units;
 
-	ArrayList<Unit> selectedUnits = new ArrayList<Unit>();
+	public ArrayList<Unit> selectedUnits = new ArrayList<Unit>();
 	boolean leftMouseKeyDown = false;
 
 	Unit prospectUnit; // In order to single-select a unit, the user must mouse down on a unit, and mouse up on the same
