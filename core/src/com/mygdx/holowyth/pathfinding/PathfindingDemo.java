@@ -46,7 +46,7 @@ import com.mygdx.holowyth.util.exception.HoloException;
 import com.mygdx.holowyth.util.tools.KeyTracker;
 import com.mygdx.holowyth.util.tools.Timer;
 
-public class PathfindingDemo implements Screen, InputProcessor {
+public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 
 	private final Holowyth game;
 
@@ -104,7 +104,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		camera.update();
 
 		// renderGraph();
-		renderDynamicGraph(true);
+		renderDynamicGraph(false);
 
 		if (this.map != null) {
 			// renderExpandedPolygons();
@@ -113,13 +113,12 @@ public class PathfindingDemo implements Screen, InputProcessor {
 			renderMapBoundaries();
 		}
 
-
 		renderPaths();
 		renderPathEndPoint(pathSmoothed, Color.GREEN);
 		renderUnits();
-		
-		unitControls.renderCirclesOnSelectedUnits();
 
+		unitControls.renderCirclesOnSelectedUnits();
+		unitControls.renderSelectionBox(UnitControls.defaultSelectionBoxColor);
 		// Rendering Test area;
 		HoloGL.renderPolygons(expandedMapPolys, shapeRenderer, Color.GRAY);
 
@@ -136,15 +135,14 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		// Testing area
 
-//		 for (Vertex v : nearbyPathable) {
-//		 HoloGL.renderCircle(v.ix * CELL_SIZE, v.iy * CELL_SIZE, shapeRenderer, Color.RED);
-//		 }
-		
-		//render expanded hit bodies
-		for (Unit u: units){
+		// for (Vertex v : nearbyPathable) {
+		// HoloGL.renderCircle(v.ix * CELL_SIZE, v.iy * CELL_SIZE, shapeRenderer, Color.RED);
+		// }
+
+		// render expanded hit bodies
+		for (Unit u : units) {
 			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + Holo.UNIT_RADIUS, shapeRenderer, Color.GRAY);
 		}
-		 
 
 		// pathing.stepAStar();
 
@@ -389,29 +387,32 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 	/**
 	 * Given a vertex, restrict it's pathability based on the expanded collision circle of the unit
-	 * @param unit Radius of the radius of the unit which is pathing. Used to get expanded geometry. 
+	 * 
+	 * @param unit
+	 *            Radius of the radius of the unit which is pathing. Used to get expanded geometry.
 	 */
 	public void restrictVertex(Vertex v, CBInfo cb, float unitRadius) {
 		float x = v.ix * CELL_SIZE;
 		float y = v.iy * CELL_SIZE;
-		
-		//if the vertex is inside the unit's expanded pathing body, we can immediately block it.
-		
+
+		// if the vertex is inside the unit's expanded pathing body, we can immediately block it.
+
 		Point p1 = new Point(x, y);
 		Point p2 = new Point(cb.x, cb.y);
 		float dist = Point.calcDistance(p1, p2);
-		
+
 		float expandedRadius = cb.unitRadius + unitRadius;
 		float radSquared = expandedRadius * expandedRadius;
-		
-		if(dist < expandedRadius){
+
+		if (dist < expandedRadius) {
 			v.block();
 			return;
 		}
-		
-		//If it's outside, we still have to check its edges to block the right ones.
-		
-		//an edge is pathable if it's closest distance to the center of the circle is equal or greater to than the expanded radius
+
+		// If it's outside, we still have to check its edges to block the right ones.
+
+		// an edge is pathable if it's closest distance to the center of the circle is equal or greater to than the
+		// expanded radius
 
 		v.N = v.N && (Line2D.ptSegDistSq(x, y, x, y + CELL_SIZE, cb.x, cb.y) >= radSquared);
 		v.S = v.S && (Line2D.ptSegDistSq(x, y, x, y - CELL_SIZE, cb.x, cb.y) >= radSquared);
@@ -558,14 +559,15 @@ public class PathfindingDemo implements Screen, InputProcessor {
 	Polygons expandedMapPolys = new Polygons();
 
 	private void mapStartup() {
-		
-		if(unitControls != null){
+
+		if (unitControls != null) {
 			multiplexer.removeProcessor(unitControls);
 		}
-		unitControls = new UnitControls(camera, shapeRenderer, units);
+		unitControls = new UnitControls(camera, shapeRenderer, units, (UnitOrderer) this);
 		multiplexer.addProcessor(unitControls);
-		
-		expandedMapPolys = expandPolygons(map.polys); //We require one set for each distinct size of unit, for now just one.
+
+		expandedMapPolys = expandPolygons(map.polys); // We require one set for each distinct size of unit, for now just
+														// one.
 		// Create pathing graph
 		createGraph();
 		// long startTime = System.nanoTime();
@@ -599,13 +601,11 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		units.add(new Unit(750, 450));
 	}
 
-	private void orderMoveTo(Unit u, float dx, float dy) {
+	public void orderMoveTo(Unit u, float dx, float dy) {
 		Path path = findPathForUnit(u, dx, dy);
 		if (path != null) {
 			u.setPath(path);
-			if (u == playerUnit) {
-				this.pathSmoothed = path;
-			}
+			this.pathSmoothed = path;
 		}
 	}
 
@@ -626,7 +626,7 @@ public class PathfindingDemo implements Screen, InputProcessor {
 			c.unitRadius = Holo.UNIT_RADIUS;
 			colBodies.add(c);
 		}
-		
+
 		// Generate dynamic graph;
 
 		// Start with the base graph
@@ -645,7 +645,8 @@ public class PathfindingDemo implements Screen, InputProcessor {
 
 		revertDynamicGraph();
 		setDynamicGraph(colBodies, unit);
-		Path newPath = pathing.doAStar(unit.x, unit.y, dx, dy, expandedMapPolys, colBodies, dynamicGraph, unit.getRadius()); // use the dynamic graph
+		Path newPath = pathing.doAStar(unit.x, unit.y, dx, dy, expandedMapPolys, colBodies, dynamicGraph,
+				unit.getRadius()); // use the dynamic graph
 
 		if (newPath != null) {
 			return smoother.smoothPath(newPath, expandedMapPolys, colBodies, unit.getRadius());
@@ -849,29 +850,17 @@ public class PathfindingDemo implements Screen, InputProcessor {
 		return false;
 	}
 
-	ArrayList<Vertex> nearbyPathable = new ArrayList<Vertex>();
-
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 
-		// System.out.println("Touch: " + screenX + " " + screenY);
 		if (button == Input.Buttons.LEFT && pointer == 0) {
-
-			// Order the unit to move to the location using the path from A*
-			Vector3 vec = new Vector3();
-
-			vec = camera.unproject(vec.set(screenX, screenY, 0));
-			// if(testing.hit(vec.x, vec.y, true) != null){// if this is the case, then some stage actor is blocking the
-			// click and we should act like that
-			// return false;
-			// }
-
-			orderMoveTo(playerUnit, vec.x, vec.y);
 
 			// Testing area
 
-			nearbyPathable = HoloPF.findNearbyReachableVertexes(new Point(vec.x, vec.y), dynamicGraph, graphWidth,
-					graphHeight, 2);
+			// Vector3 vec = new Vector3();
+			// vec = camera.unproject(vec.set(screenX, screenY, 0));
+			// orderMoveTo(playerUnit, vec.x, vec.y);
+
 			return false;
 		}
 		return false;
