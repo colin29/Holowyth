@@ -25,40 +25,60 @@ import de.lighti.clipper.ClipperOffset;
  */
 public class HoloPF {
 
-	
-	
 	/**
 	 * Determines whether an edge is pathable against a set of collision bodies (map polygons and unit circles)
+	 * 
 	 * @param x
 	 * @param y
 	 * @param x2
 	 * @param y2
 	 * @param polys
-	 * @param cbs The collision bodies for units
+	 * @param cbs
+	 *            The collision bodies for units
 	 * @return
 	 */
-	public static boolean isEdgePathable(float x, float y, float x2, float y2, Polygons polys, ArrayList<CBInfo> cbs, float unitRadius) {
+	public static boolean isEdgePathable(float x, float y, float x2, float y2, Polygons polys, ArrayList<CBInfo> cbs,
+			float unitRadius) {
 		boolean intersects = false;
-		for (Polygon polygon : polys) {
-			for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
-				if (Line2D.linesIntersect(x, y, x2, y2, polygon.floats[i], polygon.floats[i + 1],
-						polygon.floats[(i + 2) % polygon.count], polygon.floats[(i + 3) % polygon.count])) {
-					intersects = true;
+		if (polys != null) {
+			for (Polygon polygon : polys) {
+				for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
+					if (Line2D.linesIntersect(x, y, x2, y2, polygon.floats[i], polygon.floats[i + 1],
+							polygon.floats[(i + 2) % polygon.count], polygon.floats[(i + 3) % polygon.count])) {
+						intersects = true;
+					}
 				}
 			}
 		}
-		
+
 		// Check against unit circles
-		for(CBInfo cb: cbs){
-			if (Line2D.ptSegDistSq(x, y, x2, y2, cb.x, cb.y) < (cb.unitRadius+unitRadius) * (cb.unitRadius+unitRadius)){
+		for (CBInfo cb : cbs) {
+			if (Line2D.ptSegDistSq(x, y, x2, y2, cb.x, cb.y) < (cb.unitRadius + unitRadius)
+					* (cb.unitRadius + unitRadius)) {
 				intersects = true;
 			}
 		}
 		return !intersects;
 	}
-	
+
+	public static ArrayList<CBInfo> getUnitCollisions(float x, float y, float x2, float y2, ArrayList<CBInfo> cbs,
+			float unitRadius) {
+		boolean intersects = false;
+		ArrayList<CBInfo> collisions = new ArrayList<CBInfo>();
+		// Check against unit circles
+		for (CBInfo cb : cbs) {
+			if (Line2D.ptSegDistSq(x, y, x2, y2, cb.x, cb.y) < (cb.unitRadius + unitRadius)
+					* (cb.unitRadius + unitRadius)) {
+				intersects = true;
+				collisions.add(cb);
+			}
+		}
+		return collisions;
+	}
+
 	/**
 	 * Determines whether an edge is pathable against a set of collision bodies (just map polygons)
+	 * 
 	 * @param x
 	 * @param y
 	 * @param x2
@@ -81,6 +101,7 @@ public class HoloPF {
 
 	/**
 	 * Determines whether an edge is pathable against a single polygon.
+	 * 
 	 * @return
 	 */
 	public static boolean isEdgePathableAgainstPoly(float x, float y, float x2, float y2, Polygon polygon) {
@@ -184,76 +205,78 @@ public class HoloPF {
 	}
 
 	/**
-	 * @param maxCellDistance how many cells away to draw from (e.g. distance 1 would consider 9 cells)
-	 * @return A list of the nearest reachable vertexes, sorted in order of distance. (Note: these are live graph references)
+	 * @param maxCellDistance
+	 *            how many cells away to draw from (e.g. distance 1 would consider 9 cells)
+	 * @return A list of the nearest reachable vertexes, sorted in order of distance. (Note: these are live graph
+	 *         references)
 	 * 
-	 * @reachable reachable is a vertex property in the graph saying that the vertex was explored during floodfill after handling map polygons. 
-	 * It doesn't guarantee pathability in the dynamic context because the floodfill isn't redone each time the dynamic graph is set (against unit bodies). 
+	 * @reachable reachable is a vertex property in the graph saying that the vertex was explored during floodfill after
+	 *            handling map polygons. It doesn't guarantee pathability in the dynamic context because the floodfill
+	 *            isn't redone each time the dynamic graph is set (against unit bodies).
 	 */
-	public static ArrayList<Vertex> findNearbyReachableVertexes(Point p, Vertex[][] graph, int graphWidth, int graphHeight,
-			int maxCellDistance) {
+	public static ArrayList<Vertex> findNearbyReachableVertexes(Point p, Vertex[][] graph, int graphWidth,
+			int graphHeight, int maxCellDistance) {
 
-		int ix = (int) (p.x / Holo.CELL_SIZE); ; // corresponds to the closest lower left vertex
-		int iy = (int) (p.y /  Holo.CELL_SIZE);
+		int ix = (int) (p.x / Holo.CELL_SIZE);
+		; // corresponds to the closest lower left vertex
+		int iy = (int) (p.y / Holo.CELL_SIZE);
 
 		ArrayList<Vertex> prospects = new ArrayList<Vertex>();
-		
-		//Only consider vertexes inside the graph
+
+		// Only consider vertexes inside the graph
 		for (int cx = ix - maxCellDistance; cx <= ix + maxCellDistance; cx++) { // cx "current x"
-			for(int cy = iy - maxCellDistance; cy <= iy + maxCellDistance; cy++){
+			for (int cy = iy - maxCellDistance; cy <= iy + maxCellDistance; cy++) {
 				Vertex v = new Vertex(cx, cy);
-				if(isVertexInMap(v, graphWidth, graphHeight)){
+				if (isVertexInMap(v, graphWidth, graphHeight)) {
 					prospects.add(v);
 				}
 			}
 		}
-		
+
 		ArrayList<VertexDist> vds = new ArrayList<VertexDist>();
-		for(Vertex v: prospects){
-			if(graph[v.iy][v.ix].reachable){
+		for (Vertex v : prospects) {
+			if (graph[v.iy][v.ix].reachable) {
 				vds.add(new VertexDist(graph[v.iy][v.ix], p.x, p.y, Holo.CELL_SIZE));
 			}
 		}
-		vds.sort((VertexDist vd1, VertexDist vd2) ->  (vd1.dist - vd2.dist >= 0) ? 1 : -1);
-		
+		vds.sort((VertexDist vd1, VertexDist vd2) -> (vd1.dist - vd2.dist >= 0) ? 1 : -1);
+
 		ArrayList<Vertex> vertexes = new ArrayList<Vertex>();
-		for(VertexDist vd: vds){
+		for (VertexDist vd : vds) {
 			vertexes.add(vd.vertex); // note these are live graph references
 		}
 		return vertexes;
 	}
-	
-
 
 	public static Vertex findClosestReachableVertex(Point p, Vertex[][] graph, int graphWidth, int graphHeight,
 			int maxCellDistance) {
 		ArrayList<Vertex> result = findNearbyReachableVertexes(p, graph, graphWidth, graphHeight, maxCellDistance);
 		return result.size() > 0 ? result.get(0) : null;
 	}
-	
-	
-	public static boolean isPointInMap(Point p, int mapWidth, int mapHeight){
-		if(p.x <0 || p.x> mapWidth)
+
+	public static boolean isPointInMap(Point p, int mapWidth, int mapHeight) {
+		if (p.x < 0 || p.x > mapWidth)
 			return false;
-		if(p.y <0 || p.y > mapHeight)
+		if (p.y < 0 || p.y > mapHeight)
 			return false;
 		return true;
 	}
-	
+
 	/**
-	 * @return true if the vertex is within the map's graph 
+	 * @return true if the vertex is within the map's graph
 	 */
-	public static boolean isVertexInMap(Vertex v, int graphWidth, int graphHeight){
-		if(v.ix <0 || v.ix>=graphWidth)
+	public static boolean isVertexInMap(Vertex v, int graphWidth, int graphHeight) {
+		if (v.ix < 0 || v.ix >= graphWidth)
 			return false;
-		if(v.iy <0 || v.iy >= graphHeight)
+		if (v.iy < 0 || v.iy >= graphHeight)
 			return false;
 		return true;
 	}
-	public static boolean isIndexInMap(int ix, int iy, int graphWidth, int graphHeight){
-		if(ix <0 || ix>=graphWidth)
+
+	public static boolean isIndexInMap(int ix, int iy, int graphWidth, int graphHeight) {
+		if (ix < 0 || ix >= graphWidth)
 			return false;
-		if(iy <0 || iy >= graphHeight)
+		if (iy < 0 || iy >= graphHeight)
 			return false;
 		return true;
 	}

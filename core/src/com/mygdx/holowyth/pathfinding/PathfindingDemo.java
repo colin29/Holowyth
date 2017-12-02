@@ -19,6 +19,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -42,6 +43,7 @@ import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.constants.Holo;
 import com.mygdx.holowyth.util.data.Coord;
 import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.util.data.Segment;
 import com.mygdx.holowyth.util.exception.ErrorCode;
 import com.mygdx.holowyth.util.exception.HoloException;
 import com.mygdx.holowyth.util.tools.KeyTracker;
@@ -116,8 +118,8 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 				| (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
 		camera.update();
 
-		// renderGraph();
-		renderDynamicGraph(false);
+		renderGraph(false);
+		//renderDynamicGraph(false);
 
 		if (this.map != null) {
 			// renderExpandedPolygons();
@@ -127,10 +129,14 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 		}
 
 		renderPaths(false);
+		for(Unit u: units){
+			u.renderNextWayPoint(shapeRenderer);
+		}
 		renderUnitDestinations(Color.GREEN);
+		
+		unitControls.renderCirclesOnSelectedUnits();
 		renderUnits();
 
-		unitControls.renderCirclesOnSelectedUnits();
 		unitControls.renderSelectionBox(UnitControls.defaultSelectionBoxColor);
 		// Rendering Test area;
 		HoloGL.renderPolygons(expandedMapPolys, shapeRenderer, Color.GRAY);
@@ -148,6 +154,8 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 
 		// Testing area
 
+		
+		
 		// for (Vertex v : nearbyPathable) {
 		// HoloGL.renderCircle(v.ix * CELL_SIZE, v.iy * CELL_SIZE, shapeRenderer, Color.RED);
 		// }
@@ -254,7 +262,7 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 
 		// Add Widgets here
 
-		// createParameterWindow();
+//		createParameterWindow();
 
 		root.debug();
 
@@ -271,7 +279,7 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 
 		// root.add(new TextButton("test", skin));
 		stage.addActor(testing);
-		HoloUI.parameterSlider(0, 0.04f, "linearAccel", testing, skin, (Float f) -> playerUnit.linearAccelRate = f);
+		HoloUI.parameterSlider(0.01f, 10f, "COLLISION_CLEARANCE_DISTANCE", testing, skin, (Float f) -> Holo.collisionClearanceDistance = f);
 		HoloUI.parameterSlider(0, Holo.defaultUnitMoveSpeed, "initialMoveSpeed", testing, skin,
 				(Float f) -> playerUnit.initialMoveSpeed = f);
 		testing.pack();
@@ -438,32 +446,36 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 		v.SE = v.SE && (Line2D.ptSegDistSq(x, y, x + CELL_SIZE, y - CELL_SIZE, cb.x, cb.y) >= radSquared);
 	}
 
-	private void renderGraph() { // Draw Edges
-		// shapeRenderer.setColor(Color.CORAL);
-		// shapeRenderer.begin(ShapeType.Line);
-		// for (int y = 0; y < graphHeight; y++) {
-		// for (int x = 0; x < graphWidth; x++) {
-		// Vertex v = graph[y][x];
-		// if (v.N)
-		// drawLine(x, y, x, y + 1);
-		// if (v.S)
-		// drawLine(x, y, x, y - 1);
-		// if (v.W)
-		// drawLine(x, y, x - 1, y);
-		// if (v.E)
-		// drawLine(x, y, x + 1, y);
-		//
-		// if (v.NW)
-		// drawLine(x, y, x - 1, y + 1);
-		// if (v.NE)
-		// drawLine(x, y, x + 1, y + 1);
-		// if (v.SW)
-		// drawLine(x, y, x - 1, y - 1);
-		// if (v.SE)
-		// drawLine(x, y, x + 1, y - 1);
-		// }
-		// }
-		// shapeRenderer.end();
+	private void renderGraph(boolean renderEdges) {
+
+		if (renderEdges) {
+			// Draw Edges
+			shapeRenderer.setColor(Color.CORAL);
+			shapeRenderer.begin(ShapeType.Line);
+			for (int y = 0; y < graphHeight; y++) {
+				for (int x = 0; x < graphWidth; x++) {
+					Vertex v = graph[y][x];
+					if (v.N)
+						drawLine(x, y, x, y + 1);
+					if (v.S)
+						drawLine(x, y, x, y - 1);
+					if (v.W)
+						drawLine(x, y, x - 1, y);
+					if (v.E)
+						drawLine(x, y, x + 1, y);
+
+					if (v.NW)
+						drawLine(x, y, x - 1, y + 1);
+					if (v.NE)
+						drawLine(x, y, x + 1, y + 1);
+					if (v.SW)
+						drawLine(x, y, x - 1, y - 1);
+					if (v.SE)
+						drawLine(x, y, x + 1, y - 1);
+				}
+			}
+			shapeRenderer.end();
+		}
 
 		// Draw vertexes as points
 		shapeRenderer.setColor(Color.BLACK);
@@ -557,7 +569,7 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 		
 		for(Unit unit: units){
 			if(unit.path != null){
-				renderPath(unit.path, Color.BLUE, false);
+				renderPath(unit.path, Color.GRAY, false);
 			}
 			
 		}
@@ -680,7 +692,9 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 		}
 
 		revertDynamicGraph();
+		if(!Holo.debugPathfindingIgnoreUnits){
 		setDynamicGraph(colBodies, unit);
+		}
 		Path newPath = pathing.doAStar(unit.x, unit.y, dx, dy, expandedMapPolys, colBodies, dynamicGraph,
 				unit.getRadius()); // use the dynamic graph
 
@@ -759,13 +773,85 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 			u.tickLogic();
 		}
 	}
+	
 
 	private void moveUnits() {
 		for (Unit u : units) {
-			u.move();
-		}
-	}
+			
+			// Validate the motion by checking against other colliding bodies.
+			
+			float dx = u.x + u.vx;
+			float dy = u.y + u.vy;
+			
+			if(u.vx == 0 && u.vy == 0){
+				continue;
+			}
+			
+			Segment motion = new Segment(u.x, u.y, dx, dy);
+			
+			ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
+			for (Unit a : units) {
+				if (u.equals(a)) { // don't consider the unit's own collision body
+					continue;
+				}
 
+				CBInfo c = new CBInfo();
+				c.x = a.x;
+				c.y = a.y;
+				c.unitRadius = a.getRadius();
+				colBodies.add(c);
+			}
+			ArrayList<CBInfo> collisions = HoloPF.getUnitCollisions(motion.sx, motion.sy, motion.dx, motion.dy, colBodies, u.getRadius());
+			if(collisions.isEmpty()){
+				u.x += u.vx;
+				u.y += u.vy;
+			}else{
+				
+				//if line intersects with one or more other units. (should be max two, since units should not be overlapped)
+				if(collisions.size() > 2){
+					System.out.println("Wierd case, unit colliding with more than 2 units");
+				}
+				//TODO: handle case where velocity is 0,0
+				
+				float curDestx = u.x + u.vx;
+				float curDesty = u.y + u.vy;
+				//Vector2 curVel = new Vector2(u.vx, u.vy);
+				
+				System.out.format("%s is colliding with %s bodies%n", u, collisions.size());
+				
+				
+				
+				
+				for(CBInfo cb: collisions){
+					Vector2 dist = new Vector2(curDestx-cb.x, curDesty - cb.y);
+
+					// At first, dist is smaller than the combined radius, but previous push outs might have changed this.
+					if(dist.len() > cb.unitRadius + u.getRadius()){
+						continue;
+					}
+
+					// expand
+					Vector2 pushedOut = new Vector2(dist).setLength(cb.unitRadius + u.getRadius() + Holo.collisionClearanceDistance);
+					// TODO: handle edge case here dist is 0
+					
+					curDestx = cb.x + pushedOut.x;
+					curDesty = cb.y + pushedOut.y;
+				}
+				
+				// Take this motion if it's valid, otherwise don't move unit.				
+				if(HoloPF.isEdgePathable(u.x, u.y, curDestx, curDesty, this.expandedMapPolys, colBodies, u.getRadius())){
+					u.x = curDestx;
+					u.y = curDesty;
+				}
+				//return; //debugging, step for every movement that has collisions
+				
+			}
+			
+		}
+		
+		
+	}
+	
 	private void renderUnits() {
 		for (Unit unit : units) {
 			shapeRenderer.begin(ShapeType.Filled);

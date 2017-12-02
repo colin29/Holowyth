@@ -1,9 +1,10 @@
 package com.mygdx.holowyth.pathfinding;
 
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.polygon.Polygon;
+import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.constants.Holo;
-import com.mygdx.holowyth.util.data.Pair;
 import com.mygdx.holowyth.util.data.Point;
 
 public class Unit {
@@ -16,7 +17,7 @@ public class Unit {
 	public float curSpeed;
 	public float linearAccelRate = 0.08f;
 	public float factorAccel = 0.01f;
-	public float initialMoveSpeed = Holo.defaultUnitMoveSpeed; //0.32f;
+	public float initialMoveSpeed = Holo.defaultUnitMoveSpeed; // 0.32f;
 
 	public float quadAccelNormSpeed = 1f;
 	public float quadraticAccelRate = 0.02f;
@@ -24,17 +25,21 @@ public class Unit {
 	Path path;
 
 	private static final float SQRT2 = 1.414214f;
-	
+
 	private float radius = Holo.UNIT_RADIUS;
-	
+
+	private static int curId = 0;
+	private final int ID;
+
 	Unit() {
+		this.ID = this.getNextId();
 	}
 
 	public Unit(float x, float y) {
 		this();
 		this.x = x;
 		this.y = y;
-		
+
 	}
 
 	// ** Main function **/
@@ -50,36 +55,35 @@ public class Unit {
 		this.curSpeed = calculateInitialMoveSpeed();
 		isDecelerating = false;
 	}
-	
+
 	/**
-	 * When a unit is given a move command that is in a similiar direction then it is already travelling, it doesn't need to slow down
+	 * When a unit is given a move command that is in a similiar direction then it is already travelling, it doesn't
+	 * need to slow down
 	 */
-	private float calculateInitialMoveSpeed(){
-		
-		if(curSpeed < initialMoveSpeed || curSpeed < 0.001){
+	private float calculateInitialMoveSpeed() {
+
+		if (curSpeed < initialMoveSpeed || curSpeed < 0.001) {
 			return initialMoveSpeed;
 		}
-		
+
 		Point waypoint = path.get(1);
 		Vector2 v = new Vector2(vx, vy);
-		Vector2 p = new Vector2(waypoint.x-this.x, waypoint.y-this.y);
-		
-		
-		if(p.len2() < 0.001){
+		Vector2 p = new Vector2(waypoint.x - this.x, waypoint.y - this.y);
+
+		if (p.len2() < 0.001) {
 			return initialMoveSpeed;
 		}
-		
+
 		v.nor();
 		p.nor();
 		float cross = v.dot(p);
-		
-		float s = Math.min(initialMoveSpeed + curSpeed*cross, curSpeed);
+
+		float s = Math.min(initialMoveSpeed + curSpeed * cross, curSpeed);
 		s = Math.max(s, initialMoveSpeed);
-//		System.out.println("initial  move speed: " + s);
-		
+		// System.out.println("initial move speed: " + s);
+
 		return s;
-		
-		
+
 	}
 
 	private void determineMovement() {
@@ -163,10 +167,10 @@ public class Unit {
 		float dSpeed = 0; // is negative
 
 		if (useQuadraticDecel) {
-			//sum up distance required to achieve desired speed
+			// sum up distance required to achieve desired speed
 			for (float s = curSpeed; s > targetFinalSpeed; s -= quadDecelRate * (quadDecelNormSpeed / s)) {
 				distanceToDecel += s - quadDecelRate * (quadDecelNormSpeed / s);
-				// 
+				//
 			}
 			dSpeed = -1 * quadDecelRate * (quadDecelNormSpeed) / curSpeed;
 
@@ -176,11 +180,11 @@ public class Unit {
 			dSpeed = -linearDecelRate;
 		}
 
-//		System.out.format("curSpeed %s, Time to Decel %s, Distance %s, Decel dist %s, %n", curSpeed, timeToDecel,
-//				distanceToGoal, distanceToDecel);
+		// System.out.format("curSpeed %s, Time to Decel %s, Distance %s, Decel dist %s, %n", curSpeed, timeToDecel,
+		// distanceToGoal, distanceToDecel);
 
 		if (distanceToGoal < distanceToDecel) {
-//			System.out.println("Decelling");
+			// System.out.println("Decelling");
 			curSpeed = Math.max(curSpeed + dSpeed, targetFinalSpeed);
 			isDecelerating = true;
 		}
@@ -188,13 +192,23 @@ public class Unit {
 		return curSpeed;
 	}
 
-	public void move() {
-		this.x += vx;
-		this.y += vy;
-	}
-	
-	public float getRadius(){
+	public float getRadius() {
 		return radius;
+	}
+
+	private static int getNextId() {
+		return curId++;
+	}
+
+	public String toString() {
+		return String.format("Unit[ID: %s]", this.ID);
+
+	}
+	public void renderNextWayPoint(ShapeRenderer shapeRenderer){
+		if(path != null){
+			Point p =  path.get(waypointIndex);
+			HoloGL.renderCircle(p.x, p.y, shapeRenderer, Color.FIREBRICK);
+		}
 	}
 
 }

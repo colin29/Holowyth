@@ -72,7 +72,6 @@ public class HoloGL {
 	 * Often used function for debugging purposes.
 	 */
 	public static void renderCircle(float x, float y, ShapeRenderer shapeRenderer, Color color) {
-
 		
 		float pointSize = 3f;
 		shapeRenderer.begin(ShapeType.Filled);
