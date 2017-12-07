@@ -5,7 +5,6 @@ import java.util.ListIterator;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.mygdx.holowyth.pathfinding.PathfindingDemo.PathsInfo;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.data.Point;
@@ -329,6 +328,15 @@ public class PathSmoother {
 		paths.pathSmoothed1 = this.path1s;
 		paths.finalPath = this.path2s; 
 		return paths;
+	}
+	
+	/**
+	 * Data class, stores the unsmoothed and partially smoothed paths of a unit.
+	 */
+	public static class PathsInfo {
+	 	public Path pathSmoothed0;
+		public Path pathSmoothed1;
+		public Path finalPath;
 	}
 
 }

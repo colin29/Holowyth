@@ -22,7 +22,7 @@ public class Unit {
 	public float quadAccelNormSpeed = 1f;
 	public float quadraticAccelRate = 0.02f;
 	public float maxAccelFactor = 5;
-	Path path;
+	public Path path;
 
 	private static final float SQRT2 = 1.414214f;
 
