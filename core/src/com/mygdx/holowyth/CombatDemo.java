@@ -1,9 +1,6 @@
 package com.mygdx.holowyth;
 
-import java.awt.geom.Line2D;
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
@@ -27,29 +24,22 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Queue;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.map.Field;
-import com.mygdx.holowyth.pathfinding.AStarSearch;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
-import com.mygdx.holowyth.pathfinding.PathSmoother;
-import com.mygdx.holowyth.pathfinding.PathSmoother.PathsInfo;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.pathfinding.Unit;
 import com.mygdx.holowyth.pathfinding.UnitOrderer;
-import com.mygdx.holowyth.pathfinding.Vertex;
-import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.constants.Holo;
-import com.mygdx.holowyth.util.data.Coord;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 import com.mygdx.holowyth.util.exception.ErrorCode;
@@ -496,7 +486,7 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 		
 	}
 	
-	/* vvvvvvv Boilerplate code vvvvvvv */
+	/* Below is boilerplate code for running a demo  */
 
 	// UI and Disk
 
