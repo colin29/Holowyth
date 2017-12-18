@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.kotcrab.vis.ui.VisUI;
 import com.mygdx.holowyth.util.HoloUI;
@@ -30,14 +31,15 @@ public class FooGame extends Game {
 	@Override
 	public void create() {
 
+		this.assets = new AssetManager();
 		initFonts();
 		
 		VisUI.load();
 		initializeSharedResources();
 
-		this.assets = new AssetManager();
+		
 		loadCommonAssets();
-		this.setScreen(new FooScreen2(this));
+		this.setScreen(new FooScreen3(this));
 	}
 
 	@Override
@@ -65,7 +67,7 @@ public class FooGame extends Game {
 		HoloUI.addJapaneseCharacters(parameter);
 		parameter.color = Color.WHITE;
 		this.font_goth36 = generator.generateFont(parameter);
-
+		
 	}
 	
 	private void loadCommonAssets(){

@@ -20,7 +20,7 @@ public class HoloGL {
 		if (s != null) {
 			shapeRenderer.begin(ShapeType.Filled);
 			shapeRenderer.setColor(color);
-			shapeRenderer.rectLine(s.sx, s.sy, s.dx, s.dy, 1.5f);
+			shapeRenderer.rectLine(s.x1, s.y1, s.x2, s.y2, 1.5f);
 			shapeRenderer.end();
 		}
 	}

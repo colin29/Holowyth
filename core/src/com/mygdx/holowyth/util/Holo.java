@@ -1,7 +1,9 @@
-package com.mygdx.holowyth.util.constants;
+package com.mygdx.holowyth.util;
 
 import java.io.IOException;
 import java.nio.file.Paths;
+
+import com.badlogic.gdx.graphics.Color;
 
 public class Holo {
 	
@@ -18,7 +20,7 @@ public class Holo {
 	public static int defaultMapHeight = 600;
 	
 	
-	//Parameters for testing
+	// Pathfinding and collision detection
 	public static float defaultUnitMoveSpeed = 0.8f; //world units per frame
 	public static float collisionClearanceDistance = defaultUnitMoveSpeed/5; //extra distance "pushed out" by the collision detection upon collision
 	
@@ -34,8 +36,22 @@ public class Holo {
 		}
 	}
 	
+	// Combat movement
+	public static float defaultUnitEngageRange = 5;
+	public static float defaultUnitDisengageRange = defaultUnitEngageRange + 5; //the distance the enemy must travel before it stops receiving attacks from the unit.
+	
+	
+	
+	
+	
+	
 	//Editor
 	public static String editorInitialMap = "/complexMap.map";//"/blankMap.map";
+	
+	
+	//Debug display
+	
+	public static Color debugFontColor = Color.BLACK;
 	
 	//Debug settings
 	public static boolean continueShowingPathAfterArrival = true;

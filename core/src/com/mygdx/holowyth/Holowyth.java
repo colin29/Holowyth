@@ -12,7 +12,9 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.badlogic.gdx.graphics.g2d.freetype.FreetypeFontLoader.FreeTypeFontLoaderParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
@@ -28,11 +30,18 @@ public class Holowyth extends Game {
 	public SpriteBatch batch;
 	public ShapeRenderer shapeRenderer;
 
+	
+	/* Fonts */
 	public BitmapFont font;
+	public BitmapFont font_goth12;
 	public BitmapFont font_goth36;
+	
+	public BitmapFont debugFont;
+	
+	/* Skins */
+	Skin skin;
 
 	public AssetManager assets;
-
 	// IO
 	public FileChooser fileChooser;
 
@@ -55,12 +64,14 @@ public class Holowyth extends Game {
 	public void create() {
 
 		VisUI.load();
-
+		skin = VisUI.getSkin();
+		
+		this.assets = new AssetManager();
+		
 		initFileChoosers();
 		initializeSharedResources();
 		initFonts();
-
-		this.assets = new AssetManager();
+		
 		LoadingScreen loadingScreen = new LoadingScreen(this);
 		loadingScreen.queueAssets();
 		this.assets.finishLoading();
@@ -92,13 +103,22 @@ public class Holowyth extends Game {
 	}
 
 	private void initFonts() {
+		font_goth12 = generateFont("fonts/MS_Gothic.ttf", Color.WHITE, 12);
+		font_goth36 = generateFont("fonts/MS_Gothic.ttf", Color.WHITE, 36);
+		
+		debugFont= generateFont("fonts/OpenSans.ttf", Color.WHITE, 16);
+	}
+	
+	private BitmapFont generateFont(String path, Color color,  int size){
 		FreeTypeFontGenerator.setMaxTextureSize(FreeTypeFontGenerator.NO_MAXIMUM);
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/MS_Gothic.ttf"));
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(path));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
-		parameter.size = 36;
+		parameter.size = size;
 		// HoloUI.addJapaneseCharacters(parameter);
 		parameter.color = Color.WHITE;
-		this.font_goth36 = generator.generateFont(parameter);
+		BitmapFont font = generator.generateFont(parameter);
+		generator.dispose();
+		return font;
 	}
 
 	private void setScreenToGivenClass() {

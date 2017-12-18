@@ -19,7 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.mygdx.holowyth.util.constants.Holo;
+import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.misc.HoloMisc;
 
 public class Test2 extends ApplicationAdapter {

@@ -1,6 +1,9 @@
 package com.mygdx.holowyth.pathfinding;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
@@ -30,18 +33,18 @@ import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.Unit;
 import com.mygdx.holowyth.UnitControls;
+import com.mygdx.holowyth.World;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.pathfinding.Unit;
-import com.mygdx.holowyth.pathfinding.UnitOrderer;
+import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
-import com.mygdx.holowyth.util.constants.Holo;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 import com.mygdx.holowyth.util.exception.ErrorCode;
@@ -49,7 +52,7 @@ import com.mygdx.holowyth.util.exception.HoloException;
 import com.mygdx.holowyth.util.tools.KeyTracker;
 import com.mygdx.holowyth.util.tools.Timer;
 
-public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
+public class PathfindingDemo implements Screen, InputProcessor, World {
 
 	private final Holowyth game;
 
@@ -364,7 +367,7 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 		if (unitControls != null) {
 			multiplexer.removeProcessor(unitControls);
 		}
-		unitControls = new UnitControls(camera, shapeRenderer, units, (UnitOrderer) this);
+		unitControls = new UnitControls(game, camera, units);
 		multiplexer.addProcessor(unitControls);
 
 		// Pathfinding Graph
@@ -378,7 +381,7 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 		//// ---------Test Area---------////:
 
 		// Create units
-		playerUnit = new Unit(35, 20);
+		playerUnit = new Unit(35, 20, this);
 		units.add(playerUnit);
 		unitControls.selectedUnits.add(playerUnit);
 		createTestUnits();
@@ -388,9 +391,9 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 	}
 
 	private void createTestUnits() {
-		units.add(new Unit(406, 253));
-		units.add(new Unit(550, 122 - Holo.UNIT_RADIUS));
-		units.add(new Unit(750, 450));
+		units.add(new Unit(406, 253, this));
+		units.add(new Unit(550, 122 - Holo.UNIT_RADIUS, this));
+		units.add(new Unit(750, 450, this));
 	}
 	
 	// Unit Logic Related
@@ -399,15 +402,12 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 	Unit playerUnit; // the main unit we are using to demo pathfinding
 
 	public void orderMoveTo(Unit u, float dx, float dy) {
-		Path path = pathingModule.findPathForUnit(u, dx, dy, units);
-		if (path != null) {
-			u.setPath(path);
-		}
+		u.orderMove(dx, dy);
 	}
 	
 	private void tickLogicForUnits() {
 		for (Unit u : units) {
-			u.tickLogic();
+			u.handleGeneralLogic();
 		}
 	}
 	
@@ -437,7 +437,7 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 				c.unitRadius = a.getRadius();
 				colBodies.add(c);
 			}
-			ArrayList<CBInfo> collisions = HoloPF.getUnitCollisions(motion.sx, motion.sy, motion.dx, motion.dy, colBodies, u.getRadius());
+			ArrayList<CBInfo> collisions = HoloPF.getUnitCollisions(motion.x1, motion.y1, motion.x2, motion.y2, colBodies, u.getRadius());
 			if(collisions.isEmpty()){
 				u.x += u.vx;
 				u.y += u.vy;
@@ -632,6 +632,15 @@ public class PathfindingDemo implements Screen, InputProcessor, UnitOrderer {
 	}
 
 	
+	@Override
+	public ArrayList<Unit> getUnits() {
+		return this.units;
+	}
+
+	@Override
+	public PathingModule getPathingModule() {
+		return this.pathingModule;
+	}
 
 
 }

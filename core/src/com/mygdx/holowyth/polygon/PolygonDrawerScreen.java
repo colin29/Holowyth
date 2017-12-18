@@ -115,7 +115,7 @@ public class PolygonDrawerScreen implements Screen, InputProcessor {
 		
 		shapeRenderer.begin(ShapeType.Line);
 		for (Segment s : segs) { // Draw in progress line-segments
-			shapeRenderer.line(s.sx, s.sy, s.dx, s.dy);
+			shapeRenderer.line(s.x1, s.y1, s.x2, s.y2);
 		}
 		shapeRenderer.end();
 
@@ -157,10 +157,10 @@ public class PolygonDrawerScreen implements Screen, InputProcessor {
 
 		if (vertexCount >= 4) {
 			Segment s = new Segment(0, 0, 0, 0);
-			s.sx = vertexes[vertexCount - 4];
-			s.sy = vertexes[vertexCount - 3];
-			s.dx = vertexes[vertexCount - 2];
-			s.dy = vertexes[vertexCount - 1];
+			s.x1 = vertexes[vertexCount - 4];
+			s.y1 = vertexes[vertexCount - 3];
+			s.x2 = vertexes[vertexCount - 2];
+			s.y2 = vertexes[vertexCount - 1];
 			segs.add(s);
 		}
 		points.add(new Point(x, y));

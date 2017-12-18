@@ -1,6 +1,10 @@
 package com.mygdx.holowyth;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
@@ -25,7 +29,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
@@ -34,12 +37,10 @@ import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.pathfinding.Unit;
-import com.mygdx.holowyth.pathfinding.UnitOrderer;
+import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
-import com.mygdx.holowyth.util.constants.Holo;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 import com.mygdx.holowyth.util.exception.ErrorCode;
@@ -47,7 +48,7 @@ import com.mygdx.holowyth.util.exception.HoloException;
 import com.mygdx.holowyth.util.tools.KeyTracker;
 import com.mygdx.holowyth.util.tools.Timer;
 
-public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
+public class CombatDemo implements Screen, InputProcessor, World {
 
 	private final Holowyth game;
 
@@ -64,7 +65,7 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 	private Stage stage;
 	private Table root;
 
-	Skin skin = VisUI.getSkin();
+	Skin skin;
 
 	// App Fields
 	Field map;
@@ -80,11 +81,6 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 	// Logic
 	Timer timer = new Timer();
 
-	
-	
-
-
-
 	public CombatDemo(final Holowyth game) {
 		this.game = game;
 		this.camera = new OrthographicCamera();
@@ -93,6 +89,7 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 		fixedCam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
 		stage = new Stage(new ScreenViewport());
+		skin = game.skin;
 
 		shapeRenderer = game.shapeRenderer;
 		batch = game.batch;
@@ -111,7 +108,7 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 				| (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
 		camera.update();
 
-		pathingModule.renderGraph(false);
+		//pathingModule.renderGraph(false);
 		//renderDynamicGraph(false);
 
 		if (this.map != null) {
@@ -129,11 +126,16 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 		
 		unitControls.renderCirclesOnSelectedUnits();
 		renderUnits();
-
 		unitControls.renderSelectionBox(UnitControls.defaultSelectionBoxColor);
-		// Rendering Test area;
+		
 		pathingModule.renderExpandedMapPolygons();
 
+		debugInfo.setVisible(true);
+		
+		for(Unit u: units){
+			u.renderAttackingLine(shapeRenderer);
+		}
+		
 		// UI
 		stage.act(delta);
 		stage.draw();
@@ -171,14 +173,7 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 
 	}
 
-	private void doOnFrame() {
-		tickLogicForUnits();
-		moveUnits();
 
-		// Testing area
-
-		// System.out.format("Unit xy: (%s, %s) %s %n", playerUnit.x, playerUnit.y, playerUnit.curSpeed);
-	}
 
 	private void renderMapPolygons() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
@@ -246,6 +241,8 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 		root.setFillParent(true);
 		stage.addActor(root);
 		root.top().left();
+		
+		root.addActor(debugInfo);
 
 		// Add Widgets here
 
@@ -254,6 +251,8 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 		root.debug();
 
 		createCoordinateText();
+		
+		createDebugInfoDisplay();
 	}
 
 	Label coordInfo;
@@ -278,10 +277,14 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 		stage.addActor(coordInfo);
 		coordInfo.setPosition(Gdx.graphics.getWidth() - coordInfo.getWidth() - 4, 4);
 	}
-
-
-	// Expanded Geometry
-
+	Table debugInfo = new Table();
+	private void createDebugInfoDisplay(){
+		stage.addActor(debugInfo);
+//		debugInfo.debug();
+		debugInfo.setFillParent(true);
+		debugInfo.left().top();
+		debugInfo.pad(4);
+	}
 
 
 	// Rendering
@@ -358,57 +361,72 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 	 * Logically initializes a bunch of components necessary to run the map
 	 */
 	private void mapStartup(Field map) {
+
 		// Unit Controls
 		if (unitControls != null) {
 			multiplexer.removeProcessor(unitControls);
 		}
-		unitControls = new UnitControls(camera, shapeRenderer, units, (UnitOrderer) this);
+		unitControls = new UnitControls(game, camera, units);
 		multiplexer.addProcessor(unitControls);
 
-		// Pathfinding Graph
-		
+		//Pathing		
 		pathingModule.initForMap(map);
-		// Pathing
 		
-
+		//Debug
+		
+		debugInfo.add(unitControls.getDebugTable());
 
 
 		//// ---------Test Area---------////:
 
 		// Create units
-		playerUnit = new Unit(35, 20);
+		playerUnit = new Unit(220, 220, this);
 		units.add(playerUnit);
 		unitControls.selectedUnits.add(playerUnit);
 		createTestUnits();
 
-		orderMoveTo(playerUnit, CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
+		playerUnit.orderMove(CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
 
 	}
 
 	private void createTestUnits() {
-		units.add(new Unit(406, 253));
-		units.add(new Unit(550, 122 - Holo.UNIT_RADIUS));
-		units.add(new Unit(750, 450));
+		units.add(new Unit(406, 253, this));
+		units.add(new Unit(550, 122 - Holo.UNIT_RADIUS, this));
+		units.add(new Unit(750, 450, this));
 	}
 	
-	// Unit Logic Related
+	/**
+	 * Main function that contains game logic that is run every frame
+	 */
+	private void doOnFrame() {
+		tickLogicForUnits();
+		moveUnits();
+		
+		handleCombatLogic();
+		// Testing area
 
+		// System.out.format("Unit xy: (%s, %s) %s %n", playerUnit.x, playerUnit.y, playerUnit.curSpeed);
+	}
+
+	// Game and Movement Logic
+	
 	ArrayList<Unit> units = new ArrayList<Unit>();
 	Unit playerUnit; // the main unit we are using to demo pathfinding
-
-	public void orderMoveTo(Unit u, float dx, float dy) {
-		Path path = pathingModule.findPathForUnit(u, dx, dy, units);
-		if (path != null) {
-			u.setPath(path);
-		}
-	}
 	
 	private void tickLogicForUnits() {
 		for (Unit u : units) {
-			u.tickLogic();
+			u.handleGeneralLogic();
+		}
+	}
+	private void handleCombatLogic(){
+		for (Unit u : units) {
+			u.handleCombatLogic();
 		}
 	}
 	
+	/** 
+	 * Moves units according to their velocity. Rejects any illegal movements based on collision detection.
+	 */
 	private void moveUnits() {
 		for (Unit u : units) {
 			
@@ -435,7 +453,7 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 				c.unitRadius = a.getRadius();
 				colBodies.add(c);
 			}
-			ArrayList<CBInfo> collisions = HoloPF.getUnitCollisions(motion.sx, motion.sy, motion.dx, motion.dy, colBodies, u.getRadius());
+			ArrayList<CBInfo> collisions = HoloPF.getUnitCollisions(motion.x1, motion.y1, motion.x2, motion.y2, colBodies, u.getRadius());
 			if(collisions.isEmpty()){
 				u.x += u.vx;
 				u.y += u.vy;
@@ -445,7 +463,6 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 				if(collisions.size() > 2){
 					System.out.println("Wierd case, unit colliding with more than 2 units");
 				}
-				//TODO: handle case where velocity is 0,0
 				
 				float curDestx = u.x + u.vx;
 				float curDesty = u.y + u.vy;
@@ -477,7 +494,6 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 					u.x = curDestx;
 					u.y = curDesty;
 				}
-				//return; //debugging, step for every movement that has collisions
 				
 			}
 			
@@ -535,14 +551,24 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 
 	}
 
-	private void loadMap(Field map) {
+	private void loadMap(Field newMap) {
+		
+		if(newMap != null){
+			mapShutdown();
+			this.map = null;
+		}
+	
 		System.out.println("New map loaded");
-		this.map = map;
-		map.hasUnsavedChanges = false;
+		this.map = newMap;
+		newMap.hasUnsavedChanges = false;
 
-		camera.position.set(map.width() / 2, map.height() / 2, 0);
+		camera.position.set(newMap.width() / 2, newMap.height() / 2, 0);
 
-		mapStartup(this.map);
+		mapStartup(newMap);
+	}
+
+	private void mapShutdown(){
+		debugInfo.clear();
 	}
 
 	// Cursor Related
@@ -629,7 +655,13 @@ public class CombatDemo implements Screen, InputProcessor, UnitOrderer {
 		return false;
 	}
 
-	
+	@Override
+	public ArrayList<Unit> getUnits() {
+		return this.units;
+	}
 
-
+	@Override
+	public PathingModule getPathingModule() {
+		return this.pathingModule;
+	}
 }

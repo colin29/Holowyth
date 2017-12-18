@@ -154,7 +154,7 @@ public class AStarSearch {
 			// terminate if this node is the goal
 			if (curNode.vertexID == goalVertex) {
 				searchDone = true;
-				System.out.println("Goal Reached (A* search)");
+//				System.out.println("Goal Reached (A* search)");
 				return;
 			}
 

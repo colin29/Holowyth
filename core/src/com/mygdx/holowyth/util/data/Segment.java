@@ -1,22 +1,22 @@
 package com.mygdx.holowyth.util.data;
 
 public class Segment {
-	public float sx, sy, dx, dy;
+	public float x1, y1, x2, y2;
 	public Segment(float sx, float sy, float dx,  float dy){
-		this.sx = sx;
-		this.sy = sy;
-		this.dx = dx;
-		this.dy = dy;
+		this.x1 = sx;
+		this.y1 = sy;
+		this.x2 = dx;
+		this.y2 = dy;
 	}
 	
 	public Segment(Point a, Point b){
-		this.sx = a.x;
-		this.sy = a.y;
-		this.dx = b.x;
-		this.dy = b.y;
+		this.x1 = a.x;
+		this.y1 = a.y;
+		this.x2 = b.x;
+		this.y2 = b.y;
 	}
 	
 	public float getLength(){
-		return (float) Math.sqrt((dx-sx)*(dx-sx) + (dy-sy)*(dy-sy));
+		return (float) Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
 	}
 }

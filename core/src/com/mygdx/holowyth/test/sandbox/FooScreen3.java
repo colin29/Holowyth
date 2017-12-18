@@ -70,7 +70,7 @@ public class FooScreen3 implements Screen {
 		game.shapeRenderer.translate(0*timeElapsed, 0*timeElapsed, -100 + -0*timeElapsed);
 //		game.shapeRenderer.translate(0*timeElapsed, 0*timeElapsed, -100 + -0*timeElapsed);
 //		game.shapeRenderer.rotate(0, 0, 1, 4*timeElapsed);
-		game.shapeRenderer.rotate(0, 1, 0, 20*timeElapsed);
+		game.shapeRenderer.rotate(0, 0, 1, 20*timeElapsed);
 		game.shapeRenderer.rect(0, 0, width, height);
 		game.shapeRenderer.setColor(Color.BROWN);
 		game.shapeRenderer.rect(-width / 20, -height / 2, width/10, height);
