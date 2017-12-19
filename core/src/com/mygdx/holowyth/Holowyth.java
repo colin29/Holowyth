@@ -39,7 +39,7 @@ public class Holowyth extends Game {
 	public BitmapFont debugFont;
 	
 	/* Skins */
-	Skin skin;
+	public Skin skin;
 
 	public AssetManager assets;
 	// IO

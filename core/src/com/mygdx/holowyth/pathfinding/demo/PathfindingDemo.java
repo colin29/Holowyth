@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.pathfinding;
+package com.mygdx.holowyth.pathfinding.demo;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -33,9 +33,6 @@ import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.Unit;
-import com.mygdx.holowyth.UnitControls;
-import com.mygdx.holowyth.World;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
@@ -52,7 +49,7 @@ import com.mygdx.holowyth.util.exception.HoloException;
 import com.mygdx.holowyth.util.tools.KeyTracker;
 import com.mygdx.holowyth.util.tools.Timer;
 
-public class PathfindingDemo implements Screen, InputProcessor, World {
+public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
 	private final Holowyth game;
 
@@ -73,7 +70,7 @@ public class PathfindingDemo implements Screen, InputProcessor, World {
 
 	// App Fields
 	Field map;
-	UnitControls unitControls;
+	PFUnitControls unitControls;
 	PathingModule pathingModule;
 
 	
@@ -127,7 +124,7 @@ public class PathfindingDemo implements Screen, InputProcessor, World {
 		}
 
 		renderPaths(false);
-		for(Unit u: units){
+		for(PFDemoUnit u: units){
 			u.renderNextWayPoint(shapeRenderer);
 		}
 		renderUnitDestinations(Color.GREEN);
@@ -135,7 +132,7 @@ public class PathfindingDemo implements Screen, InputProcessor, World {
 		unitControls.renderCirclesOnSelectedUnits();
 		renderUnits();
 
-		unitControls.renderSelectionBox(UnitControls.defaultSelectionBoxColor);
+		unitControls.renderSelectionBox(PFUnitControls.defaultSelectionBoxColor);
 		// Rendering Test area;
 		pathingModule.renderExpandedMapPolygons();
 
@@ -159,7 +156,7 @@ public class PathfindingDemo implements Screen, InputProcessor, World {
 		// }
 
 		// render expanded hit bodies
-		for (Unit u : units) {
+		for (PFDemoUnit u : units) {
 			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + Holo.UNIT_RADIUS, shapeRenderer, Color.GRAY);
 		}
 
@@ -296,7 +293,7 @@ public class PathfindingDemo implements Screen, InputProcessor, World {
 		if(renderIntermediatePaths){
 			pathingModule.renderIntermediatePaths(units);
 		}else{
-			for(Unit unit: units){
+			for(PFDemoUnit unit: units){
 				if(unit.path != null){
 					renderPath(unit.path, Color.GRAY, false);
 				}
@@ -313,7 +310,7 @@ public class PathfindingDemo implements Screen, InputProcessor, World {
 
 	private void renderUnitDestinations(Color color) {
 		
-		for (Unit unit: units){
+		for (PFDemoUnit unit: units){
 			if(unit.path != null){
 				Point finalPoint = unit.path.get(unit.path.size() - 1);
 				shapeRenderer.begin(ShapeType.Filled);
@@ -331,7 +328,7 @@ public class PathfindingDemo implements Screen, InputProcessor, World {
 	}
 
 	private void renderUnits() {
-		for (Unit unit : units) {
+		for (PFDemoUnit unit : units) {
 			shapeRenderer.begin(ShapeType.Filled);
 
 			if (unit == playerUnit) {
@@ -346,7 +343,7 @@ public class PathfindingDemo implements Screen, InputProcessor, World {
 		}
 
 		// Render an outline around the unit
-		for (Unit unit : units) {
+		for (PFDemoUnit unit : units) {
 			shapeRenderer.begin(ShapeType.Line);
 			shapeRenderer.setColor(Color.BLACK);
 			shapeRenderer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
@@ -367,7 +364,7 @@ public class PathfindingDemo implements Screen, InputProcessor, World {
 		if (unitControls != null) {
 			multiplexer.removeProcessor(unitControls);
 		}
-		unitControls = new UnitControls(game, camera, units);
+		unitControls = new PFUnitControls(game, camera, units);
 		multiplexer.addProcessor(unitControls);
 
 		// Pathfinding Graph
@@ -381,7 +378,7 @@ public class PathfindingDemo implements Screen, InputProcessor, World {
 		//// ---------Test Area---------////:
 
 		// Create units
-		playerUnit = new Unit(35, 20, this);
+		playerUnit = new PFDemoUnit(35, 20, this);
 		units.add(playerUnit);
 		unitControls.selectedUnits.add(playerUnit);
 		createTestUnits();
@@ -391,28 +388,28 @@ public class PathfindingDemo implements Screen, InputProcessor, World {
 	}
 
 	private void createTestUnits() {
-		units.add(new Unit(406, 253, this));
-		units.add(new Unit(550, 122 - Holo.UNIT_RADIUS, this));
-		units.add(new Unit(750, 450, this));
+		units.add(new PFDemoUnit(406, 253, this));
+		units.add(new PFDemoUnit(550, 122 - Holo.UNIT_RADIUS, this));
+		units.add(new PFDemoUnit(750, 450, this));
 	}
 	
 	// Unit Logic Related
 
-	ArrayList<Unit> units = new ArrayList<Unit>();
-	Unit playerUnit; // the main unit we are using to demo pathfinding
+	ArrayList<PFDemoUnit> units = new ArrayList<PFDemoUnit>();
+	PFDemoUnit playerUnit; // the main unit we are using to demo pathfinding
 
-	public void orderMoveTo(Unit u, float dx, float dy) {
+	public void orderMoveTo(PFDemoUnit u, float dx, float dy) {
 		u.orderMove(dx, dy);
 	}
 	
 	private void tickLogicForUnits() {
-		for (Unit u : units) {
+		for (PFDemoUnit u : units) {
 			u.handleGeneralLogic();
 		}
 	}
 	
 	private void moveUnits() {
-		for (Unit u : units) {
+		for (PFDemoUnit u : units) {
 			
 			// Validate the motion by checking against other colliding bodies.
 			
@@ -426,7 +423,7 @@ public class PathfindingDemo implements Screen, InputProcessor, World {
 			Segment motion = new Segment(u.x, u.y, dx, dy);
 			
 			ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
-			for (Unit a : units) {
+			for (PFDemoUnit a : units) {
 				if (u.equals(a)) { // don't consider the unit's own collision body
 					continue;
 				}
@@ -633,7 +630,7 @@ public class PathfindingDemo implements Screen, InputProcessor, World {
 
 	
 	@Override
-	public ArrayList<Unit> getUnits() {
+	public ArrayList<PFDemoUnit> getUnits() {
 		return this.units;
 	}
 

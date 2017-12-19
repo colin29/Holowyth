@@ -380,7 +380,7 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		//// ---------Test Area---------////:
 
 		// Create units
-		playerUnit = new Unit(220, 220, this);
+		playerUnit = new Unit(220, 220, this, Unit.Side.PLAYER);
 		units.add(playerUnit);
 		unitControls.selectedUnits.add(playerUnit);
 		createTestUnits();
@@ -390,9 +390,9 @@ public class CombatDemo implements Screen, InputProcessor, World {
 	}
 
 	private void createTestUnits() {
-		units.add(new Unit(406, 253, this));
-		units.add(new Unit(550, 122 - Holo.UNIT_RADIUS, this));
-		units.add(new Unit(750, 450, this));
+		units.add(new Unit(406, 253, this, Unit.Side.ENEMY));
+		units.add(new Unit(550, 122 - Holo.UNIT_RADIUS, this, Unit.Side.ENEMY));
+		units.add(new Unit(750, 450, this, Unit.Side.ENEMY));
 	}
 	
 	/**

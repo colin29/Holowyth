@@ -30,7 +30,7 @@ public class PathingModule {
 	PathSmoother smoother = new PathSmoother();
 	
 	// Debug
-		HashMap<Unit, PathsInfo> intermediatePaths;
+		HashMap<UnitInter, PathsInfo> intermediatePaths;
 
 	/**
 	 * @Lifetime can be from app start to app shutdown. Call initFormap() whenever a new map is loaded.
@@ -54,7 +54,7 @@ public class PathingModule {
 		pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE, map.width(), map.height());
 		
 		// Debug
-		intermediatePaths = new HashMap<Unit, PathsInfo>();
+		intermediatePaths = new HashMap<UnitInter, PathsInfo>();
 	}
 	
 	// Graph construction 
@@ -65,20 +65,20 @@ public class PathingModule {
 
 	// Unit pathfinding
 	
-	public Path findPathForUnit(Unit unit, float dx, float dy, ArrayList<Unit> units) {
+	public Path findPathForUnit(UnitInter unit, float dx, float dy, ArrayList<? extends UnitInter> units) {
 	
 		// For pathfinding, need to get expanded geometry of unit collision bodies as well
 	
 		ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
 	
-		for (Unit a : units) {
+		for (UnitInter a : units) {
 			if (unit.equals(a)) { // don't consider the unit's own collision body
 				continue;
 			}
 	
 			CBInfo c = new CBInfo();
-			c.x = a.x;
-			c.y = a.y;
+			c.x = a.getX();
+			c.y = a.getY();
 			c.unitRadius = Holo.UNIT_RADIUS;
 			colBodies.add(c);
 		}
@@ -103,7 +103,7 @@ public class PathingModule {
 		if(!Holo.debugPathfindingIgnoreUnits){
 		setDynamicGraph(colBodies, unit);
 		}
-		Path newPath = pathing.doAStar(unit.x, unit.y, dx, dy, expandedMapPolys, colBodies, dynamicGraph,
+		Path newPath = pathing.doAStar(unit.getX(), unit.getY(), dx, dy, expandedMapPolys, colBodies, dynamicGraph,
 				unit.getRadius()); // use the dynamic graph
 	
 		if (newPath != null) {
@@ -244,7 +244,7 @@ public class PathingModule {
 	 * @param u
 	 *            The pathing unit
 	 */
-	private void setDynamicGraph(ArrayList<CBInfo> infos, Unit u) {
+	private void setDynamicGraph(ArrayList<CBInfo> infos, UnitInter u) {
 
 		for (CBInfo cb : infos) {
 			prospects = new ArrayList<Vertex>();
@@ -426,10 +426,10 @@ public class PathingModule {
 	/**
 	 * Render intermediate paths for all units in the list 
 	 */
-	public void renderIntermediatePaths(ArrayList<Unit> units){
-		for(Unit unit: units){
+	public void renderIntermediatePaths(ArrayList<? extends UnitInter> units){
+		for(UnitInter unit: units){
 			PathsInfo info = intermediatePaths.get(unit);
-			if(info != null && (unit.path != null || Holo.continueShowingPathAfterArrival)){
+			if(info != null && (unit.getPath() != null || Holo.continueShowingPathAfterArrival)){
 				if(info.finalPath != null){
 					renderPath(info.pathSmoothed0, Color.PINK, false);
 					renderPath(info.pathSmoothed1, Color.FIREBRICK, true);

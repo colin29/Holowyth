@@ -1,4 +1,11 @@
-package com.mygdx.holowyth;
+/**
+ * 
+ */
+/**
+ * @author Colin Ta
+ *
+ */
+package com.mygdx.holowyth.pathfinding.demo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,7 +24,10 @@ import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 
-public class Unit implements UnitInter {
+/**
+ * Simpler unit class for use in the Pathfinding demo
+ */
+public class PFDemoUnit implements UnitInter {
 
 	public static float waypointMinDistance = 0.01f;
 
@@ -38,7 +48,7 @@ public class Unit implements UnitInter {
 
 	// World Fields
 	PathingModule pathingModule;
-	ArrayList<Unit> units;
+	ArrayList<PFDemoUnit> units;
 	 
 
 	// Collision Detection
@@ -50,20 +60,15 @@ public class Unit implements UnitInter {
 
 	// Orders
 	Order currentOrder = Order.IDLE;
-	Unit target; // target for the current command.
+	PFDemoUnit target; // target for the current command.
 
 	private static int attackPathfindingInterval = 30;
 	private int framesUntilAttackRepath = attackPathfindingInterval;
 
 	// Combat
-	Unit attacking; // unit the unit is current attacking.
-	private static Map<Unit, Set<Unit>> unitsAttacking = new HashMap<Unit, Set<Unit>>();
+	PFDemoUnit attacking; // unit the unit is current attacking.
+	private static Map<PFDemoUnit, Set<PFDemoUnit>> unitsAttacking = new HashMap<PFDemoUnit, Set<PFDemoUnit>>();
 	Mode mode = Mode.FLEE;
-	Side side;
-	
-	public enum Side{  //for now, simple, two forces
-		PLAYER, ENEMY
-	}
 	
 	public enum Order {
 		MOVE, ATTACKUNIT, IDLE
@@ -74,11 +79,11 @@ public class Unit implements UnitInter {
 	}
 	
 
-	Unit() {
-		this.ID = Unit.getNextId();
+	PFDemoUnit() {
+		this.ID = PFDemoUnit.getNextId();
 	}
 
-	public Unit(float x, float y, World world, Side side) {
+	public PFDemoUnit(float x, float y, PFWorld world) {
 		this();
 		this.x = x;
 		this.y = y;
@@ -87,7 +92,7 @@ public class Unit implements UnitInter {
 		this.units = world.getUnits();
 		this.pathingModule = world.getPathingModule();
 		
-		Unit.unitsAttacking.put(this, new HashSet<Unit>());
+		PFDemoUnit.unitsAttacking.put(this, new HashSet<PFDemoUnit>());
 
 	}
 
@@ -129,7 +134,7 @@ public class Unit implements UnitInter {
 		}
 	}
 
-	public void orderAttackUnit(Unit unit) {
+	public void orderAttackUnit(PFDemoUnit unit) {
 		if(!isActionAllowed(Order.ATTACKUNIT)){
 			return;
 		}
@@ -149,7 +154,7 @@ public class Unit implements UnitInter {
 
 	private void pathForAttackingUnit(){
 		// find path as normal, except for pathing ignore the target's collision body
-		ArrayList<Unit> someUnits = new ArrayList<Unit>(units);
+		ArrayList<PFDemoUnit> someUnits = new ArrayList<PFDemoUnit>(units);
 		someUnits.remove(target);
 
 		Path path = pathingModule.findPathForUnit(this, target.x, target.y, someUnits);
@@ -259,7 +264,7 @@ public class Unit implements UnitInter {
 			}
 
 			// Check if reached waypoint
-			if (dist < Unit.waypointMinDistance) {
+			if (dist < PFDemoUnit.waypointMinDistance) {
 				waypointIndex += 1;
 				// check if completed path
 				if (waypointIndex == path.size()) {
@@ -363,7 +368,7 @@ public class Unit implements UnitInter {
 		}
 		
 		if(this.mode == Mode.ENGAGE){
-			Set<Unit> attackingMe = unitsAttacking.get(this);
+			Set<PFDemoUnit> attackingMe = unitsAttacking.get(this);
 			if(!attackingMe.isEmpty() && attacking == null){
 				orderAttackUnit(attackingMe.iterator().next());
 			}
@@ -372,12 +377,12 @@ public class Unit implements UnitInter {
 		
 	}
 	
-	private void startAttacking(Unit target){
+	private void startAttacking(PFDemoUnit target){
 		clearPath();
 		attacking = target;
 		unitsAttacking.get(target).add(this);
 	}
-	private void stopAttacking(Unit target){
+	private void stopAttacking(PFDemoUnit target){
 		attacking = null;
 		unitsAttacking.get(target).remove(this);
 	}
@@ -493,5 +498,5 @@ public class Unit implements UnitInter {
 	public Path getPath() {
 		return this.path;
 	}
-
+	
 }

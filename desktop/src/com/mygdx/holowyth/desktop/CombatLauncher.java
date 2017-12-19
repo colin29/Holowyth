@@ -5,7 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.holowyth.CombatDemo;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.pathfinding.PathfindingDemo;
+import com.mygdx.holowyth.pathfinding.demo.PathfindingDemo;
 import com.mygdx.holowyth.test.SceneTest;
 import com.mygdx.holowyth.test.sandbox.Test2;
 import com.mygdx.holowyth.test.ui.UIDemo;
