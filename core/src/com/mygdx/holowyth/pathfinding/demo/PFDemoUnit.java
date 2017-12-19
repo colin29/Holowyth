@@ -18,7 +18,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.pathfinding.UnitInter;
+import com.mygdx.holowyth.pathfinding.UnitInterPF;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
@@ -27,7 +27,7 @@ import com.mygdx.holowyth.util.data.Segment;
 /**
  * Simpler unit class for use in the Pathfinding demo
  */
-public class PFDemoUnit implements UnitInter {
+public class PFDemoUnit implements UnitInterPF {
 
 	public static float waypointMinDistance = 0.01f;
 

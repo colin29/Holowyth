@@ -30,7 +30,7 @@ public class PathingModule {
 	PathSmoother smoother = new PathSmoother();
 	
 	// Debug
-		HashMap<UnitInter, PathsInfo> intermediatePaths;
+		HashMap<UnitInterPF, PathsInfo> intermediatePaths;
 
 	/**
 	 * @Lifetime can be from app start to app shutdown. Call initFormap() whenever a new map is loaded.
@@ -54,7 +54,7 @@ public class PathingModule {
 		pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE, map.width(), map.height());
 		
 		// Debug
-		intermediatePaths = new HashMap<UnitInter, PathsInfo>();
+		intermediatePaths = new HashMap<UnitInterPF, PathsInfo>();
 	}
 	
 	// Graph construction 
@@ -65,13 +65,13 @@ public class PathingModule {
 
 	// Unit pathfinding
 	
-	public Path findPathForUnit(UnitInter unit, float dx, float dy, ArrayList<? extends UnitInter> units) {
+	public Path findPathForUnit(UnitInterPF unit, float dx, float dy, ArrayList<? extends UnitInterPF> units) {
 	
 		// For pathfinding, need to get expanded geometry of unit collision bodies as well
 	
 		ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
 	
-		for (UnitInter a : units) {
+		for (UnitInterPF a : units) {
 			if (unit.equals(a)) { // don't consider the unit's own collision body
 				continue;
 			}
@@ -244,7 +244,7 @@ public class PathingModule {
 	 * @param u
 	 *            The pathing unit
 	 */
-	private void setDynamicGraph(ArrayList<CBInfo> infos, UnitInter u) {
+	private void setDynamicGraph(ArrayList<CBInfo> infos, UnitInterPF u) {
 
 		for (CBInfo cb : infos) {
 			prospects = new ArrayList<Vertex>();
@@ -426,8 +426,8 @@ public class PathingModule {
 	/**
 	 * Render intermediate paths for all units in the list 
 	 */
-	public void renderIntermediatePaths(ArrayList<? extends UnitInter> units){
-		for(UnitInter unit: units){
+	public void renderIntermediatePaths(ArrayList<? extends UnitInterPF> units){
+		for(UnitInterPF unit: units){
 			PathsInfo info = intermediatePaths.get(unit);
 			if(info != null && (unit.getPath() != null || Holo.continueShowingPathAfterArrival)){
 				if(info.finalPath != null){

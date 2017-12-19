@@ -24,4 +24,9 @@ public class Point {
 		float dy = p2.y - p1.y;
 		return (float) Math.sqrt(dx*dx + dy*dy);
 	}
+	public static float calcDistanceSqr(Point p1, Point p2){
+		float dx = p2.x - p1.x;
+		float dy = p2.y - p1.y;
+		return dx*dx + dy*dy;
+	}
 }

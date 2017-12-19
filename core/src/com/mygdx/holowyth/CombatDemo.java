@@ -468,7 +468,7 @@ public class CombatDemo implements Screen, InputProcessor, World {
 				float curDesty = u.y + u.vy;
 				//Vector2 curVel = new Vector2(u.vx, u.vy);
 				
-				System.out.format("%s is colliding with %s bodies%n", u, collisions.size());
+//				System.out.format("%s is colliding with %s bodies%n", u, collisions.size());
 				
 				
 				

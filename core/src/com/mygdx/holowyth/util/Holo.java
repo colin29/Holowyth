@@ -1,14 +1,11 @@
 package com.mygdx.holowyth.util;
 
-import java.io.IOException;
-import java.nio.file.Paths;
-
 import com.badlogic.gdx.graphics.Color;
 
 public class Holo {
 	
 	// Paths
-	public static String mapsDirectory = getCanonicalPath("./../saveFiles/");
+	public static String mapsDirectory = HoloIO.getCanonicalPath("./../saveFiles/");
 	
 	// Initial Settings (only apply at startup)
 	public static boolean enableCursorGrabbing = false;
@@ -40,6 +37,7 @@ public class Holo {
 	public static float defaultUnitEngageRange = 5;
 	public static float defaultUnitDisengageRange = defaultUnitEngageRange + 5; //the distance the enemy must travel before it stops receiving attacks from the unit.
 	
+	public static float idleAggroRange = 150f;
 	
 	
 	
@@ -56,15 +54,6 @@ public class Holo {
 	//Debug settings
 	public static boolean continueShowingPathAfterArrival = true;
  	public static boolean debugPathfindingIgnoreUnits = false;
-	
-	private static String getCanonicalPath(String string){
-		try {
-			return Paths.get(string).toRealPath().toString();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return null;
-		}
-	}
 
 	
 

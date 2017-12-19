@@ -1,9 +1,11 @@
 package com.mygdx.holowyth;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 import com.badlogic.gdx.graphics.Color;
@@ -11,13 +13,13 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.pathfinding.UnitInter;
+import com.mygdx.holowyth.pathfinding.UnitInterPF;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 
-public class Unit implements UnitInter {
+public class Unit implements UnitInterPF {
 
 	public static float waypointMinDistance = 0.01f;
 
@@ -39,7 +41,6 @@ public class Unit implements UnitInter {
 	// World Fields
 	PathingModule pathingModule;
 	ArrayList<Unit> units;
-	 
 
 	// Collision Detection
 	private float radius = Holo.UNIT_RADIUS;
@@ -60,19 +61,18 @@ public class Unit implements UnitInter {
 	private static Map<Unit, Set<Unit>> unitsAttacking = new HashMap<Unit, Set<Unit>>();
 	Mode mode = Mode.FLEE;
 	Side side;
-	
-	public enum Side{  //for now, simple, two forces
+
+	public enum Side { // for now, simple, two forces
 		PLAYER, ENEMY
 	}
-	
+
 	public enum Order {
-		MOVE, ATTACKUNIT, IDLE
+		MOVE, ATTACKUNIT, IDLE, ATTACKMOVE
 	}
-	
+
 	public enum Mode {
 		ENGAGE, FLEE
 	}
-	
 
 	Unit() {
 		this.ID = Unit.getNextId();
@@ -82,11 +82,12 @@ public class Unit implements UnitInter {
 		this();
 		this.x = x;
 		this.y = y;
+		this.side = side;
 
 		// get neccesary references
 		this.units = world.getUnits();
 		this.pathingModule = world.getPathingModule();
-		
+
 		Unit.unitsAttacking.put(this, new HashSet<Unit>());
 
 	}
@@ -99,10 +100,12 @@ public class Unit implements UnitInter {
 		handleRepathing();
 		determineMovement();
 
+		makeIdleEnemiesAggro();
+
 	}
-	
-	/** Repath regularly if unit is ordered to attack but is not attacking yet 	 */
-	private void handleRepathing(){
+
+	/** Repath regularly if unit is ordered to attack but is not attacking yet */
+	private void handleRepathing() {
 		if (this.currentOrder == Order.ATTACKUNIT && attacking == null) {
 			framesUntilAttackRepath -= 1;
 			if (framesUntilAttackRepath <= 0) {
@@ -111,14 +114,13 @@ public class Unit implements UnitInter {
 			}
 		}
 	}
-	
 
 	int waypointIndex;
 
 	// Orders
 
 	public void orderMove(float dx, float dy) {
-		if(!isActionAllowed(Order.MOVE)){
+		if (!isMoveOrderAllowed()) {
 			return;
 		}
 		Path path = pathingModule.findPathForUnit(this, dx, dy, units);
@@ -130,7 +132,7 @@ public class Unit implements UnitInter {
 	}
 
 	public void orderAttackUnit(Unit unit) {
-		if(!isActionAllowed(Order.ATTACKUNIT)){
+		if (!isAttackOrderAllowed(unit)) {
 			return;
 		}
 		if (unit == this) {
@@ -138,16 +140,25 @@ public class Unit implements UnitInter {
 			return;
 		}
 		clearOrder();
-		
+
 		this.currentOrder = Order.ATTACKUNIT;
 		this.target = unit;
 
-		this.attacking = null; // assuming this is a valid order to make, the unit is now no longer attacking anything yet
-		
+		this.attacking = null; // assuming this is a valid order to make, the unit is now no longer attacking anything
+								// yet
+
 		pathForAttackingUnit();
 	}
+	
+	public void orderAttackMove(float x, float y){
+		if (!isAttackMoveOrderAllowed()) {
+			return;
+		}
+		//TODO:
+		
+	}
 
-	private void pathForAttackingUnit(){
+	private void pathForAttackingUnit() {
 		// find path as normal, except for pathing ignore the target's collision body
 		ArrayList<Unit> someUnits = new ArrayList<Unit>(units);
 		someUnits.remove(target);
@@ -168,7 +179,8 @@ public class Unit implements UnitInter {
 		curSpeed = calculateInitialMoveSpeed();
 		isDecelerating = false;
 	}
-	private void clearPath(){
+
+	private void clearPath() {
 		this.path = null;
 		waypointIndex = -1;
 		vx = 0;
@@ -263,6 +275,7 @@ public class Unit implements UnitInter {
 				waypointIndex += 1;
 				// check if completed path
 				if (waypointIndex == path.size()) {
+					currentOrder = Order.IDLE;
 					clearPath();
 				}
 			}
@@ -345,43 +358,43 @@ public class Unit implements UnitInter {
 
 	// Combat
 
-	/** Handles the combat logic for a unit for one frame*/
-	public void handleCombatLogic(){
+	/** Handles the combat logic for a unit for one frame */
+	public void handleCombatLogic() {
 
-		if(currentOrder == Order.ATTACKUNIT){
-			//If the unit is on an attackUnit command and its in engage range, make it start attacking the target
+		if (currentOrder == Order.ATTACKUNIT) {
+			// If the unit is on an attackUnit command and its in engage range, make it start attacking the target
 			// If the unit falls out of engage range, stop it from attacking
 			Point a, b;
 			a = this.getPos();
 			b = target.getPos();
 			float dist = Point.calcDistance(a, b);
-			if(dist <= this.radius + target.radius + Holo.defaultUnitEngageRange){
+			if (dist <= this.radius + target.radius + Holo.defaultUnitEngageRange) {
 				startAttacking(target);
-			} else if(dist >= this.radius + target.radius + Holo.defaultUnitDisengageRange){
+			} else if (dist >= this.radius + target.radius + Holo.defaultUnitDisengageRange) {
 				stopAttacking(target);
 			}
 		}
-		
-		if(this.mode == Mode.ENGAGE){
+
+		if (this.mode == Mode.ENGAGE) {
 			Set<Unit> attackingMe = unitsAttacking.get(this);
-			if(!attackingMe.isEmpty() && attacking == null){
+			if (!attackingMe.isEmpty() && attacking == null) {
 				orderAttackUnit(attackingMe.iterator().next());
 			}
 		}
-		
-		
+
 	}
-	
-	private void startAttacking(Unit target){
+
+	private void startAttacking(Unit target) {
 		clearPath();
 		attacking = target;
 		unitsAttacking.get(target).add(this);
 	}
-	private void stopAttacking(Unit target){
+
+	private void stopAttacking(Unit target) {
 		attacking = null;
 		unitsAttacking.get(target).remove(this);
 	}
-	
+
 	// Debug
 	private static int getNextId() {
 		return curId++;
@@ -398,84 +411,121 @@ public class Unit implements UnitInter {
 			HoloGL.renderCircle(p.x, p.y, shapeRenderer, Color.FIREBRICK);
 		}
 	}
-	public void renderAttackingLine(ShapeRenderer shapeRenderer){
-		if(this.attacking != null){
-			
-			Color arrowColor = Color.RED; 
+
+	public void renderAttackingLine(ShapeRenderer shapeRenderer) {
+		if (this.attacking != null) {
+
+			Color arrowColor = Color.RED;
 			float wingLength = 8f;
 			float arrowAngle = 30f;
-			
-			//draw a line from the center of this unit to the edge of the other unit
+
+			// draw a line from the center of this unit to the edge of the other unit
 			float len = new Segment(this.getPos(), attacking.getPos()).getLength();
 			float newLen = len - attacking.radius * 0.35f;
 			float dx = attacking.x - this.x;
 			float dy = attacking.y - this.y;
-			float ratio = newLen/len;
+			float ratio = newLen / len;
 			float nx = dx * ratio;
 			float ny = dy * ratio;
-			Point edgePoint = new Point(x+nx, y+ny);
+			Point edgePoint = new Point(x + nx, y + ny);
 			Segment s = new Segment(this.getPos(), edgePoint);
-			
+
 			HoloGL.renderSegment(s, shapeRenderer, arrowColor);
-			
-			//Draw the arrow wings
-			
-			//calculate angle of the main arrow line
-			float angle = (float) Math.acos(dx/len);
-			if(dy < 0){
-				angle = (float) (2*Math.PI - angle);
+
+			// Draw the arrow wings
+
+			// calculate angle of the main arrow line
+			float angle = (float) Math.acos(dx / len);
+			if (dy < 0) {
+				angle = (float) (2 * Math.PI - angle);
 			}
-			
+
 			float backwardsAngle = (float) (angle + Math.PI);
-			
-			//draw a line in the +x direction, then rotate it and transform it as needed.
-			
-			Segment wingSeg = new Segment (0, 0, wingLength, 0); // create the base wing segment
-			
+
+			// draw a line in the +x direction, then rotate it and transform it as needed.
+
+			Segment wingSeg = new Segment(0, 0, wingLength, 0); // create the base wing segment
+
 			shapeRenderer.identity();
 			shapeRenderer.translate(edgePoint.x, edgePoint.y, 0);
 			shapeRenderer.rotate(0, 0, 1, (float) Math.toDegrees(backwardsAngle) + arrowAngle);
-			
+
 			HoloGL.renderSegment(wingSeg, shapeRenderer, arrowColor);
-			
+
 			shapeRenderer.identity();
 			shapeRenderer.translate(edgePoint.x, edgePoint.y, 0);
 			shapeRenderer.rotate(0, 0, 1, (float) Math.toDegrees(backwardsAngle) - arrowAngle);
 
 			HoloGL.renderSegment(wingSeg, shapeRenderer, arrowColor);
-			
+
 			shapeRenderer.identity();
-			
+
 		}
 	}
+
+	private boolean isAttackOrderAllowed(Unit target) {
+		if (attacking != null)
+			return false;
+		if (target.side == this.side) {
+			return false;
+		}
+		return true;
+	}
+
+	private boolean isMoveOrderAllowed() {
+		if (attacking != null)
+			return false;
+		return true;
+	}
+	private boolean isAttackMoveOrderAllowed() {
+		return isMoveOrderAllowed();
+	}
+
 	/**
-	 * Determines whether the particular action is allowed in the current state
+	 * Makes this unit aggro to nearby visible targets if it is an enemy faction unit
 	 */
-	private boolean isActionAllowed(Order order){
-		switch(order){
-		case ATTACKUNIT:
-			if(attacking == null){
-				return true;
+	private void makeIdleEnemiesAggro() {
+		if (this.side == Side.ENEMY && currentOrder == Order.IDLE) {
+			
+			PriorityQueue<Unit> closestEnemies = new PriorityQueue<Unit>(closestUnitComp);
+			for(Unit u: units){
+				if(u == this)
+					continue;
+				if(u.side != Side.ENEMY){
+					closestEnemies.add(u);
+				}
 			}
-		case MOVE:
-			if(attacking == null){
-				return true;
+			if(!closestEnemies.isEmpty()){
+				Unit closestEnemy = closestEnemies.remove();
+				float x = getDist(this, closestEnemy);
+				if(getDist(this, closestEnemy) <= Holo.idleAggroRange){
+					this.orderAttackUnit(closestEnemy);
+				}
 			}
-		case IDLE:
-			break;
-		default:
-			break;
 		}
-		return false;
-		
 	}
+
+	// Convenience functions
+	public static float getDist(Unit u1, Unit u2) {
+		return Point.calcDistance(u1.getPos(), u2.getPos());
+	}
+
+	//Tools
+	private Comparator<Unit> closestUnitComp = (Unit u1, Unit u2) -> {
+		if (Point.calcDistanceSqr(this.getPos(), u1.getPos())
+				- Point.calcDistanceSqr(this.getPos(), u2.getPos()) >= 0) {
+			return -1;
+		} else {
+			return 1;
+		}
+	};
 
 	// Getters
 	public float getRadius() {
 		return radius;
 	}
-	
-	public Point getPos(){
+
+	public Point getPos() {
 		return new Point(this.x, this.y);
 	}
 

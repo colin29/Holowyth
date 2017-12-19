@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.nio.file.Paths;
 
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.util.exception.ErrorCode;
@@ -62,5 +63,15 @@ public class HoloIO {
 		}
 		map.hasUnsavedChanges = false;
 		System.out.println("Writing Map to disk finished");
+	}
+
+	//utility functions
+	static String getCanonicalPath(String string){
+		try {
+			return Paths.get(string).toRealPath().toString();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 }
