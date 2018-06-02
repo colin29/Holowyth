@@ -54,6 +54,9 @@ public class Holo {
 	//Debug settings
 	public static boolean continueShowingPathAfterArrival = true;
  	public static boolean debugPathfindingIgnoreUnits = false;
+ 	
+ 	//Rendering Testing
+ 	public static boolean useTestSprites = false;
 
 	
 

@@ -359,7 +359,7 @@ public class PolyMapEditor implements Screen, InputProcessor {
 
 		header.align(Align.center);
 
-		// Add Property fields
+		// Add Property names and fields
 		final TextField nameField = new TextField(map.name, skin);
 		final TextField widthField = new TextField(Integer.toString(map.width()), skin);
 		final TextField heightField = new TextField(Integer.toString(map.height()), skin);
@@ -412,8 +412,7 @@ public class PolyMapEditor implements Screen, InputProcessor {
 		});
 
 		dialog.pack();
-		dialog.setPosition(Gdx.graphics.getWidth() / 2 - dialog.getWidth() / 2,
-				Gdx.graphics.getHeight() / 2 - dialog.getHeight() / 2);
+		HoloUI.centerOnStage(dialog);
 	}
 
 	private void displayTitleBarInformation() {

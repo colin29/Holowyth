@@ -113,6 +113,15 @@ public class Unit implements UnitInterPF {
 				framesUntilAttackRepath = attackPathfindingInterval;
 			}
 		}
+		
+		//TODO:
+//		if(this.currentOrder == Order.MOVE){
+//			framesUntilAttackRepath -= 1;
+//			if (framesUntilAttackRepath <= 0) {
+//				pathForAttackingUnit();
+//				framesUntilAttackRepath = attackPathfindingInterval;
+//			}
+//		}
 	}
 
 	int waypointIndex;

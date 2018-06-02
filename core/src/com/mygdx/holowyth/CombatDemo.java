@@ -72,8 +72,6 @@ public class CombatDemo implements Screen, InputProcessor, World {
 	UnitControls unitControls;
 	PathingModule pathingModule;
 
-	
-
 	// Appearance
 	Color defaultClearColor = HoloUI.color(255, 236, 179);
 	Color clearColor = defaultClearColor;
@@ -95,7 +93,7 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		batch = game.batch;
 
 		pathingModule = new PathingModule(camera, shapeRenderer);
-		
+
 		createUI();
 	}
 
@@ -108,8 +106,8 @@ public class CombatDemo implements Screen, InputProcessor, World {
 				| (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
 		camera.update();
 
-		//pathingModule.renderGraph(false);
-		//renderDynamicGraph(false);
+		// pathingModule.renderGraph(false);
+		// renderDynamicGraph(false);
 
 		if (this.map != null) {
 			// renderExpandedPolygons();
@@ -119,23 +117,23 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		}
 
 		renderPaths(false);
-		for(Unit u: units){
+		for (Unit u : units) {
 			u.renderNextWayPoint(shapeRenderer);
 		}
 		renderUnitDestinations(Color.GREEN);
-		
+
 		unitControls.renderCirclesOnSelectedUnits();
 		renderUnits();
 		unitControls.renderSelectionBox(UnitControls.defaultSelectionBoxColor);
-		
+
 		pathingModule.renderExpandedMapPolygons();
 
 		debugInfo.setVisible(true);
-		
-		for(Unit u: units){
+
+		for (Unit u : units) {
 			u.renderAttackingLine(shapeRenderer);
 		}
-		
+
 		// UI
 		stage.act(delta);
 		stage.draw();
@@ -149,8 +147,6 @@ public class CombatDemo implements Screen, InputProcessor, World {
 
 		// Testing area
 
-		
-		
 		// for (Vertex v : nearbyPathable) {
 		// HoloGL.renderCircle(v.ix * CELL_SIZE, v.iy * CELL_SIZE, shapeRenderer, Color.RED);
 		// }
@@ -172,8 +168,6 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		}
 
 	}
-
-
 
 	private void renderMapPolygons() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
@@ -241,17 +235,17 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		root.setFillParent(true);
 		stage.addActor(root);
 		root.top().left();
-		
+
 		root.addActor(debugInfo);
 
 		// Add Widgets here
 
-//		createParameterWindow();
+		// createParameterWindow();
 
 		root.debug();
 
 		createCoordinateText();
-		
+
 		createDebugInfoDisplay();
 	}
 
@@ -265,7 +259,8 @@ public class CombatDemo implements Screen, InputProcessor, World {
 
 		// root.add(new TextButton("test", skin));
 		stage.addActor(testing);
-		HoloUI.parameterSlider(0.01f, 10f, "COLLISION_CLEARANCE_DISTANCE", testing, skin, (Float f) -> Holo.collisionClearanceDistance = f);
+		HoloUI.parameterSlider(0.01f, 10f, "COLLISION_CLEARANCE_DISTANCE", testing, skin,
+				(Float f) -> Holo.collisionClearanceDistance = f);
 		HoloUI.parameterSlider(0, Holo.defaultUnitMoveSpeed, "initialMoveSpeed", testing, skin,
 				(Float f) -> playerUnit.initialMoveSpeed = f);
 		testing.pack();
@@ -277,86 +272,99 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		stage.addActor(coordInfo);
 		coordInfo.setPosition(Gdx.graphics.getWidth() - coordInfo.getWidth() - 4, 4);
 	}
+
 	Table debugInfo = new Table();
-	private void createDebugInfoDisplay(){
+
+	private void createDebugInfoDisplay() {
 		stage.addActor(debugInfo);
-//		debugInfo.debug();
+		// debugInfo.debug();
 		debugInfo.setFillParent(true);
 		debugInfo.left().top();
 		debugInfo.pad(4);
 	}
 
-
 	// Rendering
 	private void renderPaths(boolean renderIntermediatePaths) {
 		// Render Path
-		
-		if(renderIntermediatePaths){
+
+		if (renderIntermediatePaths) {
 			pathingModule.renderIntermediatePaths(units);
-		}else{
-			for(Unit unit: units){
-				if(unit.path != null){
+		} else {
+			for (Unit unit : units) {
+				if (unit.path != null) {
 					renderPath(unit.path, Color.GRAY, false);
 				}
 			}
 		}
-		
-		
+
 	}
 
 	float pathThickness = 2f;
+
 	private void renderPath(Path path, Color color, boolean renderPoints) {
 		HoloPF.renderPath(path, color, renderPoints, pathThickness, shapeRenderer);
 	}
 
 	private void renderUnitDestinations(Color color) {
-		
-		for (Unit unit: units){
-			if(unit.path != null){
+
+		for (Unit unit : units) {
+			if (unit.path != null) {
 				Point finalPoint = unit.path.get(unit.path.size() - 1);
 				shapeRenderer.begin(ShapeType.Filled);
 				shapeRenderer.setColor(color);
 				shapeRenderer.circle(finalPoint.x, finalPoint.y, 4f);
 				shapeRenderer.end();
-				
+
 				shapeRenderer.begin(ShapeType.Line);
 				shapeRenderer.setColor(Color.BLACK);
 				shapeRenderer.circle(finalPoint.x, finalPoint.y, 4f);
 				shapeRenderer.end();
 			}
-			
+
 		}
 	}
 
 	private void renderUnits() {
-		for (Unit unit : units) {
-			shapeRenderer.begin(ShapeType.Filled);
+		if (Holo.useTestSprites) {
+			renderUnitsWithTestSprites();
+		} else {
+			for (Unit unit : units) {
+				shapeRenderer.begin(ShapeType.Filled);
 
-			if (unit == playerUnit) {
-				shapeRenderer.setColor(Color.PURPLE);
-			} else {
-				shapeRenderer.setColor(Color.YELLOW);
+				if (unit == playerUnit) {
+					shapeRenderer.setColor(Color.PURPLE);
+				} else {
+					shapeRenderer.setColor(Color.YELLOW);
+				}
+
+				shapeRenderer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
+
+				shapeRenderer.end();
 			}
 
-			shapeRenderer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
-
-			shapeRenderer.end();
-		}
-
-		// Render an outline around the unit
-		for (Unit unit : units) {
-			shapeRenderer.begin(ShapeType.Line);
-			shapeRenderer.setColor(Color.BLACK);
-			shapeRenderer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
-			shapeRenderer.end();
+			// Render an outline around the unit
+			for (Unit unit : units) {
+				shapeRenderer.begin(ShapeType.Line);
+				shapeRenderer.setColor(Color.BLACK);
+				shapeRenderer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
+				shapeRenderer.end();
+			}
 		}
 
 	}
 
-	
+	private void renderUnitsWithTestSprites() {
+		for (Unit unit : units) {
+			if (unit == playerUnit) {
+			} else {
+			}
+		}
+	}
+
 	// *** Run on Map Load (Important!) ***//
 
 	int CELL_SIZE = Holo.CELL_SIZE;
+
 	/**
 	 * Logically initializes a bunch of components necessary to run the map
 	 */
@@ -369,13 +377,12 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		unitControls = new UnitControls(game, camera, units);
 		multiplexer.addProcessor(unitControls);
 
-		//Pathing		
+		// Pathing
 		pathingModule.initForMap(map);
-		
-		//Debug
-		
-		debugInfo.add(unitControls.getDebugTable());
 
+		// Debug
+
+		debugInfo.add(unitControls.getDebugTable());
 
 		//// ---------Test Area---------////:
 
@@ -394,14 +401,14 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		units.add(new Unit(550, 122 - Holo.UNIT_RADIUS, this, Unit.Side.ENEMY));
 		units.add(new Unit(750, 450, this, Unit.Side.ENEMY));
 	}
-	
+
 	/**
 	 * Main function that contains game logic that is run every frame
 	 */
 	private void doOnFrame() {
 		tickLogicForUnits();
 		moveUnits();
-		
+
 		handleCombatLogic();
 		// Testing area
 
@@ -409,38 +416,39 @@ public class CombatDemo implements Screen, InputProcessor, World {
 	}
 
 	// Game and Movement Logic
-	
+
 	ArrayList<Unit> units = new ArrayList<Unit>();
 	Unit playerUnit; // the main unit we are using to demo pathfinding
-	
+
 	private void tickLogicForUnits() {
 		for (Unit u : units) {
 			u.handleGeneralLogic();
 		}
 	}
-	private void handleCombatLogic(){
+
+	private void handleCombatLogic() {
 		for (Unit u : units) {
 			u.handleCombatLogic();
 		}
 	}
-	
-	/** 
+
+	/**
 	 * Moves units according to their velocity. Rejects any illegal movements based on collision detection.
 	 */
 	private void moveUnits() {
 		for (Unit u : units) {
-			
+
 			// Validate the motion by checking against other colliding bodies.
-			
+
 			float dx = u.x + u.vx;
 			float dy = u.y + u.vy;
-			
-			if(u.vx == 0 && u.vy == 0){
+
+			if (u.vx == 0 && u.vy == 0) {
 				continue;
 			}
-			
+
 			Segment motion = new Segment(u.x, u.y, dx, dy);
-			
+
 			ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
 			for (Unit a : units) {
 				if (u.equals(a)) { // don't consider the unit's own collision body
@@ -453,56 +461,57 @@ public class CombatDemo implements Screen, InputProcessor, World {
 				c.unitRadius = a.getRadius();
 				colBodies.add(c);
 			}
-			ArrayList<CBInfo> collisions = HoloPF.getUnitCollisions(motion.x1, motion.y1, motion.x2, motion.y2, colBodies, u.getRadius());
-			if(collisions.isEmpty()){
+			ArrayList<CBInfo> collisions = HoloPF.getUnitCollisions(motion.x1, motion.y1, motion.x2, motion.y2,
+					colBodies, u.getRadius());
+			if (collisions.isEmpty()) {
 				u.x += u.vx;
 				u.y += u.vy;
-			}else{
-				
-				//if line intersects with one or more other units. (should be max two, since units should not be overlapped)
-				if(collisions.size() > 2){
+			} else {
+
+				// if line intersects with one or more other units. (should be max two, since units should not be
+				// overlapped)
+				if (collisions.size() > 2) {
 					System.out.println("Wierd case, unit colliding with more than 2 units");
 				}
-				
+
 				float curDestx = u.x + u.vx;
 				float curDesty = u.y + u.vy;
-				//Vector2 curVel = new Vector2(u.vx, u.vy);
-				
-//				System.out.format("%s is colliding with %s bodies%n", u, collisions.size());
-				
-				
-				
-				
-				for(CBInfo cb: collisions){
-					Vector2 dist = new Vector2(curDestx-cb.x, curDesty - cb.y);
+				// Vector2 curVel = new Vector2(u.vx, u.vy);
 
-					// At first, dist is smaller than the combined radius, but previous push outs might have changed this.
-					if(dist.len() > cb.unitRadius + u.getRadius()){
+				// System.out.format("%s is colliding with %s bodies%n", u, collisions.size());
+
+				for (CBInfo cb : collisions) {
+					Vector2 dist = new Vector2(curDestx - cb.x, curDesty - cb.y);
+
+					// At first, dist is smaller than the combined radius, but previous push outs might have changed
+					// this.
+					if (dist.len() > cb.unitRadius + u.getRadius()) {
 						continue;
 					}
 
 					// expand
-					Vector2 pushedOut = new Vector2(dist).setLength(cb.unitRadius + u.getRadius() + Holo.collisionClearanceDistance);
+					Vector2 pushedOut = new Vector2(dist)
+							.setLength(cb.unitRadius + u.getRadius() + Holo.collisionClearanceDistance);
 					// TODO: handle edge case here dist is 0
-					
+
 					curDestx = cb.x + pushedOut.x;
 					curDesty = cb.y + pushedOut.y;
 				}
-				
-				// Take this motion if it's valid, otherwise don't move unit.				
-				if(HoloPF.isEdgePathable(u.x, u.y, curDestx, curDesty, pathingModule.getExpandedMapPolys(), colBodies, u.getRadius())){
+
+				// Take this motion if it's valid, otherwise don't move unit.
+				if (HoloPF.isEdgePathable(u.x, u.y, curDestx, curDesty, pathingModule.getExpandedMapPolys(), colBodies,
+						u.getRadius())) {
 					u.x = curDestx;
 					u.y = curDesty;
 				}
-				
+
 			}
-			
+
 		}
-		
-		
+
 	}
-	
-	/* Below is boilerplate code for running a demo  */
+
+	/* Below is boilerplate code for running a demo */
 
 	// UI and Disk
 
@@ -530,7 +539,6 @@ public class CombatDemo implements Screen, InputProcessor, World {
 			public void selected(Array<FileHandle> file) {
 				System.out.println("Selected file: " + file.get(0).file().getAbsolutePath());
 
-				System.out.println("Removed Load Dialog");
 				loadMapFromDisk(file.get(0).file().getAbsolutePath());
 			}
 		});
@@ -552,12 +560,15 @@ public class CombatDemo implements Screen, InputProcessor, World {
 	}
 
 	private void loadMap(Field newMap) {
-		
-		if(newMap != null){
+
+		if (newMap != null) {
 			mapShutdown();
 			this.map = null;
+		} else {
+			System.out.println("Error: new map was null. New map not loaded");
+			return;
 		}
-	
+
 		System.out.println("New map loaded");
 		this.map = newMap;
 		newMap.hasUnsavedChanges = false;
@@ -567,7 +578,7 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		mapStartup(newMap);
 	}
 
-	private void mapShutdown(){
+	private void mapShutdown() {
 		debugInfo.clear();
 	}
 

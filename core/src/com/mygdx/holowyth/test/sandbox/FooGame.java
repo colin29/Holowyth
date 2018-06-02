@@ -39,7 +39,7 @@ public class FooGame extends Game {
 
 		
 		loadCommonAssets();
-		this.setScreen(new FooScreen3(this));
+		this.setScreen(new FooScreen2(this));
 	}
 
 	@Override
