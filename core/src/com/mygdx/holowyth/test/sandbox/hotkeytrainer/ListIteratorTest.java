@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test.sandbox;
+package com.mygdx.holowyth.test.sandbox.hotkeytrainer;
 
 import java.util.ArrayList;
 import java.util.ListIterator;

@@ -4,9 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.LoadingScreen;
 import com.mygdx.holowyth.pathfinding.demo.PathfindingDemo;
 import com.mygdx.holowyth.test.SceneTest;
-import com.mygdx.holowyth.test.sandbox.Test2;
+import com.mygdx.holowyth.test.sandbox.hotkeytrainer.Test2;
 import com.mygdx.holowyth.test.ui.UIDemo;
 
 public class DesktopLauncher {
@@ -18,6 +19,6 @@ public class DesktopLauncher {
 		config.samples = 5;
 		config.vSyncEnabled = false;
 		config.foregroundFPS = 0;
-		new LwjglApplication(new Holowyth(PathfindingDemo.class), config);
+		new LwjglApplication(new Holowyth(LoadingScreen.class), config);
 	}
 }

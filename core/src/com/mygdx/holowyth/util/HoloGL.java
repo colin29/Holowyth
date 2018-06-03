@@ -93,5 +93,13 @@ public class HoloGL {
 		shapeRenderer.circle(x, y, radius);
 		shapeRenderer.end();
 	}
+	
+		public static void renderEllipseOutline(float x, float y, float height, float width, ShapeRenderer shapeRenderer, Color color) {
+		
+		shapeRenderer.begin(ShapeType.Line);
+		shapeRenderer.setColor(color);
+		shapeRenderer.ellipse(x, y, height, width, 0f);
+		shapeRenderer.end();
+	}
 
 }

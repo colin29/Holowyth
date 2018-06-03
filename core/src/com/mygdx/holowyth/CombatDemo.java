@@ -17,7 +17,9 @@ import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
@@ -108,6 +110,8 @@ public class CombatDemo implements Screen, InputProcessor, World {
 
 		// pathingModule.renderGraph(false);
 		// renderDynamicGraph(false);
+		
+		batch.setProjectionMatrix(camera.combined);
 
 		if (this.map != null) {
 			// renderExpandedPolygons();
@@ -126,7 +130,7 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		renderUnits();
 		unitControls.renderSelectionBox(UnitControls.defaultSelectionBoxColor);
 
-		pathingModule.renderExpandedMapPolygons();
+//		pathingModule.renderExpandedMapPolygons();
 
 		debugInfo.setVisible(true);
 
@@ -152,9 +156,9 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		// }
 
 		// render expanded hit bodies
-		for (Unit u : units) {
-			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + Holo.UNIT_RADIUS, shapeRenderer, Color.GRAY);
-		}
+//		for (Unit u : units) {
+//			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + Holo.UNIT_RADIUS, shapeRenderer, Color.GRAY);
+//		}
 
 		// pathing.stepAStar();
 
@@ -354,11 +358,21 @@ public class CombatDemo implements Screen, InputProcessor, World {
 	}
 
 	private void renderUnitsWithTestSprites() {
+		
+	
+		TextureRegion witchTex = new TextureRegion(game.assets.get("img/witch.png", Texture.class));
+		witchTex.getTexture().setFilter(TextureFilter.MipMapLinearLinear,TextureFilter.Nearest);
+		
 		for (Unit unit : units) {
 			if (unit == playerUnit) {
+				HoloSprite player = new HoloSprite(witchTex, unit.x, unit.y, 30, 0, 20);
+				player.draw(batch);
 			} else {
+				HoloSprite player = new HoloSprite(witchTex, unit.x, unit.y, 30, 0, 20);
+				player.draw(batch);
 			}
 		}
+		
 	}
 
 	// *** Run on Map Load (Important!) ***//

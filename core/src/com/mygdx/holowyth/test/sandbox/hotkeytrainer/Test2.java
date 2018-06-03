@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test.sandbox;
+package com.mygdx.holowyth.test.sandbox.hotkeytrainer;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;

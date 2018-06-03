@@ -52,12 +52,9 @@ public class Holowyth extends Game {
 	Class<?> screenToLoad;
 
 	/* vvvvvvv User Methods vvvvvvv */
-	public Holowyth(Class c) { // takes in screen to open
-		if (Screen.class.isAssignableFrom(c)) {
+	public Holowyth(Class<? extends Screen> c) { // takes in screen to open
 			screenToLoad = c;
-		} else {
-			throw new RuntimeException("Holowyth: class given is not a sub-class of Screen");
-		}
+	
 	}
 
 	@Override
