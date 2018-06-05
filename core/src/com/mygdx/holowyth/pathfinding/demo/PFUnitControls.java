@@ -2,7 +2,6 @@ package com.mygdx.holowyth.pathfinding.demo;
 
 import java.util.ArrayList;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
@@ -16,7 +15,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Target;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;

@@ -7,7 +7,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
-import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 
 /**

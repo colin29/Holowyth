@@ -1,8 +1,18 @@
 package com.mygdx.holowyth.units;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.badlogic.gdx.utils.Array;
 
 public class Unit implements UnitInfo {
+
+	// Info stats
+
+	private String name;
+	private int id;
 
 	// Base stats
 	int baseMaxHp, baseMaxSp;
@@ -44,12 +54,13 @@ public class Unit implements UnitInfo {
 	public enum Status {
 		PRONE, FATIGUED, MANA_EXHAUSTION, WOUNDED, FEARFUL
 	}
+
 	Array<Status> statuses = new Array<Status>();
 
 	private Unit lookingAt;
 	private Unit occupiedBy;
 
-	private EquippedItems equip;
+	private EquippedItems equip = new EquippedItems();
 
 	int level;
 
@@ -58,6 +69,14 @@ public class Unit implements UnitInfo {
 	}
 
 	UnitType unitType;
+
+	public Unit() {
+		this("Default Name");
+	}
+
+	public Unit(String name) {
+		this.name = name;
+	}
 
 	/**
 	 * 
@@ -94,7 +113,7 @@ public class Unit implements UnitInfo {
 		percep = basePercep + iPercep;
 
 		// 2: calculate hp stats
-		maxHp = Math.round(baseMaxHp * (1 + 0.1f * (5 - fort)));
+		maxHp = Math.round(baseMaxHp * (1 + 0.1f * (fort - 5)));
 		maxSp = baseMaxSp;
 
 		// 3: calculate derived stats from core stats;
@@ -122,21 +141,65 @@ public class Unit implements UnitInfo {
 		dodge = levelBonus + iDodge + 2 * (agi - mid);
 
 	}
+
 	/**
 	 * Preps the unit for use in the game world by setting the transient fields to an appropriate starting value
 	 * Idempotent (can call >=1 times)
 	 */
-	public void prepareUnit(){ 
+	public void prepareUnit() {
 		hp = maxHp;
 		sp = maxSp;
-		
+
 		statuses.clear();
 		stance = Stance.NORMAL;
 		stunState = StunState.NORMAL;
 		stunDurationRemainng = 0;
-		
+
 		lookingAt = null;
 		occupiedBy = null;
+	}
+
+	public String getInfo() {
+		recalculateStats();
+
+		String s = "";
+		s += String.format("Unit [%s]  hp: %s/%d  sp: %d/%d  <level %d>%n", name, getRoundedHp(), maxHp, sp, maxSp,
+				level);
+		s += String.format("Core stats: STR %d, AGI %d, FORT %d, PERCEP %d%n", str, agi, fort, percep);
+		s += String.format("Derived stats: Atk %d, Def %d, Force %d, Stab %d, Acc %d, Dodge %d%n", atk, def, force,
+				stab, acc, dodge);
+
+		s += "Equipped Items:\n";
+		s += getEquipped();
+
+		return s;
+	}
+
+	public String getEquipped() {
+		String s = "";
+
+		Map<String, Item> map = equip.getIteratableMap();
+
+		for (String slotLabel : EquippedItems.slotLabels) {
+			Item item = map.get(slotLabel);
+			if (item != null) {
+				s += " -" + slotLabel + ": " + item.name + "\n";
+			} else {
+				s += " -" + slotLabel + ": [None]\n";
+			}
+		}
+
+		return s;
+	}
+
+	public void printInfo() {
+		System.out.println(getInfo());
+	}
+
+	public String getRoundedHp() {
+		DecimalFormat df = new DecimalFormat("#.####");
+		df.setRoundingMode(RoundingMode.HALF_UP);
+		return df.format(hp);
 	}
 
 	private void addCoreStatBonuses(Item... items) {
@@ -164,16 +227,11 @@ public class Unit implements UnitInfo {
 		}
 	}
 
-	public String getStats() {
-		// TODO
-		return "";
-	}
-
 	public EquippedItems getEquip() {
 		return this.equip;
 	}
 
-	public class EquippedItems {
+	public static class EquippedItems {
 		Item head;
 		Item mainHand;
 		Item offHand;
@@ -184,6 +242,34 @@ public class Unit implements UnitInfo {
 		public boolean isWielding2HWeapon() {
 			// TODO:
 			return false;
+		}
+
+		static final Array<String> slotLabels = new Array<String>();
+		static {
+			slotLabels.addAll("Head", "Main Hand", "Off Hand", "Torso", "Accessory 1", "Accessory 2");
+		}
+
+		/**
+		 * Not that the return value will become outdated if any items are equipped/un-equipped
+		 * 
+		 * @return
+		 */
+		private Array<Item> getCurrentEquipsInOrder() {
+			Array<Item> a = new Array<Item>();
+			a.addAll(head, mainHand, offHand, torso, accessory1, accessory2);
+			assert (a.size == slotLabels.size);
+			return a;
+		}
+
+		public Map<String, Item> getIteratableMap() {
+			Map<String, Item> map = new HashMap<String, Item>();
+
+			Array<Item> curItems = getCurrentEquipsInOrder();
+
+			for (int i = 0; i < slotLabels.size; i++) {
+				map.put(slotLabels.get(i), curItems.get(i));
+			}
+			return map;
 		}
 
 	}

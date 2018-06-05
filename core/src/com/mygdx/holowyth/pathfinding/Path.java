@@ -2,7 +2,6 @@ package com.mygdx.holowyth.pathfinding;
 
 import java.util.ArrayList;
 
-import com.mygdx.holowyth.util.data.Pair;
 import com.mygdx.holowyth.util.data.Point;
 
 /**

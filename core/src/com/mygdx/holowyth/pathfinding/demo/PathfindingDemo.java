@@ -1,9 +1,6 @@
 package com.mygdx.holowyth.pathfinding.demo;
 
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;

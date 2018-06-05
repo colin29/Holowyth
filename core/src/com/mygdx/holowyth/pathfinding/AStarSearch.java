@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 import java.util.PriorityQueue;
 
 import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.data.Point;
-import com.mygdx.holowyth.util.data.Segment;
 
 /**
  * Currently the result of an AStarSearch can be extracted from ancestor.

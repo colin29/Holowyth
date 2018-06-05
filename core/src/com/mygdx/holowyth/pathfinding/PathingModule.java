@@ -9,7 +9,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Queue;
-import com.mygdx.holowyth.Unit;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.PathSmoother.PathsInfo;
 import com.mygdx.holowyth.polygon.Polygons;

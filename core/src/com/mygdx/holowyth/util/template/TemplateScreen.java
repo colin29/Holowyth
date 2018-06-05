@@ -10,7 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.test.sandbox.FooGame;
 
 public class TemplateScreen implements Screen {

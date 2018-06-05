@@ -2,18 +2,13 @@ package com.mygdx.holowyth.pathfinding;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
-import java.util.PriorityQueue;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.utils.Queue;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.data.Point;
-import com.mygdx.holowyth.util.data.Segment;
-
 import de.lighti.clipper.Point.LongPoint;
 import de.lighti.clipper.Clipper.EndType;
 import de.lighti.clipper.Clipper.JoinType;
