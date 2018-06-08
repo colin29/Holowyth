@@ -1,7 +1,10 @@
-package com.mygdx.holowyth.test.sandbox.hotkeytrainer;
+package com.mygdx.holowyth.test.sandbox.holowyth;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -16,8 +19,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.holowyth.util.misc.HoloMisc;
+import com.mygdx.holowyth.util.tools.FunctionBindings;
 
-public class Test2 extends ApplicationAdapter {
+public class Test2 extends ApplicationAdapter implements InputProcessor {
 
 	ShapeRenderer r;
 	OrthographicCamera c;
@@ -25,6 +29,7 @@ public class Test2 extends ApplicationAdapter {
 	Stage stage;
 
 	Skin skin;
+	private InputMultiplexer multiplexer;
 
 	@Override
 	public void create() {
@@ -32,6 +37,11 @@ public class Test2 extends ApplicationAdapter {
 		c = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		
 		createStage();
+		
+		multiplexer = new InputMultiplexer();
+		multiplexer.addProcessor(stage);
+		multiplexer.addProcessor(this);
+		Gdx.input.setInputProcessor(multiplexer);
 	}
 	@Override
 	public void render() {
@@ -55,6 +65,15 @@ public class Test2 extends ApplicationAdapter {
 				
 		skin = new Skin(Gdx.files.internal("myskin\\uiskin.json"));
 		createRootTable();
+		
+		//Test function binding
+		
+		functionBindings.bindFunctionToKey(()-> {System.out.println("foobar lambda");}, Keys.G);
+		functionBindings.bindFunctionToKey(()-> {testMethod();}, Keys.H);
+	}
+	
+	private void testMethod() {
+		System.out.println("foobar method");
 	}
 	
 	
@@ -65,7 +84,6 @@ public class Test2 extends ApplicationAdapter {
 		stage.addActor(root);
 		
 		root.debug();
-		root.setPosition(50, -50);
 		
 		TextButton b1 = new TextButton("Load", skin);
 		TextButton b2 = new TextButton("Save", skin);
@@ -88,6 +106,49 @@ public class Test2 extends ApplicationAdapter {
 		
 		//atlas = new TextureAtlas(Gdx.files.internal("packedimages/pack.atlas"));
 		
+	}
+	
+	private FunctionBindings functionBindings = new FunctionBindings();
+	
+
+	@Override
+	public boolean keyDown(int keycode) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public boolean keyUp(int keycode) {
+		return functionBindings.runBoundFunction(keycode);
+	}
+	@Override
+	public boolean keyTyped(char character) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	@Override
+	public boolean scrolled(int amount) {
+		// TODO Auto-generated method stub
+		return false;
 	}
 	
 	

@@ -7,7 +7,7 @@ import com.mygdx.holowyth.CombatDemo;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.pathfinding.demo.PathfindingDemo;
 import com.mygdx.holowyth.test.SceneTest;
-import com.mygdx.holowyth.test.sandbox.hotkeytrainer.Test2;
+import com.mygdx.holowyth.test.sandbox.holowyth.Test2;
 import com.mygdx.holowyth.test.ui.UIDemo;
 
 public class CombatLauncher {

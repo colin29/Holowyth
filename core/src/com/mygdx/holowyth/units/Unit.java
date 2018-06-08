@@ -225,8 +225,19 @@ public class Unit implements UnitInfo {
 				iDodge += item.dodgeBonus;
 			}
 		}
+		String format = String.format("", null);
+		
 	}
 
+	// Combat/Attacking methods
+	
+	private void attackUnit(Unit other) {
+		if(this == other) {
+			System.out.println("Error, cannot attack self");
+		}
+	}
+	
+	
 	public EquippedItems getEquip() {
 		return this.equip;
 	}

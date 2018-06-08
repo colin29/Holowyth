@@ -7,8 +7,8 @@ public class Timer {
 	long timeSinceLastFrame;
 	long curFrame;
 	public long frameNumber = 0;
-	long intervalTime; // in milliseconds
-	long extraTime;
+	long intervalTimeMili; // in milliseconds
+	long extraTime; // in nanoseconds
 	
 	public Timer(){
 		
@@ -19,7 +19,7 @@ public class Timer {
 	 * @param interval time, in milliseconds
 	 */
 	public void start(long interval){
-		this.intervalTime = interval;
+		this.intervalTimeMili = interval;
 		if(!started){
 			timeOfLastFrame = System.nanoTime();
 			started = true;
@@ -32,8 +32,8 @@ public class Timer {
 		timeSinceLastFrame = System.nanoTime() - timeOfLastFrame;
 		
 		
-		if(timeSinceLastFrame > intervalTime * 1000000){
-			extraTime = Math.min(timeSinceLastFrame-intervalTime * 1000000, intervalTime*1000000);
+		if(timeSinceLastFrame > intervalTimeMili * 1000000){
+			extraTime = Math.min(timeSinceLastFrame-intervalTimeMili * 1000000, intervalTimeMili*1000000);
 			timeOfLastFrame = System.nanoTime() - extraTime; //carry over remaining time, up to a max of interval
 			return true;
 		}

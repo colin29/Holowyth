@@ -14,9 +14,10 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.holowyth.test.sandbox.FooGame;
-import com.mygdx.holowyth.test.sandbox.hotkeytrainer.Test1;
-import com.mygdx.holowyth.test.sandbox.hotkeytrainer.Test2;
+import com.mygdx.holowyth.test.sandbox.holowyth.Test1;
+import com.mygdx.holowyth.test.sandbox.holowyth.Test2;
 import com.mygdx.holowyth.test.ui.UIDemo;
+import com.mygdx.holowyth.units.StatsDemo;
 
 public class SelectLauncher {
 
@@ -37,6 +38,7 @@ public class SelectLauncher {
 	public static void addApps(){
 		addApp(Test1.class);
 		addApp(Test2.class);
+		addApp(StatsDemo.class);
 		
 		LwjglApplicationConfiguration uiConfig = new LwjglApplicationConfiguration();
 		uiConfig.title = "CustomLaunchTitle";
@@ -46,7 +48,7 @@ public class SelectLauncher {
 		addApp(UIDemo.class, uiConfig);
 	}
 
-	private static String openThis = "test1"; //Set this to skip the selection screen and open an app immediately.
+	private static String openThis = "statsDemo"; //Set this to skip the selection screen and open an app immediately.
 	public static void main(String[] arg) throws InstantiationException, IllegalAccessException {
 
 		addApps();

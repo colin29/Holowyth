@@ -4,7 +4,7 @@ import com.badlogic.gdx.files.FileHandle;
 
 public class HoloMisc {
 	public static void printDirectory(String dir){
-		System.out.println("Directory\n---");
+		System.out.println("Directory Contents:\n---");
 		FileHandle h = new FileHandle(dir);
 		FileHandle[] files = h.list();
 		for (FileHandle f : files){

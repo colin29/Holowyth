@@ -3,11 +3,14 @@ package com.mygdx.holowyth.util.tools;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 
 /**
- * Tracks whether given keys are being pressed down or not.
+ * Tracks whether given keys are being pressed down or not. <br>
+ * 
+ * Note: If using Libgdx, use Gdx.input.isButtonPressed instead
  * 
  * @usage Construct a KeyTracker with the keys you would like to track.
  */
