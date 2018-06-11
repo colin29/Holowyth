@@ -109,24 +109,28 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		
 		batch.setProjectionMatrix(camera.combined);
 
+		// 1: Render Maps
 		if (this.map != null) {
-			// renderExpandedPolygons();
 			renderMapPolygons();
-
+//			pathingModule.renderExpandedMapPolygons();
+			
 			renderMapBoundaries();
 		}
 
+		// 2: Render unit paths
 		renderPaths(false);
 		for (Unit u : units) {
 			u.renderNextWayPoint(shapeRenderer);
 		}
 		renderUnitDestinations(Color.GREEN);
 
+		
+		// 3: Render units and selection indicators
+		
 		unitControls.renderCirclesOnSelectedUnits();
 		renderUnits();
 		unitControls.renderSelectionBox(UnitControls.defaultSelectionBoxColor);
 
-//		pathingModule.renderExpandedMapPolygons();
 
 		debugInfo.setVisible(true);
 
@@ -402,7 +406,7 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		unitControls.selectedUnits.add(playerUnit);
 		createTestUnits();
 
-		playerUnit.orderMove(CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
+//		playerUnit.orderMove(CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
 
 	}
 
@@ -418,14 +422,14 @@ public class CombatDemo implements Screen, InputProcessor, World {
 	private void doOnFrame() {
 		tickLogicForUnits();
 		moveUnits();
-
 		handleCombatLogic();
+		
 		// Testing area
 
 		// System.out.format("Unit xy: (%s, %s) %s %n", playerUnit.x, playerUnit.y, playerUnit.curSpeed);
 	}
 
-	// Game and Movement Logic
+	// Game and Combat Logic
 
 	ArrayList<Unit> units = new ArrayList<Unit>();
 	Unit playerUnit; // the main unit we are using to demo pathfinding
@@ -606,12 +610,7 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		}
 	}
 
-	// Input Related
-
-	final int[] TRACKED_KEYS = new int[] { Keys.LEFT, Keys.RIGHT, Keys.UP, Keys.DOWN };
-	KeyTracker keyTracker = new KeyTracker(TRACKED_KEYS, multiplexer);
-
-	/* ^^^^^^ End of User Methods ^^^^^^ */
+	/* Input methods */
 
 	@Override
 	public boolean keyDown(int keycode) {
