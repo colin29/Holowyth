@@ -93,6 +93,15 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		pathingModule = new PathingModule(camera, shapeRenderer);
 
 		createUI();
+
+		// Configure Input
+		multiplexer.addProcessor(stage);
+		multiplexer.addProcessor(this);
+		
+		// Load map and test units
+		
+		loadMapFromDisk(Holo.mapsDirectory + Holo.editorInitialMap);
+		initGameComponentsForMapStartup();
 	}
 
 	FPSLogger fps = new FPSLogger();
@@ -187,15 +196,7 @@ public class CombatDemo implements Screen, InputProcessor, World {
 	@Override
 	public void show() {
 		System.out.println("Showed Pathfinding Demo");
-		multiplexer.clear();
-		multiplexer.addProcessor(stage);
-		multiplexer.addProcessor(this);
 		Gdx.input.setInputProcessor(multiplexer);
-
-		// openFileChooserToLoadMap();
-		if (Holo.editorInitialMap != null) {
-			loadMap(HoloIO.getMapFromDisk(Holo.mapsDirectory + Holo.editorInitialMap));
-		}
 	}
 
 	@Override
@@ -213,13 +214,11 @@ public class CombatDemo implements Screen, InputProcessor, World {
 	@Override
 	public void resume() {
 		// TODO Auto-generated method stub
-
 	}
 
 	@Override
 	public void hide() {
-		// TODO Auto-generated method stub
-
+		Gdx.input.setInputProcessor(null);
 	}
 
 	@Override
@@ -380,37 +379,38 @@ public class CombatDemo implements Screen, InputProcessor, World {
 	int CELL_SIZE = Holo.CELL_SIZE;
 
 	/**
-	 * Logically initializes a bunch of components necessary to run the map
+	 * Initializes neccesary game components. <br>
+	 * Call after loading a new map. The mirror function is mapShutdown.
 	 */
-	private void mapStartup(Field map) {
-
-		// Unit Controls
+	private void initGameComponentsForMapStartup() {
+		
+		// 1: Init Unit controls
 		if (unitControls != null) {
 			multiplexer.removeProcessor(unitControls);
 		}
 		unitControls = new UnitControls(game, camera, units);
 		multiplexer.addProcessor(unitControls);
+		
 
-		// Pathing
-		pathingModule.initForMap(map);
+		// 2: Init Pathing
+		pathingModule.initForMap(this.map);
 
-		// Debug
-
+		// 3: Add Debugging info
 		debugInfo.add(unitControls.getDebugTable());
 
-		//// ---------Test Area---------////:
+		/*  Test Area  */
 
-		// Create units
+		// Create test units
 		playerUnit = new Unit(220, 220, this, Unit.Side.PLAYER);
 		units.add(playerUnit);
 		unitControls.selectedUnits.add(playerUnit);
-		createTestUnits();
+		spawnSomeEnemyUnits();
 
 //		playerUnit.orderMove(CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
 
 	}
 
-	private void createTestUnits() {
+	private void spawnSomeEnemyUnits() {
 		units.add(new Unit(406, 253, this, Unit.Side.ENEMY));
 		units.add(new Unit(550, 122 - Holo.UNIT_RADIUS, this, Unit.Side.ENEMY));
 		units.add(new Unit(750, 450, this, Unit.Side.ENEMY));
@@ -560,6 +560,9 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		game.fileChooser.setDirectory(Holo.mapsDirectory);
 	}
 
+	/**
+	 * Gets a map from disk, then loads it.
+	 */
 	private void loadMapFromDisk(String pathname) {
 		try {
 			Field loadedMap = HoloIO.getMapFromDisk(pathname);
@@ -588,8 +591,6 @@ public class CombatDemo implements Screen, InputProcessor, World {
 		newMap.hasUnsavedChanges = false;
 
 		camera.position.set(newMap.width() / 2, newMap.height() / 2, 0);
-
-		mapStartup(newMap);
 	}
 
 	private void mapShutdown() {
