@@ -37,62 +37,6 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 	static Unit unit;
 	static Item myItem;
 
-	public static void loadDummyUnitStats(Unit unit) {
-
-		unit.baseStr = 7;
-		unit.baseAgi = 5;
-		unit.baseFort = 6;
-		unit.basePercep = 6;
-
-		unit.baseMaxHp = 100;
-		unit.baseMaxSp = 50;
-
-		unit.baseMoveSpeed = 2.3f;
-
-		unit.level = 3;
-
-		unit.unitType = UnitType.PLAYER;
-	}
-
-	public static void loadDummyUnitStats2(Unit unit) {
-
-		unit.baseStr = 5;
-		unit.baseAgi = 5;
-		unit.baseFort = 5;
-		unit.basePercep = 5;
-
-		unit.baseMaxHp = 100;
-		unit.baseMaxSp = 50;
-
-		unit.baseMoveSpeed = 2.3f;
-
-		unit.level = 1;
-
-		unit.unitType = UnitType.PLAYER;
-	}
-
-	public static void loadDummyEquipment(Unit unit) {
-		Item sword = new Item("Red Sword");
-
-		sword.damage = 8;
-
-		sword.atkBonus = 2;
-		sword.defBonus = 2;
-		sword.accBonus = 4;
-
-		sword.itemType = ItemType.EQUIPMENT;
-		sword.equipType = EquipType.WEAPON;
-
-		Item ring = new Item("Stone Ring");
-		ring.itemType = ItemType.EQUIPMENT;
-		ring.equipType = EquipType.ACCESSORY;
-		ring.fortBonus = 2;
-		ring.percepBonus = 1;
-
-		unit.getEquip().mainHand = sword;
-		unit.getEquip().accessory1 = ring;
-	}
-
 	@Override
 	public void create() {
 		r = new ShapeRenderer();
@@ -106,7 +50,11 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 		Gdx.input.setInputProcessor(multiplexer);
 		
 		createTestUnits();
+		
+		// Bind hotkeys
+		functionBindings.bindFunctionToKey(()-> unit.attack(unitB), Keys.G);
 	}
+	
 
 	private void createTestUnits() {
 		unit = new Unit("Arthur");
@@ -120,10 +68,78 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 		unit.getEquip().mainHand.printInfo();
 		unit.getEquip().accessory1.printInfo();
 
-		Unit unitB = new Unit("Bob");
+		unitB = new Unit("Bob");
 		loadDummyUnitStats2(unitB);
+		loadArmor(unitB);
+		
 		unitB.recalculateStats();
+		unitB.prepareUnit();
 		unitB.printInfo();
+	}
+
+	public static void loadDummyUnitStats(Unit unit) {
+	
+		unit.baseStr = 7;
+		unit.baseAgi = 5;
+		unit.baseFort = 6;
+		unit.basePercep = 6;
+	
+		unit.baseMaxHp = 100;
+		unit.baseMaxSp = 50;
+	
+		unit.baseMoveSpeed = 2.3f;
+	
+		unit.level = 3;
+	
+		unit.unitType = UnitType.PLAYER;
+	}
+
+	public static void loadDummyUnitStats2(Unit unit) {
+	
+		unit.baseStr = 5;
+		unit.baseAgi = 5;
+		unit.baseFort = 5;
+		unit.basePercep = 5;
+	
+		unit.baseMaxHp = 100;
+		unit.baseMaxSp = 50;
+	
+		unit.baseMoveSpeed = 2.3f;
+	
+		unit.level = 1;
+	
+		unit.unitType = UnitType.PLAYER;
+	}
+
+	public static void loadDummyEquipment(Unit unit) {
+		Item sword = new Item("Red Sword");
+	
+		sword.damage = 8;
+	
+		sword.atkBonus = 2;
+		sword.defBonus = 2;
+		sword.accBonus = 4;
+	
+		sword.itemType = ItemType.EQUIPMENT;
+		sword.equipType = EquipType.WEAPON;
+	
+		Item ring = new Item("Stone Ring");
+		ring.itemType = ItemType.EQUIPMENT;
+		ring.equipType = EquipType.ACCESSORY;
+		ring.fortBonus = 2;
+		ring.percepBonus = 1;
+	
+		unit.getEquip().mainHand = sword;
+		unit.getEquip().accessory1 = ring;
+	}
+	
+	public static void loadArmor(Unit unit) {
+		Item armor = new Item("Steel Plate");
+		
+		armor.armorBonus = 6;
+		armor.dmgReductionBonus = 0.35f;
+		
+		unit.getEquip().torso = armor;
 	}
 
 	@Override
@@ -146,15 +162,6 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 
 		skin = new Skin(Gdx.files.internal("myskin\\uiskin.json"));
 		createRootTable();
-
-		// Test function binding
-
-		functionBindings.bindFunctionToKey(() -> {
-			System.out.println("foobar lambda");
-		}, Keys.G);
-		functionBindings.bindFunctionToKey(() -> {
-			testMethod();
-		}, Keys.H);
 	}
 
 	private void testMethod() {
@@ -168,12 +175,6 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 		stage.addActor(root);
 
 		root.debug();
-
-		TextButton b1 = new TextButton("Load", skin);
-		TextButton b2 = new TextButton("Save", skin);
-
-		root.add(b1);
-		root.add(b2);
 
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts\\fantasy_one.ttf"));
 
@@ -190,6 +191,7 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 	}
 
 	private FunctionBindings functionBindings = new FunctionBindings();
+	private Unit unitB;
 
 	@Override
 	public boolean keyDown(int keycode) {

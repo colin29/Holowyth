@@ -25,6 +25,9 @@ public class Item {
 	int strBonus, agiBonus, fortBonus, percepBonus;
 	int atkBonus, defBonus, forceBonus, stabBonus, accBonus, dodgeBonus; // conditional bonuses are handled manually in
 																			// the combat simulator, for now.
+	
+	int armorBonus;
+	float dmgReductionBonus; // is a percentage reduction
 
 	String name;
 
@@ -33,6 +36,16 @@ public class Item {
 
 	boolean is2HWeapon;
 
+	public Item(String name, EquipType equipType) {
+		this(name, ItemType.EQUIPMENT);
+		this.equipType = equipType;
+	}
+	
+	public Item(String name, ItemType itemType) {
+		this(name);
+		this.itemType = itemType;
+	}
+	
 	public Item(String name) {
 		this.name = name;
 	}

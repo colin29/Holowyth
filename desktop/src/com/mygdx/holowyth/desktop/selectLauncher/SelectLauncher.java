@@ -22,8 +22,7 @@ import com.mygdx.holowyth.units.StatsDemo;
 public class SelectLauncher {
 
 	private static Map<String, AppLaunch> apps = new TreeMap<String, AppLaunch>();
-
-
+	
 	private static LwjglApplicationConfiguration defaultConfig;
 	static {
 		defaultConfig = new LwjglApplicationConfiguration();
@@ -38,9 +37,16 @@ public class SelectLauncher {
 	public static void addApps(){
 		addApp(Test1.class);
 		addApp(Test2.class);
-		addApp(StatsDemo.class);
 		
-		LwjglApplicationConfiguration uiConfig = new LwjglApplicationConfiguration();
+		LwjglApplicationConfiguration uiConfig;
+		
+		uiConfig = new LwjglApplicationConfiguration();
+		uiConfig.width = 380;
+		uiConfig.height = 300;
+		uiConfig.samples = 5;
+		addApp(StatsDemo.class, uiConfig);
+		
+		uiConfig = new LwjglApplicationConfiguration();
 		uiConfig.title = "CustomLaunchTitle";
 		uiConfig.width = 960;
 		uiConfig.height = 640;
@@ -48,12 +54,10 @@ public class SelectLauncher {
 		addApp(UIDemo.class, uiConfig);
 	}
 
-	private static String openThis = "statsDemo"; //Set this to skip the selection screen and open an app immediately.
+	private static String openThis = "statsdemo"; //Set this to skip the selection screen and open an app immediately.
 	public static void main(String[] arg) throws InstantiationException, IllegalAccessException {
 
 		addApps();
-
-		
 		printAllApps();
 		System.out.println("Enter an app to launch:");
 

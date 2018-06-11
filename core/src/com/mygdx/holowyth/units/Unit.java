@@ -32,10 +32,15 @@ public class Unit implements UnitInfo {
 	private int str, agi, fort, percep; // core stats
 	private int maxHp, maxSp;
 	private int atk, def, force, stab, acc, dodge;
+	
+	private int armor, armorPiercing;
+	private float dmgReduction, armorNegation;
 
-	// Helper Stats
+	// Helper Stats (summed up item bonuses)
 	private int iStr, iAgi, iFort, iPercep; // core stats
-	private int iAtk, iDef, iForce, iStab, iAcc, iDodge; // summed up item bonuses
+	private int iAtk, iDef, iForce, iStab, iAcc, iDodge; 
+	private int iArmor, iArmorPiercing;
+	private float iDmgReduction, iArmorNegation;
 
 	public enum Stance {
 		DEFENSIVE, NORMAL, ALL_OUT_AGGRESSIVE
@@ -70,6 +75,8 @@ public class Unit implements UnitInfo {
 
 	UnitType unitType;
 
+
+
 	public Unit() {
 		this("Default Name");
 	}
@@ -77,6 +84,7 @@ public class Unit implements UnitInfo {
 	public Unit(String name) {
 		this.name = name;
 	}
+	
 
 	/**
 	 * 
@@ -89,11 +97,6 @@ public class Unit implements UnitInfo {
 		// private int maxHp, maxSp;
 		// private int str, agi, fort, percep;
 		// int atk, def, force, stab, acc, dodge;
-
-		str = baseStr;
-		agi = baseAgi;
-		fort = baseFort;
-		percep = basePercep;
 
 		// 1: calculate new stats from equipment bonuses
 
@@ -124,6 +127,11 @@ public class Unit implements UnitInfo {
 		iStab = 0;
 		iAcc = 0;
 		iDodge = 0;
+		
+		iArmor = 0;
+		iDmgReduction = 0;
+		iArmorPiercing = 0;
+		iArmorNegation = 0;
 
 		addDerivedStatBonuses(equip.head, equip.torso, equip.mainHand, equip.accessory1, equip.accessory2);
 		if (equip.mainHand != equip.offHand) {
@@ -139,6 +147,13 @@ public class Unit implements UnitInfo {
 		stab = levelBonus + iStab + 2 * (fort - mid) + 1 * (str - mid);
 		acc = levelBonus + iAcc + 2 * (percep - mid);
 		dodge = levelBonus + iDodge + 2 * (agi - mid);
+		
+		armor = iArmor;
+		dmgReduction = iDmgReduction;
+		armorPiercing = iArmorPiercing;
+		armorNegation = iArmorNegation;
+		
+		
 
 	}
 
@@ -168,9 +183,17 @@ public class Unit implements UnitInfo {
 		s += String.format("Core stats: STR %d, AGI %d, FORT %d, PERCEP %d%n", str, agi, fort, percep);
 		s += String.format("Derived stats: Atk %d, Def %d, Force %d, Stab %d, Acc %d, Dodge %d%n", atk, def, force,
 				stab, acc, dodge);
+		s += "Other stats: \n";
+		s += String.format (" -Damage %s, AP %d, Armor Negation %s%% %n", getRoundedString(getUnitAttackDamage()), armorPiercing, getAsPercentage(armorNegation));
+		s += String.format(" -Armor %d, DR %s%% %n", armor, getAsPercentage(dmgReduction));
+		
 
 		s += "Equipped Items:\n";
 		s += getEquipped();
+		
+		s += "Item details:";
+		
+		//TODO:
 
 		return s;
 	}
@@ -197,9 +220,16 @@ public class Unit implements UnitInfo {
 	}
 
 	public String getRoundedHp() {
+		return getRoundedString(hp);
+	}
+	private String getAsPercentage(float value) {
+		return getRoundedString(value*100);
+	}
+	
+	private String getRoundedString(float value) {
 		DecimalFormat df = new DecimalFormat("#.####");
 		df.setRoundingMode(RoundingMode.HALF_UP);
-		return df.format(hp);
+		return df.format(value);
 	}
 
 	private void addCoreStatBonuses(Item... items) {
@@ -223,18 +253,114 @@ public class Unit implements UnitInfo {
 				iStab += item.stabBonus;
 				iAcc += item.accBonus;
 				iDodge += item.dodgeBonus;
+				
+				iArmor += item.armorBonus;
+				iDmgReduction += item.dmgReductionBonus;
+				iArmorPiercing += item.armorPiercingBonus;
+				iArmorNegation += item.armorNegationBonus;
 			}
 		}
-		String format = String.format("", null);
-		
 	}
 
 	// Combat/Attacking methods
 	
-	private void attackUnit(Unit other) {
-		if(this == other) {
+
+	private float accChanceFloor = 0.05f;
+	private float accChanceCeiling = 1f;
+
+	private float atkChanceFloor = 0.01f;
+	private float atkChanceCeiling = 1f;
+
+	
+/**
+ * Called when an the unit makes an actual strike
+ * @param enemy
+ */
+	public void attack(Unit enemy) {
+		if(this == enemy) {
 			System.out.println("Error, cannot attack self");
+			return;
 		}
+		if(enemy.isDead()) {
+			System.out.println("Cannot attack a dead target");
+			return;
+		}
+		
+//		System.out.printf("%s attacks %s%n", this.name, enemy.name);
+		
+		float chanceToHit = 0;
+		
+		// 1. Simulate dodge chance
+		
+		int acc = this.acc;
+		int dodge = enemy.dodge;
+		
+		chanceToHit = (float) (Math.pow(2, (acc-dodge)/10f) * 0.5);
+		chanceToHit = Math.min(accChanceCeiling, chanceToHit);
+		chanceToHit = Math.max(accChanceFloor, chanceToHit);
+		System.out.printf("Chance to acc: %f %d relative acc %n", chanceToHit, acc-dodge);
+		
+		
+		if(Math.random() > chanceToHit) {
+			System.out.printf("%s dodged %s's attack%n", enemy.name, this.name);
+			return;
+		}
+		
+		// 2. Simulate block chance
+		
+		int atk = this.atk;
+		int def = enemy.def;
+		
+		chanceToHit = (float) (Math.pow(2, (atk - def)/10f) * 0.25);
+		chanceToHit = Math.min(atkChanceCeiling, chanceToHit);
+		chanceToHit = Math.max(atkChanceFloor, chanceToHit);
+		System.out.printf("Chance to hit: %f %d relative acc %n", chanceToHit, atk-def);
+		
+		if(Math.random() > chanceToHit) {
+			System.out.printf("%s blocked %s's attack%n", enemy.name, this.name);
+			return;
+		}
+		
+		// 3. Calculate damage and reduction from armor
+		
+		float origDamage;
+		float weaponDamage = isWieldingAWeapon() ? equip.mainHand.damage : 0;
+		float strengthBonus = (this.str-5)*0.1f;
+		
+		origDamage = getUnitAttackDamage();
+		
+		
+		
+		float damage = 999;
+		
+		// 5. Apply damage
+		System.out.printf("%s hit and did %f damage to %s%n",this.name, damage, enemy.name);
+		enemy.applyDamage(damage);
+		
+		
+	}
+	
+	public float getUnitAttackDamage() {
+		float weaponDamage = isWieldingAWeapon() ? equip.mainHand.damage : 0;
+		float strengthBonus = (this.str-5)*0.1f;
+		
+		return weaponDamage * (1+strengthBonus);
+	}
+	
+	/**
+	 * @param damage
+	 * @return The amount of damage actually done
+	 */
+	public float applyDamage(float damage) {
+		hp -= damage;
+		return damage;
+	}
+	public boolean isDead() {
+		return hp <= 0;
+	}
+	
+	public boolean isWieldingAWeapon() {
+		return equip.mainHand != null;
 	}
 	
 	

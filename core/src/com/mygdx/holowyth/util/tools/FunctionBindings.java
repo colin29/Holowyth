@@ -35,7 +35,7 @@ public class FunctionBindings {
 	public boolean runBoundFunction(int keyCode) {
 		if(functionBindings.containsKey(keyCode)) {
 			functionBindings.get(keyCode).run();
-			System.out.printf("Function for key %s called %n", Keys.toString(keyCode));
+//			System.out.printf("Function for key %s called %n", Keys.toString(keyCode));
 			return true;
 		}
 		return false;

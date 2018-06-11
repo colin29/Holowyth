@@ -23,9 +23,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 
 public class HoloUI {
 
+	@FunctionalInterface
 	public interface VoidInterface {
 		public void run();
 	}
+	@FunctionalInterface
 	public interface FloatConsumer {
 		public void accept(Float f);
 	}
