@@ -24,8 +24,6 @@ public class StatsTest {
 		
 		
 		unit.printInfo();
-		unit.getEquip().mainHand.printInfo();
-		unit.getEquip().accessory1.printInfo();
 		
 		Unit unitB = new Unit("Bob");
 		loadDummyUnitStats2(unitB);

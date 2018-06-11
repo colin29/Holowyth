@@ -59,25 +59,22 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 	private void createTestUnits() {
 		unit = new Unit("Arthur");
 
-		loadDummyUnitStats(unit);
-		loadDummyEquipment(unit);
-		unit.recalculateStats();
+		loadUnitStats(unit);
+		loadSomeEquipment(unit);
 		unit.prepareUnit();
 
 		unit.printInfo();
-		unit.getEquip().mainHand.printInfo();
-		unit.getEquip().accessory1.printInfo();
+		
 
 		unitB = new Unit("Bob");
-		loadDummyUnitStats2(unitB);
+		loadUnitStats2(unitB);
 		loadArmor(unitB);
 		
-		unitB.recalculateStats();
 		unitB.prepareUnit();
 		unitB.printInfo();
 	}
 
-	public static void loadDummyUnitStats(Unit unit) {
+	public static void loadUnitStats(Unit unit) {
 	
 		unit.baseStr = 7;
 		unit.baseAgi = 5;
@@ -94,7 +91,7 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 		unit.unitType = UnitType.PLAYER;
 	}
 
-	public static void loadDummyUnitStats2(Unit unit) {
+	public static void loadUnitStats2(Unit unit) {
 	
 		unit.baseStr = 5;
 		unit.baseAgi = 5;
@@ -111,7 +108,7 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 		unit.unitType = UnitType.PLAYER;
 	}
 
-	public static void loadDummyEquipment(Unit unit) {
+	public static void loadSomeEquipment(Unit unit) {
 		Item sword = new Item("Red Sword");
 	
 		sword.damage = 8;
@@ -119,6 +116,7 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 		sword.atkBonus = 2;
 		sword.defBonus = 2;
 		sword.accBonus = 4;
+		sword.armorNegationBonus = 0.1f;
 	
 		sword.itemType = ItemType.EQUIPMENT;
 		sword.equipType = EquipType.WEAPON;
@@ -134,7 +132,7 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 	}
 	
 	public static void loadArmor(Unit unit) {
-		Item armor = new Item("Steel Plate");
+		Item armor = new Item("Steel Plate", EquipType.ARMOR);
 		
 		armor.armorBonus = 6;
 		armor.dmgReductionBonus = 0.35f;

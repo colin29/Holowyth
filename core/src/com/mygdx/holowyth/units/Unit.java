@@ -2,8 +2,12 @@ package com.mygdx.holowyth.units;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import static com.mygdx.holowyth.units.DataUtil.*;
 
 import com.badlogic.gdx.utils.Array;
 
@@ -162,6 +166,8 @@ public class Unit implements UnitInfo {
 	 * Idempotent (can call >=1 times)
 	 */
 	public void prepareUnit() {
+		recalculateStats();
+		
 		hp = maxHp;
 		sp = maxSp;
 
@@ -184,14 +190,16 @@ public class Unit implements UnitInfo {
 		s += String.format("Derived stats: Atk %d, Def %d, Force %d, Stab %d, Acc %d, Dodge %d%n", atk, def, force,
 				stab, acc, dodge);
 		s += "Other stats: \n";
-		s += String.format (" -Damage %s, AP %d, Armor Negation %s%% %n", getRoundedString(getUnitAttackDamage()), armorPiercing, getAsPercentage(armorNegation));
-		s += String.format(" -Armor %d, DR %s%% %n", armor, getAsPercentage(dmgReduction));
+		s += String.format (" -Damage %s, AP %d, Armor Negation %s %n", getRoundedString(getUnitAttackDamage()), armorPiercing, getAsPercentage(armorNegation));
+		s += String.format(" -Armor %d, DR %s %n", armor, getAsPercentage(dmgReduction));
 		
 
 		s += "Equipped Items:\n";
 		s += getEquipped();
 		
-		s += "Item details:";
+		s += "Item details:\n";
+		
+		s += getInfoForAllEquippedItems();
 		
 		//TODO:
 
@@ -214,6 +222,26 @@ public class Unit implements UnitInfo {
 
 		return s;
 	}
+	
+	public String getInfoForAllEquippedItems() {
+		// Get a list of all distinct items (different names)
+		
+		List<Item> distinctItems = new ArrayList<Item>();
+		
+		for(Item item : equip.getArrayOfEquipSlots()) {
+			if(item == null)
+				continue;
+			if(distinctItems.stream().noneMatch(i -> i.name == item.name)) {
+				distinctItems.add(item);
+			}
+		}
+		
+		String s = "";
+		for(Item item: distinctItems) {
+			s += item.getInfo();
+		}
+		return s;
+	}
 
 	public void printInfo() {
 		System.out.println(getInfo());
@@ -222,15 +250,8 @@ public class Unit implements UnitInfo {
 	public String getRoundedHp() {
 		return getRoundedString(hp);
 	}
-	private String getAsPercentage(float value) {
-		return getRoundedString(value*100);
-	}
 	
-	private String getRoundedString(float value) {
-		DecimalFormat df = new DecimalFormat("#.####");
-		df.setRoundingMode(RoundingMode.HALF_UP);
-		return df.format(value);
-	}
+
 
 	private void addCoreStatBonuses(Item... items) {
 		for (Item item : items) {
@@ -329,10 +350,13 @@ public class Unit implements UnitInfo {
 		
 		origDamage = getUnitAttackDamage();
 		
+		origDamage = 100f;
 		
+		float damageReduced = Math.max(enemy.armor-armorPiercing, origDamage*enemy.dmgReduction);
+		damageReduced *= (1-armorNegation);
 		
-		float damage = 999;
-		
+		float damage = origDamage - damageReduced;
+				
 		// 5. Apply damage
 		System.out.printf("%s hit and did %f damage to %s%n",this.name, damage, enemy.name);
 		enemy.applyDamage(damage);
@@ -387,21 +411,29 @@ public class Unit implements UnitInfo {
 		}
 
 		/**
-		 * Not that the return value will become outdated if any items are equipped/un-equipped
+		 * Note that the returned value will become outdated if any items are equipped/un-equipped
 		 * 
-		 * @return
+		 * Like the fields, null means no item equipped
+		 * 
+		 * @return A list of the items in each field, in order. Each index corresponds to an equip slot, so null is a valid value
 		 */
-		private Array<Item> getCurrentEquipsInOrder() {
+		private Array<Item> getArrayOfEquipSlots() {
 			Array<Item> a = new Array<Item>();
 			a.addAll(head, mainHand, offHand, torso, accessory1, accessory2);
 			assert (a.size == slotLabels.size);
 			return a;
 		}
 
+		/**
+		 * Allows other classes to consistently get all the equip slots and their content in order <br>
+		 * Note that the returned map will become outdated if any items are equipped/un-equipped. <br>
+		 * Like the fields, null means no item equipped. Some items, namely 2h weapons will appear in both hand slots <br>
+		 * @return A map of the equip slots, slotName -> Item
+		 */
 		public Map<String, Item> getIteratableMap() {
 			Map<String, Item> map = new HashMap<String, Item>();
 
-			Array<Item> curItems = getCurrentEquipsInOrder();
+			Array<Item> curItems = getArrayOfEquipSlots();
 
 			for (int i = 0; i < slotLabels.size; i++) {
 				map.put(slotLabels.get(i), curItems.get(i));

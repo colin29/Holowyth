@@ -4,6 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
+import org.apache.commons.lang3.StringUtils;
+
+import static com.mygdx.holowyth.units.DataUtil.*;
+
 import com.badlogic.gdx.utils.Array;
 
 public class Item {
@@ -32,7 +36,7 @@ public class Item {
 	String name;
 
 	int armorPiercingBonus; // both of these stack additively.
-	int armorNegationBonus;
+	float armorNegationBonus;
 
 	boolean is2HWeapon;
 
@@ -64,8 +68,11 @@ public class Item {
 
 	public String getInfo() {
 		String s = "";
-		s += String.format("Item [%s]  %s%n", name, getCompleteItemType());
-		s += "Bonuses: " + getListOfEquipBonuses();
+		s += String.format("[%s]  %s%n", name, getCompleteItemType());
+		if(damage>0) {
+			s += String.format(" Damage: %d%n", damage);
+		}
+		s += " " + getListOfEquipBonuses();
 		return s;
 	}
 
@@ -78,14 +85,14 @@ public class Item {
 	}
 
 	public String getListOfEquipBonuses() {
-
-		Map<String, Integer> m = new HashMap<String, Integer>();
+		// Need to handle both ints and floats
+		Map<String, Object> m = new HashMap<String, Object>();
 		Array<String> ordering = new Array<String>(); // order which to display stat bonuses in, if any.
 
 		/**
 		 * StatBonuslabel is how you want the bonus to appear (e.g the "str" in "str+3")
 		 */
-		BiConsumer<String, Integer> registerStat = (String statBonusLabel, Integer statValue) -> {
+		BiConsumer<String, Object> registerStat = (String statBonusLabel, Object statValue) -> {
 			m.put(statBonusLabel, statValue);
 			ordering.add(statBonusLabel);
 		};
@@ -102,20 +109,34 @@ public class Item {
 		registerStat.accept("acc", accBonus);
 		registerStat.accept("dodge", dodgeBonus);
 
+		registerStat.accept("Armor", armorBonus);
+		registerStat.accept("DR", dmgReductionBonus);
+		
 		registerStat.accept("AP", armorPiercingBonus);
-		registerStat.accept("Armor Negate %", armorNegationBonus);
+		registerStat.accept("Armor Negate", armorNegationBonus);
 
 		String s = "";
 
 		for (String statBonusLabel : ordering) {
-			int statBonus = m.get(statBonusLabel);
-			if (statBonus != 0) {
-				String sign = statBonus > 0 ? "+" : "-";
-				s += statBonusLabel + sign + Math.abs(statBonus) + ", ";
+			Object statBonus = m.get(statBonusLabel);
+			if(statBonus instanceof Integer) {
+				int sbInt = (Integer) statBonus;
+				if (sbInt != 0) {
+					String sign = sbInt > 0 ? "+" : "-";
+					s += statBonusLabel + sign + Math.abs(sbInt) + ", ";
+				}
+			}else if(statBonus instanceof Float) {
+				float sbFloat = (Float) statBonus;
+				if (sbFloat != 0) {
+					String sign = sbFloat > 0 ? "+" : "-";
+					s += statBonusLabel + " " + sign + getAsPercentage(Math.abs(sbFloat)) + ", ";
+				}
+			}else {
+				System.out.printf("Invalid data type %s for label %s%n", statBonus.getClass().getSimpleName(), statBonusLabel);
 			}
 		}
+		s = StringUtils.removeEnd(s, ", ");
 		s += "\n";
 		return s;
 	}
-
 }
