@@ -1,4 +1,4 @@
-package com.mygdx.holowyth;
+package com.mygdx.holowyth.combatDemo;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -78,7 +78,7 @@ public class Unit implements UnitInterPF {
 		this.ID = Unit.getNextId();
 	}
 
-	public Unit(float x, float y, World world, Side side) {
+	public Unit(float x, float y, WorldInfo world, Side side) {
 		this();
 		this.x = x;
 		this.y = y;
@@ -470,6 +470,10 @@ public class Unit implements UnitInterPF {
 			shapeRenderer.identity();
 
 		}
+	}
+	// For now we allow multiple player characters
+	public boolean isPlayerCharacter() {
+		return side == Side.PLAYER;
 	}
 
 	private boolean isAttackOrderAllowed(Unit target) {

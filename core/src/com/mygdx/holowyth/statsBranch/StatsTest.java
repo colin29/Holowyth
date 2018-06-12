@@ -1,8 +1,8 @@
-package com.mygdx.holowyth.units;
+package com.mygdx.holowyth.statsBranch;
 
-import com.mygdx.holowyth.units.Item.EquipType;
-import com.mygdx.holowyth.units.Item.ItemType;
-import com.mygdx.holowyth.units.Unit.UnitType;
+import com.mygdx.holowyth.statsBranch.Item.EquipType;
+import com.mygdx.holowyth.statsBranch.Item.ItemType;
+import com.mygdx.holowyth.statsBranch.Unit.UnitType;
 
 /**
  * Tests some of the unit functionality, but is a simple program instead of a libgdx application.

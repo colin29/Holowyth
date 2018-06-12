@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.units;
+package com.mygdx.holowyth.statsBranch;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -18,9 +18,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.mygdx.holowyth.units.Item.EquipType;
-import com.mygdx.holowyth.units.Item.ItemType;
-import com.mygdx.holowyth.units.Unit.UnitType;
+import com.mygdx.holowyth.statsBranch.Item.EquipType;
+import com.mygdx.holowyth.statsBranch.Item.ItemType;
+import com.mygdx.holowyth.statsBranch.Unit.UnitType;
 import com.mygdx.holowyth.util.misc.HoloMisc;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
 

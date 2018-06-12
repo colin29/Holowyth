@@ -10,7 +10,7 @@ import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.data.Segment;
 
 /**
- * Utility class with various rendering/visualization functions.
+ * Utility class with various basic rendering/visualization functions.
  *
  */
 public class HoloGL {
@@ -51,22 +51,6 @@ public class HoloGL {
 		shapeRenderer.end();
 	}
 
-	public static void renderMapBoundaries(Field map, ShapeRenderer shapeRenderer) {
-		shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1);
-		shapeRenderer.begin(ShapeType.Line);
-
-		Vector2 topRight = new Vector2(map.width(), map.height());
-		Vector2 topLeft = new Vector2(0, map.height());
-		Vector2 botRight = new Vector2(map.width(), 0);
-		Vector2 botLeft = new Vector2(0, 0);
-		shapeRenderer.line(topLeft, topRight);
-		shapeRenderer.line(botLeft, botRight);
-		shapeRenderer.line(topLeft, botLeft);
-		shapeRenderer.line(topRight, botRight);
-
-		shapeRenderer.end();
-	}
-
 	/**
 	 * Often used function for debugging purposes.
 	 */
@@ -100,5 +84,21 @@ public class HoloGL {
 		shapeRenderer.ellipse(x, y, height, width, 0f);
 		shapeRenderer.end();
 	}
+
+		public static void renderMapBoundaries(Field map, ShapeRenderer shapeRenderer) {
+			shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1);
+			shapeRenderer.begin(ShapeType.Line);
+		
+			Vector2 topRight = new Vector2(map.width(), map.height());
+			Vector2 topLeft = new Vector2(0, map.height());
+			Vector2 botRight = new Vector2(map.width(), 0);
+			Vector2 botLeft = new Vector2(0, 0);
+			shapeRenderer.line(topLeft, topRight);
+			shapeRenderer.line(botLeft, botRight);
+			shapeRenderer.line(topLeft, botLeft);
+			shapeRenderer.line(topRight, botRight);
+		
+			shapeRenderer.end();
+		}
 
 }

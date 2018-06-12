@@ -1,4 +1,6 @@
-package com.mygdx.holowyth.units;
+package com.mygdx.holowyth.statsBranch;
+
+import static com.mygdx.holowyth.statsBranch.DataUtil.*;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -6,8 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static com.mygdx.holowyth.units.DataUtil.*;
 
 import com.badlogic.gdx.utils.Array;
 

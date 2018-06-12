@@ -13,11 +13,11 @@ import javax.xml.crypto.dsig.spec.SignatureMethodParameterSpec;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
+import com.mygdx.holowyth.statsBranch.StatsDemo;
 import com.mygdx.holowyth.test.sandbox.FooGame;
 import com.mygdx.holowyth.test.sandbox.holowyth.Test1;
 import com.mygdx.holowyth.test.sandbox.holowyth.Test2;
 import com.mygdx.holowyth.test.ui.UIDemo;
-import com.mygdx.holowyth.units.StatsDemo;
 
 public class SelectLauncher {
 

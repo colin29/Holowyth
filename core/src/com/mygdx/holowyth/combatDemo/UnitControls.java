@@ -1,4 +1,4 @@
-package com.mygdx.holowyth;
+package com.mygdx.holowyth.combatDemo;
 
 import java.util.ArrayList;
 
@@ -15,12 +15,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
 
 /**
- * Accepts player input to select and order units to move (and other behaviour later on).
+ * Accepts player input to select and order units to move (and other behaviour later on). <br>
+ * 
+ * Has Map Lifetime
  * 
  * @author Colin Ta
  */

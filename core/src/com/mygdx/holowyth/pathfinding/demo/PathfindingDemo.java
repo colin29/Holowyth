@@ -288,7 +288,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		// Render Path
 		
 		if(renderIntermediatePaths){
-			pathingModule.renderIntermediatePaths(units);
+			pathingModule.renderIntermediateAndFinalPaths(units);
 		}else{
 			for(PFDemoUnit unit: units){
 				if(unit.path != null){

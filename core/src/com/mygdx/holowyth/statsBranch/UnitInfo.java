@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.units;
+package com.mygdx.holowyth.statsBranch;
 
 public interface UnitInfo {
 

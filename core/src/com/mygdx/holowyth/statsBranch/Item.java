@@ -1,12 +1,12 @@
-package com.mygdx.holowyth.units;
+package com.mygdx.holowyth.statsBranch;
+
+import static com.mygdx.holowyth.statsBranch.DataUtil.*;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.StringUtils;
-
-import static com.mygdx.holowyth.units.DataUtil.*;
 
 import com.badlogic.gdx.utils.Array;
 

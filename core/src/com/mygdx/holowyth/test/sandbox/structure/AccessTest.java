@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.test.sandbox.structure;
 
-import com.mygdx.holowyth.units.UnitInfo;
+import com.mygdx.holowyth.statsBranch.UnitInfo;
 
 public class AccessTest {
 	

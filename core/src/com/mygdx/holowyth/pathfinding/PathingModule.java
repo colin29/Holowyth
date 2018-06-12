@@ -17,6 +17,15 @@ import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Coord;
 import com.mygdx.holowyth.util.data.Point;
 
+/**
+ * Handles pathfinding for the app's needs <br>
+ * Knows how to render certain information about itself
+ * 
+ * Has application lifetime.
+ * 
+ * @author Colin Ta
+ *
+ */
 public class PathingModule {
 
 	// Rendering and pipeline variables
@@ -41,7 +50,10 @@ public class PathingModule {
 		this.shapeRenderer = shapeRenderer;
 
 	}
-
+	
+	/*
+	 * Re-inits for the given map
+	 */
 	public void initForMap(Field map) {
 		this.map = map;
 		
@@ -425,7 +437,7 @@ public class PathingModule {
 	/**
 	 * Render intermediate paths for all units in the list 
 	 */
-	public void renderIntermediatePaths(ArrayList<? extends UnitInterPF> units){
+	public void renderIntermediateAndFinalPaths(ArrayList<? extends UnitInterPF> units){
 		for(UnitInterPF unit: units){
 			PathsInfo info = intermediatePaths.get(unit);
 			if(info != null && (unit.getPath() != null || Holo.continueShowingPathAfterArrival)){
