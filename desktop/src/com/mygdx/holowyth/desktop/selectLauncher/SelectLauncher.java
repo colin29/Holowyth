@@ -18,6 +18,7 @@ import com.mygdx.holowyth.test.sandbox.FooGame;
 import com.mygdx.holowyth.test.sandbox.holowyth.Test1;
 import com.mygdx.holowyth.test.sandbox.holowyth.Test2;
 import com.mygdx.holowyth.test.ui.UIDemo;
+import com.mygdx.holowyth.util.debug.DebugDemo;
 
 public class SelectLauncher {
 
@@ -31,6 +32,15 @@ public class SelectLauncher {
 		defaultConfig.samples = 5;
 	}
 	
+	
+	final static LwjglApplicationConfiguration smallWindow;
+	static {
+	smallWindow	= new LwjglApplicationConfiguration();
+	smallWindow.width = 380;
+	smallWindow.height = 300;
+	smallWindow.samples = 5;
+	}
+	
 	/**
 	 *  Add apps to be served here.
 	 */
@@ -38,13 +48,10 @@ public class SelectLauncher {
 		addApp(Test1.class);
 		addApp(Test2.class);
 		
-		LwjglApplicationConfiguration uiConfig;
 		
-		uiConfig = new LwjglApplicationConfiguration();
-		uiConfig.width = 380;
-		uiConfig.height = 300;
-		uiConfig.samples = 5;
-		addApp(StatsDemo.class, uiConfig);
+		addApp(StatsDemo.class, smallWindow);
+		
+		LwjglApplicationConfiguration uiConfig;
 		
 		uiConfig = new LwjglApplicationConfiguration();
 		uiConfig.title = "CustomLaunchTitle";
@@ -52,9 +59,11 @@ public class SelectLauncher {
 		uiConfig.height = 640;
 		uiConfig.samples = 5;
 		addApp(UIDemo.class, uiConfig);
+		
+		addApp(DebugDemo.class, smallWindow);
 	}
 
-	private static String openThis = "statsdemo"; //Set this to skip the selection screen and open an app immediately.
+	private static String openThis = "debugDemo"; //Set this to skip the selection screen and open an app immediately.
 	public static void main(String[] arg) throws InstantiationException, IllegalAccessException {
 
 		addApps();

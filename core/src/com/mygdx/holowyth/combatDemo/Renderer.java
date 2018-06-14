@@ -81,7 +81,7 @@ public class Renderer {
 
 		batch.setProjectionMatrix(worldCamera.combined);
 
-		// 1: Render Maps
+		// 1: Render Map
 		if (this.map != null) {
 			renderMapPolygons();
 //			pathingModule.renderExpandedMapPolygons();
@@ -114,10 +114,10 @@ public class Renderer {
 		stage.draw();
 	}
 	
-	// Rendering
+	private float pathThickness = 2f;
 	private void renderPaths(boolean renderIntermediatePaths) {
 		// Render Path
-
+	
 		if (renderIntermediatePaths) {
 			pathingModule.renderIntermediateAndFinalPaths(world.units);
 		} else {
@@ -127,16 +127,11 @@ public class Renderer {
 				}
 			}
 		}
-
-	}
-
-	private float pathThickness = 2f;
-	private void renderPath(Path path, Color color, boolean renderPoints) {
-		HoloPF.renderPath(path, color, renderPoints, pathThickness, shapeRenderer);
+	
 	}
 
 	private void renderUnitDestinations(Color color) {
-
+	
 		for (Unit unit : world.units) {
 			if (unit.path != null) {
 				Point finalPoint = unit.path.get(unit.path.size() - 1);
@@ -144,14 +139,18 @@ public class Renderer {
 				shapeRenderer.setColor(color);
 				shapeRenderer.circle(finalPoint.x, finalPoint.y, 4f);
 				shapeRenderer.end();
-
+	
 				shapeRenderer.begin(ShapeType.Line);
 				shapeRenderer.setColor(Color.BLACK);
 				shapeRenderer.circle(finalPoint.x, finalPoint.y, 4f);
 				shapeRenderer.end();
 			}
-
+	
 		}
+	}
+
+	private void renderPath(Path path, Color color, boolean renderPoints) {
+		HoloPF.renderPath(path, color, renderPoints, pathThickness, shapeRenderer);
 	}
 
 	private void renderUnits() {

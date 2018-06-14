@@ -22,7 +22,8 @@ import com.mygdx.holowyth.util.exception.HoloException;
 /**
  * Provides the common base functionality of a demo to be able to have a currently loaded map, and to get maps from disk
  * 
- * Also acts as an adapter to the Screen and InputProcessor classes, providing empty implementations for most of the methods. Override just what you need.
+ * Also acts as an adapter to the Screen and InputProcessor classes, providing empty implementations for most of the
+ * methods. Override just what you need.
  * 
  * 
  * @author Colin Ta
@@ -31,25 +32,25 @@ import com.mygdx.holowyth.util.exception.HoloException;
 public abstract class DemoScreen implements Screen, InputProcessor {
 
 	protected Holowyth game;
-	protected Field map; //currently loaded map
-	
+	protected Field map; // currently loaded map
+
 	protected Stage stage;
-	
+
 	protected OrthographicCamera camera;
 	protected OrthographicCamera fixedCam;
-	
+
 	protected SpriteBatch batch;
-	
-	protected DemoScreen(Holowyth game){
+
+	protected DemoScreen(Holowyth game) {
 		this.game = game;
 		this.camera = new OrthographicCamera();
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		this.fixedCam = new OrthographicCamera();
 		fixedCam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		
+
 		batch = game.batch;
-		
-		stage = new Stage(new ScreenViewport());  
+
+		stage = new Stage(new ScreenViewport());
 	}
 
 	@SuppressWarnings("unused")
@@ -89,10 +90,12 @@ public abstract class DemoScreen implements Screen, InputProcessor {
 
 	protected void loadMap(Field newMap) {
 
-		if (newMap != null) {
+		if (this.map != null) {
 			mapShutdown();
 			this.map = null;
-		} else {
+		} else
+
+		if (newMap == null) {
 			System.out.println("Error: new map was null. New map not loaded");
 			return;
 		}
@@ -114,9 +117,9 @@ public abstract class DemoScreen implements Screen, InputProcessor {
 					Holo.titleName + " --- " + map.name + " [" + map.width() + "x" + map.height() + "] " + starText);
 		}
 	}
-	
+
 	protected abstract void mapShutdown();
-	
+
 	// Cursor Related
 	protected void renderCursor() {
 		batch.setProjectionMatrix(fixedCam.combined);
@@ -130,11 +133,9 @@ public abstract class DemoScreen implements Screen, InputProcessor {
 			batch.end();
 		}
 	}
-	
-	
+
 	/* Inherited methods */
-	
-	
+
 	@Override
 	public abstract void show();
 
@@ -144,7 +145,7 @@ public abstract class DemoScreen implements Screen, InputProcessor {
 	@Override
 	public void resize(int width, int height) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -157,7 +158,7 @@ public abstract class DemoScreen implements Screen, InputProcessor {
 
 	@Override
 	public void hide() {
-			Gdx.input.setInputProcessor(null);
+		Gdx.input.setInputProcessor(null);
 	}
 
 	@Override

@@ -1,6 +1,8 @@
 package com.mygdx.holowyth.combatDemo;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
@@ -25,6 +27,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
@@ -84,7 +87,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	public CombatDemo(final Holowyth game) {
 		super(game);
-
+		
 		skin = game.skin;
 		shapeRenderer = game.shapeRenderer;
 		
@@ -159,7 +162,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	// UI
 	Window testing;
-
+	
 	private void createUI() {
 		stage = new Stage(new ScreenViewport());
 
@@ -169,6 +172,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		root.top().left();
 
 		root.addActor(debugInfo);
+		stage.addActor(root);
 
 		// Add Widgets here
 
@@ -179,6 +183,14 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		createCoordinateText();
 
 		createDebugInfoDisplay();
+		
+		LabelStyle labelStyle = new LabelStyle(game.debugFont, Holo.debugFontColor);
+		Table t = new Table();
+		t.row();
+		t.add(new Label("testName", labelStyle));
+		t.add(new Label("testValue", labelStyle));
+		debugInfo.add(t);
+		debugInfo.debug();
 	}
 
 	Label coordInfo;
@@ -208,7 +220,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	private void createDebugInfoDisplay() {
 		// debugInfo.debug();
 		debugInfo.setFillParent(true);
-		debugInfo.left().top();
+		debugInfo.top().left();
 		debugInfo.pad(4);
 		
 		stage.addActor(debugInfo);
@@ -241,7 +253,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		
 
 		// Add Debugging info
+		debugInfo.row();
 		debugInfo.add(unitControls.getDebugTable());
+		System.out.println(debugInfo.getColumns());
 		
 		// Set Renderer to render world and other map-lifetime components
 		renderer.setWorld(world);
@@ -289,6 +303,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	
 	@Override
 	protected void mapShutdown() {
+		System.out.println("test");
 		debugInfo.clear();
 	}
 

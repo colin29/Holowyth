@@ -14,9 +14,9 @@ public class DataUtil {
 	public static String getRoundedString(float value) {
 		DecimalFormat df = new DecimalFormat("#.####");
 		df.setRoundingMode(RoundingMode.HALF_UP);
-		return df.format(value) + "%";
+		return df.format(value);
 	}
 	public static String getAsPercentage(float value) {
-		return getRoundedString(value*100);
+		return getRoundedString(value*100) + "%";
 	}
 }
