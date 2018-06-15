@@ -5,6 +5,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 
+/**
+ * Class to expedite creating test libgdx apps
+ * @author Colin Ta
+ *
+ */
 public abstract class ApplicationListenerAdapter implements ApplicationListener {
 
 	@Override

@@ -19,6 +19,9 @@ import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.util.debug.DebugStore;
+import com.mygdx.holowyth.util.debug.DebugValue;
+import com.mygdx.holowyth.util.debug.DebugValues;
 
 /**
  * Accepts player input to select and order units to move (and other behaviour later on). <br>
@@ -49,10 +52,9 @@ public class UnitControls implements InputProcessor {
 	Skin skin;
 	LabelStyle labelStyle;
 
-	Table table;
-	Label currentStateText;
-
-	public UnitControls(Holowyth game, Camera camera, ArrayList<Unit> units) {
+	String currentStateText;
+	
+	public UnitControls(Holowyth game, Camera camera, ArrayList<Unit> units, DebugStore debugStore) {
 		this.shapeRenderer = game.shapeRenderer;
 		this.camera = camera;
 		this.units = units;
@@ -61,19 +63,10 @@ public class UnitControls implements InputProcessor {
 		this.skin = game.skin;
 
 		labelStyle = new LabelStyle(game.debugFont, Holo.debugFontColor);
+		
+		DebugValues debugValues = debugStore.registerComponent("Unit Controls");
+		debugValues.add("Order Context", () -> currentStateText);
 
-		createDebugTable();
-	}
-
-	private void createDebugTable() {
-		table = new Table();
-		currentStateText = new Label("Initial Value", labelStyle);
-		table.add(currentStateText);
-	}
-
-	/** Gets debug info for this module, which the parent is free to display how they wish */
-	public Table getDebugTable() {
-		return table;
 	}
 
 	float clickX, clickY; // world location of the last recorded click.
@@ -83,7 +76,7 @@ public class UnitControls implements InputProcessor {
 	public boolean keyDown(int keycode) {
 		if (keycode == Keys.A && selectedUnits.size() > 0) {
 			clearAwaitingOrders();
-			currentStateText.setText("Select Attack Target");
+			currentStateText = "Select Attack Target";
 			attackClickWaiting = true;
 			return true;
 		}
@@ -133,7 +126,7 @@ public class UnitControls implements InputProcessor {
 	 */
 	private void clearAwaitingOrders() {
 		attackClickWaiting = false;
-		currentStateText.setText("Idle");
+		currentStateText = "Idle";
 	}
 
 	private void handleRightClickMove(float x, float y) {

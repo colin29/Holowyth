@@ -21,6 +21,7 @@ import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.util.tools.Timer;
 
 /**
  * Handles all of CombatDemo's rendering <br>
@@ -53,6 +54,13 @@ public class Renderer {
 	// Graphics options
 	
 	private Color clearColor = Color.BLACK;
+	
+	// Graphic flags:
+	
+	// Frame rate control
+	Timer timer = new Timer();
+	
+	public boolean renderUnitExpandedHitBodies = false;
 	
 	private UnitControls unitControls;
 
@@ -112,6 +120,19 @@ public class Renderer {
 		// UI
 		stage.act(delta);
 		stage.draw();
+		
+
+		
+
+		timer.start(1000 / 60);
+
+		if (timer.taskReady()) {
+			tickGameLogic();
+		}
+	}
+	
+	private void tickGameLogic() {
+		world.tick();
 	}
 	
 	private float pathThickness = 2f;
@@ -180,6 +201,11 @@ public class Renderer {
 			}
 		}
 
+	}
+	private void renderUnitExpandedHitBodies() {
+		for (Unit u : world.units) {
+			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + Holo.UNIT_RADIUS, shapeRenderer, Color.GRAY);
+		}
 	}
 
 	private void renderUnitsWithTestSprites() {

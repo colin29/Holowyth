@@ -1,7 +1,11 @@
 package com.mygdx.holowyth.combatDemo;
 
+import static com.mygdx.holowyth.statsBranch.DataUtil.getAsPercentage;
+import static com.mygdx.holowyth.statsBranch.DataUtil.getRoundedString;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -47,13 +51,20 @@ import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
+import com.mygdx.holowyth.util.debug.DebugDemo;
+import com.mygdx.holowyth.util.debug.DebugStore;
+import com.mygdx.holowyth.util.debug.DebugValue;
+import com.mygdx.holowyth.util.debug.DebugValues;
+import com.mygdx.holowyth.util.debug.ValueLabelMapping;
 import com.mygdx.holowyth.util.exception.ErrorCode;
 import com.mygdx.holowyth.util.exception.HoloException;
 import com.mygdx.holowyth.util.tools.KeyTracker;
 import com.mygdx.holowyth.util.tools.Timer;
 
 /**
- * Is responsible for the startup construction of the UI, and setting up the other components on both creation and map load
+ * Is responsible for the startup construction of the UI, and setting up the other components on both creation and map
+ * load
+ * 
  * @author Colin Ta
  *
  */
@@ -67,30 +78,33 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	// Scene2D
 	private Table root;
-
 	Skin skin;
 
-	// App Fields
-	
+	// Game Components
+
 	UnitControls unitControls;
 	PathingModule pathingModule;
-	
+
 	World world;
 
 	// Appearance
 	Color initialClearColor = HoloUI.color(255, 236, 179);
 
-	// Logic
-	Timer timer = new Timer();
-	
+	// Misc.
+	FPSLogger fps = new FPSLogger();
+
+	// Settings
+
+	int CELL_SIZE = Holo.CELL_SIZE;
+
 	Renderer renderer;
 
 	public CombatDemo(final Holowyth game) {
 		super(game);
-		
+
 		skin = game.skin;
 		shapeRenderer = game.shapeRenderer;
-		
+
 		pathingModule = new PathingModule(camera, shapeRenderer);
 
 		createUI();
@@ -98,19 +112,17 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		// Configure Input
 		multiplexer.addProcessor(stage);
 		multiplexer.addProcessor(this);
-		
+
 		// Load map and test units
-		
+
 		loadMapFromDisk(Holo.mapsDirectory + Holo.editorInitialMap);
-		
-		//Init Renderer
+
+		// Init Renderer
 		renderer = new Renderer(game, camera, stage, pathingModule);
 		renderer.setClearColor(initialClearColor);
-		
+
 		initGameComponentsForMapStartup();
 	}
-
-	FPSLogger fps = new FPSLogger();
 
 	@Override
 	public void render(float delta) {
@@ -120,33 +132,10 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		// Cursor related
 		renderCursor();
-
-		// User Controls
-
-		// Testing area
-
-		// for (Vertex v : nearbyPathable) {
-		// HoloGL.renderCircle(v.ix * CELL_SIZE, v.iy * CELL_SIZE, shapeRenderer, Color.RED);
-		// }
-
-		// render expanded hit bodies
-//		for (Unit u : units) {
-//			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + Holo.UNIT_RADIUS, shapeRenderer, Color.GRAY);
-//		}
-
-		// pathing.stepAStar();
-
-		int blank = 1;
-		blank = blank + 1;
-
-		timer.start(1000 / 60);
-
-		if (timer.taskReady()) {
-			doOnFrame();
-		}
-
+		
+		// update debug display
+		valueLabelMapping.forEach(CombatDemo::updateLabel);
 	}
-
 
 	@Override
 	public void show() {
@@ -158,11 +147,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	public void dispose() {
 	}
 
-	/* vvvvvvv User Methods vvvvvvv */
-
-	// UI
-	Window testing;
-	
 	private void createUI() {
 		stage = new Stage(new ScreenViewport());
 
@@ -171,7 +155,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		stage.addActor(root);
 		root.top().left();
 
-		root.addActor(debugInfo);
 		stage.addActor(root);
 
 		// Add Widgets here
@@ -182,31 +165,28 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		createCoordinateText();
 
+//		createParameterWindow();
+
 		createDebugInfoDisplay();
-		
-		LabelStyle labelStyle = new LabelStyle(game.debugFont, Holo.debugFontColor);
-		Table t = new Table();
-		t.row();
-		t.add(new Label("testName", labelStyle));
-		t.add(new Label("testValue", labelStyle));
-		debugInfo.add(t);
-		debugInfo.debug();
+
 	}
 
-	Label coordInfo;
+	Window parameterWindow;
 
 	private void createParameterWindow() {
 		// Create a table for adjusting parameters
 
-		testing = new Window("Parameters", skin);
-		testing.setPosition(700, 400);
+		parameterWindow = new Window("Parameters", skin);
+		parameterWindow.setPosition(0, 100);
 
 		// root.add(new TextButton("test", skin));
-		stage.addActor(testing);
-//		HoloUI.parameterSlider(0, Holo.defaultUnitMoveSpeed, "initialMoveSpeed", testing, skin,
-//				(Float f) -> playerUnit.initialMoveSpeed = f);
-		testing.pack();
+		stage.addActor(parameterWindow);
+		// HoloUI.parameterSlider(0, Holo.defaultUnitMoveSpeed, "initialMoveSpeed", testing, skin,
+		// (Float f) -> playerUnit.initialMoveSpeed = f);
+		parameterWindow.pack();
 	}
+
+	Label coordInfo;
 
 	private void createCoordinateText() {
 		coordInfo = new Label("(000, 000)\n", skin);
@@ -215,98 +195,115 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		coordInfo.setPosition(Gdx.graphics.getWidth() - coordInfo.getWidth() - 4, 4);
 	}
 
-	Table debugInfo = new Table();
+	Table debugInfo;
 
 	private void createDebugInfoDisplay() {
-		// debugInfo.debug();
+		debugInfo = new Table();
 		debugInfo.setFillParent(true);
+		
 		debugInfo.top().left();
 		debugInfo.pad(4);
+//		debugInfo.debug();
+		
+		debugInfo.defaults().spaceRight(20).left();
 		
 		stage.addActor(debugInfo);
 	}
 
-
-
 	// *** Run on Map Load (Important!) ***//
 
-	int CELL_SIZE = Holo.CELL_SIZE;
-
+	Unit playerUnit;
+	DebugStore debugStore = new DebugStore();
 	/**
 	 * Initializes neccesary game components. <br>
 	 * Call after loading a new map. The mirror function is mapShutdown.
 	 */
 	private void initGameComponentsForMapStartup() {
-	
+
 		// Init Pathing
 		pathingModule.initForMap(this.map);
-		
+
 		// Init World
-		world = new World(this.map, pathingModule);
-		
+		world = new World(this.map, pathingModule, debugStore);
+
 		// Init Unit controls
 		if (unitControls != null) {
 			multiplexer.removeProcessor(unitControls);
 		}
-		unitControls = new UnitControls(game, camera, world.units);
+		unitControls = new UnitControls(game, camera, world.units, debugStore);
 		multiplexer.addProcessor(unitControls);
-		
 
-		// Add Debugging info
-		debugInfo.row();
-		debugInfo.add(unitControls.getDebugTable());
-		System.out.println(debugInfo.getColumns());
-		
+		populateDebugTable();
+
 		// Set Renderer to render world and other map-lifetime components
 		renderer.setWorld(world);
 		renderer.setUnitControls(unitControls);
 
-		
-
-		/*  Test Area  */
+		/* Test Area */
 
 		// Create test units
 		playerUnit = world.spawnUnit(220, 220, Unit.Side.PLAYER);
 		unitControls.selectedUnits.add(playerUnit);
 		world.spawnSomeEnemyUnits();
 
-//		playerUnit.orderMove(CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
+		// playerUnit.orderMove(CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
 
 	}
 
-	
-
-	/**
-	 * Main function that contains game logic that is run every frame
-	 */
-	private void doOnFrame() {
-		world.tick();
+	ValueLabelMapping valueLabelMapping = new ValueLabelMapping();
+	private void populateDebugTable() {
 		
-		// Testing area
+		LabelStyle debugStyle = new LabelStyle(game.debugFont, Holo.debugFontColor);
+		
 
-		// System.out.format("Unit xy: (%s, %s) %s %n", playerUnit.x, playerUnit.y, playerUnit.curSpeed);
+		for (Map.Entry<String, DebugValues> entry : debugStore.getStore().entrySet()) {
+			String componentName = entry.getKey();
+			debugInfo.add(new Label(componentName, debugStyle));
+			debugInfo.row();
+			ArrayList<DebugValue> listOfValues = entry.getValue();
+
+			for (DebugValue v : listOfValues) {
+				Label n = new Label(" -" + v.getName(), debugStyle);
+				Label l = new Label("", debugStyle);
+				debugInfo.add(n, l);
+				debugInfo.row();
+				valueLabelMapping.registerLabel(v, l);
+			}
+		}
 	}
 
-	// Game and Combat Logic
+	private static void updateLabel(DebugValue v, Label l) {
+		String str;
 
-//	ArrayList<Unit> units = new ArrayList<Unit>();
-	Unit playerUnit; // the main unit we are using to demo pathfinding
-
-
-
-
-	/* Below is boilerplate code for running a demo */
-
-	// UI and Disk
-
-
+		switch (v.getValueType()) {
+		case FLOAT:
+			if (v.shouldDisplayAsPercentage()) {
+				str = getAsPercentage(v.getFloatValue());
+			} else {
+				str = getRoundedString(v.getFloatValue());
+			}
+			break;
+		case INT:
+			str = String.valueOf(v.getIntValue());
+			break;
+		case STRING:
+			str = v.getStringValue();
+			break;
+		default:
+			System.out.println("Unsupported debug value type");
+			str = null;
+			break;
+		}
+		
+		l.setText(str);
+//		System.out.println("Updated value:  -" + v.name + " " + str);
+	}
 	
 	@Override
 	protected void mapShutdown() {
 		System.out.println("test");
 		debugInfo.clear();
 	}
-
 
 	/* Input methods */
 
@@ -326,8 +323,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 
 		if (button == Input.Buttons.LEFT && pointer == 0) {
-
-			// Testing area
 
 			// Vector3 vec = new Vector3();
 			// vec = camera.unproject(vec.set(screenX, screenY, 0));

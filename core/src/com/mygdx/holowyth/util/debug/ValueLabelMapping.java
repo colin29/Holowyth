@@ -13,7 +13,7 @@ public class ValueLabelMapping {
 	
 	public void registerLabel(DebugValue debugValue, Label label) {
 		if(mapping.containsKey(debugValue)) {
-			new Exception("Warning: Duplicate DebugValue " + debugValue.name).printStackTrace(System.out);
+			new Exception("Warning: Duplicate DebugValue " + debugValue.getName()).printStackTrace(System.out);
 			return;
 		}
 		mapping.put(debugValue, label);

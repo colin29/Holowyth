@@ -9,24 +9,29 @@ import java.util.function.IntSupplier;
  */
 public class DebugValue {
 	
-	String name;
+	private String name;
 	FloatSupplier floatGetter;
 	IntSupplier intGetter;
-	
+	StringSupplier stringGetter;
 	private boolean formatPercentage = false;
 	
-	public enum ValueType {FLOAT, INT};
+	public enum ValueType {FLOAT, INT, STRING};
 	ValueType valueType;
 	
-	DebugValue(String name, FloatSupplier getter){
+	public DebugValue(String name, FloatSupplier getter){
 		this.name = name;
 		this.floatGetter = getter;
 		valueType = ValueType.FLOAT;
 	}
-	DebugValue(String name, IntSupplier getter){
+	public DebugValue(String name, IntSupplier getter){
 		this.name = name;
 		this.intGetter = getter;
 		valueType = ValueType.INT;
+	}
+	public DebugValue(String name, StringSupplier getter){
+		this.name = name;
+		this.stringGetter = getter;
+		valueType = ValueType.STRING;
 	}
 	
 	public ValueType getValueType() {
@@ -39,6 +44,9 @@ public class DebugValue {
 	public int getIntValue() {
 		return intGetter.getAsInt();
 	}
+	public String getStringValue() {
+		return stringGetter.getAsString();
+	}
 	
 	public void displayAsPercentage() {
 		formatPercentage = true;
@@ -47,11 +55,22 @@ public class DebugValue {
 		return formatPercentage;
 	}
 	
+	public String getName() {
+		return name;
+	}
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	boolean printAsPercentage = false;
 
 	@FunctionalInterface
 	public abstract interface FloatSupplier{
 		abstract float getAsFloat();
+	}
+	@FunctionalInterface
+	public abstract interface StringSupplier{
+		abstract String getAsString();
 	}
 
 }

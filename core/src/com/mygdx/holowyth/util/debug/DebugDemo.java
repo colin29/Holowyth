@@ -86,14 +86,14 @@ public class DebugDemo extends ApplicationListenerAdapter {
 		debugTable.defaults().spaceRight(20).left();
 		debugTable.top().left();
 		
-		for (Map.Entry<String, ArrayList<DebugValue>> entry : store.getStore().entrySet()) {
+		for (Map.Entry<String, DebugValues> entry : store.getStore().entrySet()) {
 			String componentName = entry.getKey();
 			debugTable.add(new Label(componentName, skin));
 			debugTable.row();
 			ArrayList<DebugValue> listOfValues = entry.getValue();
 
 			for (DebugValue v : listOfValues) {
-				Label n = new Label(v.name, skin);
+				Label n = new Label(v.getName(), skin);
 				Label l = new Label("", skin);
 				debugTable.add(n, l);
 				debugTable.row();

@@ -10,6 +10,9 @@ import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.data.Segment;
+import com.mygdx.holowyth.util.debug.DebugStore;
+import com.mygdx.holowyth.util.debug.DebugValue;
+import com.mygdx.holowyth.util.debug.DebugValues;
 
 
 /**
@@ -23,9 +26,11 @@ public class World implements WorldInfo {
 	PathingModule pathingModule;
 	Field map; // Each world instance is tied to a single map (specifically, is loaded from a single map)
 	
-	public World(Field map, PathingModule pathingModule){
+	public World(Field map, PathingModule pathingModule, DebugStore debugStore){
 		this.map = map;
 		this.pathingModule = pathingModule;
+		
+		DebugValues debugValues = debugStore.registerComponent("World");
 	}
 	
 	/**
@@ -35,6 +40,7 @@ public class World implements WorldInfo {
 		tickLogicForUnits();
 		moveUnits();
 		handleCombatLogic();
+		
 	}
 	
 	ArrayList<Unit> units = new ArrayList<Unit>();
