@@ -3,6 +3,7 @@ package com.mygdx.holowyth.combatDemo;
 import java.util.ArrayList;
 
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.unit.Unit;
 
 public interface WorldInfo { 
 	//contains information which units can query

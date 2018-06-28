@@ -5,7 +5,6 @@ import java.util.function.IntSupplier;
 
 import com.mygdx.holowyth.util.debug.DebugValue.FloatSupplier;
 import com.mygdx.holowyth.util.debug.DebugValue.StringSupplier;
-import com.mygdx.holowyth.util.debug.DebugValue.ValueType;
 
 public class DebugValues extends ArrayList<DebugValue> {
 	

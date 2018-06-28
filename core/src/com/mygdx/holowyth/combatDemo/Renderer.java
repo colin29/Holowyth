@@ -13,11 +13,12 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.combatDemo.Unit.Side;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
@@ -57,9 +58,7 @@ public class Renderer {
 	
 	// Graphic flags:
 	
-	// Frame rate control
-	Timer timer = new Timer();
-	
+
 	public boolean renderUnitExpandedHitBodies = false;
 	
 	private UnitControls unitControls;
@@ -97,10 +96,8 @@ public class Renderer {
 		}
 
 		// 2: Render unit paths
-		renderPaths(false);	
-		for (Unit u : world.units) {
-			u.renderNextWayPoint(shapeRenderer);
-		}
+//		renderPaths(false);	
+		
 		renderUnitDestinations(Color.GREEN);
 
 		
@@ -124,15 +121,7 @@ public class Renderer {
 
 		
 
-		timer.start(1000 / 60);
-
-		if (timer.taskReady()) {
-			tickGameLogic();
-		}
-	}
-	
-	private void tickGameLogic() {
-		world.tick();
+		
 	}
 	
 	private float pathThickness = 2f;
@@ -143,10 +132,14 @@ public class Renderer {
 			pathingModule.renderIntermediateAndFinalPaths(world.units);
 		} else {
 			for (Unit unit : world.units) {
-				if (unit.path != null) {
-					renderPath(unit.path, Color.GRAY, false);
+				if (unit.motion.path != null) {
+					renderPath(unit.motion.path, Color.GRAY, false);
 				}
 			}
+		}
+		
+		for (Unit u : world.units) {
+			u.motion.renderNextWayPoint(shapeRenderer);
 		}
 	
 	}
@@ -154,8 +147,10 @@ public class Renderer {
 	private void renderUnitDestinations(Color color) {
 	
 		for (Unit unit : world.units) {
-			if (unit.path != null) {
-				Point finalPoint = unit.path.get(unit.path.size() - 1);
+			if (unit.isPlayerCharacter() && unit.motion.path != null) {
+				
+				Path path = unit.motion.getPath();
+				Point finalPoint = path.get(path.size() - 1);
 				shapeRenderer.begin(ShapeType.Filled);
 				shapeRenderer.setColor(color);
 				shapeRenderer.circle(finalPoint.x, finalPoint.y, 4f);

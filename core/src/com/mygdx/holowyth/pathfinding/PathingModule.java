@@ -288,7 +288,7 @@ public class PathingModule {
 	/**
 	 * Given a vertex, restrict it's pathability based on the expanded collision circle of the unit
 	 * 
-	 * @param unit
+	 * @param self
 	 *            Radius of the radius of the unit which is pathing. Used to get expanded geometry.
 	 */
 	private void restrictVertex(Vertex v, CBInfo cb, float unitRadius) {

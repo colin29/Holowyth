@@ -38,12 +38,13 @@ import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.combatDemo.Unit.Side;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.DemoScreen;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
@@ -94,6 +95,10 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	FPSLogger fps = new FPSLogger();
 
 	// Settings
+	
+	// Frame rate control
+	Timer timer = new Timer();
+	
 
 	int CELL_SIZE = Holo.CELL_SIZE;
 
@@ -135,8 +140,15 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		
 		// update debug display
 		valueLabelMapping.forEach(CombatDemo::updateLabel);
-	}
+		
+		//Game logic
+		timer.start(1000 / 60);
 
+		if (timer.taskReady()) {
+			world.tick();
+		}
+	}
+	
 	@Override
 	public void show() {
 		System.out.println("Showed Pathfinding Demo");

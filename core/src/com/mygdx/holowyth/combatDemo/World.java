@@ -3,11 +3,12 @@ package com.mygdx.holowyth.combatDemo;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.combatDemo.Unit.Side;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.data.Segment;
 import com.mygdx.holowyth.util.debug.DebugStore;
@@ -58,21 +59,21 @@ public class World implements WorldInfo {
 	}
 	
 	/**
-	 * Moves units according to their velocity. Rejects any illegal movements based on collision detection.
+	 * Moves units according to their velocity. Rejects any illegal or conflicting movements based on collision detection.
 	 */
 	private void moveUnits() {
 		for (Unit u : units) {
 
 			// Validate the motion by checking against other colliding bodies.
 
-			float dx = u.x + u.vx;
-			float dy = u.y + u.vy;
+			float destX = u.x + u.motion.vx;
+			float destY = u.y + u.motion.vy;
 
-			if (u.vx == 0 && u.vy == 0) {
+			if (u.motion.vx == 0 && u.motion.vy == 0) {
 				continue;
 			}
 
-			Segment motion = new Segment(u.x, u.y, dx, dy);
+			Segment motion = new Segment(u.x, u.y, destX, destY);
 
 			ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
 			for (Unit a : units) {
@@ -89,8 +90,8 @@ public class World implements WorldInfo {
 			ArrayList<CBInfo> collisions = HoloPF.getUnitCollisions(motion.x1, motion.y1, motion.x2, motion.y2,
 					colBodies, u.getRadius());
 			if (collisions.isEmpty()) {
-				u.x += u.vx;
-				u.y += u.vy;
+				u.x += u.motion.vx;
+				u.y += u.motion.vy;
 			} else {
 
 				// if line intersects with one or more other units. (should be max two, since units should not be
@@ -99,8 +100,8 @@ public class World implements WorldInfo {
 					System.out.println("Wierd case, unit colliding with more than 2 units");
 				}
 
-				float curDestx = u.x + u.vx;
-				float curDesty = u.y + u.vy;
+				float curDestx = u.x + u.motion.vx;
+				float curDesty = u.y + u.motion.vy;
 				// Vector2 curVel = new Vector2(u.vx, u.vy);
 
 				// System.out.format("%s is colliding with %s bodies%n", u, collisions.size());

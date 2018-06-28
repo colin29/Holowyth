@@ -12,7 +12,7 @@ dependencies {
 	compile "com.kotcrab.vis:vis-ui:$visuiVersion"
 	compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"	
 	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
-	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.7'
+	compile group: 'org.apache.commons', name: 'commons.math3.util', version: '3.7'
 }
 
 eclipse.project {
