@@ -3,12 +3,16 @@ package com.mygdx.holowyth.combatDemo;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.holowyth.combatDemo.effects.EffectsHandler;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.statsBranch.StatsDemo;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.UnitStats;
 import com.mygdx.holowyth.unit.Unit.Side;
+import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.data.Segment;
 import com.mygdx.holowyth.util.debug.DebugStore;
@@ -27,9 +31,12 @@ public class World implements WorldInfo {
 	PathingModule pathingModule;
 	Field map; // Each world instance is tied to a single map (specifically, is loaded from a single map)
 	
-	public World(Field map, PathingModule pathingModule, DebugStore debugStore){
+	EffectsHandler effects;
+	
+	public World(Field map, PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects){
 		this.map = map;
 		this.pathingModule = pathingModule;
+		this.effects = effects;
 		
 		DebugValues debugValues = debugStore.registerComponent("World");
 	}
@@ -138,14 +145,27 @@ public class World implements WorldInfo {
 	}
 
 	void spawnSomeEnemyUnits() {
-		spawnUnit(406, 253, Unit.Side.ENEMY);
-		spawnUnit(550, 122 - Holo.UNIT_RADIUS, Unit.Side.ENEMY);
-		spawnUnit(750, 450, Unit.Side.ENEMY);
+		ArrayList<Unit> someUnits = new ArrayList<Unit>();
+		someUnits.add(spawnUnit(406, 253, Unit.Side.ENEMY));
+		someUnits.add(spawnUnit(550, 122 - Holo.UNIT_RADIUS, Unit.Side.ENEMY));
+		someUnits.add(spawnUnit(750, 450, Unit.Side.ENEMY));
+		
+		for(Unit unit : someUnits) {
+			PresetUnits.loadUnitStats2(unit.stats);
+			unit.setName("Goblin");
+			unit.stats.prepareUnit();
+		}
 	}
 	
 	public Unit spawnUnit(float x, float y, Side side) {
 		Unit newUnit = new Unit(x, y, this, side);
 		units.add(newUnit);
+		return newUnit;
+	}
+	
+	public Unit spawnUnit(float x, float y, Side side, String name) {
+		Unit newUnit = spawnUnit(x, y, side);
+		newUnit.setName(name);
 		return newUnit;
 	}
 
@@ -157,6 +177,9 @@ public class World implements WorldInfo {
 	@Override
 	public PathingModule getPathingModule() {
 		return pathingModule;
+	}
+	public EffectsHandler getEffectsHandler() {
+		return effects;
 	}
 	public Field getMap() {
 		return map;

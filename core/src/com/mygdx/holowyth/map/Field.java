@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.map;
 
 import java.io.Serializable;
+
 import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.exception.ErrorCode;
 import com.mygdx.holowyth.util.exception.HoloException;

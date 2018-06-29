@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.util;
+package com.mygdx.holowyth.util.template;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -16,6 +16,8 @@ import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.map.Field;
+import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.exception.ErrorCode;
 import com.mygdx.holowyth.util.exception.HoloException;
 

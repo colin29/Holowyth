@@ -18,9 +18,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.mygdx.holowyth.statsBranch.Item.EquipType;
-import com.mygdx.holowyth.statsBranch.Item.ItemType;
-import com.mygdx.holowyth.statsBranch.Unit.UnitType;
+import com.mygdx.holowyth.statsBranch.UnitStatsSB.UnitType;
+import com.mygdx.holowyth.unit.Item;
+import com.mygdx.holowyth.unit.UnitStats;
+import com.mygdx.holowyth.unit.Item.EquipType;
+import com.mygdx.holowyth.unit.Item.ItemType;
 import com.mygdx.holowyth.util.misc.HoloMisc;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
 
@@ -34,7 +36,7 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 	Skin skin;
 	private InputMultiplexer multiplexer;
 
-	static Unit unit;
+	static UnitStatsSB unit;
 	static Item myItem;
 
 	@Override
@@ -57,7 +59,7 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 	
 
 	private void createTestUnits() {
-		unit = new Unit("Arthur");
+		unit = new UnitStatsSB("Arthur");
 
 		loadUnitStats(unit);
 		loadSomeEquipment(unit);
@@ -66,7 +68,7 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 		unit.printInfo();
 		
 
-		unitB = new Unit("Bob");
+		unitB = new UnitStatsSB("Bob");
 		loadUnitStats2(unitB);
 		loadArmor(unitB);
 		
@@ -74,8 +76,7 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 		unitB.printInfo();
 	}
 
-	public static void loadUnitStats(Unit unit) {
-	
+	public static void loadUnitStats(UnitStatsSB unit) {
 		unit.baseStr = 7;
 		unit.baseAgi = 5;
 		unit.baseFort = 6;
@@ -91,7 +92,7 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 		unit.unitType = UnitType.PLAYER;
 	}
 
-	public static void loadUnitStats2(Unit unit) {
+	public static void loadUnitStats2(UnitStatsSB unit) {
 	
 		unit.baseStr = 5;
 		unit.baseAgi = 5;
@@ -108,7 +109,7 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 		unit.unitType = UnitType.PLAYER;
 	}
 
-	public static void loadSomeEquipment(Unit unit) {
+	public static void loadSomeEquipment(UnitStatsSB unit) {
 		Item sword = new Item("Red Sword");
 	
 		sword.damage = 8;
@@ -131,7 +132,7 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 		unit.getEquip().accessory1 = ring;
 	}
 	
-	public static void loadArmor(Unit unit) {
+	public static void loadArmor(UnitStatsSB unit) {
 		Item armor = new Item("Steel Plate", EquipType.ARMOR);
 		
 		armor.armorBonus = 6;
@@ -189,7 +190,7 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 	}
 
 	private FunctionBindings functionBindings = new FunctionBindings();
-	private Unit unitB;
+	private UnitStatsSB unitB;
 
 	@Override
 	public boolean keyDown(int keycode) {

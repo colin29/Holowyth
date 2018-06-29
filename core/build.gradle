@@ -15,6 +15,7 @@ dependencies {
 	compile group: 'org.apache.commons', name: 'commons.math3.util', version: '3.7'
 }
 
+
 eclipse.project {
     name = appName + "-core"
 }

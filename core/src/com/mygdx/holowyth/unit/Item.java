@@ -1,6 +1,6 @@
-package com.mygdx.holowyth.statsBranch;
+package com.mygdx.holowyth.unit;
 
-import static com.mygdx.holowyth.statsBranch.DataUtil.*;
+import static com.mygdx.holowyth.util.DataUtil.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,29 +16,29 @@ public class Item {
 		EQUIPMENT, CONSUMABLE, OTHER
 	}
 
-	ItemType itemType;
+	public ItemType itemType;
 
 	public enum EquipType {
 		HEADGEAR, ARMOR, WEAPON, SHIELD, ACCESSORY
 	}
 
-	EquipType equipType;
+	public EquipType equipType;
 
-	int damage;
+	public int damage;
 
-	int strBonus, agiBonus, fortBonus, percepBonus;
-	int atkBonus, defBonus, forceBonus, stabBonus, accBonus, dodgeBonus; // conditional bonuses are handled manually in
+	public int strBonus, agiBonus, fortBonus, percepBonus;
+	public int atkBonus, defBonus, forceBonus, stabBonus, accBonus, dodgeBonus; // conditional bonuses are handled manually in
 																			// the combat simulator, for now.
 	
-	int armorBonus;
-	float dmgReductionBonus; // is a percentage reduction
+	public int armorBonus;
+	public float dmgReductionBonus; // is a percentage reduction
 
-	String name;
+	public String name;
 
-	int armorPiercingBonus; // both of these stack additively.
-	float armorNegationBonus;
+	public int armorPiercingBonus; // both of these stack additively.
+	public float armorNegationBonus;
 
-	boolean is2HWeapon;
+	public boolean is2HWeapon;
 
 	public Item(String name, EquipType equipType) {
 		this(name, ItemType.EQUIPMENT);

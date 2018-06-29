@@ -36,6 +36,8 @@ public class Holowyth extends Game {
 	
 	public BitmapFont debugFont;
 	
+	public BitmapFont damageEffectFont;
+	
 	/* Skins */
 	public Skin skin;
 
@@ -48,6 +50,7 @@ public class Holowyth extends Game {
 	}
 
 	Class<?> screenToLoad;
+	public BitmapFont missEffectFont;
 
 	/* vvvvvvv User Methods vvvvvvv */
 	public Holowyth(Class<? extends Screen> c) { // takes in screen to open
@@ -102,7 +105,24 @@ public class Holowyth extends Game {
 		font_goth36 = generateFont("fonts/MS_Gothic.ttf", Color.WHITE, 36);
 		
 		debugFont= generateFont("fonts/OpenSans.ttf", Color.WHITE, 16);
+		
+		damageEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 16, Color.BLACK, 1.5f);
+		missEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 15, Color.WHITE, 0.2f);
 	}
+	
+	private BitmapFont generateFontWithBorder(String path, Color color,  int size, Color borderColor,  float borderWidth){
+		FreeTypeFontGenerator.setMaxTextureSize(FreeTypeFontGenerator.NO_MAXIMUM);
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(path));
+		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
+		parameter.size = size;
+		parameter.borderWidth = borderWidth;
+		parameter.borderColor = borderColor;
+		parameter.color = color;
+		BitmapFont font = generator.generateFont(parameter);
+		generator.dispose();
+		return font;
+	}
+
 	
 	private BitmapFont generateFont(String path, Color color,  int size){
 		FreeTypeFontGenerator.setMaxTextureSize(FreeTypeFontGenerator.NO_MAXIMUM);
@@ -110,7 +130,7 @@ public class Holowyth extends Game {
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = size;
 		// HoloUI.addJapaneseCharacters(parameter);
-		parameter.color = Color.WHITE;
+		parameter.color = color;
 		BitmapFont font = generator.generateFont(parameter);
 		generator.dispose();
 		return font;

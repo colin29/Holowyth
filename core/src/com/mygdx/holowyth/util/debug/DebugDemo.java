@@ -1,5 +1,7 @@
 package com.mygdx.holowyth.util.debug;
 
+import static com.mygdx.holowyth.util.DataUtil.*;
+
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.TreeMap;
@@ -15,8 +17,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
 import com.mygdx.holowyth.util.template.ApplicationListenerAdapter;
-
-import static com.mygdx.holowyth.statsBranch.DataUtil.*;
 
 /**
  * Testing class: Simulates roughly the main usage case for the DebugStore

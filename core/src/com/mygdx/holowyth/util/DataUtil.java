@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.statsBranch;
+package com.mygdx.holowyth.util;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -15,6 +15,10 @@ public class DataUtil {
 		DecimalFormat df = new DecimalFormat("#.####");
 		df.setRoundingMode(RoundingMode.HALF_UP);
 		return df.format(value);
+	}
+	public static String getFullyRoundedString(float value) {
+		String str = String.valueOf(Math.round(value));
+		return str;
 	}
 	public static String getAsPercentage(float value) {
 		return getRoundedString(value*100) + "%";

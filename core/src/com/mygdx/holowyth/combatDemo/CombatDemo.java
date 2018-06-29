@@ -1,7 +1,7 @@
 package com.mygdx.holowyth.combatDemo;
 
-import static com.mygdx.holowyth.statsBranch.DataUtil.getAsPercentage;
-import static com.mygdx.holowyth.statsBranch.DataUtil.getRoundedString;
+import static com.mygdx.holowyth.util.DataUtil.getAsPercentage;
+import static com.mygdx.holowyth.util.DataUtil.getRoundedString;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -38,14 +38,16 @@ import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.combatDemo.effects.EffectsHandler;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.statsBranch.StatsDemo;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
-import com.mygdx.holowyth.util.DemoScreen;
+import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.HoloIO;
@@ -59,6 +61,7 @@ import com.mygdx.holowyth.util.debug.DebugValues;
 import com.mygdx.holowyth.util.debug.ValueLabelMapping;
 import com.mygdx.holowyth.util.exception.ErrorCode;
 import com.mygdx.holowyth.util.exception.HoloException;
+import com.mygdx.holowyth.util.template.DemoScreen;
 import com.mygdx.holowyth.util.tools.KeyTracker;
 import com.mygdx.holowyth.util.tools.Timer;
 
@@ -85,6 +88,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	UnitControls unitControls;
 	PathingModule pathingModule;
+	EffectsHandler effects; //keeps track of vfx effects
 
 	World world;
 
@@ -146,6 +150,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		if (timer.taskReady()) {
 			world.tick();
+			effects.tick();
 		}
 	}
 	
@@ -226,17 +231,22 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	Unit playerUnit;
 	DebugStore debugStore = new DebugStore();
+
+	
 	/**
 	 * Initializes neccesary game components. <br>
 	 * Call after loading a new map. The mirror function is mapShutdown.
 	 */
 	private void initGameComponentsForMapStartup() {
 
+		
+		effects = new EffectsHandler(game, camera, debugStore);
+		
 		// Init Pathing
 		pathingModule.initForMap(this.map);
 
 		// Init World
-		world = new World(this.map, pathingModule, debugStore);
+		world = new World(this.map, pathingModule, debugStore, effects);
 
 		// Init Unit controls
 		if (unitControls != null) {
@@ -250,11 +260,18 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		// Set Renderer to render world and other map-lifetime components
 		renderer.setWorld(world);
 		renderer.setUnitControls(unitControls);
+		renderer.setEffectsHandler(effects);
 
 		/* Test Area */
 
 		// Create test units
-		playerUnit = world.spawnUnit(220, 220, Unit.Side.PLAYER);
+		playerUnit = world.spawnUnit(320, 220, Unit.Side.PLAYER, "Elvin");
+		PresetUnits.loadUnitStats(playerUnit.stats);
+		PresetUnits.loadSomeEquipment(playerUnit.stats);
+		PresetUnits.loadArmor(playerUnit.stats);
+		playerUnit.stats.prepareUnit();
+		playerUnit.stats.printInfo();
+		
 		unitControls.selectedUnits.add(playerUnit);
 		world.spawnSomeEnemyUnits();
 

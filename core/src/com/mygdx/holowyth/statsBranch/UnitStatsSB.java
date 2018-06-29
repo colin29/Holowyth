@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.statsBranch;
 
-import static com.mygdx.holowyth.statsBranch.DataUtil.*;
+import static com.mygdx.holowyth.util.DataUtil.*;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
@@ -10,19 +10,27 @@ import java.util.List;
 import java.util.Map;
 
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.holowyth.unit.Item;
 
-public class Unit implements UnitInfo {
+
+/**
+ * Old separate version of UnitStats used for running StatsDemo
+ * 
+ * Simple stat fields are exposed public, while those which may trigger extra handling will be exposed through getters and setters
+ * @author Colin Ta
+ *
+ */
+public class UnitStatsSB {
 
 	// Info stats
 
 	private String name;
-	private int id;
 
 	// Base stats
-	int baseMaxHp, baseMaxSp;
-	float baseMoveSpeed;
+	public int baseMaxHp, baseMaxSp;
+	public float baseMoveSpeed;
 
-	int baseStr, baseAgi, baseFort, basePercep;
+	public int baseStr, baseAgi, baseFort, basePercep;
 
 	int expGives;
 
@@ -66,26 +74,27 @@ public class Unit implements UnitInfo {
 
 	Array<Status> statuses = new Array<Status>();
 
-	private Unit lookingAt;
-	private Unit occupiedBy;
+	/**
+	 * A unit that is distracted by a target is easier to surpise
+	 */
+	private UnitStatsSB lookingAt;
+	private UnitStatsSB occupiedBy;
 
 	private EquippedItems equip = new EquippedItems();
 
-	int level;
+	public int level;
 
 	public enum UnitType { // Player-like characters have their derived stats calculated like players. Monsters do not.
 		PLAYER, MONSTER
 	}
 
-	UnitType unitType;
-
-
-
-	public Unit() {
+	public UnitType unitType;
+	
+	public UnitStatsSB() {
 		this("Default Name");
 	}
 
-	public Unit(String name) {
+	public UnitStatsSB(String name) {
 		this.name = name;
 	}
 	
@@ -297,15 +306,20 @@ public class Unit implements UnitInfo {
  * Called when an the unit makes an actual strike
  * @param enemy
  */
-	public void attack(Unit enemy) {
+	public void attack(UnitStatsSB enemy) {
 		if(this == enemy) {
 			System.out.println("Error, cannot attack self");
+			return;
+		}
+		if(this.isDead()) {
+			System.out.println("Error, self is dead");
 			return;
 		}
 		if(enemy.isDead()) {
 			System.out.println("Cannot attack a dead target");
 			return;
 		}
+		
 		
 //		System.out.printf("%s attacks %s%n", this.name, enemy.name);
 		
@@ -319,7 +333,7 @@ public class Unit implements UnitInfo {
 		chanceToHit = (float) (Math.pow(2, (acc-dodge)/10f) * 0.5);
 		chanceToHit = Math.min(accChanceCeiling, chanceToHit);
 		chanceToHit = Math.max(accChanceFloor, chanceToHit);
-		System.out.printf("Chance to acc: %f %d relative acc %n", chanceToHit, acc-dodge);
+		System.out.printf(" -Chance to acc: %f %d relative acc %n", chanceToHit, acc-dodge);
 		
 		
 		if(Math.random() > chanceToHit) {
@@ -335,7 +349,7 @@ public class Unit implements UnitInfo {
 		chanceToHit = (float) (Math.pow(2, (atk - def)/10f) * 0.25);
 		chanceToHit = Math.min(atkChanceCeiling, chanceToHit);
 		chanceToHit = Math.max(atkChanceFloor, chanceToHit);
-		System.out.printf("Chance to hit: %f %d relative acc %n", chanceToHit, atk-def);
+		System.out.printf(" -Chance to land strike: %f %d relative acc %n", chanceToHit, atk-def);
 		
 		if(Math.random() > chanceToHit) {
 			System.out.printf("%s blocked %s's attack%n", enemy.name, this.name);
@@ -345,27 +359,27 @@ public class Unit implements UnitInfo {
 		// 3. Calculate damage and reduction from armor
 		
 		float origDamage;
-		float weaponDamage = isWieldingAWeapon() ? equip.mainHand.damage : 0;
-		float strengthBonus = (this.str-5)*0.1f;
 		
 		origDamage = getUnitAttackDamage();
-		
-		origDamage = 100f;
 		
 		float damageReduced = Math.max(enemy.armor-armorPiercing, origDamage*enemy.dmgReduction);
 		damageReduced *= (1-armorNegation);
 		
 		float damage = origDamage - damageReduced;
+		
+		if(damage < 0) {
+			damage = 0;
+		}
 				
 		// 5. Apply damage
 		System.out.printf("%s hit and did %f damage to %s%n",this.name, damage, enemy.name);
+		
+		
 		enemy.applyDamage(damage);
-		
-		
 	}
 	
 	public float getUnitAttackDamage() {
-		float weaponDamage = isWieldingAWeapon() ? equip.mainHand.damage : 0;
+		float weaponDamage = isWieldingAWeapon() ? equip.mainHand.damage : 1;
 		float strengthBonus = (this.str-5)*0.1f;
 		
 		return weaponDamage * (1+strengthBonus);
@@ -377,6 +391,11 @@ public class Unit implements UnitInfo {
 	 */
 	public float applyDamage(float damage) {
 		hp -= damage;
+		
+		if(hp < 0) {
+			hp = 0;
+		}
+		
 		return damage;
 	}
 	public boolean isDead() {
@@ -393,19 +412,19 @@ public class Unit implements UnitInfo {
 	}
 
 	public static class EquippedItems {
-		Item head;
-		Item mainHand;
-		Item offHand;
-		Item torso;
-		Item accessory1;
-		Item accessory2;
+		public Item head;
+		public Item mainHand;
+		public Item offHand;
+		public Item torso;
+		public Item accessory1;
+		public Item accessory2;
 
 		public boolean isWielding2HWeapon() {
 			// TODO:
 			return false;
 		}
 
-		static final Array<String> slotLabels = new Array<String>();
+		public static final Array<String> slotLabels = new Array<String>();
 		static {
 			slotLabels.addAll("Head", "Main Hand", "Off Hand", "Torso", "Accessory 1", "Accessory 2");
 		}
@@ -457,6 +476,13 @@ public class Unit implements UnitInfo {
 
 	public int getMaxSp() {
 		return maxSp;
+	}
+	
+	public float getHpRatio() {
+		return (float) hp / maxHp;
+	}
+	public float getSpRatio() {
+		return (float) sp / maxSp;
 	}
 
 	public int getBaseMaxHp() {
@@ -531,12 +557,20 @@ public class Unit implements UnitInfo {
 		return stunDurationRemainng;
 	}
 
-	public Unit getLookingAt() {
+	public UnitStatsSB getLookingAt() {
 		return lookingAt;
 	}
 
-	public Unit getOccupiedBy() {
+	public UnitStatsSB getOccupiedBy() {
 		return occupiedBy;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 
 }

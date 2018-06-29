@@ -29,12 +29,13 @@ import com.mygdx.holowyth.util.data.Segment;
  * @author Colin Ta
  *
  */
-public class Unit implements UnitInterPF {
+public class Unit implements UnitInterPF, UnitInfo {
 
 	public float x, y;
 	
 	// Components
 	public final UnitMotion motion;
+	public final UnitStats stats;
 
 	// World Fields
 	ArrayList<Unit> units;
@@ -56,12 +57,14 @@ public class Unit implements UnitInterPF {
 	 * Maps from a unit to a list of units attacking that one unit.
 	 */
 	private static Map<Unit, Set<Unit>> unitsAttacking = new HashMap<Unit, Set<Unit>>();
-	Mode mode = Mode.FLEE;
+	Mode mode = Mode.PASSIVE;
 	
 	/**
 	 * A unit's friendly/foe status.
 	 */
 	Side side;
+
+	private WorldInfo world;
 
 	public enum Side { // for now, simple, two forces
 		PLAYER, ENEMY
@@ -72,7 +75,7 @@ public class Unit implements UnitInterPF {
 	}
 
 	public enum Mode {
-		ENGAGE, FLEE
+		ENGAGE, PASSIVE
 	}
 
 	public Unit(float x, float y, WorldInfo world, Side side) {
@@ -87,9 +90,22 @@ public class Unit implements UnitInterPF {
 		Unit.unitsAttacking.put(this, new HashSet<Unit>());
 
 		this.motion = new UnitMotion(this, world);
+		this.world = world;
+		
+		this.stats = new UnitStats(this);
+		
+		
+	}
+	
+	public Unit(float x, float y, WorldInfo world, Side side, String name) {
+		this(x, y, world, side);
+		setName(name);
 	}
 
 	
+	public void setName(String name) {
+		this.stats.setName(name);
+	}
 
 	// Orders
 
@@ -149,6 +165,10 @@ public class Unit implements UnitInterPF {
 	
 	}
 
+	
+	private int attackCooldown = 60; 
+	private int attackCooldownLeft = 0;
+	
 	/** Handles the combat logic for a unit for one frame */
 	public void handleCombatLogic() {
 
@@ -159,10 +179,19 @@ public class Unit implements UnitInterPF {
 			a = this.getPos();
 			b = target.getPos();
 			float dist = Point.calcDistance(a, b);
-			if (dist <= this.radius + target.radius + Holo.defaultUnitEngageRange) {
+			if ((attacking != target) && dist <= this.radius + target.radius + Holo.defaultUnitEngageRange) {
 				startAttacking(target);
-			} else if (dist >= this.radius + target.radius + Holo.defaultUnitDisengageRange) {
-				stopAttacking(target);
+			} else if ((attacking == target) && dist >= this.radius + target.radius + Holo.defaultUnitDisengageRange) {
+				stopAttacking();
+			}
+			
+			if (isAttacking()) {
+				if(attackCooldownLeft <= 0) {
+					this.attack(attacking);
+					attackCooldownLeft = attackCooldown;
+				}else {
+					attackCooldownLeft -=1;
+				}
 			}
 		}
 
@@ -174,18 +203,28 @@ public class Unit implements UnitInterPF {
 		}
 
 	}
+	
+	private void attack(Unit enemy) {
+		this.stats.attack(enemy.stats);
+	}
 
 	private void startAttacking(Unit target) {
+		System.out.println("started attacking");
 		motion.stopCurrentMovement();
 		attacking = target;
-		unitsAttacking.get(target).add(this);
+		unitsAttacking.get(attacking).add(this);
+		
+		attackCooldownLeft = attackCooldown / 2;
 	}
 
-	private void stopAttacking(Unit target) {
+	private void stopAttacking() {
+		unitsAttacking.get(this.attacking).remove(this);
 		attacking = null;
-		unitsAttacking.get(target).remove(this);
 	}
 
+	private boolean isAttacking() {
+		return attacking != null;
+	}
 
 
 	private boolean isAttackOrderAllowed(Unit target) {
@@ -342,6 +381,30 @@ public class Unit implements UnitInterPF {
 	@Override
 	public Path getPath() {
 		return motion.getPath();
+	}
+
+	public Side getSide() {
+		return side;
+	}
+
+	public UnitStatsInfo getStats() {
+		return stats;
+	}
+
+	public Order getCurrentOrder() {
+		return currentOrder;
+	}
+
+	public UnitInfo getTarget() {
+		return target;
+	}
+
+	public UnitInfo getAttacking() {
+		return attacking;
+	}
+
+	public WorldInfo getWorld() {
+		return world;
 	}
 	
 }
