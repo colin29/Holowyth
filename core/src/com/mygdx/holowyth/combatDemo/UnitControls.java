@@ -276,6 +276,7 @@ public class UnitControls implements InputProcessor {
 	public void renderCirclesOnSelectedUnits() {
 		for (Unit u : selectedUnits) {
 			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + 2.5f, shapeRenderer, Color.GREEN);
+			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + 3.25f, shapeRenderer, Color.GREEN);
 			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + 4, shapeRenderer, Color.GREEN);
 		}
 	}

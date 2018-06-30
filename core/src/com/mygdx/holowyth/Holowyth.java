@@ -107,7 +107,7 @@ public class Holowyth extends Game {
 		debugFont= generateFont("fonts/OpenSans.ttf", Color.WHITE, 16);
 		
 		damageEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 16, Color.BLACK, 1.5f);
-		missEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 15, Color.WHITE, 0.2f);
+		missEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 15, Color.GRAY, 0.5f);
 	}
 	
 	private BitmapFont generateFontWithBorder(String path, Color color,  int size, Color borderColor,  float borderWidth){

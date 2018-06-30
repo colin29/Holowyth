@@ -9,7 +9,7 @@ import com.badlogic.gdx.graphics.Color;
 public class MissEffect extends DamageEffect {
 
 	MissEffect(float x, float y) {
-		super("Miss", x, y, Color.GRAY);
+		super("Miss", x, y, Color.WHITE);
 	}
 
 }

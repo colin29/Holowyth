@@ -126,7 +126,7 @@ public class Renderer {
 		
 		effects.renderDamageEffects();
 		
-		
+		effects.renderBlockEffects(delta);
 		
 
 		// UI
@@ -244,14 +244,15 @@ public class Renderer {
 		HoloGL.renderMapBoundaries(map, shapeRenderer);
 	}
 
-	private float hpBarWidthMax = 100;
-	private float hpBarWidthMin = 20;
-	private float hpBarWidthBase = 40;
+	private float hpBarWidthBase = 30;
+	private float hpBarWidthMax = 2 * hpBarWidthBase;
+	private float hpBarWidthMin = 0.5f * hpBarWidthBase;
+	
 	
 	private void renderUnitHpBars() {
 		
-		final float hpBarVertSpacing = 10;
-		final float hpBarHeight = 6;
+		final float hpBarVertSpacing = 5;
+		final float hpBarHeight = 4;
 		
 		shapeRenderer.setProjectionMatrix(worldCamera.combined);
 		
@@ -274,7 +275,7 @@ public class Renderer {
 			// Draw the hp bar
 
 			shapeRenderer.begin(ShapeType.Filled);
-			shapeRenderer.setColor(Color.FOREST);
+			shapeRenderer.setColor(Color.RED);
 			
 			shapeRenderer.rect(x, y, hpBarWidth * hpRatio, hpBarHeight);
 			shapeRenderer.end();

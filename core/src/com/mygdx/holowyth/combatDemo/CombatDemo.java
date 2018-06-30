@@ -94,6 +94,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	// Appearance
 	Color initialClearColor = HoloUI.color(255, 236, 179);
+	{
+		initialClearColor = Color.FOREST;
+	}
 
 	// Misc.
 	FPSLogger fps = new FPSLogger();

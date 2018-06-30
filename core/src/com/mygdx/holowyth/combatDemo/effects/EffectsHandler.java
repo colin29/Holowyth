@@ -19,7 +19,7 @@ public class EffectsHandler {
 	Holowyth game;
 	OrthographicCamera worldCamera;
 	
-	SparksEffectManager sparksManager;
+	SparksEffectHandler sparksManager;
 	
 	ArrayList<DamageEffect> damageEffects = new ArrayList<DamageEffect>();
 	
@@ -30,7 +30,7 @@ public class EffectsHandler {
 		DebugValues debugValues = debugStore.registerComponent("Effects");
 		debugValues.add("damageEffect count", () -> damageEffects.size());
 		
-		sparksManager = new SparksEffectManager(game, camera, debugStore);
+		sparksManager = new SparksEffectHandler(game, camera, debugStore);
 	}
 	
 	public void renderDamageEffects() {
@@ -97,6 +97,19 @@ public class EffectsHandler {
 		float x = unit.getX();
 		float y = unit.getY() + unit.getRadius()/2;
 		damageEffects.add(new MissEffect(x, y));
+	}
+
+	public void renderBlockEffects(float delta) {
+		sparksManager.render();
+	}
+	
+	public void makeBlockEffect(UnitInfo self, UnitInfo enemy) {
+		
+		float ratio = 0.66f; // how close the effect is drawn to the enemy.
+		
+		float x = enemy.getX() * ratio + self.getX() * (1-ratio);
+		float y = enemy.getY() * ratio + self.getY() * (1-ratio);
+		sparksManager.addSparkEffect(x, y);
 	}
 
 }

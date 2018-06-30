@@ -338,7 +338,7 @@ public class UnitStats implements UnitStatsInfo {
 
 		if (Math.random() > chanceToHit) {
 			System.out.printf("%s's attack missed %s %n", this.name, enemy.name);
-			effects.makeMissEffect(enemy.self);
+			effects.makeMissEffect(this.self);
 			return;
 		}
 
@@ -355,6 +355,7 @@ public class UnitStats implements UnitStatsInfo {
 
 		if (Math.random() > chanceToHit) {
 			System.out.printf("%s's attack was blocked by %s %n", this.name, enemy.name);
+			effects.makeBlockEffect(this.self, enemy.self);
 			return;
 		}
 
