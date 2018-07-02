@@ -89,6 +89,8 @@ public class Renderer {
 		Gdx.gl.glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT
 				| (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
+		Gdx.gl.glEnable(GL20.GL_BLEND);
+		
 		worldCamera.update();
 
 		batch.setProjectionMatrix(worldCamera.combined);
@@ -113,6 +115,7 @@ public class Renderer {
 		if (unitControls == null) {
 			renderUnits();
 		} else {
+			unitControls.clearDeadUnitsFromSelection();
 			unitControls.renderCirclesOnSelectedUnits();
 			renderUnits();
 			unitControls.renderSelectionBox(UnitControls.defaultSelectionBoxColor);
@@ -185,7 +188,12 @@ public class Renderer {
 		if (Holo.useTestSprites) {
 			renderUnitsWithTestSprites();
 		} else {
+
+			
+			
+			
 			for (Unit unit : world.units) {
+				
 				shapeRenderer.begin(ShapeType.Filled);
 
 				if (unit.isPlayerCharacter()) {
@@ -193,6 +201,8 @@ public class Renderer {
 				} else {
 					shapeRenderer.setColor(Color.YELLOW);
 				}
+				shapeRenderer.getColor().a = unit.stats.isDead() ? 0.5f : 1;
+			
 
 				shapeRenderer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
 
@@ -203,6 +213,7 @@ public class Renderer {
 			for (Unit unit : world.units) {
 				shapeRenderer.begin(ShapeType.Line);
 				shapeRenderer.setColor(Color.BLACK);
+				shapeRenderer.getColor().a = unit.stats.isDead() ? 0.5f : 1;
 				shapeRenderer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
 				shapeRenderer.end();
 			}

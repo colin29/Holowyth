@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.combatDemo;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
@@ -172,6 +173,16 @@ public class UnitControls implements InputProcessor {
 			}
 		}
 	}
+	
+	public void clearDeadUnitsFromSelection() {
+		ListIterator<Unit> iter = selectedUnits.listIterator();
+		while(iter.hasNext()) {
+			Unit unit = iter.next();
+			if(unit.stats.isDead()) {
+				iter.remove();
+			}
+		}
+	}
 
 	private void handleLeftClickSelect(float x, float y) {
 		Point p1 = new Point(x, y);
@@ -210,40 +221,44 @@ public class UnitControls implements InputProcessor {
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 
 		if (button == Input.Buttons.LEFT && pointer == 0) {
-			Vector3 vec = new Vector3(); // obtain world coordinates of the click.
-			vec = camera.unproject(vec.set(screenX, screenY, 0));
-
 			if (leftMouseKeyDown) {
-				Point p = new Point(vec.x, vec.y);
-
-				clickX2 = p.x;
-				clickY2 = p.y;
-
-				float x = Math.min(clickX, clickX2);
-				float y = Math.min(clickY, clickY2);
-				float x2 = Math.max(clickX, clickX2);
-				float y2 = Math.max(clickY, clickY2);
-
-				// check if unit circles are inside or touching the selection box.
-
-				ArrayList<Unit> newlySelected = new ArrayList<Unit>();
-
-				for (Unit u : units) {
-					if (u.x >= x - u.getRadius() && u.x <= x2 + u.getRadius() && u.y >= y - u.getRadius()
-							&& u.y <= y2 + u.getRadius()) {
-						newlySelected.add(u);
-					}
-				}
-
-				if (!newlySelected.isEmpty()) {
-					selectedUnits.clear();
-					selectedUnits.addAll(newlySelected);
-				}
+				selectAllUnitsWithinSelectionBox(screenX, screenY);
 			}
 
 			leftMouseKeyDown = false;
 		}
 		return false;
+	}
+	
+	public void selectAllUnitsWithinSelectionBox(float screenX, float screenY) {
+		Vector3 vec = new Vector3(); // obtain world coordinates of the click.
+		vec = camera.unproject(vec.set(screenX, screenY, 0));
+		Point p = new Point(vec.x, vec.y);
+
+		clickX2 = p.x;
+		clickY2 = p.y;
+
+		float x = Math.min(clickX, clickX2);
+		float y = Math.min(clickY, clickY2);
+		float x2 = Math.max(clickX, clickX2);
+		float y2 = Math.max(clickY, clickY2);
+
+		// check if unit circles are inside or touching the selection box.
+
+		ArrayList<Unit> newlySelected = new ArrayList<Unit>();
+
+		for (Unit u : units) {
+			if (u.x >= x - u.getRadius() && u.x <= x2 + u.getRadius() && u.y >= y - u.getRadius()
+					&& u.y <= y2 + u.getRadius() 
+					&& !u.stats.isDead()) {
+				newlySelected.add(u);
+			}
+		}
+
+		if (!newlySelected.isEmpty()) {
+			selectedUnits.clear();
+			selectedUnits.addAll(newlySelected);
+		}
 	}
 
 	@Override

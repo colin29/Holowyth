@@ -118,6 +118,8 @@ public class UnitMotion {
 
 	private void determineMovementForMoveOrderedUnit() {
 		
+		
+		
 		if (path != null) {
 			// Apply acceleration if the unit is not already at full speed
 			if (curSpeed < speed && !isDecelerating) {

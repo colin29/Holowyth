@@ -324,6 +324,9 @@ public class UnitStats implements UnitStatsInfo {
 		// System.out.printf("%s attacks %s%n", this.name, enemy.name);
 
 		float chanceToHit = 0;
+		
+		enemy.applyDamage(100);
+		
 
 		// 1. Simulate dodge chance
 
@@ -395,8 +398,9 @@ public class UnitStats implements UnitStatsInfo {
 	public float applyDamage(float damage) {
 		hp -= damage;
 
-		if (hp < 0) {
+		if (hp <= 0) {
 			hp = 0;
+			self.unitDies();
 		}
 
 		return damage;

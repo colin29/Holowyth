@@ -56,7 +56,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 	/**
 	 * Maps from a unit to a list of units attacking that one unit.
 	 */
-	private static Map<Unit, Set<Unit>> unitsAttacking = new HashMap<Unit, Set<Unit>>();
+	static Map<Unit, Set<Unit>> unitsAttacking = new HashMap<Unit, Set<Unit>>();
 	Mode mode = Mode.PASSIVE;
 	
 	/**
@@ -172,9 +172,22 @@ public class Unit implements UnitInterPF, UnitInfo {
 	/** Handles the combat logic for a unit for one frame */
 	public void handleCombatLogic() {
 
+		if(attacking != null && attacking.stats.isDead()) {
+			stopAttacking();
+		}
+		
 		if (currentOrder == Order.ATTACKUNIT) {
 			// If the unit is on an attackUnit command and its in engage range, make it start attacking the target
 			// If the unit falls out of engage range, stop it from attacking
+			
+			
+			
+			if(target.stats.isDead()) {
+				clearOrder();
+				return;
+			}
+			
+			
 			Point a, b;
 			a = this.getPos();
 			b = target.getPos();
@@ -228,6 +241,8 @@ public class Unit implements UnitInterPF, UnitInfo {
 
 
 	private boolean isAttackOrderAllowed(Unit target) {
+		if(stats.isDead())
+			return false;
 		if (attacking != null)
 			return false;
 		if (target.side == this.side) {
@@ -237,12 +252,16 @@ public class Unit implements UnitInterPF, UnitInfo {
 	}
 
 	private boolean isMoveOrderAllowed() {
+		if(stats.isDead())
+			return false;
 		if (attacking != null)
 			return false;
 		return true;
 	}
 
 	private boolean isAttackMoveOrderAllowed() {
+		if(stats.isDead())
+			return false;
 		return isMoveOrderAllowed();
 	}
 
@@ -330,6 +349,17 @@ public class Unit implements UnitInterPF, UnitInfo {
 		}
 	}
 
+	void unitDies() {
+		
+		motion.stopCurrentMovement();
+		this.clearOrder();
+		System.out.println("unit died");
+		
+		// Stop this (now-dead) unit from attacking
+		if(attacking != null) {
+			stopAttacking();
+		}
+	}
 
 
 	// For now we allow multiple player characters
