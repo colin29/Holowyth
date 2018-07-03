@@ -1,5 +1,9 @@
 package com.mygdx.holowyth.util.data;
 
+/**
+ * Data struct holding x and y.
+ * @author Colin Ta
+ */
 public class Point {
 	public float x, y;
 	public Point(){
@@ -28,5 +32,14 @@ public class Point {
 		float dx = p2.x - p1.x;
 		float dy = p2.y - p1.y;
 		return dx*dx + dy*dy;
+	}
+	public static float getAngleInDegrees(Point p1, Point p2) {
+	    float angle = (float) Math.toDegrees(Math.atan2(p2.y - p1.y, p2.x - p1.x));
+
+	    if(angle < 0){
+	        angle += 360;
+	    }
+
+	    return angle;
 	}
 }

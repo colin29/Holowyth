@@ -146,12 +146,13 @@ public class World implements WorldInfo {
 
 	void spawnSomeEnemyUnits() {
 		ArrayList<Unit> someUnits = new ArrayList<Unit>();
-		someUnits.add(spawnUnit(406, 253, Unit.Side.ENEMY));
-		someUnits.add(spawnUnit(550, 122 - Holo.UNIT_RADIUS, Unit.Side.ENEMY));
-		someUnits.add(spawnUnit(750, 450, Unit.Side.ENEMY));
+		someUnits.add(spawnUnit(480, 253, Unit.Side.ENEMY));
+		someUnits.add(spawnUnit(450, 300, Unit.Side.ENEMY));
+		someUnits.add(spawnUnit(400, 350, Unit.Side.ENEMY));
 		
 		for(Unit unit : someUnits) {
 			PresetUnits.loadUnitStats2(unit.stats);
+			PresetUnits.loadBasicWeapon(unit.stats);
 			unit.setName("Goblin");
 			unit.stats.prepareUnit();
 		}

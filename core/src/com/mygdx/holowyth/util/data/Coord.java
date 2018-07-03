@@ -1,7 +1,7 @@
 package com.mygdx.holowyth.util.data;
 
 /**
- * Data class holding two ints
+ * Data class holding two ints. Different from {@link Point} in that it's for int coordinates instead of an arbitrary point 
  */
 public class Coord {
 		public int x, y;

@@ -38,13 +38,23 @@ public class PresetUnits {
 	
 		unit.baseMoveSpeed = 2.3f;
 	
-		unit.level = 1;
+		unit.level = 3;
 	
 		unit.unitType = UnitType.PLAYER;
 	}
 
+	public static void loadBasicWeapon(UnitStats unit) {
+		Item sword = new Item("Wooden Sword", EquipType.WEAPON);
+		
+		sword.damage = 5;
+		sword.atkBonus = 1;
+		sword.accBonus = 3;
+		
+		unit.getEquip().mainHand = sword;
+	}
+	
 	public static void loadSomeEquipment(UnitStats unit) {
-		Item sword = new Item("Red Sword");
+		Item sword = new Item("Red Sword", EquipType.WEAPON);
 	
 		sword.damage = 8;
 	
@@ -53,12 +63,7 @@ public class PresetUnits {
 		sword.accBonus = 4;
 		sword.armorNegationBonus = 0.1f;
 	
-		sword.itemType = ItemType.EQUIPMENT;
-		sword.equipType = EquipType.WEAPON;
-	
-		Item ring = new Item("Stone Ring");
-		ring.itemType = ItemType.EQUIPMENT;
-		ring.equipType = EquipType.ACCESSORY;
+		Item ring = new Item("Stone Ring", EquipType.ACCESSORY);
 		ring.fortBonus = 2;
 		ring.percepBonus = 1;
 	
@@ -67,10 +72,10 @@ public class PresetUnits {
 	}
 	
 	public static void loadArmor(UnitStats unit) {
-		Item armor = new Item("Steel Plate", EquipType.ARMOR);
+		Item armor = new Item("Chain Mail", EquipType.ARMOR);
 		
-		armor.armorBonus = 6;
-		armor.dmgReductionBonus = 0.35f;
+		armor.armorBonus = 3;
+		armor.dmgReductionBonus = 0.20f;
 		
 		unit.getEquip().torso = armor;
 	}

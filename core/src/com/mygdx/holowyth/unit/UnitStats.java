@@ -12,6 +12,8 @@ import java.util.Map;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.holowyth.combatDemo.effects.EffectsHandler;
 import com.mygdx.holowyth.util.DataUtil;
+import com.mygdx.holowyth.util.data.Pair;
+import com.mygdx.holowyth.util.data.Point;
 
 /**
  * Simple stat fields are exposed public, while those which may trigger extra handling will be exposed through getters
@@ -22,7 +24,7 @@ import com.mygdx.holowyth.util.DataUtil;
  */
 public class UnitStats implements UnitStatsInfo {
 
-	public static boolean printDetailedCombatInfo = false;
+	public static boolean printDetailedCombatInfo = true;
 
 	Unit self;
 
@@ -325,9 +327,6 @@ public class UnitStats implements UnitStatsInfo {
 
 		float chanceToHit = 0;
 		
-		enemy.applyDamage(100);
-		
-
 		// 1. Simulate dodge chance
 
 		int acc = this.acc;
@@ -337,10 +336,10 @@ public class UnitStats implements UnitStatsInfo {
 		chanceToHit = Math.min(accChanceCeiling, chanceToHit);
 		chanceToHit = Math.max(accChanceFloor, chanceToHit);
 		if(printDetailedCombatInfo)
-			System.out.printf(" -Chance to acc: %f %d relative acc %n", chanceToHit, acc - dodge);
+//			System.out.printf(" -Chance to hit: %f %d relative acc %n", chanceToHit, acc - dodge);
 
 		if (Math.random() > chanceToHit) {
-			System.out.printf("%s's attack missed %s %n", this.name, enemy.name);
+//			System.out.printf("%s's attack missed %s %n", this.name, enemy.name);
 			effects.makeMissEffect(this.self);
 			return;
 		}
@@ -348,16 +347,20 @@ public class UnitStats implements UnitStatsInfo {
 		// 2. Simulate block chance
 
 		int atk = this.atk;
-		int def = enemy.def;
+		int def = enemy.def - getBeingAttackedByMultipleEnemiesDefPenalty(enemy)
+				- getBeingFlankedDefPenalty(enemy);
+		
+		System.out.printf("Defence: %d - %d - %d = %d %n",
+				enemy.def, getBeingAttackedByMultipleEnemiesDefPenalty(enemy), getBeingFlankedDefPenalty(enemy), def);
 
 		chanceToHit = (float) (Math.pow(2, (atk - def) / 10f) * 0.25);
 		chanceToHit = Math.min(atkChanceCeiling, chanceToHit);
 		chanceToHit = Math.max(atkChanceFloor, chanceToHit);
 		if(printDetailedCombatInfo)
-			System.out.printf(" -Chance to land strike: %f %d relative acc %n", chanceToHit, atk - def);
+			System.out.printf(" -Chance to be unblocked: %f %d relative acc %n", chanceToHit, atk - def);
 
 		if (Math.random() > chanceToHit) {
-			System.out.printf("%s's attack was blocked by %s %n", this.name, enemy.name);
+//			System.out.printf("%s's attack was blocked by %s %n", this.name, enemy.name);
 			effects.makeBlockEffect(this.self, enemy.self);
 			return;
 		}
@@ -367,7 +370,7 @@ public class UnitStats implements UnitStatsInfo {
 		float origDamage;
 
 		origDamage = getUnitAttackDamage();
-
+		
 		float damageReduced = Math.max(enemy.armor - armorPiercing, origDamage * enemy.dmgReduction);
 		damageReduced *= (1 - armorNegation);
 
@@ -382,6 +385,53 @@ public class UnitStats implements UnitStatsInfo {
 
 		effects.makeDamageEffect(damage, enemy.self);
 		enemy.applyDamage(damage);
+	}
+	
+	private int getBeingAttackedByMultipleEnemiesDefPenalty(UnitStats unit) {
+		int numEnemiesBeyondFirst = Math.max(0, unit.self.getAttackers().size()-1);
+		
+		return 2*numEnemiesBeyondFirst;
+	}
+	
+	private int getBeingFlankedDefPenalty(UnitStats unit) {
+		if(unit.isBeingFlanked()) {
+			return 4;
+		}else {
+			return 0;
+		}
+	}
+	
+	private static final float flankingRequiredAngle = 130;
+	
+	
+	private boolean isBeingFlanked() {
+		
+		if (self.getAttackers().size() < 2) {
+			return false;
+		}
+		
+		ArrayList<Pair<Unit, Float>> angles = new ArrayList<Pair<Unit, Float>>();
+		for(Unit u: self.getAttackers()) {
+			angles.add(new Pair<Unit, Float>(u, Point.getAngleInDegrees(self.getPos(), u.getPos())));
+		}
+		
+		//Brute force through values looking for two angles that differ by flanking 
+		
+		// Size of array is at least 2 because of condition above
+		for(int i=0; i<angles.size()-1;i++) {
+			for(int j=i+1; j<angles.size();j++) {
+				float angleUnit1 = angles.get(i).second();
+				float angleUnit2 = angles.get(j).second();
+				if(Math.abs(angleUnit1-angleUnit2) >= flankingRequiredAngle) {
+					String name1 = angles.get(i).first().stats.name;
+					String name2 = angles.get(j).first().stats.name;
+					System.out.printf("Unit %s is being flanked by %s and %s%n", this.name, name1, name2);
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 
 	public float getUnitAttackDamage() {

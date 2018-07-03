@@ -55,8 +55,9 @@ public class Unit implements UnitInterPF, UnitInfo {
 	Unit attacking;
 	/**
 	 * Maps from a unit to a list of units attacking that one unit.
+	 * Other classes should use {@link #getAttackers()}
 	 */
-	static Map<Unit, Set<Unit>> unitsAttacking = new HashMap<Unit, Set<Unit>>();
+	private static Map<Unit, Set<Unit>> unitsAttacking = new HashMap<Unit, Set<Unit>>();
 	Mode mode = Mode.PASSIVE;
 	
 	/**
@@ -201,7 +202,8 @@ public class Unit implements UnitInterPF, UnitInfo {
 			if (isAttacking()) {
 				if(attackCooldownLeft <= 0) {
 					this.attack(attacking);
-					attackCooldownLeft = attackCooldown;
+					attackCooldownLeft = Math.round(attackCooldown / getAttackingSameTargetAtkspdPenalty(attacking));
+//					System.out.println("attack cooldown reset: " + attackCooldownLeft + " Penalty: " + getAttackingSameTargetAtkspdPenalty(attacking));
 				}else {
 					attackCooldownLeft -=1;
 				}
@@ -215,6 +217,20 @@ public class Unit implements UnitInterPF, UnitInfo {
 			}
 		}
 
+	}
+	
+	private float getAttackingSameTargetAtkspdPenalty(Unit target) {
+		int n = unitsAttacking.get(target).size();
+		
+		if(n <=1) {
+			return 1;
+		}else if(n==2) {
+			return 0.8f;
+		}else if(n==3) {
+			return 0.6f;
+		}else { // 4 or more
+			return 0.5f;
+		}
 	}
 	
 	private void attack(Unit enemy) {
@@ -435,6 +451,10 @@ public class Unit implements UnitInterPF, UnitInfo {
 
 	public WorldInfo getWorld() {
 		return world;
+	}
+	
+	public Set<Unit> getAttackers(){
+		return unitsAttacking.get(this);
 	}
 	
 }

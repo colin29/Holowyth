@@ -55,7 +55,6 @@ public class SparksEffectHandler {
 	}
 	
 	public void addSparkEffect(float x, float y) {
-		System.out.printf("Added spark: (%f %f) %n", x, y);
 		PooledEffect effect = effectPool.obtain();
 		effect.setPosition(x, y);
 		effects.add(effect);
