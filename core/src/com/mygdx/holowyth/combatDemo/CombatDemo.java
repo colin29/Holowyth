@@ -88,14 +88,14 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	UnitControls unitControls;
 	PathingModule pathingModule;
-	EffectsHandler effects; //keeps track of vfx effects
+	EffectsHandler effects; // keeps track of vfx effects
 
 	World world;
 
 	// Appearance
 	Color initialClearColor = HoloUI.color(255, 236, 179);
 	{
-		//initialClearColor = Color.FOREST;
+		// initialClearColor = Color.FOREST;
 		initialClearColor = HoloUI.color(79, 121, 66);
 	}
 
@@ -103,10 +103,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	FPSLogger fps = new FPSLogger();
 
 	// Settings
-	
+
 	// Frame rate control
 	Timer timer = new Timer();
-	
 
 	int CELL_SIZE = Holo.CELL_SIZE;
 
@@ -145,11 +144,11 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		// Cursor related
 		renderCursor();
-		
+
 		// update debug display
 		valueLabelMapping.forEach(CombatDemo::updateLabel);
-		
-		//Game logic
+
+		// Game logic
 		timer.start(1000 / 60);
 
 		if (timer.taskReady()) {
@@ -157,13 +156,13 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 			effects.tick();
 		}
 	}
-	
+
 	@Override
 	public void show() {
 		System.out.println("Showed Pathfinding Demo");
 		Gdx.input.setInputProcessor(multiplexer);
-		
-		System.out.println(com.badlogic.gdx.Version.VERSION);
+
+		System.out.println("Gdx Version: " + com.badlogic.gdx.Version.VERSION);
 	}
 
 	@Override
@@ -188,7 +187,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		createCoordinateText();
 
-//		createParameterWindow();
+		// createParameterWindow();
 
 		createDebugInfoDisplay();
 
@@ -223,13 +222,13 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	private void createDebugInfoDisplay() {
 		debugInfo = new Table();
 		debugInfo.setFillParent(true);
-		
+
 		debugInfo.top().left();
 		debugInfo.pad(4);
-//		debugInfo.debug();
-		
+		// debugInfo.debug();
+
 		debugInfo.defaults().spaceRight(20).left();
-		
+
 		stage.addActor(debugInfo);
 	}
 
@@ -238,16 +237,14 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	Unit playerUnit;
 	DebugStore debugStore = new DebugStore();
 
-	
 	/**
 	 * Initializes neccesary game components. <br>
 	 * Call after loading a new map. The mirror function is mapShutdown.
 	 */
 	private void initGameComponentsForMapStartup() {
 
-		
 		effects = new EffectsHandler(game, camera, debugStore);
-		
+
 		// Init Pathing
 		pathingModule.initForMap(this.map);
 
@@ -258,7 +255,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		if (unitControls != null) {
 			multiplexer.removeProcessor(unitControls);
 		}
-		unitControls = new UnitControls(game, camera, world.units, debugStore);
+		unitControls = new UnitControls(game, camera, fixedCam, world.units, debugStore);
 		multiplexer.addProcessor(unitControls);
 
 		populateDebugTable();
@@ -277,7 +274,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		PresetUnits.loadArmor(playerUnit.stats);
 		playerUnit.stats.prepareUnit();
 		playerUnit.stats.printInfo();
-		
+
 		unitControls.selectedUnits.add(playerUnit);
 		world.spawnSomeEnemyUnits();
 
@@ -286,10 +283,10 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	}
 
 	ValueLabelMapping valueLabelMapping = new ValueLabelMapping();
+
 	private void populateDebugTable() {
-		
+
 		LabelStyle debugStyle = new LabelStyle(game.debugFont, Holo.debugFontColor);
-		
 
 		for (Map.Entry<String, DebugValues> entry : debugStore.getStore().entrySet()) {
 			String componentName = entry.getKey();
@@ -329,11 +326,11 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 			str = null;
 			break;
 		}
-		
+
 		l.setText(str);
-//		System.out.println("Updated value:  -" + v.name + " " + str);
+		// System.out.println("Updated value: -" + v.name + " " + str);
 	}
-	
+
 	@Override
 	protected void mapShutdown() {
 		System.out.println("test");
@@ -370,11 +367,20 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
-		// update coordInfo
+		updateMouseCoordLabel(screenX, screenY);
+		return false;
+	}
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		updateMouseCoordLabel(screenX, screenY);
+		return false;
+	}
+
+	private void updateMouseCoordLabel(int screenX, int screenY) {
 		Vector3 vec = new Vector3();
 		vec = camera.unproject(vec.set(screenX, screenY, 0));
 		coordInfo.setText("(" + (int) (vec.x) + ", " + (int) (vec.y) + ")\n" + "(" + (int) (vec.x) / CELL_SIZE + ", "
 				+ (int) (vec.y) / CELL_SIZE + ")");
-		return false;
+
 	}
 }

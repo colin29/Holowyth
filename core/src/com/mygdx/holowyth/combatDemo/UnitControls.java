@@ -3,6 +3,7 @@ package com.mygdx.holowyth.combatDemo;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
@@ -32,11 +34,12 @@ import com.mygdx.holowyth.util.debug.DebugValues;
  * 
  * @author Colin Ta
  */
-public class UnitControls implements InputProcessor {
+public class UnitControls extends InputProcessorAdapter {
 
 	Holowyth game;
 
 	Camera camera;
+	Camera fixedCam;
 	ShapeRenderer shapeRenderer;
 
 	ArrayList<Unit> units;
@@ -55,24 +58,28 @@ public class UnitControls implements InputProcessor {
 	LabelStyle labelStyle;
 
 	String currentStateText;
-	
-	public UnitControls(Holowyth game, Camera camera, ArrayList<Unit> units, DebugStore debugStore) {
+
+	public UnitControls(Holowyth game, Camera camera, Camera fixedCam, ArrayList<Unit> units, DebugStore debugStore) {
 		this.shapeRenderer = game.shapeRenderer;
 		this.camera = camera;
+		this.fixedCam = fixedCam;
 		this.units = units;
 
 		this.font = game.debugFont;
 		this.skin = game.skin;
 
 		labelStyle = new LabelStyle(game.debugFont, Holo.debugFontColor);
-		
+
 		DebugValues debugValues = debugStore.registerComponent("Unit Controls");
 		debugValues.add("Order Context", () -> currentStateText);
+//		debugValues.add("SelectX1", () -> selectionX1);
+//		debugValues.add("SelectY1", () -> selectionY1);
+//		debugValues.add("SelectX2", () -> selectionX2);
+//		debugValues.add("SelectY2", () -> selectionY2);
 
 	}
 
-	float clickX, clickY; // world location of the last recorded click.
-	float clickX2, clickY2; // location of opposite point (of the selection box)
+	float clickX, clickY; // Current click in world coordinates
 
 	@Override
 	public boolean keyDown(int keycode) {
@@ -82,16 +89,6 @@ public class UnitControls implements InputProcessor {
 			attackClickWaiting = true;
 			return true;
 		}
-		return false;
-	}
-
-	@Override
-	public boolean keyUp(int keycode) {
-		return false;
-	}
-
-	@Override
-	public boolean keyTyped(char character) {
 		return false;
 	}
 
@@ -106,9 +103,9 @@ public class UnitControls implements InputProcessor {
 		if (button == Input.Buttons.LEFT && pointer == 0) {
 			System.out.println("Left click detected");
 			if (attackClickWaiting) {
-				handleLeftClickAttack(vec.x, vec.y);
+				handleAttackLeftClick(vec.x, vec.y);
 			} else {
-				handleLeftClickSelect(vec.x, vec.y);
+				handleLeftClick(vec.x, vec.y, screenX, screenY);
 			}
 			return true;
 		}
@@ -120,6 +117,30 @@ public class UnitControls implements InputProcessor {
 		}
 
 		return false;
+	}
+
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+
+		if (button == Input.Buttons.LEFT && pointer == 0) {
+			if (leftMouseKeyDown) {
+				selectAllInSelectionBox(screenX, screenY);
+			}
+			leftMouseKeyDown = false;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		if (pointer == 0 && leftMouseKeyDown) {
+			Vector3 vec = new Vector3(); // obtain window coordinates of the click.
+			vec = fixedCam.unproject(vec.set(screenX, screenY, 0));
+			selectionX2 = vec.x;
+			selectionY2 = vec.y;
+		}
+		return false;
+
 	}
 
 	/**
@@ -139,109 +160,143 @@ public class UnitControls implements InputProcessor {
 		}
 	}
 
-	private void handleLeftClickAttack(float x, float y) {
+	/**
+	 * Handle a left-click following being in the "attack" context
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	private void handleAttackLeftClick(float x, float y) {
 		clearAwaitingOrders();
 		Point p1 = new Point(x, y);
 		Point p2 = new Point();
 		float dist;
 		// select a unit if there is one underneath this point. If there are multiple units, select the one that
 		// occurs last (on top)
-		Unit lastResult = null;
+		Unit target = null;
 
 		for (Unit u : units) {
 			p2.set(u.x, u.y);
 			dist = Point.calcDistance(p1, p2);
 			if (dist <= u.getRadius()) {
-				lastResult = u;
+				target = u;
 			}
 			// check distance of the click to the center of the circle
-		}
-
-		Unit target = null;
-		if (lastResult != null) {
-			// select this unit
-			target = lastResult;
 		}
 		if (target != null) {
 			for (Unit u : selectedUnits) {
 				u.orderAttackUnit(target);
 			}
-		} else {
-			// if no unit is under the cursor, then treat as an attackMove
+		} else { // if no unit is under the cursor, then treat as an attackMove
 			for (Unit u : selectedUnits) {
 				u.orderAttackMove(x, y);
 			}
 		}
 	}
-	
+
+	/**
+	 * The current selection box coordinates, in window coordinates
+	 */
+	float selectionX1, selectionY1;
+	float selectionX2, selectionY2;
+
+	/**
+	 * Handle a left click following a default context
+	 */
+	private void handleLeftClick(float worldX, float worldY, float screenX, float screenY) {
+
+		leftMouseKeyDown = true;
+
+		Unit selected = selectUnitAtClickedPoint(worldX, worldY);
+		if (selected != null) {
+			selectedUnits.clear();
+			selectedUnits.add(selected);
+		}
+
+		// Set up a new selection box, initially zero-sized at the point of click
+		Vector3 vec = new Vector3();
+		vec = fixedCam.unproject(vec.set(screenX, screenY, 0));
+
+		selectionX1 = vec.x;
+		selectionY1 = vec.y;
+
+		selectionX2 = vec.x;
+		selectionY2 = vec.y;
+	}
+
+	/**
+	 * Select a unit if there is one underneath this point. If there are multiple units, select the one that occurs last
+	 * 
+	 * @param x
+	 * @param y
+	 */
+	private Unit selectUnitAtClickedPoint(float x, float y) {
+		Unit selected = null;
+
+		Point p1 = new Point(x, y);
+		Point p2 = new Point();
+
+		for (Unit u : units) {
+			p2.set(u.x, u.y);
+			if (Point.calcDistance(p1, p2) <= u.getRadius()) {
+				selected = u;
+			}
+		}
+
+		if (selected != null) {
+			return selected;
+		} else {
+			return null;
+		}
+	}
+
 	public void clearDeadUnitsFromSelection() {
 		ListIterator<Unit> iter = selectedUnits.listIterator();
-		while(iter.hasNext()) {
+		while (iter.hasNext()) {
 			Unit unit = iter.next();
-			if(unit.stats.isDead()) {
+			if (unit.stats.isDead()) {
 				iter.remove();
 			}
 		}
 	}
 
-	private void handleLeftClickSelect(float x, float y) {
-		Point p1 = new Point(x, y);
-		Point p2 = new Point();
-		float dist;
-		// select a unit if there is one underneath this point. If there are multiple units, select the one that
-		// occurs last (on top)
-		Unit lastResult = null;
 
-		for (Unit u : units) {
-			p2.set(u.x, u.y);
-			dist = Point.calcDistance(p1, p2);
-			if (dist <= u.getRadius()) {
-				lastResult = u;
-			}
-			// check distance of the click to the center of the circle
-		}
+	/**
+	 * Selects all units inside the selection box
+	 * 
+	 * @param finalX
+	 * @param finalY
+	 */
+	public void selectAllInSelectionBox(float mouseX, float mouseY) {
 
-		if (lastResult != null) {
-			// select this unit
-			selectedUnits.clear();
-			selectedUnits.add(lastResult);
-		}
+		Vector3 vec = new Vector3();
+		// Set selectionX2, Y2
 
-		// Mark point of click for dragging purposes.
-		clickX = p1.x;
-		clickY = p1.y;
+		vec = fixedCam.unproject(vec.set(mouseX, mouseY, 0));
+		selectionX2 = vec.x;
+		selectionY2 = vec.y;
 
-		clickX2 = p1.x;
-		clickY2 = p1.y;
+		// Obtain world coordinates of the start and end of the selection box
 
-		leftMouseKeyDown = true;
-	}
+		Point world1, world2;
 
-	@Override
-	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		// get world cordinates
 
-		if (button == Input.Buttons.LEFT && pointer == 0) {
-			if (leftMouseKeyDown) {
-				selectAllUnitsWithinSelectionBox(screenX, screenY);
-			}
+		vec = fixedCam.project(vec.set(selectionX1, selectionY1, 0)); // convert first to screen coords, then to world
+		vec.y = Gdx.graphics.getHeight() - vec.y; //must reverse because project produces a bottom-left coordinated vector
+		vec = camera.unproject(vec);
+		world1 = new Point(vec.x, vec.y);
 
-			leftMouseKeyDown = false;
-		}
-		return false;
-	}
-	
-	public void selectAllUnitsWithinSelectionBox(float screenX, float screenY) {
-		Vector3 vec = new Vector3(); // obtain world coordinates of the click.
-		vec = camera.unproject(vec.set(screenX, screenY, 0));
-		Point p = new Point(vec.x, vec.y);
+		vec = fixedCam.project(vec.set(selectionX2, selectionY2, 0));
+		vec.y = Gdx.graphics.getHeight() - vec.y;
+		vec = camera.unproject(vec);
+		world2 = new Point(vec.x, vec.y);
 
-		clickX2 = p.x;
-		clickY2 = p.y;
+		float x = Math.min(world1.x, world2.x);
+		float y = Math.min(world1.y, world2.y);
+		float x2 = Math.max(world1.x, world2.x);
+		float y2 = Math.max(world1.y, world2.y);
 
-		float x = Math.min(clickX, clickX2);
-		float y = Math.min(clickY, clickY2);
-		float x2 = Math.max(clickX, clickX2);
-		float y2 = Math.max(clickY, clickY2);
 
 		// check if unit circles are inside or touching the selection box.
 
@@ -249,8 +304,7 @@ public class UnitControls implements InputProcessor {
 
 		for (Unit u : units) {
 			if (u.x >= x - u.getRadius() && u.x <= x2 + u.getRadius() && u.y >= y - u.getRadius()
-					&& u.y <= y2 + u.getRadius() 
-					&& !u.stats.isDead()) {
+					&& u.y <= y2 + u.getRadius() && !u.stats.isDead()) {
 				newlySelected.add(u);
 			}
 		}
@@ -259,30 +313,6 @@ public class UnitControls implements InputProcessor {
 			selectedUnits.clear();
 			selectedUnits.addAll(newlySelected);
 		}
-	}
-
-	@Override
-	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		if (pointer == 0 && leftMouseKeyDown) {
-			Vector3 vec = new Vector3(); // obtain world coordinates of the click.
-			vec = camera.unproject(vec.set(screenX, screenY, 0));
-			Point p = new Point(vec.x, vec.y);
-			clickX2 = p.x;
-			clickY2 = p.y;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean mouseMoved(int screenX, int screenY) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean scrolled(int amount) {
-		// TODO Auto-generated method stub
-		return false;
 	}
 
 	/**
@@ -296,20 +326,26 @@ public class UnitControls implements InputProcessor {
 		}
 	}
 
-	public void renderDebuggingText() {
-		// TODO:
-	}
-
 	public static Color defaultSelectionBoxColor = Color.BLUE;
 
+	private static final Matrix4 IDENTITY = new Matrix4();
+
+	/**
+	 * We restore the old projection matrix to avoid side effects.
+	 * 
+	 * @param color
+	 */
 	public void renderSelectionBox(Color color) {
+		Matrix4 old = shapeRenderer.getTransformMatrix();
+		shapeRenderer.setProjectionMatrix(fixedCam.combined);
 		if (leftMouseKeyDown) {
 			shapeRenderer.setColor(color);
 			shapeRenderer.begin(ShapeType.Line);
-			shapeRenderer.rect(Math.min(clickX, clickX2), Math.min(clickY, clickY2), Math.abs(clickX2 - clickX),
-					Math.abs(clickY2 - clickY));
+			shapeRenderer.rect(Math.min(selectionX1, selectionX2), Math.min(selectionY1, selectionY2),
+					Math.abs(selectionX2 - selectionX1), Math.abs(selectionY2 - selectionY1));
 			shapeRenderer.end();
 		}
+		shapeRenderer.setProjectionMatrix(old);
 	}
 
 }

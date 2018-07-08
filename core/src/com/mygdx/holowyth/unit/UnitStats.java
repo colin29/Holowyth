@@ -350,8 +350,8 @@ public class UnitStats implements UnitStatsInfo {
 		int def = enemy.def - getBeingAttackedByMultipleEnemiesDefPenalty(enemy)
 				- getBeingFlankedDefPenalty(enemy);
 		
-		System.out.printf("Defence: %d - %d - %d = %d %n",
-				enemy.def, getBeingAttackedByMultipleEnemiesDefPenalty(enemy), getBeingFlankedDefPenalty(enemy), def);
+//		System.out.printf("Defence: %d - %d - %d = %d %n",
+//				enemy.def, getBeingAttackedByMultipleEnemiesDefPenalty(enemy), getBeingFlankedDefPenalty(enemy), def);
 
 		chanceToHit = (float) (Math.pow(2, (atk - def) / 10f) * 0.25);
 		chanceToHit = Math.min(atkChanceCeiling, chanceToHit);
