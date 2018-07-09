@@ -34,8 +34,8 @@ public class SparksEffectHandler {
 		this.batch = game.batch;
 		this.camera = camera;
 		
-		DebugValues debugValues = debugStore.registerComponent("Sparks Manager");
-		debugValues.add("Sparks count: ", ()->effects.size());
+//		DebugValues debugValues = debugStore.registerComponent("Sparks Manager");
+//		debugValues.add("Sparks count: ", ()->effects.size());
 	}
 
 	public void render() {

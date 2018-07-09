@@ -84,7 +84,10 @@ public class Renderer {
 		this.worldCamera = worldCamera;
 		this.stage = stage;
 	}
-
+	
+/*
+ * Methods call should not set projection matrixes (it is assumed to be the world matrix). If they do they should restore the old state
+ */
 	public void render(float delta) {
 		Gdx.gl.glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT

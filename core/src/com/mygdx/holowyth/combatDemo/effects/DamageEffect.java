@@ -2,8 +2,12 @@ package com.mygdx.holowyth.combatDemo.effects;
 
 import com.badlogic.gdx.graphics.Color;
 
-public class DamageEffect {
-	
+/**
+ * The effect that displays a number when damage is dealt.
+ * @author Colin Ta
+ *
+ */
+public class DamageEffect {	
 	
 	private static int duration = 110;
 	private static float initialVelocity = 0.4f;

@@ -47,17 +47,17 @@ public class UnitControls extends InputProcessorAdapter {
 	public ArrayList<Unit> selectedUnits = new ArrayList<Unit>();
 	boolean leftMouseKeyDown = false;
 
-	Unit prospectUnit; // In order to single-select a unit, the user must mouse down on a unit, and mouse up on the same
-						// unit.
+	public enum Context {
+		NONE, ATTACK, RETREAT;
+	}
 
-	boolean attackClickWaiting;
+	Context context = Context.NONE;
 
 	// For displaying Debug info
 	BitmapFont font;
 	Skin skin;
 	LabelStyle labelStyle;
 
-	String currentStateText;
 
 	public UnitControls(Holowyth game, Camera camera, Camera fixedCam, ArrayList<Unit> units, DebugStore debugStore) {
 		this.shapeRenderer = game.shapeRenderer;
@@ -71,11 +71,11 @@ public class UnitControls extends InputProcessorAdapter {
 		labelStyle = new LabelStyle(game.debugFont, Holo.debugFontColor);
 
 		DebugValues debugValues = debugStore.registerComponent("Unit Controls");
-		debugValues.add("Order Context", () -> currentStateText);
-//		debugValues.add("SelectX1", () -> selectionX1);
-//		debugValues.add("SelectY1", () -> selectionY1);
-//		debugValues.add("SelectX2", () -> selectionX2);
-//		debugValues.add("SelectY2", () -> selectionY2);
+		debugValues.add("Order Context", () -> getCurrentContextText());
+		// debugValues.add("SelectX1", () -> selectionX1);
+		// debugValues.add("SelectY1", () -> selectionY1);
+		// debugValues.add("SelectX2", () -> selectionX2);
+		// debugValues.add("SelectY2", () -> selectionY2);
 
 	}
 
@@ -85,8 +85,11 @@ public class UnitControls extends InputProcessorAdapter {
 	public boolean keyDown(int keycode) {
 		if (keycode == Keys.A && selectedUnits.size() > 0) {
 			clearAwaitingOrders();
-			currentStateText = "Select Attack Target";
-			attackClickWaiting = true;
+			context = Context.ATTACK;
+			return true;
+		}else if (keycode == Keys.R && selectedUnits.size() > 0){
+			clearAwaitingOrders();
+			context = Context.RETREAT;
 			return true;
 		}
 		return false;
@@ -101,8 +104,7 @@ public class UnitControls extends InputProcessorAdapter {
 
 		// Handle Left Click
 		if (button == Input.Buttons.LEFT && pointer == 0) {
-			System.out.println("Left click detected");
-			if (attackClickWaiting) {
+			if (context == Context.ATTACK) {
 				handleAttackLeftClick(vec.x, vec.y);
 			} else {
 				handleLeftClick(vec.x, vec.y, screenX, screenY);
@@ -111,8 +113,16 @@ public class UnitControls extends InputProcessorAdapter {
 		}
 
 		// Handle Right Click
+		/**
+		 * Right click clears context if there is one, otherwise it's a move command.
+		 */
 		if (button == Input.Buttons.RIGHT && pointer == 0) {
-			handleRightClickMove(vec.x, vec.y);
+			if(context != Context.NONE) {
+				context = Context.NONE;
+			}else {
+				handleMoveRightClick(vec.x, vec.y);
+			}
+			
 			return true;
 		}
 
@@ -148,11 +158,23 @@ public class UnitControls extends InputProcessorAdapter {
 	 * waiting for the first one
 	 */
 	private void clearAwaitingOrders() {
-		attackClickWaiting = false;
-		currentStateText = "Idle";
+		context = Context.NONE;
 	}
 
-	private void handleRightClickMove(float x, float y) {
+	private String getCurrentContextText() {
+		switch (context) {
+		case ATTACK:
+			return "Select Attack Target";
+		case RETREAT:
+			return "Select retreat location";
+		case NONE:
+			return "Idle";
+		default:
+			return "Unspecified context label";
+		}
+	}
+
+	private void handleMoveRightClick(float x, float y) {
 		clearAwaitingOrders();
 		Point p = new Point(x, y);
 		for (Unit u : selectedUnits) {
@@ -260,7 +282,6 @@ public class UnitControls extends InputProcessorAdapter {
 		}
 	}
 
-
 	/**
 	 * Selects all units inside the selection box
 	 * 
@@ -283,7 +304,8 @@ public class UnitControls extends InputProcessorAdapter {
 		// get world cordinates
 
 		vec = fixedCam.project(vec.set(selectionX1, selectionY1, 0)); // convert first to screen coords, then to world
-		vec.y = Gdx.graphics.getHeight() - vec.y; //must reverse because project produces a bottom-left coordinated vector
+		vec.y = Gdx.graphics.getHeight() - vec.y; // must reverse because project produces a bottom-left coordinated
+													// vector
 		vec = camera.unproject(vec);
 		world1 = new Point(vec.x, vec.y);
 
@@ -296,7 +318,6 @@ public class UnitControls extends InputProcessorAdapter {
 		float y = Math.min(world1.y, world2.y);
 		float x2 = Math.max(world1.x, world2.x);
 		float y2 = Math.max(world1.y, world2.y);
-
 
 		// check if unit circles are inside or touching the selection box.
 

@@ -14,6 +14,11 @@ import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.debug.DebugStore;
 import com.mygdx.holowyth.util.debug.DebugValues;
 
+/**
+ * Manages all effects for the game
+ * @author Colin Ta
+ *
+ */
 public class EffectsHandler {
 	
 	Holowyth game;
@@ -27,8 +32,8 @@ public class EffectsHandler {
 		this.game = game;
 		this.worldCamera = camera;
 		
-		DebugValues debugValues = debugStore.registerComponent("Effects");
-		debugValues.add("damageEffect count", () -> damageEffects.size());
+//		DebugValues debugValues = debugStore.registerComponent("Effects");
+//		debugValues.add("damageEffect count", () -> damageEffects.size());
 		
 		sparksManager = new SparksEffectHandler(game, camera, debugStore);
 	}
