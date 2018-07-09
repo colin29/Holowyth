@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
@@ -50,16 +49,6 @@ public class HoloUI {
 		}
 	}
 
-	/**
-	 * Convenience function to make new colors from a RBG tuple 
-	 * @return
-	 */
-	public static Color color(int r, int g, int b) {
-		return new Color((float) r / 256, (float) g / 256, (float) b / 256, 1);
-	}
-
-	
-	
 	// Widget Functions
 	public static Cell<TextButton> textButton(Table table, String text, Skin skin, VoidInterface action) {
 		return textButton(table, text, skin, new ChangeListener() {

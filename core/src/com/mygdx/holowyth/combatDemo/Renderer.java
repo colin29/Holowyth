@@ -122,23 +122,39 @@ public class Renderer {
 			unitControls.renderCirclesOnSelectedUnits();
 			renderUnits();
 			unitControls.renderSelectionBox(UnitControls.defaultSelectionBoxColor);
+			renderCirclesAroundBusyRetreatingUnits();
 		}
 
 		for (Unit u : world.units) {
 			u.renderAttackingLine(shapeRenderer);
 		}
+
+		
 		
 		// Render effects
 		
 		effects.renderDamageEffects();
-		
 		effects.renderBlockEffects(delta);
 		
+		
+
 
 		// UI
 		stage.act(delta);
 		stage.draw();
 
+	}
+	
+	public void renderCirclesAroundBusyRetreatingUnits() {
+		for (UnitInfo u : world.units) {
+			if(u.isRetreatCooldownActive()) {
+				Color color = HoloGL.color(30,144,255); 
+				shapeRenderer.setProjectionMatrix(worldCamera.combined);
+				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, shapeRenderer, color);
+				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 3.25f, shapeRenderer, color);
+				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 4, shapeRenderer, color);	
+			}
+		}
 	}
 
 	private float pathThickness = 2f;

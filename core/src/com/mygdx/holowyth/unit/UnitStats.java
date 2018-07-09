@@ -24,7 +24,7 @@ import com.mygdx.holowyth.util.data.Point;
  */
 public class UnitStats implements UnitStatsInfo {
 
-	public static boolean printDetailedCombatInfo = true;
+	public static boolean printDetailedCombatInfo = false;
 
 	Unit self;
 
@@ -381,7 +381,7 @@ public class UnitStats implements UnitStatsInfo {
 		}
 
 		// 5. Apply damage
-		System.out.printf("%s's attack hit and did %s damage to %s%n", this.name, DataUtil.getRoundedString(damage), enemy.name);
+//		System.out.printf("%s's attack hit and did %s damage to %s%n", this.name, DataUtil.getRoundedString(damage), enemy.name);
 
 		effects.makeDamageEffect(damage, enemy.self);
 		enemy.applyDamage(damage);
@@ -423,9 +423,9 @@ public class UnitStats implements UnitStatsInfo {
 				float angleUnit1 = angles.get(i).second();
 				float angleUnit2 = angles.get(j).second();
 				if(Math.abs(angleUnit1-angleUnit2) >= flankingRequiredAngle) {
-					String name1 = angles.get(i).first().stats.name;
-					String name2 = angles.get(j).first().stats.name;
-					System.out.printf("Unit %s is being flanked by %s and %s%n", this.name, name1, name2);
+//					String name1 = angles.get(i).first().stats.name;
+//					String name2 = angles.get(j).first().stats.name;
+//					System.out.printf("Unit %s is being flanked by %s and %s%n", this.name, name1, name2);
 					return true;
 				}
 			}

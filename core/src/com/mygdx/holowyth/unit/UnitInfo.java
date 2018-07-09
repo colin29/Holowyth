@@ -24,4 +24,9 @@ public interface UnitInfo {
 	public UnitInfo getTarget();
 
 	public UnitInfo getAttacking();
+	
+	/**
+	 * For a short time when a unit starts retreating they can't be given any other commands
+	 */
+	public boolean isRetreatCooldownActive();
 }

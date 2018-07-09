@@ -58,7 +58,6 @@ public class UnitControls extends InputProcessorAdapter {
 	Skin skin;
 	LabelStyle labelStyle;
 
-
 	public UnitControls(Holowyth game, Camera camera, Camera fixedCam, ArrayList<Unit> units, DebugStore debugStore) {
 		this.shapeRenderer = game.shapeRenderer;
 		this.camera = camera;
@@ -84,11 +83,11 @@ public class UnitControls extends InputProcessorAdapter {
 	@Override
 	public boolean keyDown(int keycode) {
 		if (keycode == Keys.A && selectedUnits.size() > 0) {
-			clearAwaitingOrders();
+			clearContext();
 			context = Context.ATTACK;
 			return true;
-		}else if (keycode == Keys.R && selectedUnits.size() > 0){
-			clearAwaitingOrders();
+		} else if (keycode == Keys.R && selectedUnits.size() > 0) {
+			clearContext();
 			context = Context.RETREAT;
 			return true;
 		}
@@ -105,10 +104,12 @@ public class UnitControls extends InputProcessorAdapter {
 		// Handle Left Click
 		if (button == Input.Buttons.LEFT && pointer == 0) {
 			if (context == Context.ATTACK) {
-				handleAttackLeftClick(vec.x, vec.y);
+				handleAttackCommand(vec.x, vec.y);
+			} else if (context == Context.RETREAT) {
+				handleRetreatCommand(vec.x, vec.y);
 			} else {
-				handleLeftClick(vec.x, vec.y, screenX, screenY);
 			}
+			handleLeftClick(vec.x, vec.y, screenX, screenY);
 			return true;
 		}
 
@@ -117,16 +118,56 @@ public class UnitControls extends InputProcessorAdapter {
 		 * Right click clears context if there is one, otherwise it's a move command.
 		 */
 		if (button == Input.Buttons.RIGHT && pointer == 0) {
-			if(context != Context.NONE) {
-				context = Context.NONE;
-			}else {
-				handleMoveRightClick(vec.x, vec.y);
+			if (context != Context.NONE) {
+				clearContext();
+			} else {
+				handleRightClick(vec.x, vec.y);
 			}
-			
+
 			return true;
 		}
 
 		return false;
+	}
+
+	private void handleRightClick(float x, float y) {
+
+		// Attack command if click is over an enemy unit.
+
+		Point p1 = new Point(x, y);
+		Point p2 = new Point();
+		float dist;
+		// select a unit if there is one underneath this point. If there are multiple units, select the one that
+		// occurs last (on top)
+		Unit target = null;
+
+		for (Unit u : units) {
+			p2.set(u.x, u.y);
+			dist = Point.calcDistance(p1, p2);
+			if (dist <= u.getRadius()) {
+				target = u;
+			}
+			// check distance of the click to the center of the circle
+		}
+
+		if (target != null) {
+			for(Unit u: selectedUnits) {
+				boolean valid = u.orderAttackUnit(target);
+				if(!valid) {
+					u.orderMove(x, y);
+				}
+			}
+		}else {
+			handleMoveCommand(x, y);
+		}
+
+	}
+
+	private void handleRetreatCommand(float x, float y) {
+		clearContext();
+		for (Unit u : selectedUnits) {
+			u.orderRetreat(x, y);
+		}
 	}
 
 	@Override
@@ -157,7 +198,7 @@ public class UnitControls extends InputProcessorAdapter {
 	 * Makes it so when you are part-way through an order, and then the start of a separate order, the game will stop
 	 * waiting for the first one
 	 */
-	private void clearAwaitingOrders() {
+	private void clearContext() {
 		context = Context.NONE;
 	}
 
@@ -174,11 +215,10 @@ public class UnitControls extends InputProcessorAdapter {
 		}
 	}
 
-	private void handleMoveRightClick(float x, float y) {
-		clearAwaitingOrders();
-		Point p = new Point(x, y);
+	private void handleMoveCommand(float x, float y) {
+		clearContext();
 		for (Unit u : selectedUnits) {
-			u.orderMove(p.x, p.y);
+			u.orderMove(x, y);
 		}
 	}
 
@@ -188,8 +228,8 @@ public class UnitControls extends InputProcessorAdapter {
 	 * @param x
 	 * @param y
 	 */
-	private void handleAttackLeftClick(float x, float y) {
-		clearAwaitingOrders();
+	private void handleAttackCommand(float x, float y) {
+		clearContext();
 		Point p1 = new Point(x, y);
 		Point p2 = new Point();
 		float dist;
@@ -357,7 +397,7 @@ public class UnitControls extends InputProcessorAdapter {
 	 * @param color
 	 */
 	public void renderSelectionBox(Color color) {
-		Matrix4 old = shapeRenderer.getTransformMatrix();
+		Matrix4 old = shapeRenderer.getProjectionMatrix().cpy();
 		shapeRenderer.setProjectionMatrix(fixedCam.combined);
 		if (leftMouseKeyDown) {
 			shapeRenderer.setColor(color);

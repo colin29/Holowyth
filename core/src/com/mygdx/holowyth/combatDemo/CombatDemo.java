@@ -51,7 +51,6 @@ import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.HoloIO;
-import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 import com.mygdx.holowyth.util.debug.DebugDemo;
@@ -93,10 +92,10 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	World world;
 
 	// Appearance
-	Color initialClearColor = HoloUI.color(255, 236, 179);
+	Color initialClearColor = HoloGL.color(255, 236, 179);
 	{
 		// initialClearColor = Color.FOREST;
-		initialClearColor = HoloUI.color(79, 121, 66);
+		initialClearColor = HoloGL.color(79, 121, 66);
 	}
 
 	// Misc.

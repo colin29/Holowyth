@@ -32,7 +32,7 @@ import com.mygdx.holowyth.util.data.Segment;
 public class Unit implements UnitInterPF, UnitInfo {
 
 	public float x, y;
-	
+
 	// Components
 	public final UnitMotion motion;
 	public final UnitStats stats;
@@ -52,14 +52,14 @@ public class Unit implements UnitInterPF, UnitInfo {
 	Unit target; // target for the current command.
 
 	// Combat
+	/** The unit this unit is attacking. Attacking a unit <--> being engaged. */
 	Unit attacking;
 	/**
-	 * Maps from a unit to a list of units attacking that one unit.
-	 * Other classes should use {@link #getAttackers()}
+	 * Maps from a unit to a list of units attacking that one unit. Other classes should use {@link #getAttackers()}
 	 */
 	private static Map<Unit, Set<Unit>> unitsAttacking = new HashMap<Unit, Set<Unit>>();
 	Mode mode = Mode.PASSIVE;
-	
+
 	/**
 	 * A unit's friendly/foe status.
 	 */
@@ -72,7 +72,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 	}
 
 	public enum Order {
-		MOVE, ATTACKUNIT, IDLE, ATTACKMOVE
+		MOVE, ATTACKUNIT, IDLE, ATTACKMOVE, RETREAT
 	}
 
 	public enum Mode {
@@ -92,18 +92,16 @@ public class Unit implements UnitInterPF, UnitInfo {
 
 		this.motion = new UnitMotion(this, world);
 		this.world = world;
-		
+
 		this.stats = new UnitStats(this);
-		
-		
+
 	}
-	
+
 	public Unit(float x, float y, WorldInfo world, Side side, String name) {
 		this(x, y, world, side);
 		setName(name);
 	}
 
-	
 	public void setName(String name) {
 		this.stats.setName(name);
 	}
@@ -120,23 +118,24 @@ public class Unit implements UnitInterPF, UnitInfo {
 		}
 	}
 
-	public void orderAttackUnit(Unit unit) {
+	/**
+	 * @param unit
+	 * @return Whether the command was valid and accepted
+	 */
+	public boolean orderAttackUnit(Unit unit) {
 		if (!isAttackOrderAllowed(unit)) {
-			return;
+			return false;
 		}
 		if (unit == this) {
 			System.out.println("Warning: invalid attack command (unit can't attack itself)");
-			return;
+			return false;
 		}
 		clearOrder();
-
 		this.currentOrder = Order.ATTACKUNIT;
 		this.target = unit;
 
-		this.attacking = null; // assuming this is a valid order to make, the unit is now no longer attacking anything
-								// yet
-
 		this.motion.pathForAttackingUnit();
+		return true;
 	}
 
 	public void orderAttackMove(float x, float y) {
@@ -147,7 +146,27 @@ public class Unit implements UnitInterPF, UnitInfo {
 
 	}
 
-	/** 
+	public void orderRetreat(float x, float y) {
+		if (!isRetreatOrderAllowed()) {
+			return;
+		}
+
+		retreatDurationRemaining = retreatDuration;
+		if (motion.orderMove(x, y)) {
+			stopAttacking();
+			clearOrder();
+			this.currentOrder = Order.RETREAT;
+		}
+
+	}
+
+	static final int retreatDuration = 50;
+	/**
+	 * For a short time when a unit starts retreating they can't be given any other commands
+	 */
+	int retreatDurationRemaining;
+
+	/**
 	 * Clears any current order on this unit. For internal use.
 	 */
 	void clearOrder() {
@@ -162,33 +181,31 @@ public class Unit implements UnitInterPF, UnitInfo {
 	 */
 	public void handleGeneralLogic() {
 		motion.tick();
-		makeIdleEnemiesAggro();
-	
+		aggroIfIsEnemyUnit();
+		if (currentOrder == Order.RETREAT)
+			retreatDurationRemaining -= 1;
+
 	}
 
-	
-	private int attackCooldown = 60; 
+	private int attackCooldown = 60;
 	private int attackCooldownLeft = 0;
-	
+
 	/** Handles the combat logic for a unit for one frame */
 	public void handleCombatLogic() {
 
-		if(attacking != null && attacking.stats.isDead()) {
+		if (attacking != null && attacking.stats.isDead()) {
 			stopAttacking();
 		}
-		
+
 		if (currentOrder == Order.ATTACKUNIT) {
 			// If the unit is on an attackUnit command and its in engage range, make it start attacking the target
 			// If the unit falls out of engage range, stop it from attacking
-			
-			
-			
-			if(target.stats.isDead()) {
+
+			if (target.stats.isDead()) {
 				clearOrder();
 				return;
 			}
-			
-			
+
 			Point a, b;
 			a = this.getPos();
 			b = target.getPos();
@@ -198,14 +215,15 @@ public class Unit implements UnitInterPF, UnitInfo {
 			} else if ((attacking == target) && dist >= this.radius + target.radius + Holo.defaultUnitDisengageRange) {
 				stopAttacking();
 			}
-			
+
 			if (isAttacking()) {
-				if(attackCooldownLeft <= 0) {
+				if (attackCooldownLeft <= 0) {
 					this.attack(attacking);
 					attackCooldownLeft = Math.round(attackCooldown / getAttackingSameTargetAtkspdPenalty(attacking));
-//					System.out.println("attack cooldown reset: " + attackCooldownLeft + " Penalty: " + getAttackingSameTargetAtkspdPenalty(attacking));
-				}else {
-					attackCooldownLeft -=1;
+					// System.out.println("attack cooldown reset: " + attackCooldownLeft + " Penalty: " +
+					// getAttackingSameTargetAtkspdPenalty(attacking));
+				} else {
+					attackCooldownLeft -= 1;
 				}
 			}
 		}
@@ -218,76 +236,80 @@ public class Unit implements UnitInterPF, UnitInfo {
 		}
 
 	}
-	
+
 	private float getAttackingSameTargetAtkspdPenalty(Unit target) {
 		int n = unitsAttacking.get(target).size();
-		
-		if(n <=1) {
+
+		if (n <= 1) {
 			return 1;
-		}else if(n==2) {
+		} else if (n == 2) {
 			return 0.8f;
-		}else if(n==3) {
+		} else if (n == 3) {
 			return 0.6f;
-		}else { // 4 or more
+		} else { // 4 or more
 			return 0.5f;
 		}
 	}
-	
+
 	private void attack(Unit enemy) {
 		this.stats.attack(enemy.stats);
 	}
 
 	private void startAttacking(Unit target) {
-		System.out.println("started attacking");
 		motion.stopCurrentMovement();
 		attacking = target;
 		unitsAttacking.get(attacking).add(this);
-		
+
 		attackCooldownLeft = attackCooldown / 2;
 	}
 
+	/**
+	 * Disengages a unit.
+	 */
 	private void stopAttacking() {
-		unitsAttacking.get(this.attacking).remove(this);
-		attacking = null;
+		if (this.attacking != null) {
+			unitsAttacking.get(this.attacking).remove(this);
+			attacking = null;
+		}
 	}
 
 	private boolean isAttacking() {
 		return attacking != null;
 	}
 
-
+	// @formatter:off
 	private boolean isAttackOrderAllowed(Unit target) {
-		if(stats.isDead())
-			return false;
-		if (attacking != null)
-			return false;
-		if (target.side == this.side) {
-			return false;
-		}
-		return true;
+		return !stats.isDead()
+				&& attacking == null
+				&& target.side != this.side
+				&& !isRetreatCooldownActive();
 	}
 
 	private boolean isMoveOrderAllowed() {
-		if(stats.isDead())
-			return false;
-		if (attacking != null)
-			return false;
-		return true;
+		return !stats.isDead()
+				&& attacking == null
+				&& !isRetreatCooldownActive();
 	}
 
 	private boolean isAttackMoveOrderAllowed() {
-		if(stats.isDead())
-			return false;
 		return isMoveOrderAllowed();
 	}
+	private boolean isRetreatOrderAllowed() {
+		return !stats.isDead()
+				&& this.attacking != null
+				&& this.currentOrder != Order.RETREAT;
+	}
+	public boolean isRetreatCooldownActive() {
+		return currentOrder == Order.RETREAT && retreatDurationRemaining >0;
+	}
+	// @formatter:on
 
-	
 	// Automatic Unit Behaviour
-	
+
 	/**
 	 * Makes this unit aggro to the closest target if it is an enemy faction unit
 	 */
-	private void makeIdleEnemiesAggro() {
+	private void aggroIfIsEnemyUnit() {
 		if (this.side == Side.ENEMY && currentOrder == Order.IDLE) {
 
 			PriorityQueue<Unit> closestTargets = new PriorityQueue<Unit>(closestUnitComp);
@@ -307,7 +329,6 @@ public class Unit implements UnitInterPF, UnitInfo {
 		}
 	}
 
-	
 	// Debug
 	private static int getNextId() {
 		return curId++;
@@ -316,11 +337,11 @@ public class Unit implements UnitInterPF, UnitInfo {
 	// Debug Rendering
 	public void renderAttackingLine(ShapeRenderer shapeRenderer) {
 		if (this.attacking != null) {
-	
+
 			Color arrowColor = Color.RED;
 			float wingLength = 8f;
 			float arrowAngle = 30f;
-	
+
 			// draw a line from the center of this unit to the edge of the other unit
 			float len = new Segment(this.getPos(), attacking.getPos()).getLength();
 			float newLen = len - attacking.radius * 0.35f;
@@ -331,65 +352,62 @@ public class Unit implements UnitInterPF, UnitInfo {
 			float ny = dy * ratio;
 			Point edgePoint = new Point(x + nx, y + ny);
 			Segment s = new Segment(this.getPos(), edgePoint);
-	
+
 			HoloGL.renderSegment(s, shapeRenderer, arrowColor);
-	
+
 			// Draw the arrow wings
-	
+
 			// calculate angle of the main arrow line
 			float angle = (float) Math.acos(dx / len);
 			if (dy < 0) {
 				angle = (float) (2 * Math.PI - angle);
 			}
-	
+
 			float backwardsAngle = (float) (angle + Math.PI);
-	
+
 			// draw a line in the +x direction, then rotate it and transform it as needed.
-	
+
 			Segment wingSeg = new Segment(0, 0, wingLength, 0); // create the base wing segment
-	
+
 			shapeRenderer.identity();
 			shapeRenderer.translate(edgePoint.x, edgePoint.y, 0);
 			shapeRenderer.rotate(0, 0, 1, (float) Math.toDegrees(backwardsAngle) + arrowAngle);
-	
+
 			HoloGL.renderSegment(wingSeg, shapeRenderer, arrowColor);
-	
+
 			shapeRenderer.identity();
 			shapeRenderer.translate(edgePoint.x, edgePoint.y, 0);
 			shapeRenderer.rotate(0, 0, 1, (float) Math.toDegrees(backwardsAngle) - arrowAngle);
-	
+
 			HoloGL.renderSegment(wingSeg, shapeRenderer, arrowColor);
-	
+
 			shapeRenderer.identity();
-	
+
 		}
 	}
 
 	void unitDies() {
-		
+
 		motion.stopCurrentMovement();
 		this.clearOrder();
 		System.out.println("unit died");
-		
+
 		// Stop this (now-dead) unit from attacking
-		if(attacking != null) {
+		if (attacking != null) {
 			stopAttacking();
 		}
 	}
-
 
 	// For now we allow multiple player characters
 	public boolean isPlayerCharacter() {
 		return side == Side.PLAYER;
 	}
 
-
-
 	public String toString() {
 		return String.format("Unit[ID: %s]", this.ID);
 
 	}
-	
+
 	// Convenience functions
 	public static float getDist(Unit u1, Unit u2) {
 		return Point.calcDistance(u1.getPos(), u2.getPos());
@@ -452,9 +470,9 @@ public class Unit implements UnitInterPF, UnitInfo {
 	public WorldInfo getWorld() {
 		return world;
 	}
-	
-	public Set<Unit> getAttackers(){
+
+	public Set<Unit> getAttackers() {
 		return unitsAttacking.get(this);
 	}
-	
+
 }

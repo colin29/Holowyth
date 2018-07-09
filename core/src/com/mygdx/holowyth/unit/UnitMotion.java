@@ -39,6 +39,11 @@ public class UnitMotion {
 	ArrayList<Unit> units;
 	private PathingModule pathing;
 
+	/**
+	 * This class merely sets unit velocities, it is up to the World class to accept/resolve movements
+	 * @param self
+	 * @param world
+	 */
 	UnitMotion(Unit self, WorldInfo world) {
 		this.self = self;
 		units = world.getUnits();
@@ -103,22 +108,22 @@ public class UnitMotion {
 
 	/**
 	 * Sets the velocity for the unit based on the unit's path. Also accounts for accel+decel at the begin and end of
-	 * movement. When movement is complete, a unit's path is set to null
+	 * movement. When movement is complete, a unit's path is set to null.
 	 */
 	private void determineMovement() {
 		switch (self.currentOrder) {
 		case MOVE:
-			determineMovementForMoveOrderedUnit();
+			determineMovementForMoveOrder();
+		case RETREAT:
+			determineMovementForMoveOrder();
 		case ATTACKUNIT:
-			determineMovementForAttackOrderedUnit();
+			determineMovementForAttackOrder();
 		default:
 			break;
 		}
 	}
 
-	private void determineMovementForMoveOrderedUnit() {
-		
-		
+	private void determineMovementForMoveOrder() {
 		
 		if (path != null) {
 			// Apply acceleration if the unit is not already at full speed
@@ -174,9 +179,9 @@ public class UnitMotion {
 		}
 	}
 
-	private void determineMovementForAttackOrderedUnit() {
+	private void determineMovementForAttackOrder() {
 		if (path != null) {
-			determineMovementForMoveOrderedUnit();
+			determineMovementForMoveOrder();
 			// Can add extra code this so that units don't enter too deeply into the engage range. The math is simple
 			// but the fact that the units can't be aware of the other's movement makes it non-trivial
 		}

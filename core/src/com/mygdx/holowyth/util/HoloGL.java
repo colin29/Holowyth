@@ -101,4 +101,12 @@ public class HoloGL {
 			shapeRenderer.end();
 		}
 
+		/**
+		 * Convenience function to make new colors from a RBG tuple 
+		 * @return
+		 */
+		public static Color color(int r, int g, int b) {
+			return new Color((float) r / 256, (float) g / 256, (float) b / 256, 1);
+		}
+
 }
