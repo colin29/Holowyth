@@ -257,6 +257,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
 	Label coordInfo;
 
+	@SuppressWarnings("unused")
 	private void createParameterWindow() {
 		// Create a table for adjusting parameters
 

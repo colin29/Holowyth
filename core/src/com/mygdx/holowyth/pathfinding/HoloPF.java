@@ -59,6 +59,7 @@ public class HoloPF {
 
 	public static ArrayList<CBInfo> getUnitCollisions(float x, float y, float x2, float y2, ArrayList<CBInfo> cbs,
 			float unitRadius) {
+		@SuppressWarnings("unused")
 		boolean intersects = false;
 		ArrayList<CBInfo> collisions = new ArrayList<CBInfo>();
 		// Check against unit circles

@@ -4,7 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -19,13 +18,11 @@ import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.UnitInfo;
 import com.mygdx.holowyth.unit.UnitStatsInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
-import com.mygdx.holowyth.util.tools.Timer;
 
 /**
  * Handles all of CombatDemo's rendering <br>
@@ -159,6 +156,7 @@ public class Renderer {
 
 	private float pathThickness = 2f;
 
+	@SuppressWarnings("unused")
 	private void renderPaths(boolean renderIntermediatePaths) {
 		// Render Path
 
@@ -240,6 +238,7 @@ public class Renderer {
 
 	}
 
+	@SuppressWarnings("unused")
 	private void renderUnitExpandedHitBodies() {
 		for (Unit u : world.units) {
 			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + Holo.UNIT_RADIUS, shapeRenderer, Color.GRAY);

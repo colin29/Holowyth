@@ -188,8 +188,6 @@ public class PFDemoUnit implements UnitInterPF {
 
 	// Unit Movement
 
-	private static final float SQRT2 = 1.414214f;
-
 	/**
 	 * When a unit is given a move command that is in a similar direction then it is already travelling, it doesn't need
 	 * to slow down

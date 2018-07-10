@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test.polygon;
+package com.mygdx.holowyth.test.demo;
 
 import java.util.ArrayList;
 import java.util.Arrays;

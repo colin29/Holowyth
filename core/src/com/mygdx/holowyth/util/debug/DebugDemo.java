@@ -4,12 +4,8 @@ import static com.mygdx.holowyth.util.DataUtil.*;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.TreeMap;
-
-import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;

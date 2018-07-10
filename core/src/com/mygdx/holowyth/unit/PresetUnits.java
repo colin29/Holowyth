@@ -1,7 +1,6 @@
 package com.mygdx.holowyth.unit;
 
 import com.mygdx.holowyth.unit.Item.EquipType;
-import com.mygdx.holowyth.unit.Item.ItemType;
 import com.mygdx.holowyth.unit.UnitStats.UnitType;
 
 /**

@@ -22,7 +22,6 @@ import java.io.Writer;
 import java.util.Arrays;
 
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.math.MathUtils;
@@ -559,6 +558,10 @@ public class ParticleEmitter {
 				y += height * MathUtils.random();
 			break;
 		}
+		case point:
+			break;
+		default:
+			break;
 		}
 
 		particle.setBounds(x - spriteWidth / 2, y - spriteHeight / 2, spriteWidth, spriteHeight);

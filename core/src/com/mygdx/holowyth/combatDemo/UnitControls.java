@@ -6,7 +6,6 @@ import java.util.ListIterator;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -14,17 +13,14 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.debug.DebugStore;
-import com.mygdx.holowyth.util.debug.DebugValue;
 import com.mygdx.holowyth.util.debug.DebugValues;
 
 /**
@@ -388,8 +384,6 @@ public class UnitControls extends InputProcessorAdapter {
 	}
 
 	public static Color defaultSelectionBoxColor = Color.BLUE;
-
-	private static final Matrix4 IDENTITY = new Matrix4();
 
 	/**
 	 * We restore the old projection matrix to avoid side effects.

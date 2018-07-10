@@ -300,6 +300,7 @@ public class AStarSearch {
 //		return startIy * graphWidth + startIx;
 //	}
 	
+	@SuppressWarnings("unused")
 	private int findClosestPathableVertex(float x, float y, Polygons polys, ArrayList<CBInfo> cbs,
 			Vertex[][] graph, float unitRadius) {
 		substituteLocationFound = false;

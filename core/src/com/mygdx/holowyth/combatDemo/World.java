@@ -8,15 +8,12 @@ import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.statsBranch.StatsDemo;
 import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.unit.UnitStats;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.data.Segment;
 import com.mygdx.holowyth.util.debug.DebugStore;
-import com.mygdx.holowyth.util.debug.DebugValue;
 import com.mygdx.holowyth.util.debug.DebugValues;
 
 
@@ -38,6 +35,7 @@ public class World implements WorldInfo {
 		this.pathingModule = pathingModule;
 		this.effects = effects;
 		
+		@SuppressWarnings("unused")
 		DebugValues debugValues = debugStore.registerComponent("World");
 	}
 	

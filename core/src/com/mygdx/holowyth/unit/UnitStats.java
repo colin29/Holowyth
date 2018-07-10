@@ -2,8 +2,6 @@ package com.mygdx.holowyth.unit;
 
 import static com.mygdx.holowyth.util.DataUtil.*;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +9,6 @@ import java.util.Map;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.holowyth.combatDemo.effects.EffectsHandler;
-import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.data.Pair;
 import com.mygdx.holowyth.util.data.Point;
 

@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test;
+package com.mygdx.holowyth.test.gdx;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;

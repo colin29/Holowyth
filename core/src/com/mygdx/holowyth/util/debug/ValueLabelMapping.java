@@ -2,7 +2,6 @@ package com.mygdx.holowyth.util.debug;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.function.BiConsumer;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Label;

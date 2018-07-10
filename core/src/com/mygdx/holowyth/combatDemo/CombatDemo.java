@@ -4,27 +4,16 @@ import static com.mygdx.holowyth.util.DataUtil.getAsPercentage;
 import static com.mygdx.holowyth.util.DataUtil.getRoundedString;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.Texture.TextureFilter;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -32,36 +21,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
-import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
-import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.combatDemo.effects.EffectsHandler;
-import com.mygdx.holowyth.map.Field;
-import com.mygdx.holowyth.pathfinding.CBInfo;
-import com.mygdx.holowyth.pathfinding.HoloPF;
-import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.statsBranch.StatsDemo;
 import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
-import com.mygdx.holowyth.util.HoloIO;
-import com.mygdx.holowyth.util.data.Point;
-import com.mygdx.holowyth.util.data.Segment;
-import com.mygdx.holowyth.util.debug.DebugDemo;
 import com.mygdx.holowyth.util.debug.DebugStore;
 import com.mygdx.holowyth.util.debug.DebugValue;
 import com.mygdx.holowyth.util.debug.DebugValues;
 import com.mygdx.holowyth.util.debug.ValueLabelMapping;
-import com.mygdx.holowyth.util.exception.ErrorCode;
-import com.mygdx.holowyth.util.exception.HoloException;
 import com.mygdx.holowyth.util.template.DemoScreen;
-import com.mygdx.holowyth.util.tools.KeyTracker;
 import com.mygdx.holowyth.util.tools.Timer;
 
 /**
@@ -194,6 +166,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	Window parameterWindow;
 
+	@SuppressWarnings("unused")
 	private void createParameterWindow() {
 		// Create a table for adjusting parameters
 

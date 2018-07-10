@@ -1,7 +1,6 @@
 package com.mygdx.holowyth.combatDemo.effects;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.ListIterator;
 
 import com.badlogic.gdx.graphics.Color;
@@ -12,7 +11,6 @@ import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.unit.UnitInfo;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.debug.DebugStore;
-import com.mygdx.holowyth.util.debug.DebugValues;
 
 /**
  * Manages all effects for the game
@@ -87,7 +85,6 @@ public class EffectsHandler {
 	 * @param damage
 	 * @param unit The unit to display the damage over
 	 */
-	private static float damageEffectVerticalOffset = 5;
 	public void makeDamageEffect(float damage, UnitInfo unit) {
 		float x = unit.getX();
 		float y = unit.getY() + unit.getRadius()/2;
