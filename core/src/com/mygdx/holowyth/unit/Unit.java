@@ -1,18 +1,24 @@
 package com.mygdx.holowyth.unit;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitInterPF;
+import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.skill.Skill.Targeting;
+import com.mygdx.holowyth.skill.effect.UnitEffect;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
@@ -74,6 +80,73 @@ public class Unit implements UnitInterPF, UnitInfo {
 
 	public enum Mode {
 		ENGAGE, PASSIVE
+	}
+
+	/**
+	 * The skill the character is actively casting or channelling, else null. The Skill class will reset this when the
+	 * active portion has finished.
+	 */
+	private Skill activeSkill;
+
+	public void useNovaFlare() {
+		UnitEffect novaFlareEffect = new UnitEffect(this) {
+			int time;
+			int timeSecondaryExplosion = 30;
+			int mainDamage = 20;
+			int secondaryDamage = 5;
+			float splashRadius = 70;
+			boolean secondaryExplosionFired;
+			
+			float x, y;
+
+			@Override
+			public void begin() {
+				x = source.x;
+				y = source.y;
+				time = 0;
+			}
+
+			@Override
+			public void tick() {
+				if (time == 0) {
+					applySplashAroundLocation(x, y, splashRadius, mainDamage);
+				}
+				if (time == timeSecondaryExplosion) {
+					applySplashAroundLocation(x, y, splashRadius, secondaryDamage);
+					secondaryExplosionFired = true;
+				}
+				time += 1;
+			}
+
+			public void applySplashAroundLocation(float x, float y, float splashRadius, int damage) {
+				List<Unit> units = world.getUnits();
+				for (Unit unit : units) {
+					if (Unit.getDist(source, unit) <= splashRadius) {
+						if (unit != source) {
+							unit.stats.applyDamage(damage);
+						}
+					}
+				}
+			}
+
+			@Override
+			public boolean isComplete() {
+				return secondaryExplosionFired;
+			}
+
+		};
+
+		Skill skill = new Skill(Targeting.NONE, new ArrayList<UnitEffect>(Arrays.asList(novaFlareEffect)));
+		skill.name = "Nova Flare";
+		
+		useSkill(skill);
+		
+		
+	}
+	
+	public void useSkill(Skill skill) {
+		activeSkill = skill;
+		skill.begin(this);
 	}
 
 	public Unit(float x, float y, WorldInfo world, Side side) {
@@ -176,12 +249,14 @@ public class Unit implements UnitInterPF, UnitInfo {
 	/**
 	 * Main function, also is where the unit determines its movement
 	 */
-	public void handleGeneralLogic() {
+	public void handleLogic() {
 		motion.tick();
 		aggroIfIsEnemyUnit();
 		if (currentOrder == Order.RETREAT)
 			retreatDurationRemaining -= 1;
-
+		
+		if(activeSkill != null)
+			activeSkill.tick();
 	}
 
 	private int attackCooldown = 60;
@@ -384,10 +459,8 @@ public class Unit implements UnitInterPF, UnitInfo {
 	}
 
 	void unitDies() {
-
 		motion.stopCurrentMovement();
 		this.clearOrder();
-		System.out.println("unit died");
 
 		// Stop this (now-dead) unit from attacking
 		if (attacking != null) {
@@ -468,8 +541,20 @@ public class Unit implements UnitInterPF, UnitInfo {
 		return world;
 	}
 
+	public World getWorldMutable() {
+		return (World) world;
+	}
+
 	public Set<Unit> getAttackers() {
 		return unitsAttacking.get(this);
+	}
+
+	public Skill getActiveSkill() {
+		return activeSkill;
+	}
+
+	public void setActiveSkill(Skill activeSkill) {
+		this.activeSkill = activeSkill;
 	}
 
 }

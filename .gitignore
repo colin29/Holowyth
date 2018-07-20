@@ -8,6 +8,8 @@
 hs_err_pid*
 *.jar
 
+!libs/**/*.jar
+
 
 ## Eclipse
 

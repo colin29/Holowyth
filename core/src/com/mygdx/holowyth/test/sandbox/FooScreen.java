@@ -192,8 +192,8 @@ public class FooScreen implements Screen {
 		game.font_goth36.draw(game.batch, "I kinda found relatable:\r\n" + 
 				"\r\n" + 
 				"-Tiat's struggle and being lost. The process of looking back on your young self. Being so focused on one thing that it becomes a large fixture in your life (Kutori for her)\r\n" + 
-				"-Kutori's à”ín. Her process of finding out her feelings and moving forward herself.\r\n" + 
-				"-Nephelm's ãïñ≥ä¥. Not being attached to much, the thought that every thing could just disappear the moment your turn away from it.\r\n" + 
+				"-Kutori's ÊÑèÂú∞. Her process of finding out her feelings and moving forward herself.\r\n" + 
+				"-Nephelm's ËôöÁÑ°ÊÑü. Not being attached to much, the thought that every thing could just disappear the moment your turn away from it.\r\n" + 
 				"", 50, 600, 700, Align.left,  true);
 		game.batch.end();
 	}

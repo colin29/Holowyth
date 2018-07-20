@@ -380,7 +380,6 @@ public class UnitStats implements UnitStatsInfo {
 		// 5. Apply damage
 //		System.out.printf("%s's attack hit and did %s damage to %s%n", this.name, DataUtil.getRoundedString(damage), enemy.name);
 
-		effects.makeDamageEffect(damage, enemy.self);
 		enemy.applyDamage(damage);
 	}
 	
@@ -439,10 +438,13 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	/**
+	 * Will always apply a damage effect, refactor if you want it different.
 	 * @param damage
 	 * @return The amount of damage actually done
 	 */
 	public float applyDamage(float damage) {
+		effects.makeDamageEffect(damage, this.self);
+		
 		hp -= damage;
 
 		if (hp <= 0) {

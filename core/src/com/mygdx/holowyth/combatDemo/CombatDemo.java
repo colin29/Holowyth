@@ -57,7 +57,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	// Game Components
 
-	UnitControls unitControls;
+	Controls unitControls;
 	PathingModule pathingModule;
 	EffectsHandler effects; // keeps track of vfx effects
 
@@ -227,7 +227,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		if (unitControls != null) {
 			multiplexer.removeProcessor(unitControls);
 		}
-		unitControls = new UnitControls(game, camera, fixedCam, world.units, debugStore);
+		unitControls = new Controls(game, camera, fixedCam, world.units, debugStore, world);
 		multiplexer.addProcessor(unitControls);
 
 		populateDebugTable();

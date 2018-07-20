@@ -22,6 +22,7 @@ import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.debug.DebugStore;
 import com.mygdx.holowyth.util.debug.DebugValues;
+import com.mygdx.holowyth.util.tools.FunctionBindings;
 
 /**
  * Accepts player input to select and order units to move (and other behaviour later on). <br>
@@ -30,7 +31,7 @@ import com.mygdx.holowyth.util.debug.DebugValues;
  * 
  * @author Colin Ta
  */
-public class UnitControls extends InputProcessorAdapter {
+public class Controls extends InputProcessorAdapter {
 
 	Holowyth game;
 
@@ -38,7 +39,10 @@ public class UnitControls extends InputProcessorAdapter {
 	Camera fixedCam;
 	ShapeRenderer shapeRenderer;
 
+	World world;
 	ArrayList<Unit> units;
+
+	private FunctionBindings functionBindings = new FunctionBindings();
 
 	public ArrayList<Unit> selectedUnits = new ArrayList<Unit>();
 	boolean leftMouseKeyDown = false;
@@ -54,10 +58,11 @@ public class UnitControls extends InputProcessorAdapter {
 	Skin skin;
 	LabelStyle labelStyle;
 
-	public UnitControls(Holowyth game, Camera camera, Camera fixedCam, ArrayList<Unit> units, DebugStore debugStore) {
+	public Controls(Holowyth game, Camera camera, Camera fixedCam, ArrayList<Unit> units, DebugStore debugStore, World world) {
 		this.shapeRenderer = game.shapeRenderer;
 		this.camera = camera;
 		this.fixedCam = fixedCam;
+		this.world = world;
 		this.units = units;
 
 		this.font = game.debugFont;
@@ -66,15 +71,24 @@ public class UnitControls extends InputProcessorAdapter {
 		labelStyle = new LabelStyle(game.debugFont, Holo.debugFontColor);
 
 		DebugValues debugValues = debugStore.registerComponent("Unit Controls");
-		debugValues.add("Order Context", () -> getCurrentContextText());
+		debugValues.add("Order Context", ()->getCurrentContextText());
 		// debugValues.add("SelectX1", () -> selectionX1);
 		// debugValues.add("SelectY1", () -> selectionY1);
 		// debugValues.add("SelectX2", () -> selectionX2);
 		// debugValues.add("SelectY2", () -> selectionY2);
+		
+		functionBindings.bindFunctionToKey(()-> castNovaCommand(), Keys.NUM_1);
 
 	}
 
 	float clickX, clickY; // Current click in world coordinates
+
+	private void castNovaCommand() {
+		if (selectedUnits.size() == 1) {
+			Unit unit = selectedUnits.get(0);
+			unit.useNovaFlare();
+		}
+	}
 
 	@Override
 	public boolean keyDown(int keycode) {
@@ -87,6 +101,11 @@ public class UnitControls extends InputProcessorAdapter {
 			context = Context.RETREAT;
 			return true;
 		}
+		return false;
+	}
+
+	public boolean keyUp(int keycode) {
+		functionBindings.runBoundFunction(keycode);
 		return false;
 	}
 
@@ -147,13 +166,13 @@ public class UnitControls extends InputProcessorAdapter {
 		}
 
 		if (target != null) {
-			for(Unit u: selectedUnits) {
+			for (Unit u : selectedUnits) {
 				boolean valid = u.orderAttackUnit(target);
-				if(!valid) {
+				if (!valid) {
 					u.orderMove(x, y);
 				}
 			}
-		}else {
+		} else {
 			handleMoveCommand(x, y);
 		}
 

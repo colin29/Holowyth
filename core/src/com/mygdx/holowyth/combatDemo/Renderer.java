@@ -61,7 +61,7 @@ public class Renderer {
 
 	public boolean renderUnitExpandedHitBodies = false;
 
-	private UnitControls unitControls;
+	private Controls unitControls;
 
 	/**
 	 * The game, worldCamera, and other screen-lifetime modules are passed in.
@@ -118,7 +118,7 @@ public class Renderer {
 			unitControls.clearDeadUnitsFromSelection();
 			unitControls.renderCirclesOnSelectedUnits();
 			renderUnits();
-			unitControls.renderSelectionBox(UnitControls.defaultSelectionBoxColor);
+			unitControls.renderSelectionBox(Controls.defaultSelectionBoxColor);
 			renderCirclesAroundBusyRetreatingUnits();
 		}
 
@@ -321,7 +321,7 @@ public class Renderer {
 		
 	}
 
-	public void setUnitControls(UnitControls unitControls) {
+	public void setUnitControls(Controls unitControls) {
 		this.unitControls = unitControls;
 	}
 

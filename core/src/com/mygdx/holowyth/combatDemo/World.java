@@ -53,7 +53,7 @@ public class World implements WorldInfo {
 	
 	private void tickLogicForUnits() {
 		for (Unit u : units) {
-			u.handleGeneralLogic();
+			u.handleLogic();
 		}
 	}
 
