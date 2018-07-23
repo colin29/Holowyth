@@ -80,9 +80,9 @@ public class Skills {
 			super();
 			name = "Nova Flare";
 		}
-		
+
 		public void pluginTargeting(Unit caster) {
-			finalizeEffect(new ArrayList<UnitEffect>(Arrays.asList(new NovaFlareEffect(caster))));
+			setEffect(new ArrayList<UnitEffect>(Arrays.asList(new NovaFlareEffect(caster))));
 		}
 	}
 
@@ -108,7 +108,7 @@ public class Skills {
 
 		public void applySplashAroundLocation(float x, float y, float splashRadius, int damage) {
 			List<Unit> units = source.getWorldMutable().getUnits();
-			
+
 			Point p = new Point(x, y);
 			for (Unit unit : units) {
 				if (Point.calcDistance(p, unit.getPos()) <= splashRadius) {
@@ -124,6 +124,7 @@ public class Skills {
 			return fired;
 		}
 	};
+
 	public static class Explosion extends GroundSkill {
 		public Explosion() {
 			super();
@@ -132,9 +133,8 @@ public class Skills {
 
 		@Override
 		public void pluginTargeting(Unit caster, float x, float y) {
-			finalizeEffect(new ArrayList<UnitEffect>(Arrays.asList(new ExplosionEffect(caster, x, y))));
+			setEffect(new ArrayList<UnitEffect>(Arrays.asList(new ExplosionEffect(caster, x, y))));
 		}
 	}
 
-	
 }

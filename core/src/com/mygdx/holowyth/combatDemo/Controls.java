@@ -1,7 +1,11 @@
 package com.mygdx.holowyth.combatDemo;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -50,7 +54,7 @@ public class Controls extends InputProcessorAdapter {
 
 	private FunctionBindings functionBindings = new FunctionBindings();
 
-	public ArrayList<Unit> selectedUnits = new ArrayList<Unit>();
+	public SelectedUnits selectedUnits = new SelectedUnits();
 	boolean leftMouseKeyDown = false;
 
 	public enum Context {
@@ -64,7 +68,8 @@ public class Controls extends InputProcessorAdapter {
 	Skin skin;
 	LabelStyle labelStyle;
 
-	public Controls(Holowyth game, Camera camera, Camera fixedCam, ArrayList<Unit> units, DebugStore debugStore, World world) {
+	public Controls(Holowyth game, Camera camera, Camera fixedCam, ArrayList<Unit> units, DebugStore debugStore,
+			World world) {
 		this.shapeRenderer = game.shapeRenderer;
 		this.camera = camera;
 		this.fixedCam = fixedCam;
@@ -77,14 +82,17 @@ public class Controls extends InputProcessorAdapter {
 		labelStyle = new LabelStyle(game.debugFont, Holo.debugFontColor);
 
 		DebugValues debugValues = debugStore.registerComponent("Unit Controls");
-		debugValues.add("Order Context", ()->getCurrentContextText());
+		debugValues.add("Order Context", () -> getCurrentContextText());
+		
+		debugValues.add("# of units selected", () -> selectedUnits.size());
+		
 		// debugValues.add("SelectX1", () -> selectionX1);
 		// debugValues.add("SelectY1", () -> selectionY1);
 		// debugValues.add("SelectX2", () -> selectionX2);
 		// debugValues.add("SelectY2", () -> selectionY2);
-		
-		functionBindings.bindFunctionToKey(()-> useSkillCommand(), Keys.NUM_1);
-		functionBindings.bindFunctionToKey(()-> useSkill2(), Keys.NUM_2);
+
+		functionBindings.bindFunctionToKey(() -> useSkillCommand(), Keys.NUM_1);
+		functionBindings.bindFunctionToKey(() -> useSkill2(), Keys.NUM_2);
 
 	}
 
@@ -92,30 +100,32 @@ public class Controls extends InputProcessorAdapter {
 
 	Skill skillToUse = new Skills.Explosion();
 	Skill curSkill = null;
+
 	private void useSkillCommand() {
+
+		System.out.println("used skill 1");
 		
 		if (selectedUnits.size() == 1) {
-			Unit unit = selectedUnits.get(0);
+			Unit unit = selectedUnits.iterator().next();
 			try {
 				curSkill = (Skill) skillToUse.clone();
-				 
-				 if(curSkill.getTargeting() == Targeting.GROUND) {
+
+				if (curSkill.getTargeting() == Targeting.GROUND) {
 					context = Context.SKILL_GROUND;
-				 }
-				 
-				 
-				 
+				}
+
 			} catch (CloneNotSupportedException e) {
 				e.printStackTrace();
 			}
 		}
 	}
+
 	private void useSkill2() {
 		if (selectedUnits.size() == 1) {
 			curSkill = new Skills.NovaFlare();
-			 if(curSkill.getTargeting() == Targeting.NONE) {
-				 handleSkillNone();
-			 }
+			if (curSkill.getTargeting() == Targeting.NONE) {
+				handleSkillNone();
+			}
 		}
 	}
 
@@ -147,10 +157,9 @@ public class Controls extends InputProcessorAdapter {
 
 		// Handle Left Click
 		if (button == Input.Buttons.LEFT && pointer == 0) {
-			
-			
-			switch(context) {
-			
+
+			switch (context) {
+
 			case ATTACK:
 				handleAttackCommand(vec.x, vec.y);
 				break;
@@ -182,24 +191,25 @@ public class Controls extends InputProcessorAdapter {
 
 		return false;
 	}
-	
+
 	private void handleSkillGround(float x, float y) {
-		if(selectedUnits.size() != 1) {
-			System.out.println("Selected units is not exactly one: " + selectedUnits.size());
+		if (selectedUnits.size() != 1) {
+			new Exception("Selected units is not exactly one: " + selectedUnits.size()).printStackTrace();
 			return;
 		}
 		GroundSkill c = (GroundSkill) this.curSkill;
-		Unit caster = selectedUnits.get(0);
-		c.pluginTargeting(caster , x, y);
+		Unit caster = selectedUnits.iterator().next();
+		c.pluginTargeting(caster, x, y);
 		caster.useSkill(c);
 	}
+
 	private void handleSkillNone() {
-		if(selectedUnits.size() != 1) {
-			System.out.println("Selected units is not exactly one: " + selectedUnits.size());
+		if (selectedUnits.size() != 1) {
+			new Exception("Selected units is not exactly one: " + selectedUnits.size()).printStackTrace();
 			return;
 		}
 		NoneSkill c = (NoneSkill) this.curSkill;
-		Unit caster = selectedUnits.get(0);
+		Unit caster = selectedUnits.iterator().next();
 		c.pluginTargeting(caster);
 		caster.useSkill(c);
 	}
@@ -387,7 +397,7 @@ public class Controls extends InputProcessorAdapter {
 	}
 
 	public void clearDeadUnitsFromSelection() {
-		ListIterator<Unit> iter = selectedUnits.listIterator();
+		Iterator<Unit> iter = selectedUnits.iterator();
 		while (iter.hasNext()) {
 			Unit unit = iter.next();
 			if (unit.stats.isDead()) {
@@ -479,6 +489,83 @@ public class Controls extends InputProcessorAdapter {
 			shapeRenderer.end();
 		}
 		shapeRenderer.setProjectionMatrix(old);
+	}
+	
+	/**
+	 * Is guaranteed to be called when selectedUnits is modified
+	 * Is called immediately after a modifiying action, if that action actually changed the set.
+	 */
+	private void onSelectedUnitsModified() {
+		System.out.println("selectedUnits modified");
+		if(context == Context.SKILL_GROUND || context == Context.SKILL_UNIT) {
+			context = Context.NONE;
+		}
+	}
+
+	/**
+	 * Same as set, but tracks when the set is modified.
+	 * @author Colin Ta
+	 *
+	 */
+	public class SelectedUnits extends HashSet<Unit> {
+
+		private static final long serialVersionUID = 1L;
+		private final Set<Unit> selected = new HashSet<Unit>();
+		
+		
+		
+		@Override
+		public boolean remove(Object u){
+			if(selected.remove(u)) {
+				onSelectedUnitsModified();
+				return true;
+			}else {
+				return false;
+			}
+		}
+		
+		@Override
+		public boolean add(Unit u) {
+			if(selected.add(u)) {
+				onSelectedUnitsModified();
+				return true;
+			}else {
+				return false;
+			}
+		}
+		@Override
+		public int size() {
+			return selected.size();
+		}
+
+
+		public Iterator<Unit> iterator(){
+			return new Iterator<Unit>() {
+				private final Iterator<Unit> iter = selected.iterator();
+				@Override
+				public boolean hasNext() {
+					return iter.hasNext();
+				}
+
+				@Override
+				public Unit next() {
+					return iter.next();
+				}
+				public void remove() {
+					iter.remove();
+					onSelectedUnitsModified();
+				}
+			};
+		}
+		
+		public void clear() {
+			if(!selected.isEmpty()) {
+				selected.clear();
+				onSelectedUnitsModified();
+			}else {
+				selected.clear();
+			}
+		}
 	}
 
 }

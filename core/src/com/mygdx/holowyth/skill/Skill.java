@@ -14,6 +14,18 @@ import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.skill.effect.UnitEffect;
 import com.mygdx.holowyth.unit.Unit;
 
+/**
+ * Represents a skill instance that is cast and then produces effects. A skill manages its effects through it's lifetime.
+ * 
+ * A skill instance also functions as a identifier (ie. that for marking that key is bound to that particular skill)
+ * (When the skill is actually to be used, a clone should be used)
+ * 
+ * Usage: creation --> set effect --> begin() --> effects start running
+ * 
+ * 
+ * @author Colin Ta
+ *
+ */
 public class Skill implements Cloneable {
 
 	public float cooldown; // in game frames
@@ -62,7 +74,7 @@ public class Skill implements Cloneable {
 	}
 
 	public void begin(Unit caster) {
-		if (!areEffectsFinalized()) {
+		if (!areEffectsSet()) {
 			System.out.println("Effects not finalized yet " + this.name);
 			return;
 		}
@@ -118,11 +130,11 @@ public class Skill implements Cloneable {
 		}
 	}
 
-	public void finalizeEffect(List<UnitEffect> effects) {
+	public void setEffect(List<UnitEffect> effects) {
 		this.effects = effects;
 	}
 
-	public boolean areEffectsFinalized() {
+	public boolean areEffectsSet() {
 		return effects != null;
 	}
 
