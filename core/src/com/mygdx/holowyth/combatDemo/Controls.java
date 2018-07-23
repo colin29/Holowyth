@@ -16,6 +16,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.skill.GroundSkill;
+import com.mygdx.holowyth.skill.NoneSkill;
+import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.skill.Skill.Targeting;
+import com.mygdx.holowyth.skill.Skills;
+import com.mygdx.holowyth.skill.Skills.Explosion;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
@@ -48,7 +54,7 @@ public class Controls extends InputProcessorAdapter {
 	boolean leftMouseKeyDown = false;
 
 	public enum Context {
-		NONE, ATTACK, RETREAT;
+		NONE, ATTACK, RETREAT, SKILL_GROUND, SKILL_UNIT
 	}
 
 	Context context = Context.NONE;
@@ -77,16 +83,39 @@ public class Controls extends InputProcessorAdapter {
 		// debugValues.add("SelectX2", () -> selectionX2);
 		// debugValues.add("SelectY2", () -> selectionY2);
 		
-		functionBindings.bindFunctionToKey(()-> castNovaCommand(), Keys.NUM_1);
+		functionBindings.bindFunctionToKey(()-> useSkillCommand(), Keys.NUM_1);
+		functionBindings.bindFunctionToKey(()-> useSkill2(), Keys.NUM_2);
 
 	}
 
 	float clickX, clickY; // Current click in world coordinates
 
-	private void castNovaCommand() {
+	Skill skillToUse = new Skills.Explosion();
+	Skill curSkill = null;
+	private void useSkillCommand() {
+		
 		if (selectedUnits.size() == 1) {
 			Unit unit = selectedUnits.get(0);
-			unit.useNovaFlare();
+			try {
+				curSkill = (Skill) skillToUse.clone();
+				 
+				 if(curSkill.getTargeting() == Targeting.GROUND) {
+					context = Context.SKILL_GROUND;
+				 }
+				 
+				 
+				 
+			} catch (CloneNotSupportedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	private void useSkill2() {
+		if (selectedUnits.size() == 1) {
+			curSkill = new Skills.NovaFlare();
+			 if(curSkill.getTargeting() == Targeting.NONE) {
+				 handleSkillNone();
+			 }
 		}
 	}
 
@@ -118,13 +147,22 @@ public class Controls extends InputProcessorAdapter {
 
 		// Handle Left Click
 		if (button == Input.Buttons.LEFT && pointer == 0) {
-			if (context == Context.ATTACK) {
+			
+			
+			switch(context) {
+			
+			case ATTACK:
 				handleAttackCommand(vec.x, vec.y);
-			} else if (context == Context.RETREAT) {
+				break;
+			case RETREAT:
 				handleRetreatCommand(vec.x, vec.y);
-			} else {
+				break;
+			case SKILL_GROUND:
+				handleSkillGround(vec.x, vec.y);
+				break;
+			default:
+				handleLeftClick(vec.x, vec.y, screenX, screenY);
 			}
-			handleLeftClick(vec.x, vec.y, screenX, screenY);
 			return true;
 		}
 
@@ -143,6 +181,27 @@ public class Controls extends InputProcessorAdapter {
 		}
 
 		return false;
+	}
+	
+	private void handleSkillGround(float x, float y) {
+		if(selectedUnits.size() != 1) {
+			System.out.println("Selected units is not exactly one: " + selectedUnits.size());
+			return;
+		}
+		GroundSkill c = (GroundSkill) this.curSkill;
+		Unit caster = selectedUnits.get(0);
+		c.pluginTargeting(caster , x, y);
+		caster.useSkill(c);
+	}
+	private void handleSkillNone() {
+		if(selectedUnits.size() != 1) {
+			System.out.println("Selected units is not exactly one: " + selectedUnits.size());
+			return;
+		}
+		NoneSkill c = (NoneSkill) this.curSkill;
+		Unit caster = selectedUnits.get(0);
+		c.pluginTargeting(caster);
+		caster.useSkill(c);
 	}
 
 	private void handleRightClick(float x, float y) {
@@ -226,7 +285,7 @@ public class Controls extends InputProcessorAdapter {
 		case NONE:
 			return "Idle";
 		default:
-			return "Unspecified context label";
+			return context.toString();
 		}
 	}
 

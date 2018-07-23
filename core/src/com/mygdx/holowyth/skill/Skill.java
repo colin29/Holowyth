@@ -14,59 +14,75 @@ import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.skill.effect.UnitEffect;
 import com.mygdx.holowyth.unit.Unit;
 
-public class Skill {
-	
+public class Skill implements Cloneable {
+
 	public float cooldown; // in game frames
 	public int spCost;
-	
+
 	public String name = "Skill name";
 
 	// World fields
 	Unit caster;
 	World world;
-	
+
 	// Components
-	public Casting casting = new Casting(this); //default behaviour, can assign over this from a sub class.
-	
+	public Casting casting = new Casting(this); // default behaviour, can assign over this from a sub class.
+
 	public boolean hasChannelingBehaviour = false;
-	
-	public enum Status {INIT, CASTING, CHANNELING, RESOLVING, DONE}
+
+	public enum Status {
+		INIT, CASTING, CHANNELING, RESOLVING, DONE
+	}
+
 	private Status status = Status.INIT;
-	
+
 	/**
-	 * Represents the type of input the spell takes. (e.g. explosion is cast on the ground, whereas backstab targets a unit)
+	 * Represents the type of input the spell takes. (e.g. explosion is cast on the ground, whereas backstab targets a
+	 * unit)
+	 * 
 	 * @author Colin Ta
 	 *
 	 */
-	public enum Targeting {GROUND, UNIT, NONE}
+	public enum Targeting {
+		GROUND, UNIT, NONE
+	}
+
 	private final Targeting targeting; // determines what types of effects can be entered
-	private boolean targetingComplete;
-	
-	private List<UnitEffect> effects;
-	
+
+	private List<UnitEffect> effects; // if this is set, then all the effects are instantiated and the skill is fully
+										// defined.
+
+	public Skill(Targeting targeting) {
+		this.targeting = targeting;
+	}
+
 	public Skill(Targeting targeting, List<UnitEffect> effects) {
 		this.targeting = targeting;
 		this.effects = effects;
 	}
-	
+
 	public void begin(Unit caster) {
+		if (!areEffectsFinalized()) {
+			System.out.println("Effects not finalized yet " + this.name);
+			return;
+		}
+			
+
 		this.caster = caster;
 		this.world = caster.getWorldMutable();
-		
-		
-		// Todo: trigger targeting
-		
+
 		status = Status.CASTING;
 		casting.begin(caster);
 	}
+
 	public void tick() {
-		
-		if(status == Status.CASTING) {
+
+		if (status == Status.CASTING) {
 			casting.tick();
-			if(casting.isComplete()) {
-				if(hasChannelingBehaviour) {
+			if (casting.isComplete()) {
+				if (hasChannelingBehaviour) {
 					status = Status.CHANNELING;
-				}else {
+				} else {
 					status = Status.RESOLVING;
 				}
 				onFinishCasting();
@@ -74,44 +90,53 @@ public class Skill {
 		}
 
 		// TODO: skills with Channeling behaviour
-		
-		if(status == Status.CHANNELING || status == Status.RESOLVING) {
-			for(Effect effect: effects) {
+
+		if (status == Status.CHANNELING || status == Status.RESOLVING) {
+			for (Effect effect : effects) {
 				effect.tick();
 			}
 		}
-		
+
 		// Remove all completed effects from the list
-		
-		CollectionUtils.filter(effects, (item)->!item.isComplete());
-		
+
+		CollectionUtils.filter(effects, (item) -> !item.isComplete());
+
 		// If all effects are completed, skill is complete
-		
-		if(effects.isEmpty()) {
+
+		if (effects.isEmpty()) {
 			status = Status.DONE;
 			caster.setActiveSkill(null);
 			System.out.printf("Skill %s finished. %n", this.name);
 		}
-		
+
 	}
-	
+
 	private void onFinishCasting() {
 		// Start all effects
-		for(Effect effect: effects) {
+		for (Effect effect : effects) {
 			effect.begin();
 		}
+	}
+
+	public void finalizeEffect(List<UnitEffect> effects) {
+		this.effects = effects;
+	}
+
+	public boolean areEffectsFinalized() {
+		return effects != null;
 	}
 
 	public Status getStatus() {
 		return status;
 	}
 
-	
 	public Targeting getTargeting() {
 		return targeting;
 	}
-	
-	
 
-	
+	@Override
+	public Object clone() throws CloneNotSupportedException {
+		return super.clone();
+	}
+
 }

@@ -18,6 +18,7 @@ import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitInterPF;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skill.Targeting;
+import com.mygdx.holowyth.skill.Skills;
 import com.mygdx.holowyth.skill.effect.UnitEffect;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
@@ -87,62 +88,6 @@ public class Unit implements UnitInterPF, UnitInfo {
 	 * active portion has finished.
 	 */
 	private Skill activeSkill;
-
-	public void useNovaFlare() {
-		UnitEffect novaFlareEffect = new UnitEffect(this) {
-			int time;
-			int timeSecondaryExplosion = 30;
-			int mainDamage = 20;
-			int secondaryDamage = 5;
-			float splashRadius = 70;
-			boolean secondaryExplosionFired;
-			
-			float x, y;
-
-			@Override
-			public void begin() {
-				x = source.x;
-				y = source.y;
-				time = 0;
-			}
-
-			@Override
-			public void tick() {
-				if (time == 0) {
-					applySplashAroundLocation(x, y, splashRadius, mainDamage);
-				}
-				if (time == timeSecondaryExplosion) {
-					applySplashAroundLocation(x, y, splashRadius, secondaryDamage);
-					secondaryExplosionFired = true;
-				}
-				time += 1;
-			}
-
-			public void applySplashAroundLocation(float x, float y, float splashRadius, int damage) {
-				List<Unit> units = world.getUnits();
-				for (Unit unit : units) {
-					if (Unit.getDist(source, unit) <= splashRadius) {
-						if (unit != source) {
-							unit.stats.applyDamage(damage);
-						}
-					}
-				}
-			}
-
-			@Override
-			public boolean isComplete() {
-				return secondaryExplosionFired;
-			}
-
-		};
-
-		Skill skill = new Skill(Targeting.NONE, new ArrayList<UnitEffect>(Arrays.asList(novaFlareEffect)));
-		skill.name = "Nova Flare";
-		
-		useSkill(skill);
-		
-		
-	}
 	
 	public void useSkill(Skill skill) {
 		activeSkill = skill;
