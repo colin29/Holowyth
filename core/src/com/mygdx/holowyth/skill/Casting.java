@@ -9,10 +9,12 @@ import com.mygdx.holowyth.unit.Unit;
  * @author Colin Ta
  *
  */
-public class Casting {
+public class Casting implements Cloneable {
 	
 	float castTime = 0; //by default, cast time of 0
 	float castTimeRemaining;
+	
+	private boolean completed = false;
 	
 	Skill parent;
 	
@@ -36,7 +38,6 @@ public class Casting {
 		}
 	}
 	
-	private boolean completed = false;
 	public boolean isComplete() {
 		return completed;
 	}
@@ -46,6 +47,17 @@ public class Casting {
 	protected void onBeginCast() {
 	}
 	protected void onFinishCast() {
+	}
+	@Override
+	public Object clone() {
+		try {
+			return super.clone();
+		} catch (CloneNotSupportedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+		
 	}
 
 }

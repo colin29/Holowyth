@@ -17,6 +17,7 @@ import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitInterPF;
 import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.skill.Skill.Status;
 import com.mygdx.holowyth.skill.Skill.Targeting;
 import com.mygdx.holowyth.skill.Skills;
 import com.mygdx.holowyth.skill.effect.UnitEffect;
@@ -31,7 +32,7 @@ import com.mygdx.holowyth.util.data.Segment;
  * Also controls automatic behavior of units.
  * 
  * @author Colin Ta
- *
+ * 
  */
 public class Unit implements UnitInterPF, UnitInfo {
 
@@ -88,7 +89,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 	 * active portion has finished.
 	 */
 	private Skill activeSkill;
-	
+
 	public void useSkill(Skill skill) {
 		activeSkill = skill;
 		skill.begin(this);
@@ -182,6 +183,25 @@ public class Unit implements UnitInterPF, UnitInfo {
 	int retreatDurationRemaining;
 
 	/**
+	 * A stop order stops a unit's motion and current order. You cannot use stop to cancel your own casting atm.
+	 */
+	public void orderStop() {
+		if (!isStopOrderAllowed()) {
+			return;
+		}
+		motion.stopCurrentMovement();
+		clearOrder();
+	}
+	
+	/**
+	 * Stops a unit's motion and halts any current orders. Unlike orderStop, is not affected by order restrictions.
+	 */
+	public void stopUnit() {
+		clearOrder();
+		motion.stopCurrentMovement();
+	}
+
+	/**
 	 * Clears any current order on this unit. For internal use.
 	 */
 	void clearOrder() {
@@ -199,8 +219,8 @@ public class Unit implements UnitInterPF, UnitInfo {
 		aggroIfIsEnemyUnit();
 		if (currentOrder == Order.RETREAT)
 			retreatDurationRemaining -= 1;
-		
-		if(activeSkill != null)
+
+		if (activeSkill != null)
 			activeSkill.tick();
 	}
 
@@ -299,13 +319,15 @@ public class Unit implements UnitInterPF, UnitInfo {
 		return !stats.isDead()
 				&& attacking == null
 				&& target.side != this.side
-				&& !isRetreatCooldownActive();
+				&& !isRetreatCooldownActive()
+				&& !(isCasting() || isChannelling());
 	}
 
 	private boolean isMoveOrderAllowed() {
 		return !stats.isDead()
 				&& attacking == null
-				&& !isRetreatCooldownActive();
+				&& !isRetreatCooldownActive()
+				&& !(isCasting() || isChannelling());
 	}
 
 	private boolean isAttackMoveOrderAllowed() {
@@ -314,8 +336,22 @@ public class Unit implements UnitInterPF, UnitInfo {
 	private boolean isRetreatOrderAllowed() {
 		return !stats.isDead()
 				&& this.attacking != null
-				&& this.currentOrder != Order.RETREAT;
+				&& this.currentOrder != Order.RETREAT
+				&& !(isCasting() || isChannelling());
 	}
+	private boolean isStopOrderAllowed() {
+		return !stats.isDead()
+				&& !isRetreatCooldownActive()
+				&& !(isCasting() || isChannelling());
+	}
+	
+	public boolean isCasting() {
+		return this.activeSkill != null && activeSkill.getStatus() == Status.CASTING;
+	}
+	public boolean isChannelling() {
+		return this.activeSkill != null && activeSkill.getStatus() == Status.CHANNELING;
+	}
+	
 	public boolean isRetreatCooldownActive() {
 		return currentOrder == Order.RETREAT && retreatDurationRemaining >0;
 	}

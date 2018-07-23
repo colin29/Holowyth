@@ -129,6 +129,7 @@ public class Skills {
 		public Explosion() {
 			super();
 			name = "Explosion";
+			casting.castTime = 60;
 		}
 
 		@Override

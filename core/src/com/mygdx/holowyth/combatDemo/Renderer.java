@@ -17,6 +17,7 @@ import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.skill.Skill.Status;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.UnitInfo;
 import com.mygdx.holowyth.unit.UnitStatsInfo;
@@ -120,6 +121,7 @@ public class Renderer {
 			renderUnits();
 			unitControls.renderSelectionBox(Controls.defaultSelectionBoxColor);
 			renderCirclesAroundBusyRetreatingUnits();
+			renderCirclesAroundBusyCastingUnits();
 		}
 
 		for (Unit u : world.units) {
@@ -145,6 +147,18 @@ public class Renderer {
 	public void renderCirclesAroundBusyRetreatingUnits() {
 		for (UnitInfo u : world.units) {
 			if(u.isRetreatCooldownActive()) {
+				Color color = HoloGL.color(30,144,255); 
+				shapeRenderer.setProjectionMatrix(worldCamera.combined);
+				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, shapeRenderer, color);
+				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 3.25f, shapeRenderer, color);
+				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 4, shapeRenderer, color);	
+			}
+		}
+	}
+	public void renderCirclesAroundBusyCastingUnits() {
+		for (UnitInfo u : world.units) {
+			if(u.getActiveSkill() == null) continue;
+			if(u.getActiveSkill().getStatus() == Status.CASTING || u.getActiveSkill().getStatus() == Status.CHANNELING) {
 				Color color = HoloGL.color(30,144,255); 
 				shapeRenderer.setProjectionMatrix(worldCamera.combined);
 				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, shapeRenderer, color);

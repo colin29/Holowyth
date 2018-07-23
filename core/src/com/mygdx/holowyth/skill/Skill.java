@@ -26,15 +26,17 @@ import com.mygdx.holowyth.unit.Unit;
  * @author Colin Ta
  *
  */
-public class Skill implements Cloneable {
+public class Skill implements Cloneable, SkillInfo {
 
 	public float cooldown; // in game frames
 	public int spCost;
 
 	public String name = "Skill name";
 
-	// World fields
+	// Components
 	Unit caster;
+	
+	// References
 	World world;
 
 	// Components
@@ -84,7 +86,13 @@ public class Skill implements Cloneable {
 		this.world = caster.getWorldMutable();
 
 		status = Status.CASTING;
+		
 		casting.begin(caster);
+		tick();
+		// If skill was not insta-cast, we need to stop motion and actions
+		if(status == Status.CASTING || status == Status.CHANNELING) {
+			caster.stopUnit();
+		}
 	}
 
 	public void tick() {
@@ -148,7 +156,9 @@ public class Skill implements Cloneable {
 
 	@Override
 	public Object clone() throws CloneNotSupportedException {
-		return super.clone();
+		Skill newInstance = (Skill) super.clone();
+		newInstance.casting = (Casting) this.casting.clone();
+		return newInstance;
 	}
 
 }

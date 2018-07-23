@@ -201,6 +201,7 @@ public class Controls extends InputProcessorAdapter {
 		Unit caster = selectedUnits.iterator().next();
 		c.pluginTargeting(caster, x, y);
 		caster.useSkill(c);
+		clearContext();
 	}
 
 	private void handleSkillNone() {
@@ -212,6 +213,7 @@ public class Controls extends InputProcessorAdapter {
 		Unit caster = selectedUnits.iterator().next();
 		c.pluginTargeting(caster);
 		caster.useSkill(c);
+		clearContext();
 	}
 
 	private void handleRightClick(float x, float y) {
