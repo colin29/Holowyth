@@ -14,6 +14,7 @@ import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.data.Segment;
 import com.mygdx.holowyth.util.debug.DebugStore;
+import com.mygdx.holowyth.util.debug.DebugValue;
 import com.mygdx.holowyth.util.debug.DebugValues;
 
 
@@ -29,11 +30,14 @@ public class World implements WorldInfo {
 	Field map; // Each world instance is tied to a single map (specifically, is loaded from a single map)
 	
 	EffectsHandler effects;
+	DebugStore debugStore;
 	
 	public World(Field map, PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects){
 		this.map = map;
 		this.pathingModule = pathingModule;
 		this.effects = effects;
+		
+		this.debugStore = debugStore;
 		
 		@SuppressWarnings("unused")
 		DebugValues debugValues = debugStore.registerComponent("World");
@@ -182,6 +186,9 @@ public class World implements WorldInfo {
 	}
 	public Field getMap() {
 		return map;
+	}
+	public DebugStore getDebugStore() {
+		return debugStore;
 	}
 
 }

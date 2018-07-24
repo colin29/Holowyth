@@ -79,6 +79,8 @@ public class Skills {
 		public NovaFlare() {
 			super();
 			name = "Nova Flare";
+			spCost = 10;
+			cooldown = 60;
 		}
 
 		public void pluginTargeting(Unit caster) {
@@ -130,6 +132,8 @@ public class Skills {
 			super();
 			name = "Explosion";
 			casting.castTime = 60;
+			spCost = 10;
+			cooldown = 20;
 		}
 
 		@Override

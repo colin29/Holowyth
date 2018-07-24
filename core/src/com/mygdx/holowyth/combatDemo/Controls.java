@@ -3,6 +3,7 @@ package com.mygdx.holowyth.combatDemo;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -81,7 +82,7 @@ public class Controls extends InputProcessorAdapter {
 
 		labelStyle = new LabelStyle(game.debugFont, Holo.debugFontColor);
 
-		DebugValues debugValues = debugStore.registerComponent("Unit Controls");
+		DebugValues debugValues = debugStore.registerComponent("Controls");
 		debugValues.add("Order Context", () -> getCurrentContextText());
 		
 		debugValues.add("# of units selected", () -> selectedUnits.size());
@@ -91,8 +92,10 @@ public class Controls extends InputProcessorAdapter {
 		// debugValues.add("SelectX2", () -> selectionX2);
 		// debugValues.add("SelectY2", () -> selectionY2);
 
-		functionBindings.bindFunctionToKey(() -> useSkillCommand(), Keys.NUM_1);
-		functionBindings.bindFunctionToKey(() -> useSkill2(), Keys.NUM_2);
+		functionBindings.bindFunctionToKey(() -> useSkillInSlot(1), Keys.NUM_1);
+		functionBindings.bindFunctionToKey(() -> useSkillInSlot(2), Keys.NUM_2);
+		
+		functionBindings.bindFunctionToKey(() -> setSPToMax(), Keys.Q);
 
 	}
 
@@ -100,16 +103,60 @@ public class Controls extends InputProcessorAdapter {
 
 	Skill skillToUse = new Skills.Explosion();
 	Skill curSkill = null;
-
-	private void useSkillCommand() {
-
-		System.out.println("used skill 1");
+	
+	Skill[] skills = new Skill[10];
+	{
+	skills[1] =  new Skills.Explosion();
+	skills[2] = new Skills.NovaFlare();
+	}
+	
+	private void setSPToMax() {
+		for(Unit unit: selectedUnits) {
+			unit.stats.setSp(unit.stats.getMaxSp());
+		}
+	}
+	
+	
+	/**
+	 * Input from 1-9, and 0.
+	 */
+	private void useSkillInSlot(int slotNumber) {
+		
+		if(slotNumber<0 || slotNumber > 9) {
+			return;
+		}
 		
 		if (selectedUnits.size() == 1) {
 			Unit unit = selectedUnits.iterator().next();
 			try {
-				curSkill = (Skill) skillToUse.clone();
-
+				
+				curSkill = (Skill) skills[slotNumber].clone();
+				System.out.println("Using " + curSkill.name);
+				
+				if(unit.areSkillsOnCooldown()) {
+					System.out.println("Skills on cooldown");
+					return;
+				}
+				
+				if(!curSkill.hasEnoughSp(unit)) {
+					System.out.println("not enough sp");
+					return;
+				}
+				
+				switch(curSkill.getTargeting()) {
+				case GROUND:
+					context = Context.SKILL_GROUND;
+					break;
+				case NONE:
+					handleSkillNone();
+					break;
+				case UNIT:
+					break;
+				default:
+					break;
+				
+				}
+				
 				if (curSkill.getTargeting() == Targeting.GROUND) {
 					context = Context.SKILL_GROUND;
 				}
@@ -117,17 +164,51 @@ public class Controls extends InputProcessorAdapter {
 			} catch (CloneNotSupportedException e) {
 				e.printStackTrace();
 			}
-		}
+		}	
 	}
 
-	private void useSkill2() {
-		if (selectedUnits.size() == 1) {
-			curSkill = new Skills.NovaFlare();
-			if (curSkill.getTargeting() == Targeting.NONE) {
-				handleSkillNone();
-			}
-		}
-	}
+//	private void useSkillCommand() {
+//
+//		System.out.println("used skill 1");
+//		
+//		if (selectedUnits.size() == 1) {
+//			Unit unit = selectedUnits.iterator().next();
+//			try {
+//				
+//				curSkill = (Skill) skillToUse.clone();
+//				
+//				if(unit.areSkillsOnCooldown()) {
+//					System.out.println("Skills on cooldown");
+//					return;
+//				}
+//				
+//				if(!curSkill.hasEnoughSp(unit)) {
+//					System.out.println("not enough sp");
+//					return;
+//				}
+//				if (curSkill.getTargeting() == Targeting.GROUND) {
+//					context = Context.SKILL_GROUND;
+//				}
+//
+//			} catch (CloneNotSupportedException e) {
+//				e.printStackTrace();
+//			}
+//		}
+//	}
+//
+//	private void useSkill2() {
+//		if (selectedUnits.size() == 1) {
+//			curSkill = new Skills.NovaFlare();
+//			if(!curSkill.hasEnoughSp(selectedUnits.iterator().next())) {
+//				System.out.println("not enough sp");
+//				return;
+//			}
+//			if (curSkill.getTargeting() == Targeting.NONE) {
+//				handleSkillNone();
+//			}
+//		}
+//	}
+
 
 	@Override
 	public boolean keyDown(int keycode) {

@@ -44,7 +44,7 @@ public class UnitStats implements UnitStatsInfo {
 	int exp;
 
 	float hp;
-	int sp;
+	float sp;
 
 	// Calculated stats
 	private int str, agi, fort, percep; // core stats
@@ -198,7 +198,7 @@ public class UnitStats implements UnitStatsInfo {
 		recalculateStats();
 
 		String s = "";
-		s += String.format("Unit [%s]  hp: %s/%d  sp: %d/%d  <level %d>%n", name, getRoundedHp(), maxHp, sp, maxSp,
+		s += String.format("Unit [%s]  hp: %s/%d  sp: %s/%d  <level %d>%n", name, getRoundedHp(), maxHp, getRoundedSp(), maxSp,
 				level);
 		s += String.format("Core stats: STR %d, AGI %d, FORT %d, PERCEP %d%n", str, agi, fort, percep);
 		s += String.format("Derived stats: Atk %d, Def %d, Force %d, Stab %d, Acc %d, Dodge %d%n", atk, def, force,
@@ -261,6 +261,9 @@ public class UnitStats implements UnitStatsInfo {
 
 	public String getRoundedHp() {
 		return getRoundedString(hp);
+	}
+	public String getRoundedSp() {
+		return getRoundedString(sp);
 	}
 
 	private void addCoreStatBonuses(Item... items) {
@@ -333,7 +336,7 @@ public class UnitStats implements UnitStatsInfo {
 		chanceToHit = Math.min(accChanceCeiling, chanceToHit);
 		chanceToHit = Math.max(accChanceFloor, chanceToHit);
 		if(printDetailedCombatInfo)
-//			System.out.printf(" -Chance to hit: %f %d relative acc %n", chanceToHit, acc - dodge);
+			System.out.printf(" -Chance to be accurate: %f %d relative acc %n", chanceToHit, acc - dodge);
 
 		if (Math.random() > chanceToHit) {
 //			System.out.printf("%s's attack missed %s %n", this.name, enemy.name);
@@ -354,7 +357,7 @@ public class UnitStats implements UnitStatsInfo {
 		chanceToHit = Math.min(atkChanceCeiling, chanceToHit);
 		chanceToHit = Math.max(atkChanceFloor, chanceToHit);
 		if(printDetailedCombatInfo)
-			System.out.printf(" -Chance to be unblocked: %f %d relative acc %n", chanceToHit, atk - def);
+			System.out.printf(" -Chance to land hit: %f %d relative acc %n", chanceToHit, atk - def);
 
 		if (Math.random() > chanceToHit) {
 //			System.out.printf("%s's attack was blocked by %s %n", this.name, enemy.name);
@@ -525,7 +528,7 @@ public class UnitStats implements UnitStatsInfo {
 		return hp;
 	}
 
-	public int getSp() {
+	public float getSp() {
 		return sp;
 	}
 
@@ -542,7 +545,20 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	public float getSpRatio() {
+		if(maxSp == 0) {
+			return 0;	
+		}
 		return (float) sp / maxSp;
+	}
+	
+	public void addSp(float amount) {
+		sp = Math.min(sp+amount, maxSp);
+	}
+	public void subtractSp(float amount) {
+		sp = Math.max(sp-amount, 0);
+	}
+	public void setSp(float value) {
+		sp = Math.min(Math.max(value, 0), maxSp);
 	}
 
 	public int getBaseMaxHp() {

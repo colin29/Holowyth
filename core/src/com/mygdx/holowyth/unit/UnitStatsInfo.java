@@ -5,7 +5,7 @@ import com.mygdx.holowyth.unit.UnitStats.StunState;
 
 public interface UnitStatsInfo {
 	public float getHp();
-	public int getSp();
+	public float getSp();
 
 	public int getMaxHp();
 	public int getMaxSp();

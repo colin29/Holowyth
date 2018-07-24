@@ -25,6 +25,8 @@ import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
+import com.mygdx.holowyth.util.debug.DebugValue;
+import com.mygdx.holowyth.util.debug.DebugValues;
 
 /**
  * 
@@ -69,6 +71,10 @@ public class Unit implements UnitInterPF, UnitInfo {
 	 * A unit's friendly/foe status.
 	 */
 	Side side;
+	
+	// Skills
+	
+	int skillCooldown;
 
 	private WorldInfo world;
 
@@ -110,6 +116,14 @@ public class Unit implements UnitInterPF, UnitInfo {
 		this.world = world;
 
 		this.stats = new UnitStats(this);
+		
+		System.out.println(this.side.toString());
+		if(this.side == Side.PLAYER) {
+			 DebugValues debugValues = this.getWorldMutable().getDebugStore().registerComponent("Player unit");
+			 debugValues.add(new DebugValue("sp", ()->stats.getSp() + "/" + stats.getMaxSp()));
+			 debugValues.add(new DebugValue("skillCooldown", ()->skillCooldown));
+		}
+		
 
 	}
 
@@ -222,6 +236,18 @@ public class Unit implements UnitInterPF, UnitInfo {
 
 		if (activeSkill != null)
 			activeSkill.tick();
+		
+		tickSkillCooldown();
+	}
+	
+	private void tickSkillCooldown() {
+		if(skillCooldown > 0) {
+			skillCooldown -=1;
+		}
+	}
+	
+	public boolean areSkillsOnCooldown() {
+		return skillCooldown > 0;
 	}
 
 	private int attackCooldown = 60;
@@ -536,6 +562,9 @@ public class Unit implements UnitInterPF, UnitInfo {
 
 	public void setActiveSkill(Skill activeSkill) {
 		this.activeSkill = activeSkill;
+	}
+	public void setSkillCooldown(int value) {
+		skillCooldown = value;
 	}
 
 }

@@ -21,6 +21,7 @@ import com.mygdx.holowyth.skill.Skill.Status;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.UnitInfo;
 import com.mygdx.holowyth.unit.UnitStatsInfo;
+import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
@@ -82,24 +83,25 @@ public class Renderer {
 		this.worldCamera = worldCamera;
 		this.stage = stage;
 	}
-	
-/*
- * Methods call should not set projection matrixes (it is assumed to be the world matrix). If they do they should restore the old state
- */
+
+	/*
+	 * Methods call should not set projection matrixes (it is assumed to be the world matrix). If they do they should
+	 * restore the old state
+	 */
 	public void render(float delta) {
 		Gdx.gl.glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT
 				| (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
 		Gdx.gl.glEnable(GL20.GL_BLEND);
-		
+
 		worldCamera.update();
 
 		batch.setProjectionMatrix(worldCamera.combined);
 
-		renderUnitHpBars();
-		
+		renderUnitHpSpBars();
+
 		// 1: Render Map
-		
+
 		if (this.map != null) {
 			renderMapPolygons();
 			// pathingModule.renderExpandedMapPolygons();
@@ -112,7 +114,7 @@ public class Renderer {
 		renderUnitDestinations(Color.GREEN);
 
 		// 3: Render units and selection indicators
-		
+
 		if (unitControls == null) {
 			renderUnits();
 		} else {
@@ -128,42 +130,40 @@ public class Renderer {
 			u.renderAttackingLine(shapeRenderer);
 		}
 
-		
-		
 		// Render effects
-		
+
 		effects.renderDamageEffects();
 		effects.renderBlockEffects(delta);
-		
-		
-
 
 		// UI
 		stage.act(delta);
 		stage.draw();
 
 	}
-	
+
 	public void renderCirclesAroundBusyRetreatingUnits() {
 		for (UnitInfo u : world.units) {
-			if(u.isRetreatCooldownActive()) {
-				Color color = HoloGL.color(30,144,255); 
+			if (u.isRetreatCooldownActive()) {
+				Color color = HoloGL.rbg(30, 144, 255);
 				shapeRenderer.setProjectionMatrix(worldCamera.combined);
 				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, shapeRenderer, color);
 				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 3.25f, shapeRenderer, color);
-				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 4, shapeRenderer, color);	
+				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 4, shapeRenderer, color);
 			}
 		}
 	}
+
 	public void renderCirclesAroundBusyCastingUnits() {
 		for (UnitInfo u : world.units) {
-			if(u.getActiveSkill() == null) continue;
-			if(u.getActiveSkill().getStatus() == Status.CASTING || u.getActiveSkill().getStatus() == Status.CHANNELING) {
-				Color color = HoloGL.color(30,144,255); 
+			if (u.getActiveSkill() == null)
+				continue;
+			if (u.getActiveSkill().getStatus() == Status.CASTING
+					|| u.getActiveSkill().getStatus() == Status.CHANNELING) {
+				Color color = HoloGL.rbg(30, 144, 255);
 				shapeRenderer.setProjectionMatrix(worldCamera.combined);
 				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, shapeRenderer, color);
 				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 3.25f, shapeRenderer, color);
-				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 4, shapeRenderer, color);	
+				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 4, shapeRenderer, color);
 			}
 		}
 	}
@@ -220,11 +220,8 @@ public class Renderer {
 			renderUnitsWithTestSprites();
 		} else {
 
-			
-			
-			
 			for (Unit unit : world.units) {
-				
+
 				shapeRenderer.begin(ShapeType.Filled);
 
 				if (unit.isPlayerCharacter()) {
@@ -233,7 +230,6 @@ public class Renderer {
 					shapeRenderer.setColor(Color.YELLOW);
 				}
 				shapeRenderer.getColor().a = unit.stats.isDead() ? 0.5f : 1;
-			
 
 				shapeRenderer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
 
@@ -290,49 +286,68 @@ public class Renderer {
 	private float hpBarWidthBase = 30;
 	private float hpBarWidthMax = 2 * hpBarWidthBase;
 	private float hpBarWidthMin = 0.5f * hpBarWidthBase;
-	
-	
-	private void renderUnitHpBars() {
-		
-		final float hpBarVertSpacing = 5;
+
+	private Color spBarColor = HoloGL.rbg(204, 224, 255);
+
+	private void renderUnitHpSpBars() {
+
+		final float hpBarVertSpacing = 5; // space between the bottom of the unit and the top of the hpbar
 		final float hpBarHeight = 4;
-		
+		final float spBarHeight = 3f;
+
 		shapeRenderer.setProjectionMatrix(worldCamera.combined);
-		
-		
+
 		for (UnitInfo unit : world.units) {
-			
+
 			UnitStatsInfo unitStats = unit.getStats();
 			float maxHp = unitStats.getMaxHp();
 			float hpRatio = unitStats.getHpRatio();
-			
+			float spRatio = unitStats.getSpRatio();
+
 			float hpBarWidth = (float) Math.sqrt((maxHp / 100)) * hpBarWidthBase;
 			hpBarWidth = Math.max(hpBarWidth, hpBarWidthMin);
 			hpBarWidth = Math.min(hpBarWidth, hpBarWidthMax);
-			
-			
-			float x = unit.getX() - hpBarWidth/2;
+
+			float x = unit.getX() - hpBarWidth / 2;
 			float y = unit.getY() - unit.getRadius() - hpBarHeight - hpBarVertSpacing;
-			
-			
+
 			// Draw the hp bar
 
 			shapeRenderer.begin(ShapeType.Filled);
 			shapeRenderer.setColor(Color.RED);
-			
-			shapeRenderer.rect(x, y, hpBarWidth * hpRatio, hpBarHeight);
+
+			shapeRenderer.rect(x, y, hpBarWidth * hpRatio, hpBarHeight); // draws from bottom left corner.
 			shapeRenderer.end();
-			
-			
+
 			shapeRenderer.begin(ShapeType.Line);
 			shapeRenderer.setColor(Color.BLACK);
-						
+
 			shapeRenderer.rect(x, y, hpBarWidth, hpBarHeight);
-			
+
 			shapeRenderer.end();
+
+			float sX = x;
+			float sY = y - spBarHeight;
+
+			// Draw the sp bar
 			
+			
+			if(unit.getSide() == Side.PLAYER) {
+				shapeRenderer.begin(ShapeType.Filled);
+				shapeRenderer.setColor(spBarColor);
+
+				shapeRenderer.rect(sX, sY, hpBarWidth * spRatio, spBarHeight); // draws from bottom left corner.
+				shapeRenderer.end();
+
+				shapeRenderer.begin(ShapeType.Line);
+				shapeRenderer.setColor(Color.BLACK);
+
+				shapeRenderer.rect(sX, sY, hpBarWidth, spBarHeight);
+
+				shapeRenderer.end();
+			}
 		}
-		
+
 	}
 
 	public void setUnitControls(Controls unitControls) {

@@ -29,7 +29,9 @@ import com.mygdx.holowyth.unit.Unit;
 public class Skill implements Cloneable, SkillInfo {
 
 	public float cooldown; // in game frames
+	
 	public int spCost;
+	
 
 	public String name = "Skill name";
 
@@ -100,6 +102,21 @@ public class Skill implements Cloneable, SkillInfo {
 		if (status == Status.CASTING) {
 			casting.tick();
 			if (casting.isComplete()) {
+				
+				// Check that sp is sufficient, if not, abort.
+				
+				// Calculate actual sp cost here
+				
+				if(!hasEnoughSp()) {
+					status = Status.DONE;
+					return;
+				}else {
+					caster.stats.subtractSp(spCost);
+				}
+				
+				// update cooldown
+				caster.setSkillCooldown(Math.round(cooldown));
+				
 				if (hasChannelingBehaviour) {
 					status = Status.CHANNELING;
 				} else {
@@ -130,8 +147,17 @@ public class Skill implements Cloneable, SkillInfo {
 		}
 
 	}
+	
+	private boolean hasEnoughSp() {
+		return hasEnoughSp(caster);
+	}
+	public boolean hasEnoughSp(Unit unit) {
+		return unit.stats.getSp() >= spCost;
+	}
 
 	private void onFinishCasting() {
+		
+		
 		// Start all effects
 		for (Effect effect : effects) {
 			effect.begin();

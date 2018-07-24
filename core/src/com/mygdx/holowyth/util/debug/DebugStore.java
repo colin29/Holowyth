@@ -15,6 +15,7 @@ public class DebugStore {
 			System.out.printf("Warning: Duplicate component registered%s%n", name);
 			return store.get(name);
 		}else {
+			
 			DebugValues a = new DebugValues();
 			store.put(name, a);
 			return a;

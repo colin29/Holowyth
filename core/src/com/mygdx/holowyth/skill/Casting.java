@@ -23,8 +23,6 @@ public class Casting implements Cloneable {
 	}
 	
 	public void begin(Unit caste) {
-		System.out.println("Casting started");
-		
 		
 		this.castTimeRemaining = castTime;
 		onBeginCast();

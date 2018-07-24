@@ -64,10 +64,10 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	World world;
 
 	// Appearance
-	Color initialClearColor = HoloGL.color(255, 236, 179);
+	Color initialClearColor = HoloGL.rbg(255, 236, 179);
 	{
 		// initialClearColor = Color.FOREST;
-		initialClearColor = HoloGL.color(79, 121, 66);
+		initialClearColor = HoloGL.rbg(79, 121, 66);
 	}
 
 	// Misc.
@@ -230,7 +230,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		unitControls = new Controls(game, camera, fixedCam, world.units, debugStore, world);
 		multiplexer.addProcessor(unitControls);
 
-		populateDebugTable();
+		
 
 		// Set Renderer to render world and other map-lifetime components
 		renderer.setWorld(world);
@@ -251,6 +251,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		world.spawnSomeEnemyUnits();
 
 		// playerUnit.orderMove(CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
+		populateDebugTable();
 
 	}
 
