@@ -17,7 +17,9 @@ import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skill.Status;
+import com.mygdx.holowyth.skill.SkillInfo;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.UnitInfo;
 import com.mygdx.holowyth.unit.UnitStatsInfo;
@@ -99,6 +101,7 @@ public class Renderer {
 		batch.setProjectionMatrix(worldCamera.combined);
 
 		renderUnitHpSpBars();
+		renderCastingBars();
 
 		// 1: Render Map
 
@@ -330,9 +333,8 @@ public class Renderer {
 			float sY = y - spBarHeight;
 
 			// Draw the sp bar
-			
-			
-			if(unit.getSide() == Side.PLAYER) {
+
+			if (unit.getSide() == Side.PLAYER) {
 				shapeRenderer.begin(ShapeType.Filled);
 				shapeRenderer.setColor(spBarColor);
 
@@ -348,6 +350,39 @@ public class Renderer {
 			}
 		}
 
+	}
+
+	private Color castBarColor = HoloGL.rbg(204, 224, 255);
+
+	public void renderCastingBars() {
+
+		for (UnitInfo unit : world.units) {
+
+			SkillInfo skill = unit.getActiveSkill();
+			if(skill != null && skill.getStatus() == Status.CASTING) {
+			final float castBarVertSpacing = 8; // space between the bottom of the unit and the top of the hpbar
+			final float castBarHeight = 4;
+			final float castBarWidth = 30;
+
+			float x = unit.getX() - castBarWidth / 2;
+			float y = unit.getY() + unit.getRadius() + castBarVertSpacing;
+
+			// Draw the hp bar
+
+			shapeRenderer.begin(ShapeType.Filled);
+			shapeRenderer.setColor(castBarColor);
+
+			shapeRenderer.rect(x, y, castBarWidth * skill.getCasting().getProgress(), castBarHeight); // draws from bottom left corner.
+			shapeRenderer.end();
+
+			shapeRenderer.begin(ShapeType.Line);
+			shapeRenderer.setColor(Color.BLACK);
+
+			shapeRenderer.rect(x, y, castBarWidth, castBarHeight);
+
+			shapeRenderer.end();
+			}
+		}
 	}
 
 	public void setUnitControls(Controls unitControls) {

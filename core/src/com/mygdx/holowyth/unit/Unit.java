@@ -96,11 +96,6 @@ public class Unit implements UnitInterPF, UnitInfo {
 	 */
 	private Skill activeSkill;
 
-	public void useSkill(Skill skill) {
-		activeSkill = skill;
-		skill.begin(this);
-	}
-
 	public Unit(float x, float y, WorldInfo world, Side side) {
 		this.ID = Unit.getNextId();
 		this.x = x;
@@ -207,6 +202,19 @@ public class Unit implements UnitInterPF, UnitInfo {
 		clearOrder();
 	}
 	
+	public void orderUseSkill(Skill skill) {
+		
+		if(!isUseSkillAllowed()) {
+			return;
+		}
+		if(!skill.hasEnoughSp(this)) {
+			return;
+		}
+		
+		activeSkill = skill;
+		skill.begin(this);
+	}
+
 	/**
 	 * Stops a unit's motion and halts any current orders. Unlike orderStop, is not affected by order restrictions.
 	 */
@@ -221,6 +229,15 @@ public class Unit implements UnitInterPF, UnitInfo {
 	void clearOrder() {
 		currentOrder = Order.IDLE;
 		target = null;
+	}
+	
+	/**
+	 * Caused by normal attacking or stun effects. Interrupts any casting or channeling spell
+	 */
+	public void interrupt() {
+		if(isCasting() || isChannelling()) {
+			activeSkill.interrupt();
+		}
 	}
 
 	// Combat
@@ -247,7 +264,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 	}
 	
 	public boolean areSkillsOnCooldown() {
-		return skillCooldown > 0;
+		return (skillCooldown > 0);
 	}
 
 	private int attackCooldown = 60;
@@ -369,6 +386,12 @@ public class Unit implements UnitInterPF, UnitInfo {
 		return !stats.isDead()
 				&& !isRetreatCooldownActive()
 				&& !(isCasting() || isChannelling());
+	}
+	private boolean isUseSkillAllowed() {
+		return !stats.isDead()
+				&& !isRetreatCooldownActive()
+				&& !(isCasting() || isChannelling())
+				&& !areSkillsOnCooldown();
 	}
 	
 	public boolean isCasting() {

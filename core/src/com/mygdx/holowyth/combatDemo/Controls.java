@@ -107,7 +107,8 @@ public class Controls extends InputProcessorAdapter {
 	Skill[] skills = new Skill[10];
 	{
 	skills[1] =  new Skills.Explosion();
-	skills[2] = new Skills.NovaFlare();
+	skills[2] = new Skills.ExplosionLongCast();
+	skills[3] = new Skills.NovaFlare();
 	}
 	
 	private void setSPToMax() {
@@ -134,7 +135,7 @@ public class Controls extends InputProcessorAdapter {
 				System.out.println("Using " + curSkill.name);
 				
 				if(unit.areSkillsOnCooldown()) {
-					System.out.println("Skills on cooldown");
+					System.out.println(unit.stats.getName() + ": Skills are on cooldown");
 					return;
 				}
 				
@@ -166,48 +167,6 @@ public class Controls extends InputProcessorAdapter {
 			}
 		}	
 	}
-
-//	private void useSkillCommand() {
-//
-//		System.out.println("used skill 1");
-//		
-//		if (selectedUnits.size() == 1) {
-//			Unit unit = selectedUnits.iterator().next();
-//			try {
-//				
-//				curSkill = (Skill) skillToUse.clone();
-//				
-//				if(unit.areSkillsOnCooldown()) {
-//					System.out.println("Skills on cooldown");
-//					return;
-//				}
-//				
-//				if(!curSkill.hasEnoughSp(unit)) {
-//					System.out.println("not enough sp");
-//					return;
-//				}
-//				if (curSkill.getTargeting() == Targeting.GROUND) {
-//					context = Context.SKILL_GROUND;
-//				}
-//
-//			} catch (CloneNotSupportedException e) {
-//				e.printStackTrace();
-//			}
-//		}
-//	}
-//
-//	private void useSkill2() {
-//		if (selectedUnits.size() == 1) {
-//			curSkill = new Skills.NovaFlare();
-//			if(!curSkill.hasEnoughSp(selectedUnits.iterator().next())) {
-//				System.out.println("not enough sp");
-//				return;
-//			}
-//			if (curSkill.getTargeting() == Targeting.NONE) {
-//				handleSkillNone();
-//			}
-//		}
-//	}
 
 
 	@Override
@@ -281,7 +240,7 @@ public class Controls extends InputProcessorAdapter {
 		GroundSkill c = (GroundSkill) this.curSkill;
 		Unit caster = selectedUnits.iterator().next();
 		c.pluginTargeting(caster, x, y);
-		caster.useSkill(c);
+		caster.orderUseSkill(c);
 		clearContext();
 	}
 
@@ -293,7 +252,7 @@ public class Controls extends InputProcessorAdapter {
 		NoneSkill c = (NoneSkill) this.curSkill;
 		Unit caster = selectedUnits.iterator().next();
 		c.pluginTargeting(caster);
-		caster.useSkill(c);
+		caster.orderUseSkill(c);
 		clearContext();
 	}
 
@@ -579,7 +538,7 @@ public class Controls extends InputProcessorAdapter {
 	 * Is called immediately after a modifiying action, if that action actually changed the set.
 	 */
 	private void onSelectedUnitsModified() {
-		System.out.println("selectedUnits modified");
+//		System.out.println("selectedUnits modified");
 		if(context == Context.SKILL_GROUND || context == Context.SKILL_UNIT) {
 			context = Context.NONE;
 		}

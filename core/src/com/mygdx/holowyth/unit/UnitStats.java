@@ -383,7 +383,9 @@ public class UnitStats implements UnitStatsInfo {
 		// 5. Apply damage
 //		System.out.printf("%s's attack hit and did %s damage to %s%n", this.name, DataUtil.getRoundedString(damage), enemy.name);
 
-		enemy.applyDamage(damage);
+		if(enemy.applyDamage(damage) > 0) {
+			enemy.self.interrupt();
+		}
 	}
 	
 	private int getBeingAttackedByMultipleEnemiesDefPenalty(UnitStats unit) {
@@ -648,5 +650,4 @@ public class UnitStats implements UnitStatsInfo {
 	public void setName(String name) {
 		this.name = name;
 	}
-
 }

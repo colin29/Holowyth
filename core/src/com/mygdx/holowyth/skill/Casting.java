@@ -9,7 +9,7 @@ import com.mygdx.holowyth.unit.Unit;
  * @author Colin Ta
  *
  */
-public class Casting implements Cloneable {
+public class Casting implements Cloneable, CastingInfo {
 	
 	float castTime = 0; //by default, cast time of 0
 	float castTimeRemaining;
@@ -38,6 +38,18 @@ public class Casting implements Cloneable {
 	
 	public boolean isComplete() {
 		return completed;
+	}
+	// Get the progress of this casting
+	/**
+	 * 
+	 * @return current progress, from 0 to 1
+	 */
+	public float getProgress() {
+		if(completed)
+			return 1;
+		if(castTime == 0)
+			return 1;
+		return (castTime-castTimeRemaining) / castTime;
 	}
 	
 	protected void onInterrupt() {

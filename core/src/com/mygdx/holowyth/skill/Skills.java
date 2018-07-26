@@ -141,5 +141,20 @@ public class Skills {
 			setEffect(new ArrayList<UnitEffect>(Arrays.asList(new ExplosionEffect(caster, x, y))));
 		}
 	}
+	
+	public static class ExplosionLongCast extends GroundSkill {
+		public ExplosionLongCast() {
+			super();
+			name = "Explosion";
+			casting.castTime = 200;
+			spCost = 10;
+			cooldown = 20;
+		}
+
+		@Override
+		public void pluginTargeting(Unit caster, float x, float y) {
+			setEffect(new ArrayList<UnitEffect>(Arrays.asList(new ExplosionEffect(caster, x, y))));
+		}
+	}
 
 }

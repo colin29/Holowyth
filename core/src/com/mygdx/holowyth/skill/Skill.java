@@ -147,6 +147,19 @@ public class Skill implements Cloneable, SkillInfo {
 		}
 
 	}
+	public void interrupt() {
+		System.out.println("Interrupted: " + this.name);
+		status = Status.DONE;
+		caster.setActiveSkill(null);
+		if(status == Status.CASTING) {
+			casting.onInterrupt();
+		}
+		if(status == Status.CHANNELING) {
+			this.onChannellingInterrupt();
+		}
+	}
+	public void onChannellingInterrupt() {
+	}
 	
 	private boolean hasEnoughSp() {
 		return hasEnoughSp(caster);
@@ -185,6 +198,11 @@ public class Skill implements Cloneable, SkillInfo {
 		Skill newInstance = (Skill) super.clone();
 		newInstance.casting = (Casting) this.casting.clone();
 		return newInstance;
+	}
+
+	@Override
+	public CastingInfo getCasting() {
+		return casting;
 	}
 
 }
