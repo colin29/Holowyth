@@ -17,16 +17,15 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.combatDemo.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.debug.DebugStore;
@@ -37,8 +36,8 @@ import com.mygdx.holowyth.util.template.DemoScreen;
 import com.mygdx.holowyth.util.tools.Timer;
 
 /**
- * Is responsible for the startup construction of the UI, and setting up the other components on both creation and map
- * load
+ * Is responsible for the startup construction of the UI, and setting up the
+ * other components on both creation and map load
  * 
  * @author Colin Ta
  *
@@ -117,7 +116,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		renderCursor();
 
 		// update debug display
-		valueLabelMapping.forEach(CombatDemo::updateLabel);
+		updateDebugValueDisplay();
 
 		// Game logic
 		timer.start(1000 / 60);
@@ -175,7 +174,8 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		// root.add(new TextButton("test", skin));
 		stage.addActor(parameterWindow);
-		// HoloUI.parameterSlider(0, Holo.defaultUnitMoveSpeed, "initialMoveSpeed", testing, skin,
+		// HoloUI.parameterSlider(0, Holo.defaultUnitMoveSpeed,
+		// "initialMoveSpeed", testing, skin,
 		// (Float f) -> playerUnit.initialMoveSpeed = f);
 		parameterWindow.pack();
 	}
@@ -230,8 +230,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		unitControls = new Controls(game, camera, fixedCam, world.units, debugStore, world);
 		multiplexer.addProcessor(unitControls);
 
-		
-
 		// Set Renderer to render world and other map-lifetime components
 		renderer.setWorld(world);
 		renderer.setUnitControls(unitControls);
@@ -240,24 +238,19 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		/* Test Area */
 
 		// Create test units
-		playerUnit = world.spawnUnit(320, 220, Unit.Side.PLAYER, "Elvin");
-		PresetUnits.loadUnitStats(playerUnit.stats);
-		PresetUnits.loadSomeEquipment(playerUnit.stats);
-		PresetUnits.loadArmor(playerUnit.stats);
-		playerUnit.stats.prepareUnit();
-		playerUnit.stats.printInfo();
-
+		playerUnit = world.createPlayerUnit();
 		unitControls.selectedUnits.add(playerUnit);
 		world.spawnSomeEnemyUnits();
 
 		// playerUnit.orderMove(CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
-		populateDebugTable();
+		populateDebugValueDisplay();
 
 	}
 
-	ValueLabelMapping valueLabelMapping = new ValueLabelMapping();
+	ValueLabelMapping valueLabelMapping;
 
-	private void populateDebugTable() {
+	private void populateDebugValueDisplay() {
+		valueLabelMapping = new ValueLabelMapping();
 
 		LabelStyle debugStyle = new LabelStyle(game.debugFont, Holo.debugFontColor);
 
@@ -274,6 +267,12 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 				debugInfo.row();
 				valueLabelMapping.registerLabel(v, l);
 			}
+		}
+	}
+
+	private void updateDebugValueDisplay() {
+		if (valueLabelMapping != null) {
+			valueLabelMapping.forEach(CombatDemo::updateLabel);
 		}
 	}
 
@@ -301,7 +300,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		}
 
 		l.setText(str);
-		// System.out.println("Updated value: -" + v.name + " " + str);
 	}
 
 	@Override
@@ -343,6 +341,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		updateMouseCoordLabel(screenX, screenY);
 		return false;
 	}
+
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 		updateMouseCoordLabel(screenX, screenY);

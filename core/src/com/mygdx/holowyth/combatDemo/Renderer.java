@@ -17,13 +17,13 @@ import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skill.Status;
 import com.mygdx.holowyth.skill.SkillInfo;
 import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.unit.UnitInfo;
-import com.mygdx.holowyth.unit.UnitStatsInfo;
 import com.mygdx.holowyth.unit.Unit.Side;
+import com.mygdx.holowyth.unit.UnitInfo;
+import com.mygdx.holowyth.unit.UnitMotion;
+import com.mygdx.holowyth.unit.UnitStatsInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
@@ -77,6 +77,7 @@ public class Renderer {
 	 *            // May be null;
 	 */
 	public Renderer(Holowyth game, Camera worldCamera, Stage stage, PathingModule pathingModule) {
+
 		batch = game.batch;
 		shapeRenderer = game.shapeRenderer;
 
@@ -84,6 +85,7 @@ public class Renderer {
 
 		this.worldCamera = worldCamera;
 		this.stage = stage;
+		this.pathingModule = pathingModule;
 	}
 
 	/*
@@ -128,10 +130,13 @@ public class Renderer {
 			renderCirclesAroundBusyRetreatingUnits();
 			renderCirclesAroundBusyCastingUnits();
 		}
+		renderPaths(false); // temp, delete this after use
+		renderPlayerUnreachedWaypoints(Color.FIREBRICK);
 
 		for (Unit u : world.units) {
-			u.renderAttackingLine(shapeRenderer);
+			u.renderAttackingArrow(shapeRenderer);
 		}
+		renderPlayerVelocity();
 
 		// Render effects
 
@@ -191,6 +196,36 @@ public class Renderer {
 			u.motion.renderNextWayPoint(shapeRenderer);
 		}
 
+	}
+
+	private void renderPlayerUnreachedWaypoints(Color color) {
+		for (Unit unit : world.units) {
+			if (unit.isPlayerCharacter() && unit.motion.path != null) {
+				Path path = unit.motion.getPath();
+				for (int i = unit.motion.getWayPointIndex(); i < path.size(); i++) {
+					Point waypoint = path.get(i);
+					shapeRenderer.begin(ShapeType.Filled);
+					shapeRenderer.setColor(color);
+					shapeRenderer.circle(waypoint.x, waypoint.y, 4f);
+					shapeRenderer.end();
+
+					shapeRenderer.begin(ShapeType.Line);
+					shapeRenderer.setColor(Color.BLACK);
+					shapeRenderer.circle(waypoint.x, waypoint.y, 4f);
+					shapeRenderer.end();
+				}
+			}
+		}
+	}
+
+	private void renderPlayerVelocity() {
+		for (Unit u : world.units) {
+			if (u.isPlayerCharacter() && u.motion.getVelocity() > 0.01f) {
+				UnitMotion m = u.motion;
+				float scale = 15; // enlargen the velocity so we can see it
+				HoloGL.renderArrow(u.getPos(), u.getPos().add(m.vx * scale, m.vy * scale), Color.GREEN, shapeRenderer);
+			}
+		}
 	}
 
 	private void renderUnitDestinations(Color color) {
@@ -359,28 +394,31 @@ public class Renderer {
 		for (UnitInfo unit : world.units) {
 
 			SkillInfo skill = unit.getActiveSkill();
-			if(skill != null && skill.getStatus() == Status.CASTING) {
-			final float castBarVertSpacing = 8; // space between the bottom of the unit and the top of the hpbar
-			final float castBarHeight = 4;
-			final float castBarWidth = 30;
+			if (skill != null && skill.getStatus() == Status.CASTING) {
+				final float castBarVertSpacing = 8; // space between the bottom of the unit and the top of the hpbar
+				final float castBarHeight = 4;
+				final float castBarWidth = 30;
 
-			float x = unit.getX() - castBarWidth / 2;
-			float y = unit.getY() + unit.getRadius() + castBarVertSpacing;
+				float x = unit.getX() - castBarWidth / 2;
+				float y = unit.getY() + unit.getRadius() + castBarVertSpacing;
 
-			// Draw the hp bar
+				// Draw the hp bar
 
-			shapeRenderer.begin(ShapeType.Filled);
-			shapeRenderer.setColor(castBarColor);
+				shapeRenderer.begin(ShapeType.Filled);
+				shapeRenderer.setColor(castBarColor);
 
-			shapeRenderer.rect(x, y, castBarWidth * skill.getCasting().getProgress(), castBarHeight); // draws from bottom left corner.
-			shapeRenderer.end();
+				shapeRenderer.rect(x, y, castBarWidth * skill.getCasting().getProgress(), castBarHeight); // draws from
+																											// bottom
+																											// left
+																											// corner.
+				shapeRenderer.end();
 
-			shapeRenderer.begin(ShapeType.Line);
-			shapeRenderer.setColor(Color.BLACK);
+				shapeRenderer.begin(ShapeType.Line);
+				shapeRenderer.setColor(Color.BLACK);
 
-			shapeRenderer.rect(x, y, castBarWidth, castBarHeight);
+				shapeRenderer.rect(x, y, castBarWidth, castBarHeight);
 
-			shapeRenderer.end();
+				shapeRenderer.end();
 			}
 		}
 	}

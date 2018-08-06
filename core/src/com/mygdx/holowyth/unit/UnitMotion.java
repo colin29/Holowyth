@@ -9,9 +9,12 @@ import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit.Order;
+import com.mygdx.holowyth.unit.Unit.Side;
+import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.util.debug.DebugValues;
 
 public class UnitMotion {
 
@@ -21,18 +24,24 @@ public class UnitMotion {
 	private int framesUntilAttackRepath = attackPathfindingInterval;
 
 	// Movement
-	public float vx, vy;
-	public float speed = Holo.defaultUnitMoveSpeed;
-	public float curSpeed;
-	public float linearAccelRate = 0.08f;
-	public float factorAccel = 0.01f;
-	public float initialMoveSpeed = Holo.defaultUnitMoveSpeed; // 0.32f;
 
-	public float quadAccelNormSpeed = 1f;
-	public float quadraticAccelRate = 0.02f;
-	public float maxAccelFactor = 5;
+	private static float defaultUnitMoveSpeed = Holo.defaultUnitMoveSpeed;
+
+	public float vx, vy;
+	private float speed = Holo.defaultUnitMoveSpeed;
+	public float curSpeed;
+
+	// These are the default values. They can be changed later at will.
+
+	private static float defaultStartingSpeed = Holo.defaultUnitMoveSpeed * 0.4f;
+	private float startingSpeed = defaultStartingSpeed;
+
+	private static float defaultQuadraticAccelRate = 0.01f;
+	public float quadAccelRate = 0.01f;
+	private float maxAccelFactor = 5;
+
 	public Path path;
-	
+
 	int waypointIndex;
 
 	Unit self;
@@ -41,6 +50,7 @@ public class UnitMotion {
 
 	/**
 	 * This class merely sets unit velocities, it is up to the World class to accept/resolve movements
+	 * 
 	 * @param self
 	 * @param world
 	 */
@@ -48,7 +58,16 @@ public class UnitMotion {
 		this.self = self;
 		units = world.getUnits();
 		pathing = world.getPathingModule();
-		
+
+		if (self.side == Side.PLAYER) {
+
+			System.out.println(self.getWorldMutable().getDebugStore());
+
+			DebugValues debugValues = self.getWorldMutable().getDebugStore().registerComponent("Player unit Motion");
+			// debugValues.add("vx, )
+			debugValues.add("Distance to decel", () -> DataUtil.getRoundedString(distanceToDecel));
+			debugValues.add("Distance to nextWayPoint", () -> DataUtil.getRoundedString(getDistanceToNextWayPoint()));
+		}
 	}
 
 	public void tick() {
@@ -57,10 +76,11 @@ public class UnitMotion {
 	}
 
 	public void pathForAttackingUnit() {
-		// find path as normal, except for pathing ignore the target's collision body
+		// find path as normal, except for pathing ignore the target's collision
+		// body
 		ArrayList<Unit> someUnits = new ArrayList<Unit>(units);
 		someUnits.remove(self.target);
-	
+
 		Path path = pathing.findPathForUnit(self, self.target.x, self.target.y, someUnits);
 		if (path != null) {
 			this.setPath(path);
@@ -86,7 +106,9 @@ public class UnitMotion {
 		clearPath();
 	}
 
-	/** Repath regularly if unit is ordered to attack but is not attacking yet */
+	/**
+	 * Repath regularly if unit is ordered to attack but is not attacking yet
+	 */
 	private void handleRepathing() {
 		if (self.currentOrder == Order.ATTACKUNIT && self.attacking == null) {
 			framesUntilAttackRepath -= 1;
@@ -124,31 +146,33 @@ public class UnitMotion {
 	}
 
 	private void determineMovementForMoveOrder() {
-		
+
 		if (path != null) {
-			// Apply acceleration if the unit is not already at full speed
+			// Apply acceleration if the unit is not already at full speed.
+			// Acceleration is proportional to the current speed of the unit,
+			// but is capped at maxAccelFactor times the base rate.
 			if (curSpeed < speed && !isDecelerating) {
-				curSpeed = Math.min(curSpeed + Math.min(quadraticAccelRate * quadAccelNormSpeed / curSpeed,
-						quadraticAccelRate * maxAccelFactor), speed);
-				// curSpeed = Math.min(curSpeed + (speed-curSpeed)*factorAccel, speed);
+				curSpeed = Math.min(curSpeed + Math.min(quadAccelRate / curSpeed,
+						quadAccelRate * maxAccelFactor), speed);
+				// curSpeed = Math.min(curSpeed + (speed-curSpeed)*factorAccel,
+				// speed);
 			}
 
 			// System.out.println("CurSpeed: " + curSpeed);
 
 			Point curWaypoint = path.get(waypointIndex);
 
+			float dist = getDistanceToNextWayPoint();
+
 			float wx = curWaypoint.x;
 			float wy = curWaypoint.y;
-
 			float dx = wx - self.x;
 			float dy = wy - self.y;
-
-			float dist = (float) Math.sqrt(dx * dx + dy * dy);
 
 			// Apply deceleration if the unit is approaching the final goal
 
 			if (waypointIndex == path.size() - 1) {
-				curSpeed = calculateSpeedApproachingGoal(dist);
+				curSpeed = getSpeedApproachingGoal(dist);
 			}
 
 			// Check if reached waypoint
@@ -179,11 +203,32 @@ public class UnitMotion {
 		}
 	}
 
+	/**
+	 * 
+	 * @return distance to nextWayPoint if path is active, otherwise -1
+	 */
+	private float getDistanceToNextWayPoint() {
+		if (path != null) {
+			Point curWaypoint = path.get(waypointIndex);
+			float wx = curWaypoint.x;
+			float wy = curWaypoint.y;
+
+			float dx = wx - self.x;
+			float dy = wy - self.y;
+
+			return (float) Math.sqrt(dx * dx + dy * dy);
+		} else {
+			return -1;
+		}
+	}
+
 	private void determineMovementForAttackOrder() {
 		if (path != null) {
 			determineMovementForMoveOrder();
+			// TODO:
 			// Can add extra code this so that units don't enter too deeply into the engage range. The math is simple
 			// but the fact that the units can't be aware of the other's movement makes it non-trivial
+
 		}
 	}
 
@@ -192,11 +237,13 @@ public class UnitMotion {
 	/**
 	 * When a unit is given a move command that is in a similar direction then it is already travelling, it doesn't need
 	 * to slow down
+	 * 
+	 * Looks at the unit's current speed and next waypoint.
 	 */
-	private float calculateInitialMoveSpeed() {
+	private float getInitialSpeed() {
 
-		if (curSpeed < initialMoveSpeed || curSpeed < 0.001) {
-			return initialMoveSpeed;
+		if (curSpeed < startingSpeed || curSpeed < 0.001) {
+			return startingSpeed;
 		}
 
 		Point waypoint = path.get(1);
@@ -204,55 +251,58 @@ public class UnitMotion {
 		Vector2 p = new Vector2(waypoint.x - self.x, waypoint.y - self.y);
 
 		if (p.len2() < 0.001) {
-			return initialMoveSpeed;
+			return startingSpeed;
 		}
 
 		v.nor();
 		p.nor();
 		float cross = v.dot(p);
 
-		float s = Math.min(initialMoveSpeed + curSpeed * cross, curSpeed);
-		s = Math.max(s, initialMoveSpeed);
+		float s = Math.min(startingSpeed + curSpeed * cross, curSpeed);
+		s = Math.max(s, startingSpeed);
 		// System.out.println("initial move speed: " + s);
 
 		return s;
 
 	}
 
-	public float targetFinalSpeed = 0.2f;// speed/2f; // speed we want the unit to reach the goal with.
+	private static float defaultTargetFinalSpeed = 0.2f;
+	private float targetFinalSpeed = defaultTargetFinalSpeed; // speed we want the unit to reach the goal with.
+
 	public float linearDecelRate = 0.01f;
-	public float quadDecelRate = 0.02f;
-	private float quadDecelNormSpeed = 1f; // means that something at this speed should decel at the listed rate
-	private int delay = 0;
 
-	boolean isDecelerating = false;
+	private static float defaultQuadraticDecelRate = 0.02f;
+	public float quadDecelRate = defaultQuadraticDecelRate;
 
-	boolean useQuadraticDecel = true;
+	private int linearDecelEndTime = 0; // produces time on the end where the unit is moving at minimum speed
+	private boolean isDecelerating = false;
+	private static final boolean useQuadraticDecel = true;
+
+	private float distanceToDecel;
 
 	/**
 	 * Is called to determine when to decelerate when the unit arrives at the goal.
 	 * 
 	 * @return
 	 */
-	private float calculateSpeedApproachingGoal(float distanceToGoal) {
+	private float getSpeedApproachingGoal(float distanceToGoal) {
 
 		if (curSpeed <= targetFinalSpeed) {
 			return curSpeed;
 		}
 		float timeToDecel = 0;
-		float distanceToDecel = 0;
+		distanceToDecel = 0;
 		float dSpeed = 0; // is negative
 
 		if (useQuadraticDecel) {
 			// sum up distance required to achieve desired speed
-			for (float s = curSpeed; s > targetFinalSpeed; s -= quadDecelRate * (quadDecelNormSpeed / s)) {
-				distanceToDecel += s - quadDecelRate * (quadDecelNormSpeed / s);
-				//
+			for (float s = curSpeed; s > targetFinalSpeed; s -= quadDecelRate * (1 / s)) {
+				distanceToDecel += s - quadDecelRate / s;
 			}
-			dSpeed = -1 * quadDecelRate * (quadDecelNormSpeed) / curSpeed;
+			dSpeed = -1 * quadDecelRate * curSpeed;
 
 		} else { // use linear deceleration
-			timeToDecel = (curSpeed - targetFinalSpeed) / linearDecelRate + delay; // in frames
+			timeToDecel = (curSpeed - targetFinalSpeed) / linearDecelRate + linearDecelEndTime; // in frames
 			distanceToDecel = (curSpeed + targetFinalSpeed) / 2f * timeToDecel;
 			dSpeed = -linearDecelRate;
 		}
@@ -268,15 +318,15 @@ public class UnitMotion {
 
 		return curSpeed;
 	}
-	
-	
+
 	/**
-	 * @param path should not be null
+	 * @param path
+	 *            should not be null
 	 */
 	private void setPath(Path path) {
 		this.path = path;
 		waypointIndex = 0;
-		curSpeed = calculateInitialMoveSpeed();
+		curSpeed = getInitialSpeed();
 		isDecelerating = false;
 	}
 
@@ -286,7 +336,7 @@ public class UnitMotion {
 		vx = 0;
 		vy = 0;
 	}
-	
+
 	public void renderNextWayPoint(ShapeRenderer shapeRenderer) {
 		if (path != null) {
 			Point p = path.get(waypointIndex);
@@ -296,6 +346,61 @@ public class UnitMotion {
 
 	public Path getPath() {
 		return this.path;
+	}
+
+	/**
+	 * Also scales accel proportionately to speed
+	 * 
+	 * @param speed
+	 */
+	public void setSpeed(float speed) {
+		this.speed = speed;
+		this.quadAccelRate = defaultQuadraticAccelRate * (speed / defaultUnitMoveSpeed);
+		this.quadDecelRate = defaultQuadraticDecelRate * (speed / defaultUnitMoveSpeed);
+
+		this.startingSpeed = defaultStartingSpeed * (speed / defaultUnitMoveSpeed);
+		this.targetFinalSpeed = defaultTargetFinalSpeed * (float) Math.pow((speed / defaultUnitMoveSpeed), 1.4);
+
+	}
+
+	/**
+	 * Returns the velocity, which is the actual speed the unit is trying to travel. Contrast to "speed", which is how
+	 * fast the unit can move
+	 * 
+	 * @return
+	 */
+	public float getVelocity() {
+		return (float) Math.sqrt(vx * vx + vy * vy);
+	}
+
+	/**
+	 * Called by world when the pathing unit fails to make progress (even with the push out algorithm). Generally this
+	 * will make the unit repath/ reattack
+	 * 
+	 * @return
+	 */
+	public void onBlocked() {
+		System.out.println("onBlocked called");
+		switch (self.currentOrder) {
+		case MOVE:
+			orderMove(getDest().x, getDest().y);
+		case RETREAT:
+			orderMove(getDest().x, getDest().y);
+		case ATTACKUNIT:
+			determineMovementForAttackOrder();
+		default:
+			break;
+		}
+	}
+
+	public Point getDest() {
+		if (path == null)
+			return null;
+		return path.get(path.size() - 1);
+	}
+
+	public int getWayPointIndex() {
+		return waypointIndex;
 	}
 
 }

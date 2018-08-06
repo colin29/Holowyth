@@ -3,10 +3,7 @@ package com.mygdx.holowyth.combatDemo;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
 import java.util.Set;
-import java.util.TreeSet;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -26,7 +23,6 @@ import com.mygdx.holowyth.skill.NoneSkill;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skill.Targeting;
 import com.mygdx.holowyth.skill.Skills;
-import com.mygdx.holowyth.skill.Skills.Explosion;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
@@ -84,9 +80,19 @@ public class Controls extends InputProcessorAdapter {
 
 		DebugValues debugValues = debugStore.registerComponent("Controls");
 		debugValues.add("Order Context", () -> getCurrentContextText());
-		
+
 		debugValues.add("# of units selected", () -> selectedUnits.size());
-		
+		debugValues.add("Clearance between two units", () -> {
+			if (selectedUnits.size() == 2) {
+				Iterator<Unit> iter = selectedUnits.iterator();
+				Unit u1 = iter.next();
+				Unit u2 = iter.next();
+				return Unit.getDist(u1, u2) - (u1.getRadius() + u2.getRadius());
+			} else {
+				return 0;
+			}
+		});
+
 		// debugValues.add("SelectX1", () -> selectionX1);
 		// debugValues.add("SelectY1", () -> selectionY1);
 		// debugValues.add("SelectX2", () -> selectionX2);
@@ -94,7 +100,8 @@ public class Controls extends InputProcessorAdapter {
 
 		functionBindings.bindFunctionToKey(() -> useSkillInSlot(1), Keys.NUM_1);
 		functionBindings.bindFunctionToKey(() -> useSkillInSlot(2), Keys.NUM_2);
-		
+		functionBindings.bindFunctionToKey(() -> useSkillInSlot(3), Keys.NUM_3);
+
 		functionBindings.bindFunctionToKey(() -> setSPToMax(), Keys.Q);
 
 	}
@@ -103,48 +110,47 @@ public class Controls extends InputProcessorAdapter {
 
 	Skill skillToUse = new Skills.Explosion();
 	Skill curSkill = null;
-	
+
 	Skill[] skills = new Skill[10];
 	{
-	skills[1] =  new Skills.Explosion();
-	skills[2] = new Skills.ExplosionLongCast();
-	skills[3] = new Skills.NovaFlare();
+		skills[1] = new Skills.Explosion();
+		skills[2] = new Skills.ExplosionLongCast();
+		skills[3] = new Skills.NovaFlare();
 	}
-	
+
 	private void setSPToMax() {
-		for(Unit unit: selectedUnits) {
+		for (Unit unit : selectedUnits) {
 			unit.stats.setSp(unit.stats.getMaxSp());
 		}
 	}
-	
-	
+
 	/**
 	 * Input from 1-9, and 0.
 	 */
 	private void useSkillInSlot(int slotNumber) {
-		
-		if(slotNumber<0 || slotNumber > 9) {
+
+		if (slotNumber < 0 || slotNumber > 9) {
 			return;
 		}
-		
+
 		if (selectedUnits.size() == 1) {
 			Unit unit = selectedUnits.iterator().next();
 			try {
-				
+
 				curSkill = (Skill) skills[slotNumber].clone();
 				System.out.println("Using " + curSkill.name);
-				
-				if(unit.areSkillsOnCooldown()) {
+
+				if (unit.areSkillsOnCooldown()) {
 					System.out.println(unit.stats.getName() + ": Skills are on cooldown");
 					return;
 				}
-				
-				if(!curSkill.hasEnoughSp(unit)) {
+
+				if (!curSkill.hasEnoughSp(unit)) {
 					System.out.println("not enough sp");
 					return;
 				}
-				
-				switch(curSkill.getTargeting()) {
+
+				switch (curSkill.getTargeting()) {
 				case GROUND:
 					context = Context.SKILL_GROUND;
 					break;
@@ -155,9 +161,9 @@ public class Controls extends InputProcessorAdapter {
 					break;
 				default:
 					break;
-				
+
 				}
-				
+
 				if (curSkill.getTargeting() == Targeting.GROUND) {
 					context = Context.SKILL_GROUND;
 				}
@@ -165,9 +171,8 @@ public class Controls extends InputProcessorAdapter {
 			} catch (CloneNotSupportedException e) {
 				e.printStackTrace();
 			}
-		}	
+		}
 	}
-
 
 	@Override
 	public boolean keyDown(int keycode) {
@@ -183,6 +188,7 @@ public class Controls extends InputProcessorAdapter {
 		return false;
 	}
 
+	@Override
 	public boolean keyUp(int keycode) {
 		functionBindings.runBoundFunction(keycode);
 		return false;
@@ -532,20 +538,21 @@ public class Controls extends InputProcessorAdapter {
 		}
 		shapeRenderer.setProjectionMatrix(old);
 	}
-	
+
 	/**
-	 * Is guaranteed to be called when selectedUnits is modified
-	 * Is called immediately after a modifiying action, if that action actually changed the set.
+	 * Is guaranteed to be called when selectedUnits is modified Is called immediately after a modifiying action, if
+	 * that action actually changed the set.
 	 */
 	private void onSelectedUnitsModified() {
-//		System.out.println("selectedUnits modified");
-		if(context == Context.SKILL_GROUND || context == Context.SKILL_UNIT) {
+		// System.out.println("selectedUnits modified");
+		if (context == Context.SKILL_GROUND || context == Context.SKILL_UNIT) {
 			context = Context.NONE;
 		}
 	}
 
 	/**
 	 * Same as set, but tracks when the set is modified.
+	 * 
 	 * @author Colin Ta
 	 *
 	 */
@@ -553,37 +560,37 @@ public class Controls extends InputProcessorAdapter {
 
 		private static final long serialVersionUID = 1L;
 		private final Set<Unit> selected = new HashSet<Unit>();
-		
-		
-		
+
 		@Override
-		public boolean remove(Object u){
-			if(selected.remove(u)) {
+		public boolean remove(Object u) {
+			if (selected.remove(u)) {
 				onSelectedUnitsModified();
 				return true;
-			}else {
+			} else {
 				return false;
 			}
 		}
-		
+
 		@Override
 		public boolean add(Unit u) {
-			if(selected.add(u)) {
+			if (selected.add(u)) {
 				onSelectedUnitsModified();
 				return true;
-			}else {
+			} else {
 				return false;
 			}
 		}
+
 		@Override
 		public int size() {
 			return selected.size();
 		}
 
-
-		public Iterator<Unit> iterator(){
+		@Override
+		public Iterator<Unit> iterator() {
 			return new Iterator<Unit>() {
 				private final Iterator<Unit> iter = selected.iterator();
+
 				@Override
 				public boolean hasNext() {
 					return iter.hasNext();
@@ -593,18 +600,21 @@ public class Controls extends InputProcessorAdapter {
 				public Unit next() {
 					return iter.next();
 				}
+
+				@Override
 				public void remove() {
 					iter.remove();
 					onSelectedUnitsModified();
 				}
 			};
 		}
-		
+
+		@Override
 		public void clear() {
-			if(!selected.isEmpty()) {
+			if (!selected.isEmpty()) {
 				selected.clear();
 				onSelectedUnitsModified();
-			}else {
+			} else {
 				selected.clear();
 			}
 		}

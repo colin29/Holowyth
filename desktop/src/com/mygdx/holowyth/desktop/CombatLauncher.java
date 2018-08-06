@@ -11,7 +11,7 @@ import com.mygdx.holowyth.test.sandbox.holowyth.Test2;
 import com.mygdx.holowyth.test.ui.UIDemo;
 
 public class CombatLauncher {
-	public static void main (String[] arg) {
+	public static void main(String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "Holowyth";
 		config.width = 960;

@@ -1,11 +1,9 @@
 package com.mygdx.holowyth.unit;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
@@ -18,13 +16,9 @@ import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitInterPF;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skill.Status;
-import com.mygdx.holowyth.skill.Skill.Targeting;
-import com.mygdx.holowyth.skill.Skills;
-import com.mygdx.holowyth.skill.effect.UnitEffect;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
-import com.mygdx.holowyth.util.data.Segment;
 import com.mygdx.holowyth.util.debug.DebugValue;
 import com.mygdx.holowyth.util.debug.DebugValues;
 
@@ -71,9 +65,9 @@ public class Unit implements UnitInterPF, UnitInfo {
 	 * A unit's friendly/foe status.
 	 */
 	Side side;
-	
+
 	// Skills
-	
+
 	int skillCooldown;
 
 	private WorldInfo world;
@@ -107,18 +101,19 @@ public class Unit implements UnitInterPF, UnitInfo {
 
 		Unit.unitsAttacking.put(this, new HashSet<Unit>());
 
-		this.motion = new UnitMotion(this, world);
 		this.world = world;
+		this.motion = new UnitMotion(this, world);
 
 		this.stats = new UnitStats(this);
-		
+
 		System.out.println(this.side.toString());
-		if(this.side == Side.PLAYER) {
-			 DebugValues debugValues = this.getWorldMutable().getDebugStore().registerComponent("Player unit");
-			 debugValues.add(new DebugValue("sp", ()->stats.getSp() + "/" + stats.getMaxSp()));
-			 debugValues.add(new DebugValue("skillCooldown", ()->skillCooldown));
+		if (this.side == Side.PLAYER) {
+			DebugValues debugValues = this.getWorldMutable().getDebugStore().registerComponent("Player unit");
+			debugValues.add(new DebugValue("sp", () -> stats.getSp() + "/" + stats.getMaxSp()));
+			debugValues.add(new DebugValue("skillCooldown", () -> skillCooldown));
+
+			debugValues.add("speed", () -> motion.curSpeed);
 		}
-		
 
 	}
 
@@ -201,16 +196,16 @@ public class Unit implements UnitInterPF, UnitInfo {
 		motion.stopCurrentMovement();
 		clearOrder();
 	}
-	
+
 	public void orderUseSkill(Skill skill) {
-		
-		if(!isUseSkillAllowed()) {
+
+		if (!isUseSkillAllowed()) {
 			return;
 		}
-		if(!skill.hasEnoughSp(this)) {
+		if (!skill.hasEnoughSp(this)) {
 			return;
 		}
-		
+
 		activeSkill = skill;
 		skill.begin(this);
 	}
@@ -230,12 +225,12 @@ public class Unit implements UnitInterPF, UnitInfo {
 		currentOrder = Order.IDLE;
 		target = null;
 	}
-	
+
 	/**
 	 * Caused by normal attacking or stun effects. Interrupts any casting or channeling spell
 	 */
 	public void interrupt() {
-		if(isCasting() || isChannelling()) {
+		if (isCasting() || isChannelling()) {
 			activeSkill.interrupt();
 		}
 	}
@@ -253,16 +248,16 @@ public class Unit implements UnitInterPF, UnitInfo {
 
 		if (activeSkill != null)
 			activeSkill.tick();
-		
+
 		tickSkillCooldown();
 	}
-	
+
 	private void tickSkillCooldown() {
-		if(skillCooldown > 0) {
-			skillCooldown -=1;
+		if (skillCooldown > 0) {
+			skillCooldown -= 1;
 		}
 	}
-	
+
 	public boolean areSkillsOnCooldown() {
 		return (skillCooldown > 0);
 	}
@@ -401,6 +396,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 		return this.activeSkill != null && activeSkill.getStatus() == Status.CHANNELING;
 	}
 	
+	@Override
 	public boolean isRetreatCooldownActive() {
 		return currentOrder == Order.RETREAT && retreatDurationRemaining >0;
 	}
@@ -437,54 +433,9 @@ public class Unit implements UnitInterPF, UnitInfo {
 	}
 
 	// Debug Rendering
-	public void renderAttackingLine(ShapeRenderer shapeRenderer) {
+	public void renderAttackingArrow(ShapeRenderer shapeRenderer) {
 		if (this.attacking != null) {
-
-			Color arrowColor = Color.RED;
-			float wingLength = 8f;
-			float arrowAngle = 30f;
-
-			// draw a line from the center of this unit to the edge of the other unit
-			float len = new Segment(this.getPos(), attacking.getPos()).getLength();
-			float newLen = len - attacking.radius * 0.35f;
-			float dx = attacking.x - this.x;
-			float dy = attacking.y - this.y;
-			float ratio = newLen / len;
-			float nx = dx * ratio;
-			float ny = dy * ratio;
-			Point edgePoint = new Point(x + nx, y + ny);
-			Segment s = new Segment(this.getPos(), edgePoint);
-
-			HoloGL.renderSegment(s, shapeRenderer, arrowColor);
-
-			// Draw the arrow wings
-
-			// calculate angle of the main arrow line
-			float angle = (float) Math.acos(dx / len);
-			if (dy < 0) {
-				angle = (float) (2 * Math.PI - angle);
-			}
-
-			float backwardsAngle = (float) (angle + Math.PI);
-
-			// draw a line in the +x direction, then rotate it and transform it as needed.
-
-			Segment wingSeg = new Segment(0, 0, wingLength, 0); // create the base wing segment
-
-			shapeRenderer.identity();
-			shapeRenderer.translate(edgePoint.x, edgePoint.y, 0);
-			shapeRenderer.rotate(0, 0, 1, (float) Math.toDegrees(backwardsAngle) + arrowAngle);
-
-			HoloGL.renderSegment(wingSeg, shapeRenderer, arrowColor);
-
-			shapeRenderer.identity();
-			shapeRenderer.translate(edgePoint.x, edgePoint.y, 0);
-			shapeRenderer.rotate(0, 0, 1, (float) Math.toDegrees(backwardsAngle) - arrowAngle);
-
-			HoloGL.renderSegment(wingSeg, shapeRenderer, arrowColor);
-
-			shapeRenderer.identity();
-
+			HoloGL.renderArrow(this, this.attacking, Color.RED, shapeRenderer);
 		}
 	}
 
@@ -503,6 +454,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 		return side == Side.PLAYER;
 	}
 
+	@Override
 	public String toString() {
 		return String.format("Unit[ID: %s]", this.ID);
 
@@ -524,10 +476,12 @@ public class Unit implements UnitInterPF, UnitInfo {
 	};
 
 	// Getters
+	@Override
 	public float getRadius() {
 		return radius;
 	}
 
+	@Override
 	public Point getPos() {
 		return new Point(this.x, this.y);
 	}
@@ -547,22 +501,27 @@ public class Unit implements UnitInterPF, UnitInfo {
 		return motion.getPath();
 	}
 
+	@Override
 	public Side getSide() {
 		return side;
 	}
 
+	@Override
 	public UnitStatsInfo getStats() {
 		return stats;
 	}
 
+	@Override
 	public Order getCurrentOrder() {
 		return currentOrder;
 	}
 
+	@Override
 	public UnitInfo getTarget() {
 		return target;
 	}
 
+	@Override
 	public UnitInfo getAttacking() {
 		return attacking;
 	}
@@ -571,6 +530,12 @@ public class Unit implements UnitInterPF, UnitInfo {
 		return world;
 	}
 
+	/**
+	 * Some classes only get a reference to WorldInfo because they are not intended to modify the world. This method can
+	 * be used to explicitly get a mutable World instance.
+	 * 
+	 * @return
+	 */
 	public World getWorldMutable() {
 		return (World) world;
 	}
@@ -579,6 +544,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 		return unitsAttacking.get(this);
 	}
 
+	@Override
 	public Skill getActiveSkill() {
 		return activeSkill;
 	}
@@ -586,6 +552,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 	public void setActiveSkill(Skill activeSkill) {
 		this.activeSkill = activeSkill;
 	}
+
 	public void setSkillCooldown(int value) {
 		skillCooldown = value;
 	}
