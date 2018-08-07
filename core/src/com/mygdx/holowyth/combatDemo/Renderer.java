@@ -130,13 +130,13 @@ public class Renderer {
 			renderCirclesAroundBusyRetreatingUnits();
 			renderCirclesAroundBusyCastingUnits();
 		}
-		renderPaths(false); // temp, delete this after use
+		// renderPaths(false); // temp, delete this after use
 		renderPlayerUnreachedWaypoints(Color.FIREBRICK);
 
 		for (Unit u : world.units) {
 			u.renderAttackingArrow(shapeRenderer);
 		}
-		renderPlayerVelocity();
+		// renderPlayerVelocity();
 
 		// Render effects
 

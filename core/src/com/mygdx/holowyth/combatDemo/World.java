@@ -105,16 +105,15 @@ public class World implements WorldInfo {
 				u.y += u.motion.vy;
 			} else { // Push this unit outwards and try to keep going towards the waypoint
 
-				// if line intersects with one or more other units. (should be
-				// max two, since units should not be
-				// overlapped)
+				// The majority of the time a unit should only be colliding with one unit at a time since we are drawing
+				// a line segment starting from outside any expanded geometry. So assuming the speed is not fast enough
+				// to enter and exit one shape, it should only collide with one
 				if (collisions.size() > 2) {
 					System.out.println("Wierd case, unit colliding with more than 2 units");
 				}
 
 				float curDestx = u.x + u.motion.vx;
 				float curDesty = u.y + u.motion.vy;
-				// Vector2 curVel = new Vector2(u.vx, u.vy);
 
 				// System.out.format("%s is colliding with %s bodies%n", u,
 				// collisions.size());
@@ -122,9 +121,8 @@ public class World implements WorldInfo {
 				for (CBInfo cb : collisions) {
 					Vector2 dist = new Vector2(curDestx - cb.x, curDesty - cb.y);
 
-					// At first, dist is smaller than the combined radius, but
-					// previous push outs might have changed
-					// this.
+					// We do a "push out" for every unit. Subsequent push outs may lead to a suggested location that is
+					// collides with an earlier unit, the alternative location is simply rejected
 					if (dist.len() > cb.unitRadius + u.getRadius()) {
 						continue;
 					}
@@ -139,8 +137,19 @@ public class World implements WorldInfo {
 				}
 
 				// Take this motion if it's valid, otherwise don't move unit.
+
+				// If the "alternative destination" is no different from the starting location, the unit is still
+				// effectively blocked.
+
+				/**
+				 * Determines how "impatient" the algorithm will be for signalling blocked for a slow-resolving or
+				 * non-resolving push situation
+				 */
+				final float minProgress = 0.20f * u.motion.getVelocity();
+
 				if (HoloPF.isEdgePathable(u.x, u.y, curDestx, curDesty, pathingModule.getExpandedMapPolys(), colBodies,
-						u.getRadius())) {
+						u.getRadius()) && new Segment(u.x, u.y, curDestx, curDesty).getLength() > 0.05 * minProgress) {
+					// System.out.println("block distance" + new Segment(u.x, u.y, curDestx, curDesty).getLength());
 					u.x = curDestx;
 					u.y = curDesty;
 				} else {
