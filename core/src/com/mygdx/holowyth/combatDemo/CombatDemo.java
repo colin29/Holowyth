@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
@@ -33,11 +34,12 @@ import com.mygdx.holowyth.util.debug.DebugValue;
 import com.mygdx.holowyth.util.debug.DebugValues;
 import com.mygdx.holowyth.util.debug.ValueLabelMapping;
 import com.mygdx.holowyth.util.template.DemoScreen;
+import com.mygdx.holowyth.util.tools.FunctionBindings;
 import com.mygdx.holowyth.util.tools.Timer;
 
 /**
- * Is responsible for the startup construction of the UI, and setting up the
- * other components on both creation and map load
+ * Is responsible for the startup construction of the UI, and setting up the other components on both creation and map
+ * load
  * 
  * @author Colin Ta
  *
@@ -77,7 +79,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	// Frame rate control
 	Timer timer = new Timer();
 
-	int CELL_SIZE = Holo.CELL_SIZE;
+	private FunctionBindings functionBindings = new FunctionBindings();
 
 	Renderer renderer;
 
@@ -104,6 +106,8 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		renderer.setClearColor(initialClearColor);
 
 		initGameComponentsForMapStartup();
+
+		functionBindings.bindFunctionToKey(() -> debugInfo.setVisible(!debugInfo.isVisible()), Keys.GRAVE); // tilde key
 	}
 
 	@Override
@@ -318,7 +322,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	@Override
 	public boolean keyUp(int keycode) {
-		// TODO Auto-generated method stub
+		functionBindings.runBoundFunction(keycode);
 		return false;
 	}
 
@@ -351,8 +355,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	private void updateMouseCoordLabel(int screenX, int screenY) {
 		Vector3 vec = new Vector3();
 		vec = camera.unproject(vec.set(screenX, screenY, 0));
-		coordInfo.setText("(" + (int) (vec.x) + ", " + (int) (vec.y) + ")\n" + "(" + (int) (vec.x) / CELL_SIZE + ", "
-				+ (int) (vec.y) / CELL_SIZE + ")");
+		coordInfo.setText(
+				"(" + (int) (vec.x) + ", " + (int) (vec.y) + ")\n" + "(" + (int) (vec.x) / Holo.CELL_SIZE + ", "
+						+ (int) (vec.y) / Holo.CELL_SIZE + ")");
 
 	}
 }

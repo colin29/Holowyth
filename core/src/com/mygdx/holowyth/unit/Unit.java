@@ -112,7 +112,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 			debugValues.add(new DebugValue("sp", () -> stats.getSp() + "/" + stats.getMaxSp()));
 			debugValues.add(new DebugValue("skillCooldown", () -> skillCooldown));
 
-			debugValues.add("speed", () -> motion.curSpeed);
+			debugValues.add("speed", () -> motion.getCurPlannedSpeed());
 		}
 
 	}

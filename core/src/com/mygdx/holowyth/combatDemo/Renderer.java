@@ -186,8 +186,8 @@ public class Renderer {
 			pathingModule.renderIntermediateAndFinalPaths(world.units);
 		} else {
 			for (Unit unit : world.units) {
-				if (unit.motion.path != null) {
-					renderPath(unit.motion.path, Color.GRAY, false);
+				if (unit.motion.getPath() != null) {
+					renderPath(unit.motion.getPath(), Color.GRAY, false);
 				}
 			}
 		}
@@ -200,7 +200,7 @@ public class Renderer {
 
 	private void renderPlayerUnreachedWaypoints(Color color) {
 		for (Unit unit : world.units) {
-			if (unit.isPlayerCharacter() && unit.motion.path != null) {
+			if (unit.isPlayerCharacter() && unit.motion.getPath() != null) {
 				Path path = unit.motion.getPath();
 				for (int i = unit.motion.getWayPointIndex(); i < path.size(); i++) {
 					Point waypoint = path.get(i);
@@ -218,6 +218,7 @@ public class Renderer {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private void renderPlayerVelocity() {
 		for (Unit u : world.units) {
 			if (u.isPlayerCharacter() && u.motion.getVelocity() > 0.01f) {
@@ -231,7 +232,7 @@ public class Renderer {
 	private void renderUnitDestinations(Color color) {
 
 		for (Unit unit : world.units) {
-			if (unit.isPlayerCharacter() && unit.motion.path != null) {
+			if (unit.isPlayerCharacter() && unit.motion.getPath() != null) {
 
 				Path path = unit.motion.getPath();
 				Point finalPoint = path.get(path.size() - 1);

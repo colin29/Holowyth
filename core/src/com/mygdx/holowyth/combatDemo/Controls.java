@@ -103,7 +103,6 @@ public class Controls extends InputProcessorAdapter {
 		functionBindings.bindFunctionToKey(() -> useSkillInSlot(3), Keys.NUM_3);
 
 		functionBindings.bindFunctionToKey(() -> setSPToMax(), Keys.Q);
-
 	}
 
 	float clickX, clickY; // Current click in world coordinates

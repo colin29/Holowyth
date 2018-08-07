@@ -10,7 +10,6 @@ import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.Unit.Side;
-import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.data.Point;
@@ -18,38 +17,59 @@ import com.mygdx.holowyth.util.debug.DebugValues;
 
 public class UnitMotion {
 
-	public static float waypointMinDistance = 0.01f;
+	private static float waypointMinDistance = 0.01f;
 
+	// Attack Movement
 	private static int attackPathfindingInterval = 30;
 	private int framesUntilAttackRepath = attackPathfindingInterval;
 
-	// Movement
+	// Normal Movement
 
 	private static float defaultUnitMoveSpeed = Holo.defaultUnitMoveSpeed;
 
 	public float vx, vy;
-	private float speed = Holo.defaultUnitMoveSpeed;
-	public float curSpeed;
 
-	// These are the default values. They can be changed later at will.
+	// Default movement values
+	private static final float defaultTargetFinalSpeed = 0.2f;
+	private static final float defaultDecelRate = 0.02f;
 
-	private static float defaultStartingSpeed = Holo.defaultUnitMoveSpeed * 0.4f;
-	private float startingSpeed = defaultStartingSpeed;
+	private final static float defaultStartingSpeed = Holo.defaultUnitMoveSpeed * 0.4f;
+	private final static float defaultAccelRate = 0.01f;
 
-	private static float defaultQuadraticAccelRate = 0.01f;
-	public float quadAccelRate = 0.01f;
+	// Accel/Decel shared variables
+
+	/**
+	 * The speed the unit is planning to travel towards a waypoint. Corresponds to acceleration and deceleration.
+	 */
+	private float curPlannedSpeed;
 	private float maxAccelFactor = 5;
 
-	public Path path;
+	/**
+	 * The variables below all depend on speed and are modified by {@link UnitMotion#setSpeed(float)}
+	 */
+	private float speed = defaultUnitMoveSpeed;
+	{
+		setSpeed(speed);
+	}
 
-	int waypointIndex;
+	private float startingSpeed;
+	private float accelRate;
+	private float targetFinalSpeed; // speed we want the unit to reach the goal with.
+	private float decelRate;
+
+	// Path variables
+
+	private Path path;
+	private int waypointIndex;
+
+	// Application References
 
 	Unit self;
 	ArrayList<Unit> units;
 	private PathingModule pathing;
 
 	/**
-	 * This class merely sets unit velocities, it is up to the World class to accept/resolve movements
+	 * This class merely sets planned unit velocities, it is up to the World class to accept/resolve movements
 	 * 
 	 * @param self
 	 * @param world
@@ -63,10 +83,10 @@ public class UnitMotion {
 
 			System.out.println(self.getWorldMutable().getDebugStore());
 
+			@SuppressWarnings("unused")
 			DebugValues debugValues = self.getWorldMutable().getDebugStore().registerComponent("Player unit Motion");
-			// debugValues.add("vx, )
-			debugValues.add("Distance to decel", () -> DataUtil.getRoundedString(distanceToDecel));
-			debugValues.add("Distance to nextWayPoint", () -> DataUtil.getRoundedString(getDistanceToNextWayPoint()));
+			// debugValues.add("Distance to nextWayPoint", () ->
+			// DataUtil.getRoundedString(getDistanceToNextWayPoint()));
 		}
 	}
 
@@ -151,9 +171,9 @@ public class UnitMotion {
 			// Apply acceleration if the unit is not already at full speed.
 			// Acceleration is proportional to the current speed of the unit,
 			// but is capped at maxAccelFactor times the base rate.
-			if (curSpeed < speed && !isDecelerating) {
-				curSpeed = Math.min(curSpeed + Math.min(quadAccelRate / curSpeed,
-						quadAccelRate * maxAccelFactor), speed);
+			if (curPlannedSpeed < speed && !isDecelerating) {
+				curPlannedSpeed = Math.min(curPlannedSpeed + Math.min(accelRate / curPlannedSpeed,
+						accelRate * maxAccelFactor), speed);
 				// curSpeed = Math.min(curSpeed + (speed-curSpeed)*factorAccel,
 				// speed);
 			}
@@ -172,7 +192,7 @@ public class UnitMotion {
 			// Apply deceleration if the unit is approaching the final goal
 
 			if (waypointIndex == path.size() - 1) {
-				curSpeed = getSpeedApproachingGoal(dist);
+				curPlannedSpeed = getSpeedApproachingGoal(dist);
 			}
 
 			// Check if reached waypoint
@@ -186,12 +206,12 @@ public class UnitMotion {
 			}
 
 			// Determine unit movement
-			if (dist > curSpeed) {
+			if (dist > curPlannedSpeed) {
 				float sin = dy / dist;
 				float cos = dx / dist;
 
-				this.vx = cos * curSpeed;
-				this.vy = sin * curSpeed;
+				this.vx = cos * curPlannedSpeed;
+				this.vy = sin * curPlannedSpeed;
 			} else {
 				this.vx = dx;
 				this.vy = dy;
@@ -242,7 +262,7 @@ public class UnitMotion {
 	 */
 	private float getInitialSpeed() {
 
-		if (curSpeed < startingSpeed || curSpeed < 0.001) {
+		if (curPlannedSpeed < startingSpeed || curPlannedSpeed < 0.001) {
 			return startingSpeed;
 		}
 
@@ -258,7 +278,7 @@ public class UnitMotion {
 		p.nor();
 		float cross = v.dot(p);
 
-		float s = Math.min(startingSpeed + curSpeed * cross, curSpeed);
+		float s = Math.min(startingSpeed + curPlannedSpeed * cross, curPlannedSpeed);
 		s = Math.max(s, startingSpeed);
 		// System.out.println("initial move speed: " + s);
 
@@ -266,19 +286,8 @@ public class UnitMotion {
 
 	}
 
-	private static float defaultTargetFinalSpeed = 0.2f;
-	private float targetFinalSpeed = defaultTargetFinalSpeed; // speed we want the unit to reach the goal with.
-
-	public float linearDecelRate = 0.01f;
-
-	private static float defaultQuadraticDecelRate = 0.02f;
-	public float quadDecelRate = defaultQuadraticDecelRate;
-
-	private int linearDecelEndTime = 0; // produces time on the end where the unit is moving at minimum speed
-	private boolean isDecelerating = false;
-	private static final boolean useQuadraticDecel = true;
-
 	private float distanceToDecel;
+	private boolean isDecelerating = false;
 
 	/**
 	 * Is called to determine when to decelerate when the unit arrives at the goal.
@@ -287,36 +296,28 @@ public class UnitMotion {
 	 */
 	private float getSpeedApproachingGoal(float distanceToGoal) {
 
-		if (curSpeed <= targetFinalSpeed) {
-			return curSpeed;
+		if (curPlannedSpeed <= targetFinalSpeed) {
+			return curPlannedSpeed;
 		}
-		float timeToDecel = 0;
 		distanceToDecel = 0;
 		float dSpeed = 0; // is negative
 
-		if (useQuadraticDecel) {
-			// sum up distance required to achieve desired speed
-			for (float s = curSpeed; s > targetFinalSpeed; s -= quadDecelRate * (1 / s)) {
-				distanceToDecel += s - quadDecelRate / s;
-			}
-			dSpeed = -1 * quadDecelRate * curSpeed;
-
-		} else { // use linear deceleration
-			timeToDecel = (curSpeed - targetFinalSpeed) / linearDecelRate + linearDecelEndTime; // in frames
-			distanceToDecel = (curSpeed + targetFinalSpeed) / 2f * timeToDecel;
-			dSpeed = -linearDecelRate;
+		// sum up distance required to achieve desired speed
+		for (float s = curPlannedSpeed; s > targetFinalSpeed; s -= decelRate * (1 / s)) {
+			distanceToDecel += s - decelRate / s;
 		}
+		dSpeed = -1 * decelRate * curPlannedSpeed;
 
 		// System.out.format("curSpeed %s, Time to Decel %s, Distance %s, Decel dist %s, %n", curSpeed, timeToDecel,
 		// distanceToGoal, distanceToDecel);
 
 		if (distanceToGoal < distanceToDecel) {
 			// System.out.println("Decelling");
-			curSpeed = Math.max(curSpeed + dSpeed, targetFinalSpeed);
+			curPlannedSpeed = Math.max(curPlannedSpeed + dSpeed, targetFinalSpeed);
 			isDecelerating = true;
 		}
 
-		return curSpeed;
+		return curPlannedSpeed;
 	}
 
 	/**
@@ -326,7 +327,7 @@ public class UnitMotion {
 	private void setPath(Path path) {
 		this.path = path;
 		waypointIndex = 0;
-		curSpeed = getInitialSpeed();
+		curPlannedSpeed = getInitialSpeed();
 		isDecelerating = false;
 	}
 
@@ -349,14 +350,14 @@ public class UnitMotion {
 	}
 
 	/**
-	 * Also scales accel proportionately to speed
+	 * Also scales accel/decel variables proportionately to speed
 	 * 
 	 * @param speed
 	 */
 	public void setSpeed(float speed) {
 		this.speed = speed;
-		this.quadAccelRate = defaultQuadraticAccelRate * (speed / defaultUnitMoveSpeed);
-		this.quadDecelRate = defaultQuadraticDecelRate * (speed / defaultUnitMoveSpeed);
+		this.accelRate = defaultAccelRate * (speed / defaultUnitMoveSpeed);
+		this.decelRate = defaultDecelRate * (speed / defaultUnitMoveSpeed);
 
 		this.startingSpeed = defaultStartingSpeed * (speed / defaultUnitMoveSpeed);
 		this.targetFinalSpeed = defaultTargetFinalSpeed * (float) Math.pow((speed / defaultUnitMoveSpeed), 1.4);
@@ -401,6 +402,10 @@ public class UnitMotion {
 
 	public int getWayPointIndex() {
 		return waypointIndex;
+	}
+
+	public float getCurPlannedSpeed() {
+		return curPlannedSpeed;
 	}
 
 }
