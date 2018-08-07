@@ -15,7 +15,6 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
@@ -29,6 +28,8 @@ import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
+import com.mygdx.holowyth.util.HoloUtil;
+import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.debug.DebugStore;
 import com.mygdx.holowyth.util.debug.DebugValue;
 import com.mygdx.holowyth.util.debug.DebugValues;
@@ -353,11 +354,10 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	}
 
 	private void updateMouseCoordLabel(int screenX, int screenY) {
-		Vector3 vec = new Vector3();
-		vec = camera.unproject(vec.set(screenX, screenY, 0));
+		Point p = HoloUtil.getCursorInWorldCoords(camera);
 		coordInfo.setText(
-				"(" + (int) (vec.x) + ", " + (int) (vec.y) + ")\n" + "(" + (int) (vec.x) / Holo.CELL_SIZE + ", "
-						+ (int) (vec.y) / Holo.CELL_SIZE + ")");
+				"(" + (int) (p.x) + ", " + (int) (p.y) + ")\n" + "(" + (int) (p.x) / Holo.CELL_SIZE + ", "
+						+ (int) (p.y) / Holo.CELL_SIZE + ")");
 
 	}
 }

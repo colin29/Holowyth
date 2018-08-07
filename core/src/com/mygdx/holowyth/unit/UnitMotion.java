@@ -61,6 +61,10 @@ public class UnitMotion {
 	private Path path;
 	private int waypointIndex;
 
+	// Knockback
+
+	private KnockBack knockback = null;
+
 	// Application References
 
 	Unit self;
@@ -152,6 +156,12 @@ public class UnitMotion {
 	 * movement. When movement is complete, a unit's path is set to null.
 	 */
 	private void determineMovement() {
+
+		if (knockback != null) {
+			knockback.tick();
+			return;
+		}
+
 		switch (self.currentOrder) {
 		case MOVE:
 			determineMovementForMoveOrder();
@@ -405,6 +415,51 @@ public class UnitMotion {
 
 	public float getCurPlannedSpeed() {
 		return curPlannedSpeed;
+	}
+
+	public void applyKnockBack(float direction, float initSpeed) {
+		this.knockback = new KnockBack(direction, initSpeed);
+	}
+
+	public class KnockBack {
+
+		private float curSpeed;
+		private float direction;
+
+		private int initialPeriod = 10;
+		private int initialCounter = initialPeriod;
+		private static final float decelRate = 0.1f;
+
+		KnockBack(float direction, float initSpeed) {
+			this.direction = direction;
+			this.curSpeed = initSpeed;
+		}
+
+		public void tick() {
+
+			float actualDecelRate;
+			if (initialCounter > 0) {
+				actualDecelRate = decelRate / 4;
+				initialCounter -= 1;
+			} else {
+				actualDecelRate = decelRate;
+			}
+
+			UnitMotion.this.vx = curSpeed * (float) Math.cos(direction / 180 * (2 * Math.PI));
+			UnitMotion.this.vy = curSpeed * (float) Math.sin(direction / 180 * (2 * Math.PI));
+
+			System.out.println("knockback velocity: " + getVelocity());
+
+			curSpeed -= actualDecelRate;
+
+			if (curSpeed < 0.001f) {
+				System.out.println("knockback completed");
+				UnitMotion.this.vx = 0;
+				UnitMotion.this.vy = 0;
+				UnitMotion.this.knockback = null;
+			}
+
+		}
 	}
 
 }

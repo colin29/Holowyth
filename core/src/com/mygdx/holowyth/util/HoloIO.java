@@ -11,6 +11,12 @@ import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.util.exception.ErrorCode;
 import com.mygdx.holowyth.util.exception.HoloException;
 
+/**
+ * Utility methods related to disk access and paths
+ * 
+ * @author Colin Ta
+ *
+ */
 public class HoloIO {
 
 	public static Field getMapFromDisk(String pathname) {
@@ -30,7 +36,7 @@ public class HoloIO {
 			System.out.println("Field class not found");
 			c.printStackTrace();
 			throw new HoloException(ErrorCode.IO_EXCEPTION);
-		} finally{
+		} finally {
 			try {
 				in.close();
 				fileIn.close();
@@ -65,13 +71,28 @@ public class HoloIO {
 		System.out.println("Writing Map to disk finished");
 	}
 
-	//utility functions
-	static String getCanonicalPath(String string){
+	// Package utility functions
+	static String getCanonicalPathElseNull(String string) {
 		try {
-			return Paths.get(string).toRealPath().toString();
+			return getCanonicalPath(string);
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
+
+	// Utility functions
+
+	public static String getCanonicalPath(String string) throws IOException {
+		return Paths.get(string).toRealPath().toString();
+	}
+
+	public static void printCanonicalPath(String s) {
+		try {
+			System.out.println(getCanonicalPath(s));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 }

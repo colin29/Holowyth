@@ -12,7 +12,8 @@ import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 
 /**
- * Utility class with various basic rendering/visualization functions. Set shapeRenderer before calling functions.
+ * Utility class with various basic rendering/visualization functions. One should set shapeRenderer's projection matrix
+ * before calling functions.
  *
  */
 public class HoloGL {

@@ -26,7 +26,9 @@ import com.mygdx.holowyth.skill.Skills;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
+import com.mygdx.holowyth.util.HoloUtil;
 import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.util.data.Segment;
 import com.mygdx.holowyth.util.debug.DebugStore;
 import com.mygdx.holowyth.util.debug.DebugValues;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
@@ -103,6 +105,8 @@ public class Controls extends InputProcessorAdapter {
 		functionBindings.bindFunctionToKey(() -> useSkillInSlot(3), Keys.NUM_3);
 
 		functionBindings.bindFunctionToKey(() -> setSPToMax(), Keys.Q);
+
+		functionBindings.bindFunctionToKey(() -> knockBackUnit(), Keys.SPACE);
 	}
 
 	float clickX, clickY; // Current click in world coordinates
@@ -115,6 +119,20 @@ public class Controls extends InputProcessorAdapter {
 		skills[1] = new Skills.Explosion();
 		skills[2] = new Skills.ExplosionLongCast();
 		skills[3] = new Skills.NovaFlare();
+	}
+
+	private void knockBackUnit() {
+		if (selectedUnits.size() == 1) {
+			// Knock back the unit based on mouse cursor position relative to the unit
+			Unit unit = selectedUnits.iterator().next();
+
+			Point p = HoloUtil.getCursorInWorldCoords(camera);
+			Segment seg = new Segment(unit.x, unit.y, p.x, p.y);
+			float direction = (float) (seg.getAngle() * 180 / (2 * Math.PI));
+
+			unit.motion.applyKnockBack(direction, 2);
+		}
+
 	}
 
 	private void setSPToMax() {
