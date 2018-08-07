@@ -134,7 +134,7 @@ public class Renderer {
 		renderPlayerUnreachedWaypoints(Color.FIREBRICK);
 
 		for (Unit u : world.units) {
-			u.renderAttackingArrow(shapeRenderer);
+			u.renderAttackingArrow();
 		}
 		// renderPlayerVelocity();
 
@@ -149,19 +149,19 @@ public class Renderer {
 
 	}
 
-	public void renderCirclesAroundBusyRetreatingUnits() {
+	private void renderCirclesAroundBusyRetreatingUnits() {
 		for (UnitInfo u : world.units) {
 			if (u.isRetreatCooldownActive()) {
 				Color color = HoloGL.rbg(30, 144, 255);
 				shapeRenderer.setProjectionMatrix(worldCamera.combined);
-				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, shapeRenderer, color);
-				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 3.25f, shapeRenderer, color);
-				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 4, shapeRenderer, color);
+				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, color);
+				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 3.25f, color);
+				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 4, color);
 			}
 		}
 	}
 
-	public void renderCirclesAroundBusyCastingUnits() {
+	private void renderCirclesAroundBusyCastingUnits() {
 		for (UnitInfo u : world.units) {
 			if (u.getActiveSkill() == null)
 				continue;
@@ -169,9 +169,9 @@ public class Renderer {
 					|| u.getActiveSkill().getStatus() == Status.CHANNELING) {
 				Color color = HoloGL.rbg(30, 144, 255);
 				shapeRenderer.setProjectionMatrix(worldCamera.combined);
-				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, shapeRenderer, color);
-				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 3.25f, shapeRenderer, color);
-				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 4, shapeRenderer, color);
+				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, color);
+				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 3.25f, color);
+				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 4, color);
 			}
 		}
 	}
@@ -193,7 +193,7 @@ public class Renderer {
 		}
 
 		for (Unit u : world.units) {
-			u.motion.renderNextWayPoint(shapeRenderer);
+			u.motion.renderNextWayPoint();
 		}
 
 	}
@@ -224,7 +224,7 @@ public class Renderer {
 			if (u.isPlayerCharacter() && u.motion.getVelocity() > 0.01f) {
 				UnitMotion m = u.motion;
 				float scale = 15; // enlargen the velocity so we can see it
-				HoloGL.renderArrow(u.getPos(), u.getPos().add(m.vx * scale, m.vy * scale), Color.GREEN, shapeRenderer);
+				HoloGL.renderArrow(u.getPos(), u.getPos().add(m.vx * scale, m.vy * scale), Color.GREEN);
 			}
 		}
 	}
@@ -290,7 +290,7 @@ public class Renderer {
 	@SuppressWarnings("unused")
 	private void renderUnitExpandedHitBodies() {
 		for (Unit u : world.units) {
-			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + Holo.UNIT_RADIUS, shapeRenderer, Color.GRAY);
+			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + Holo.UNIT_RADIUS, Color.GRAY);
 		}
 	}
 
@@ -314,12 +314,12 @@ public class Renderer {
 	private void renderMapPolygons() {
 		shapeRenderer.setProjectionMatrix(worldCamera.combined);
 		shapeRenderer.setColor(Color.BLACK);
-		HoloGL.renderPolygons(map.polys, shapeRenderer);
+		HoloGL.renderPolygons(map.polys);
 	}
 
 	private void renderMapBoundaries() {
 		shapeRenderer.setProjectionMatrix(worldCamera.combined);
-		HoloGL.renderMapBoundaries(map, shapeRenderer);
+		HoloGL.renderMapBoundaries(map);
 	}
 
 	private float hpBarWidthBase = 30;
@@ -390,7 +390,7 @@ public class Renderer {
 
 	private Color castBarColor = HoloGL.rbg(204, 224, 255);
 
-	public void renderCastingBars() {
+	private void renderCastingBars() {
 
 		for (UnitInfo unit : world.units) {
 

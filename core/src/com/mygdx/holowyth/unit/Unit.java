@@ -9,7 +9,6 @@ import java.util.PriorityQueue;
 import java.util.Set;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.pathfinding.Path;
@@ -433,9 +432,9 @@ public class Unit implements UnitInterPF, UnitInfo {
 	}
 
 	// Debug Rendering
-	public void renderAttackingArrow(ShapeRenderer shapeRenderer) {
+	public void renderAttackingArrow() {
 		if (this.attacking != null) {
-			HoloGL.renderArrow(this, this.attacking, Color.RED, shapeRenderer);
+			HoloGL.renderArrow(this, this.attacking, Color.RED);
 		}
 	}
 

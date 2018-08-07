@@ -3,7 +3,6 @@ package com.mygdx.holowyth.unit;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.pathfinding.Path;
@@ -338,10 +337,10 @@ public class UnitMotion {
 		vy = 0;
 	}
 
-	public void renderNextWayPoint(ShapeRenderer shapeRenderer) {
+	public void renderNextWayPoint() {
 		if (path != null) {
 			Point p = path.get(waypointIndex);
-			HoloGL.renderCircle(p.x, p.y, shapeRenderer, Color.FIREBRICK);
+			HoloGL.renderCircle(p.x, p.y, Color.FIREBRICK);
 		}
 	}
 

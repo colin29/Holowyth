@@ -44,7 +44,7 @@ public class Controls extends InputProcessorAdapter {
 
 	Camera camera;
 	Camera fixedCam;
-	ShapeRenderer shapeRenderer;
+	private ShapeRenderer shapeRenderer;
 
 	World world;
 	ArrayList<Unit> units;
@@ -512,9 +512,9 @@ public class Controls extends InputProcessorAdapter {
 	 */
 	public void renderCirclesOnSelectedUnits() {
 		for (Unit u : selectedUnits) {
-			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + 2.5f, shapeRenderer, Color.GREEN);
-			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + 3.25f, shapeRenderer, Color.GREEN);
-			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + 4, shapeRenderer, Color.GREEN);
+			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + 2.5f, Color.GREEN);
+			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + 3.25f, Color.GREEN);
+			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + 4, Color.GREEN);
 		}
 	}
 

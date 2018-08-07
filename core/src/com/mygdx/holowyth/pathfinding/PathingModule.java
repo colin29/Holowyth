@@ -34,11 +34,11 @@ public class PathingModule {
 	private Polygons expandedMapPolys = new Polygons();
 	private Field map;
 	private AStarSearch pathing;
-	
+
 	PathSmoother smoother = new PathSmoother();
-	
+
 	// Debug
-		HashMap<UnitInterPF, PathsInfo> intermediatePaths;
+	HashMap<UnitInterPF, PathsInfo> intermediatePaths;
 
 	/**
 	 * @Lifetime can be from app start to app shutdown. Call initFormap() whenever a new map is loaded.
@@ -50,73 +50,74 @@ public class PathingModule {
 		this.shapeRenderer = shapeRenderer;
 
 	}
-	
+
 	/*
 	 * Re-inits for the given map
 	 */
 	public void initForMap(Field map) {
 		this.map = map;
-		
-		expandedMapPolys = HoloPF.expandPolygons(map.polys, Holo.UNIT_RADIUS); // We require one set for each distinct size of unit, for now just
+
+		expandedMapPolys = HoloPF.expandPolygons(map.polys, Holo.UNIT_RADIUS); // We require one set for each distinct
+																				// size of unit, for now just
 		// one.
 		createGraph();
 		floodFillGraph();
-		
+
 		pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE, map.width(), map.height());
-		
+
 		// Debug
 		intermediatePaths = new HashMap<UnitInterPF, PathsInfo>();
 	}
-	
-	// Graph construction 
+
+	// Graph construction
 	private int CELL_SIZE = Holo.CELL_SIZE;
 	Vertex[][] graph;
 	int graphWidth, graphHeight;
 	Vertex[][] dynamicGraph;
 
 	// Unit pathfinding
-	
+
 	public Path findPathForUnit(UnitInterPF unit, float dx, float dy, ArrayList<? extends UnitInterPF> units) {
-	
+
 		// For pathfinding, need to get expanded geometry of unit collision bodies as well
-	
+
 		ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
-	
+
 		for (UnitInterPF a : units) {
 			if (unit.equals(a)) { // don't consider the unit's own collision body
 				continue;
 			}
-	
+
 			CBInfo c = new CBInfo();
 			c.x = a.getX();
 			c.y = a.getY();
 			c.unitRadius = Holo.UNIT_RADIUS;
 			colBodies.add(c);
 		}
-	
+
 		// Generate dynamic graph;
-	
+
 		// Start with the base graph
 		for (int y = 0; y < graphHeight; y++) {
 			for (int x = 0; x < graphWidth; x++) {
 				dynamicGraph[y][x].set(graph[y][x]);
 			}
 		}
-	
+
 		// modify it for every unit
 		for (int y = 0; y < graphHeight; y++) {
 			for (int x = 0; x < graphWidth; x++) {
 				dynamicGraph[y][x].set(graph[y][x]);
 			}
 		}
-	
+
 		revertDynamicGraph();
-		if(!Holo.debugPathfindingIgnoreUnits){
-		setDynamicGraph(colBodies, unit);
+		if (!Holo.debugPathfindingIgnoreUnits) {
+			setDynamicGraph(colBodies, unit);
 		}
 		Path newPath = pathing.doAStar(unit.getX(), unit.getY(), dx, dy, expandedMapPolys, colBodies, dynamicGraph,
 				unit.getRadius()); // use the dynamic graph
-	
+
 		if (newPath != null) {
 			Path finalPath = smoother.smoothPath(newPath, expandedMapPolys, colBodies, unit.getRadius());
 			PathsInfo info = smoother.getPathInfo();
@@ -126,13 +127,15 @@ public class PathingModule {
 		return newPath;
 	}
 
-	//Getters
-	
+	// Getters
+
 	/**
-	 * Note: expanded map polygons are used both by the pathfinding module and for collision detection, but they are kept with pathfinding by convention.
+	 * Note: expanded map polygons are used both by the pathfinding module and for collision detection, but they are
+	 * kept with pathfinding by convention.
+	 * 
 	 * @return
 	 */
-	public Polygons getExpandedMapPolys(){
+	public Polygons getExpandedMapPolys() {
 		return expandedMapPolys;
 	}
 
@@ -153,7 +156,7 @@ public class PathingModule {
 			}
 		}
 	}
-	
+
 	private void floodFillGraph() {
 
 		// Start with 0,0
@@ -214,7 +217,7 @@ public class PathingModule {
 			}
 		}
 	}
-	
+
 	/**
 	 * Calculates the pathing information for a single vertex
 	 */
@@ -241,9 +244,9 @@ public class PathingModule {
 		if (iy == graphHeight - 1)
 			v.N = v.NW = v.NE = false;
 	}
-	
+
 	// Unit pathfinding
-	
+
 	ArrayList<Vertex> prospects;
 	ArrayList<Vertex> blocked = new ArrayList<Vertex>();
 
@@ -284,7 +287,7 @@ public class PathingModule {
 		}
 
 	}
-	
+
 	/**
 	 * Given a vertex, restrict it's pathability based on the expanded collision circle of the unit
 	 * 
@@ -325,7 +328,6 @@ public class PathingModule {
 		v.SE = v.SE && (Line2D.ptSegDistSq(x, y, x + CELL_SIZE, y - CELL_SIZE, cb.x, cb.y) >= radSquared);
 	}
 
-	
 	/**
 	 * Reverts the dynamic graph back to the orignal graph. The current method is simple brute-force.
 	 */
@@ -337,9 +339,8 @@ public class PathingModule {
 		}
 	}
 
-	
 	// Render functions
-	
+
 	public void renderGraph(boolean renderEdges) {
 
 		if (renderEdges) {
@@ -386,7 +387,7 @@ public class PathingModule {
 		shapeRenderer.end();
 
 	}
-	
+
 	public void renderDynamicGraph(boolean renderEdges) {
 
 		if (renderEdges) {
@@ -433,15 +434,15 @@ public class PathingModule {
 		shapeRenderer.end();
 
 	}
-	
+
 	/**
-	 * Render intermediate paths for all units in the list 
+	 * Render intermediate paths for all units in the list
 	 */
-	public void renderIntermediateAndFinalPaths(ArrayList<? extends UnitInterPF> units){
-		for(UnitInterPF unit: units){
+	public void renderIntermediateAndFinalPaths(ArrayList<? extends UnitInterPF> units) {
+		for (UnitInterPF unit : units) {
 			PathsInfo info = intermediatePaths.get(unit);
-			if(info != null && (unit.getPath() != null || Holo.continueShowingPathAfterArrival)){
-				if(info.finalPath != null){
+			if (info != null && (unit.getPath() != null || Holo.continueShowingPathAfterArrival)) {
+				if (info.finalPath != null) {
 					renderPath(info.pathSmoothed0, Color.PINK, false);
 					renderPath(info.pathSmoothed1, Color.FIREBRICK, true);
 					renderPath(info.finalPath, Color.BLUE, false);
@@ -449,15 +450,14 @@ public class PathingModule {
 			}
 		}
 	}
-	
+
 	public void renderExpandedMapPolygons() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
-		HoloGL.renderPolygons(expandedMapPolys, shapeRenderer, Color.GRAY);
+		HoloGL.renderPolygons(expandedMapPolys, Color.GRAY);
 	}
-	
-	
-	//Getters
-	
+
+	// Getters
+
 	private void drawLine(int ix, int iy, int ix2, int iy2) {
 		shapeRenderer.line(ix * CELL_SIZE, iy * CELL_SIZE, 0, ix2 * CELL_SIZE, iy2 * CELL_SIZE, 0);
 	}

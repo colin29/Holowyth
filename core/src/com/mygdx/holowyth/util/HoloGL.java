@@ -12,12 +12,14 @@ import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 
 /**
- * Utility class with various basic rendering/visualization functions.
+ * Utility class with various basic rendering/visualization functions. Set shapeRenderer before calling functions.
  *
  */
 public class HoloGL {
 
-	public static void renderSegment(Segment s, ShapeRenderer shapeRenderer, Color color) {
+	static ShapeRenderer shapeRenderer;
+
+	public static void renderSegment(Segment s, Color color) {
 		if (s != null) {
 			shapeRenderer.begin(ShapeType.Filled);
 			shapeRenderer.setColor(color);
@@ -26,7 +28,7 @@ public class HoloGL {
 		}
 	}
 
-	public static void renderPolygons(Polygons polys, ShapeRenderer shapeRenderer, Color color) {
+	public static void renderPolygons(Polygons polys, Color color) {
 		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setColor(color);
 		for (Polygon p : polys) {
@@ -38,7 +40,7 @@ public class HoloGL {
 	/**
 	 * Make sure to set the renderer's matrixes before calling these and similar methods.
 	 */
-	public static void renderPolygons(Polygons polys, ShapeRenderer shapeRenderer) {
+	public static void renderPolygons(Polygons polys) {
 		shapeRenderer.begin(ShapeType.Line);
 		for (Polygon p : polys) {
 			shapeRenderer.polygon(p.floats, 0, p.count);
@@ -56,7 +58,7 @@ public class HoloGL {
 	/**
 	 * Often used function for debugging purposes.
 	 */
-	public static void renderCircle(float x, float y, ShapeRenderer shapeRenderer, Color color) {
+	public static void renderCircle(float x, float y, Color color) {
 
 		float pointSize = 3f;
 		shapeRenderer.begin(ShapeType.Filled);
@@ -71,7 +73,7 @@ public class HoloGL {
 		shapeRenderer.end();
 	}
 
-	public static void renderCircleOutline(float x, float y, float radius, ShapeRenderer shapeRenderer, Color color) {
+	public static void renderCircleOutline(float x, float y, float radius, Color color) {
 
 		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setColor(color);
@@ -79,16 +81,14 @@ public class HoloGL {
 		shapeRenderer.end();
 	}
 
-	public static void renderEllipseOutline(float x, float y, float height, float width, ShapeRenderer shapeRenderer,
-			Color color) {
-
+	public static void renderEllipseOutline(float x, float y, float height, float width, Color color) {
 		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setColor(color);
 		shapeRenderer.ellipse(x, y, height, width, 0f);
 		shapeRenderer.end();
 	}
 
-	public static void renderMapBoundaries(Field map, ShapeRenderer shapeRenderer) {
+	public static void renderMapBoundaries(Field map) {
 		shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1);
 		shapeRenderer.begin(ShapeType.Line);
 
@@ -107,8 +107,7 @@ public class HoloGL {
 	/**
 	 * Renders an arrow pointing from unit a to unit b
 	 */
-	public static void renderArrow(UnitInfo a, UnitInfo b, Color arrowColor,
-			ShapeRenderer shapeRenderer) {
+	public static void renderArrow(UnitInfo a, UnitInfo b, Color arrowColor) {
 
 		Segment seg = new Segment(a.getPos(), b.getPos());
 		float len = seg.getLength();
@@ -124,11 +123,11 @@ public class HoloGL {
 
 		Point arrowTip = new Point(seg.x1 + nx, seg.y1 + ny);
 
-		renderArrow(a.getPos(), arrowTip, arrowColor, shapeRenderer);
+		renderArrow(a.getPos(), arrowTip, arrowColor);
 
 	}
 
-	public static void renderArrow(Point start, Point end, Color arrowColor, ShapeRenderer shapeRenderer) {
+	public static void renderArrow(Point start, Point end, Color arrowColor) {
 
 		final float wingLength = 8f;
 		final float arrowAngle = 30f;
@@ -140,7 +139,7 @@ public class HoloGL {
 
 		// Draw the arrow wings
 
-		HoloGL.renderSegment(new Segment(start, end), shapeRenderer, arrowColor);
+		HoloGL.renderSegment(new Segment(start, end), arrowColor);
 
 		// calculate angle of the main arrow line
 		float angle = (float) Math.acos(dx / s.getLength());
@@ -158,13 +157,13 @@ public class HoloGL {
 		shapeRenderer.translate(end.x, end.y, 0);
 		shapeRenderer.rotate(0, 0, 1, (float) Math.toDegrees(backwardsAngle) + arrowAngle);
 
-		HoloGL.renderSegment(wingSeg, shapeRenderer, arrowColor);
+		HoloGL.renderSegment(wingSeg, arrowColor);
 
 		shapeRenderer.identity();
 		shapeRenderer.translate(end.x, end.y, 0);
 		shapeRenderer.rotate(0, 0, 1, (float) Math.toDegrees(backwardsAngle) - arrowAngle);
 
-		HoloGL.renderSegment(wingSeg, shapeRenderer, arrowColor);
+		HoloGL.renderSegment(wingSeg, arrowColor);
 		shapeRenderer.identity();
 	}
 
@@ -175,6 +174,14 @@ public class HoloGL {
 	 */
 	public static Color rbg(int r, int g, int b) {
 		return new Color((float) r / 256, (float) g / 256, (float) b / 256, 1);
+	}
+
+	public static ShapeRenderer getShapeRenderer() {
+		return shapeRenderer;
+	}
+
+	public static void setShapeRenderer(ShapeRenderer shapeRenderer) {
+		HoloGL.shapeRenderer = shapeRenderer;
 	}
 
 }

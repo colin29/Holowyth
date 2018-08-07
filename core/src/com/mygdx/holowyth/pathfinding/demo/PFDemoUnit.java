@@ -49,7 +49,6 @@ public class PFDemoUnit implements UnitInterPF {
 	// World Fields
 	PathingModule pathingModule;
 	ArrayList<PFDemoUnit> units;
-	 
 
 	// Collision Detection
 	private float radius = Holo.UNIT_RADIUS;
@@ -69,15 +68,14 @@ public class PFDemoUnit implements UnitInterPF {
 	PFDemoUnit attacking; // unit the unit is current attacking.
 	private static Map<PFDemoUnit, Set<PFDemoUnit>> unitsAttacking = new HashMap<PFDemoUnit, Set<PFDemoUnit>>();
 	Mode mode = Mode.FLEE;
-	
+
 	public enum Order {
 		MOVE, ATTACKUNIT, IDLE
 	}
-	
+
 	public enum Mode {
 		ENGAGE, FLEE
 	}
-	
 
 	PFDemoUnit() {
 		this.ID = PFDemoUnit.getNextId();
@@ -91,7 +89,7 @@ public class PFDemoUnit implements UnitInterPF {
 		// get neccesary references
 		this.units = world.getUnits();
 		this.pathingModule = world.getPathingModule();
-		
+
 		PFDemoUnit.unitsAttacking.put(this, new HashSet<PFDemoUnit>());
 
 	}
@@ -105,9 +103,9 @@ public class PFDemoUnit implements UnitInterPF {
 		determineMovement();
 
 	}
-	
-	/** Repath regularly if unit is ordered to attack but is not attacking yet 	 */
-	private void handleRepathing(){
+
+	/** Repath regularly if unit is ordered to attack but is not attacking yet */
+	private void handleRepathing() {
 		if (this.currentOrder == Order.ATTACKUNIT && attacking == null) {
 			framesUntilAttackRepath -= 1;
 			if (framesUntilAttackRepath <= 0) {
@@ -116,14 +114,13 @@ public class PFDemoUnit implements UnitInterPF {
 			}
 		}
 	}
-	
 
 	int waypointIndex;
 
 	// Orders
 
 	public void orderMove(float dx, float dy) {
-		if(!isActionAllowed(Order.MOVE)){
+		if (!isActionAllowed(Order.MOVE)) {
 			return;
 		}
 		Path path = pathingModule.findPathForUnit(this, dx, dy, units);
@@ -135,7 +132,7 @@ public class PFDemoUnit implements UnitInterPF {
 	}
 
 	public void orderAttackUnit(PFDemoUnit unit) {
-		if(!isActionAllowed(Order.ATTACKUNIT)){
+		if (!isActionAllowed(Order.ATTACKUNIT)) {
 			return;
 		}
 		if (unit == this) {
@@ -143,16 +140,17 @@ public class PFDemoUnit implements UnitInterPF {
 			return;
 		}
 		clearOrder();
-		
+
 		this.currentOrder = Order.ATTACKUNIT;
 		this.target = unit;
 
-		this.attacking = null; // assuming this is a valid order to make, the unit is now no longer attacking anything yet
-		
+		this.attacking = null; // assuming this is a valid order to make, the unit is now no longer attacking anything
+								// yet
+
 		pathForAttackingUnit();
 	}
 
-	private void pathForAttackingUnit(){
+	private void pathForAttackingUnit() {
 		// find path as normal, except for pathing ignore the target's collision body
 		ArrayList<PFDemoUnit> someUnits = new ArrayList<PFDemoUnit>(units);
 		someUnits.remove(target);
@@ -173,7 +171,8 @@ public class PFDemoUnit implements UnitInterPF {
 		curSpeed = calculateInitialMoveSpeed();
 		isDecelerating = false;
 	}
-	private void clearPath(){
+
+	private void clearPath() {
 		this.path = null;
 		waypointIndex = -1;
 		vx = 0;
@@ -348,48 +347,49 @@ public class PFDemoUnit implements UnitInterPF {
 
 	// Combat
 
-	/** Handles the combat logic for a unit for one frame*/
-	public void handleCombatLogic(){
+	/** Handles the combat logic for a unit for one frame */
+	public void handleCombatLogic() {
 
-		if(currentOrder == Order.ATTACKUNIT){
-			//If the unit is on an attackUnit command and its in engage range, make it start attacking the target
+		if (currentOrder == Order.ATTACKUNIT) {
+			// If the unit is on an attackUnit command and its in engage range, make it start attacking the target
 			// If the unit falls out of engage range, stop it from attacking
 			Point a, b;
 			a = this.getPos();
 			b = target.getPos();
 			float dist = Point.calcDistance(a, b);
-			if(dist <= this.radius + target.radius + Holo.defaultUnitEngageRange){
+			if (dist <= this.radius + target.radius + Holo.defaultUnitEngageRange) {
 				startAttacking(target);
-			} else if(dist >= this.radius + target.radius + Holo.defaultUnitDisengageRange){
+			} else if (dist >= this.radius + target.radius + Holo.defaultUnitDisengageRange) {
 				stopAttacking(target);
 			}
 		}
-		
-		if(this.mode == Mode.ENGAGE){
+
+		if (this.mode == Mode.ENGAGE) {
 			Set<PFDemoUnit> attackingMe = unitsAttacking.get(this);
-			if(!attackingMe.isEmpty() && attacking == null){
+			if (!attackingMe.isEmpty() && attacking == null) {
 				orderAttackUnit(attackingMe.iterator().next());
 			}
 		}
-		
-		
+
 	}
-	
-	private void startAttacking(PFDemoUnit target){
+
+	private void startAttacking(PFDemoUnit target) {
 		clearPath();
 		attacking = target;
 		unitsAttacking.get(target).add(this);
 	}
-	private void stopAttacking(PFDemoUnit target){
+
+	private void stopAttacking(PFDemoUnit target) {
 		attacking = null;
 		unitsAttacking.get(target).remove(this);
 	}
-	
+
 	// Debug
 	private static int getNextId() {
 		return curId++;
 	}
 
+	@Override
 	public String toString() {
 		return String.format("Unit[ID: %s]", this.ID);
 
@@ -398,70 +398,72 @@ public class PFDemoUnit implements UnitInterPF {
 	public void renderNextWayPoint(ShapeRenderer shapeRenderer) {
 		if (path != null) {
 			Point p = path.get(waypointIndex);
-			HoloGL.renderCircle(p.x, p.y, shapeRenderer, Color.FIREBRICK);
+			HoloGL.renderCircle(p.x, p.y, Color.FIREBRICK);
 		}
 	}
-	public void renderAttackingLine(ShapeRenderer shapeRenderer){
-		if(this.attacking != null){
-			
-			Color arrowColor = Color.RED; 
+
+	public void renderAttackingLine(ShapeRenderer shapeRenderer) {
+		if (this.attacking != null) {
+
+			Color arrowColor = Color.RED;
 			float wingLength = 8f;
 			float arrowAngle = 30f;
-			
-			//draw a line from the center of this unit to the edge of the other unit
+
+			// draw a line from the center of this unit to the edge of the other unit
 			float len = new Segment(this.getPos(), attacking.getPos()).getLength();
 			float newLen = len - attacking.radius * 0.35f;
 			float dx = attacking.x - this.x;
 			float dy = attacking.y - this.y;
-			float ratio = newLen/len;
+			float ratio = newLen / len;
 			float nx = dx * ratio;
 			float ny = dy * ratio;
-			Point edgePoint = new Point(x+nx, y+ny);
+			Point edgePoint = new Point(x + nx, y + ny);
 			Segment s = new Segment(this.getPos(), edgePoint);
-			
-			HoloGL.renderSegment(s, shapeRenderer, arrowColor);
-			
-			//Draw the arrow wings
-			
-			//calculate angle of the main arrow line
-			float angle = (float) Math.acos(dx/len);
-			if(dy < 0){
-				angle = (float) (2*Math.PI - angle);
+
+			HoloGL.renderSegment(s, arrowColor);
+
+			// Draw the arrow wings
+
+			// calculate angle of the main arrow line
+			float angle = (float) Math.acos(dx / len);
+			if (dy < 0) {
+				angle = (float) (2 * Math.PI - angle);
 			}
-			
+
 			float backwardsAngle = (float) (angle + Math.PI);
-			
-			//draw a line in the +x direction, then rotate it and transform it as needed.
-			
-			Segment wingSeg = new Segment (0, 0, wingLength, 0); // create the base wing segment
-			
+
+			// draw a line in the +x direction, then rotate it and transform it as needed.
+
+			Segment wingSeg = new Segment(0, 0, wingLength, 0); // create the base wing segment
+
 			shapeRenderer.identity();
 			shapeRenderer.translate(edgePoint.x, edgePoint.y, 0);
 			shapeRenderer.rotate(0, 0, 1, (float) Math.toDegrees(backwardsAngle) + arrowAngle);
-			
-			HoloGL.renderSegment(wingSeg, shapeRenderer, arrowColor);
-			
+
+			HoloGL.renderSegment(wingSeg, arrowColor);
+
 			shapeRenderer.identity();
 			shapeRenderer.translate(edgePoint.x, edgePoint.y, 0);
 			shapeRenderer.rotate(0, 0, 1, (float) Math.toDegrees(backwardsAngle) - arrowAngle);
 
-			HoloGL.renderSegment(wingSeg, shapeRenderer, arrowColor);
-			
+			HoloGL.renderSegment(wingSeg, arrowColor);
+
 			shapeRenderer.identity();
-			
+
 		}
 	}
+
 	/**
 	 * Determines whether the particular action is allowed in the current state
 	 */
-	private boolean isActionAllowed(Order order){
-		switch(order){
+	private boolean isActionAllowed(Order order) {
+		switch (order) {
 		case ATTACKUNIT:
-			if(attacking == null){
+			if (attacking == null) {
 				return true;
 			}
 		case MOVE:
-			if(attacking == null){
+			if (attacking == null) {
 				return true;
 			}
 		case IDLE:
@@ -470,15 +472,16 @@ public class PFDemoUnit implements UnitInterPF {
 			break;
 		}
 		return false;
-		
+
 	}
 
 	// Getters
+	@Override
 	public float getRadius() {
 		return radius;
 	}
-	
-	public Point getPos(){
+
+	public Point getPos() {
 		return new Point(this.x, this.y);
 	}
 
@@ -496,5 +499,5 @@ public class PFDemoUnit implements UnitInterPF {
 	public Path getPath() {
 		return this.path;
 	}
-	
+
 }

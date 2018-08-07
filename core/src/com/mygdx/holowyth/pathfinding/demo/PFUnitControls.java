@@ -27,24 +27,24 @@ import com.mygdx.holowyth.util.data.Point;
  * @author Colin Ta
  */
 public class PFUnitControls implements InputProcessor {
-	
+
 	Holowyth game;
-	
+
 	Camera camera;
 	ShapeRenderer shapeRenderer;
-	
+
 	ArrayList<PFDemoUnit> units;
-	
+
 	public ArrayList<PFDemoUnit> selectedUnits = new ArrayList<PFDemoUnit>();
 	boolean leftMouseKeyDown = false;
 
-	PFDemoUnit prospectUnit; // In order to single-select a unit, the user must mouse down on a unit, and mouse up on the same
-						// unit.
-	
+	PFDemoUnit prospectUnit; // In order to single-select a unit, the user must mouse down on a unit, and mouse up on
+								// the same
+	// unit.
+
 	boolean attackClickWaiting;
-	
-	
-	//For displaying Debug info
+
+	// For displaying Debug info
 	BitmapFont font;
 	Skin skin;
 	LabelStyle labelStyle;
@@ -56,23 +56,23 @@ public class PFUnitControls implements InputProcessor {
 		this.shapeRenderer = game.shapeRenderer;
 		this.camera = camera;
 		this.units = units;
-		
-		this.font = game.debugFont; 
+
+		this.font = game.debugFont;
 		this.skin = game.skin;
-		
+
 		labelStyle = new LabelStyle(game.debugFont, Holo.debugFontColor);
-		
+
 		createDebugTable();
 	}
-	
-	private void createDebugTable(){
+
+	private void createDebugTable() {
 		table = new Table();
 		currentStateText = new Label("Initial Value", labelStyle);
 		table.add(currentStateText);
 	}
-	
+
 	/** Gets debug info for this module, which the parent is free to display how they wish */
-	public Table getDebugTable(){
+	public Table getDebugTable() {
 		return table;
 	}
 
@@ -81,7 +81,7 @@ public class PFUnitControls implements InputProcessor {
 
 	@Override
 	public boolean keyDown(int keycode) {
-		if(keycode == Keys.A && selectedUnits.size() > 0){
+		if (keycode == Keys.A && selectedUnits.size() > 0) {
 			clearAwaitingOrders();
 			currentStateText.setText("Select Attack Target");
 			attackClickWaiting = true;
@@ -107,15 +107,13 @@ public class PFUnitControls implements InputProcessor {
 		Vector3 vec = new Vector3(); // obtain world coordinates of the click.
 		vec = camera.unproject(vec.set(screenX, screenY, 0));
 
-		
-		
 		// Handle Left Click
 		if (button == Input.Buttons.LEFT && pointer == 0) {
 			System.out.println("Left click detected");
-			if(attackClickWaiting){
+			if (attackClickWaiting) {
 				handleLeftClickAttack(vec.x, vec.y);
-			}else{
-				handleLeftClickSelect(vec.x, vec.y);	
+			} else {
+				handleLeftClickSelect(vec.x, vec.y);
 			}
 			return true;
 		}
@@ -128,9 +126,12 @@ public class PFUnitControls implements InputProcessor {
 
 		return false;
 	}
-	
-	/** Makes it so when you are part-way through an order, and then the start of a separate order, the game will stop waiting for the first one */
-	private void clearAwaitingOrders(){
+
+	/**
+	 * Makes it so when you are part-way through an order, and then the start of a separate order, the game will stop
+	 * waiting for the first one
+	 */
+	private void clearAwaitingOrders() {
 		attackClickWaiting = false;
 		currentStateText.setText("Idle");
 	}
@@ -142,10 +143,10 @@ public class PFUnitControls implements InputProcessor {
 			u.orderMove(p.x, p.y);
 		}
 	}
-	
-	private void handleLeftClickAttack(float x, float y){
+
+	private void handleLeftClickAttack(float x, float y) {
 		clearAwaitingOrders();
-		Point p1 = new Point(x, y);		
+		Point p1 = new Point(x, y);
 		Point p2 = new Point();
 		float dist;
 		// select a unit if there is one underneath this point. If there are multiple units, select the one that
@@ -164,17 +165,17 @@ public class PFUnitControls implements InputProcessor {
 		PFDemoUnit target = null;
 		if (lastResult != null) {
 			// select this unit
-			target =  lastResult;
+			target = lastResult;
 		}
-		if(target != null){
+		if (target != null) {
 			for (PFDemoUnit u : selectedUnits) {
 				u.orderAttackUnit(target);
 			}
 		}
-		
+
 	}
-	
-	private void handleLeftClickSelect(float x, float y){
+
+	private void handleLeftClickSelect(float x, float y) {
 		Point p1 = new Point(x, y);
 		Point p2 = new Point();
 		float dist;
@@ -203,7 +204,7 @@ public class PFUnitControls implements InputProcessor {
 
 		clickX2 = p1.x;
 		clickY2 = p1.y;
-		
+
 		leftMouseKeyDown = true;
 	}
 
@@ -249,7 +250,7 @@ public class PFUnitControls implements InputProcessor {
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		if (pointer == 0 && leftMouseKeyDown) { 
+		if (pointer == 0 && leftMouseKeyDown) {
 			Vector3 vec = new Vector3(); // obtain world coordinates of the click.
 			vec = camera.unproject(vec.set(screenX, screenY, 0));
 			Point p = new Point(vec.x, vec.y);
@@ -258,7 +259,6 @@ public class PFUnitControls implements InputProcessor {
 		}
 		return false;
 	}
-	
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
@@ -271,17 +271,18 @@ public class PFUnitControls implements InputProcessor {
 		// TODO Auto-generated method stub
 		return false;
 	}
-	
+
 	/**
 	 * Renders circles around selected units
 	 */
 	public void renderCirclesOnSelectedUnits() {
 		for (PFDemoUnit u : selectedUnits) {
-			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + 2.5f, shapeRenderer, Color.GREEN);
-			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + 4, shapeRenderer, Color.GREEN);
+			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + 2.5f, Color.GREEN);
+			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + 4, Color.GREEN);
 		}
 	}
-	public void renderDebuggingText(){
+
+	public void renderDebuggingText() {
 		// TODO:
 	}
 

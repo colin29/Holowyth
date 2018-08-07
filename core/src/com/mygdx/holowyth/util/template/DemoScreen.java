@@ -10,9 +10,9 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
+import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.util.Holo;
@@ -37,8 +37,8 @@ public abstract class DemoScreen implements Screen, InputProcessor {
 
 	protected Stage stage;
 
-	protected OrthographicCamera camera;
-	protected OrthographicCamera fixedCam;
+	protected OrthographicCamera camera; // Used for rendering world objects (that use world coordinates)
+	protected OrthographicCamera fixedCam; // Used for rendering objects on the screen coordinate.
 
 	protected SpriteBatch batch;
 

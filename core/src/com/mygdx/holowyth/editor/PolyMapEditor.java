@@ -1,6 +1,9 @@
 package com.mygdx.holowyth.editor;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.function.BooleanSupplier;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
@@ -42,9 +45,6 @@ import com.mygdx.holowyth.util.data.Pair;
 import com.mygdx.holowyth.util.exception.ErrorCode;
 import com.mygdx.holowyth.util.exception.HoloException;
 import com.mygdx.holowyth.util.tools.KeyTracker;
-
-import java.util.ArrayList;
-import java.util.function.*;
 
 public class PolyMapEditor implements Screen, InputProcessor {
 
@@ -204,7 +204,7 @@ public class PolyMapEditor implements Screen, InputProcessor {
 	private void renderMapPolygons() {
 		shapeRenderer.setProjectionMatrix(camera.combined); // Render as seen by the main camera
 		shapeRenderer.setColor(0, 0, 0, 1);
-		HoloGL.renderPolygons(map.polys, shapeRenderer);
+		HoloGL.renderPolygons(map.polys);
 		if (this.current_mode == MODE.DRAWING) {
 			this.drawer.render(shapeRenderer);
 		}
@@ -212,7 +212,7 @@ public class PolyMapEditor implements Screen, InputProcessor {
 
 	private void renderMapBoundaries() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
-		HoloGL.renderMapBoundaries(map, shapeRenderer);
+		HoloGL.renderMapBoundaries(map);
 	}
 
 	// Editor UI
@@ -456,19 +456,19 @@ public class PolyMapEditor implements Screen, InputProcessor {
 	// Saving and Loading Maps
 
 	private void loadMapFromDisk(String pathname) {
-		try{
-		Field loadedMap = HoloIO.getMapFromDisk(pathname);
-		loadMap(loadedMap);
-		} catch (HoloException e){
-			if(e.code == ErrorCode.IO_EXCEPTION){
+		try {
+			Field loadedMap = HoloIO.getMapFromDisk(pathname);
+			loadMap(loadedMap);
+		} catch (HoloException e) {
+			if (e.code == ErrorCode.IO_EXCEPTION) {
 				System.out.println("IO Error, map not loaded");
 				return;
 			}
 		}
 
 	}
-	
-	private void saveMapToDisk(String pathname) throws IOException{
+
+	private void saveMapToDisk(String pathname) throws IOException {
 		HoloIO.saveMapToDisk(pathname, this.map);
 	}
 
@@ -560,13 +560,11 @@ public class PolyMapEditor implements Screen, InputProcessor {
 	}
 
 	// Input Related
-	
+
 	final int[] TRACKED_KEYS = new int[] { Keys.LEFT, Keys.RIGHT, Keys.UP, Keys.DOWN };
 	KeyTracker keyTracker = new KeyTracker(TRACKED_KEYS, multiplexer);
-	
+
 	// Misc. Functions
-	
-	
 
 	/* ^^^^^^ End of User Methods ^^^^^^ */
 
@@ -585,7 +583,7 @@ public class PolyMapEditor implements Screen, InputProcessor {
 		if (keycode == Keys.L) {
 			loadMapFromDisk("../saveFiles/polySaveFile.ser");
 			return true;
-			
+
 		}
 
 		// toggle cursor-lock (and ability to mouse scroll)
@@ -662,7 +660,7 @@ public class PolyMapEditor implements Screen, InputProcessor {
 
 	private void openFileChooserToSaveMap() {
 		System.out.println("Opening Save Dialog");
-		
+
 		game.fileChooser.setMode(Mode.SAVE);
 		game.fileChooser.setSelectionMode(SelectionMode.FILES);
 		game.fileChooser.setListener(new FileChooserAdapter() {
@@ -676,15 +674,15 @@ public class PolyMapEditor implements Screen, InputProcessor {
 				}
 			}
 		});
-		
+
 		stage.addActor(game.fileChooser);
 		game.fileChooser.setDirectory(Holo.mapsDirectory);
 	}
-	
+
 	private void openFileChooserToLoadMap() {
 		System.out.println("Opening Load Dialog");
 		stage.addActor(game.fileChooser);
-		
+
 		game.fileChooser.setMode(Mode.OPEN);
 		game.fileChooser.setSelectionMode(SelectionMode.FILES);
 		game.fileChooser.setListener(new FileChooserAdapter() {
@@ -696,7 +694,7 @@ public class PolyMapEditor implements Screen, InputProcessor {
 				loadMapFromDisk(file.get(0).file().getAbsolutePath());
 			}
 		});
-		
+
 		game.fileChooser.setDirectory(Holo.mapsDirectory);
 	}
 

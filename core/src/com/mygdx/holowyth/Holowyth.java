@@ -18,6 +18,7 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.mygdx.holowyth.editor.PolyMapEditor;
+import com.mygdx.holowyth.util.HoloGL;
 
 public class Holowyth extends Game {
 
@@ -28,16 +29,15 @@ public class Holowyth extends Game {
 	public SpriteBatch batch;
 	public ShapeRenderer shapeRenderer;
 
-	
 	/* Fonts */
 	public BitmapFont font;
 	public BitmapFont font_goth12;
 	public BitmapFont font_goth36;
-	
+
 	public BitmapFont debugFont;
-	
+
 	public BitmapFont damageEffectFont;
-	
+
 	/* Skins */
 	public Skin skin;
 
@@ -54,8 +54,8 @@ public class Holowyth extends Game {
 
 	/* vvvvvvv User Methods vvvvvvv */
 	public Holowyth(Class<? extends Screen> c) { // takes in screen to open
-			screenToLoad = c;
-	
+		screenToLoad = c;
+
 	}
 
 	@Override
@@ -63,13 +63,13 @@ public class Holowyth extends Game {
 
 		VisUI.load();
 		skin = VisUI.getSkin();
-		
+
 		this.assets = new AssetManager();
-		
+
 		initFileChoosers();
 		initializeSharedResources();
 		initFonts();
-		
+
 		LoadingScreen loadingScreen = new LoadingScreen(this);
 		loadingScreen.queueAssets();
 		this.assets.finishLoading();
@@ -97,20 +97,23 @@ public class Holowyth extends Game {
 	private void initializeSharedResources() {
 		batch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
+		HoloGL.setShapeRenderer(shapeRenderer);
+
 		font = new BitmapFont(); // Use LibGDX's default Arial font.
 	}
 
 	private void initFonts() {
 		font_goth12 = generateFont("fonts/MS_Gothic.ttf", Color.WHITE, 12);
 		font_goth36 = generateFont("fonts/MS_Gothic.ttf", Color.WHITE, 36);
-		
-		debugFont= generateFont("fonts/OpenSans.ttf", Color.WHITE, 16);
-		
+
+		debugFont = generateFont("fonts/OpenSans.ttf", Color.WHITE, 16);
+
 		damageEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 16, Color.BLACK, 1.5f);
 		missEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 15, Color.GRAY, 0.5f);
 	}
-	
-	private BitmapFont generateFontWithBorder(String path, Color color,  int size, Color borderColor,  float borderWidth){
+
+	private BitmapFont generateFontWithBorder(String path, Color color, int size, Color borderColor,
+			float borderWidth) {
 		FreeTypeFontGenerator.setMaxTextureSize(FreeTypeFontGenerator.NO_MAXIMUM);
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(path));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
@@ -123,8 +126,7 @@ public class Holowyth extends Game {
 		return font;
 	}
 
-	
-	private BitmapFont generateFont(String path, Color color,  int size){
+	private BitmapFont generateFont(String path, Color color, int size) {
 		FreeTypeFontGenerator.setMaxTextureSize(FreeTypeFontGenerator.NO_MAXIMUM);
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(path));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();

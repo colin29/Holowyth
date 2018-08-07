@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.pathfinding.demo;
 
 import java.util.ArrayList;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
@@ -70,19 +71,12 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 	PFUnitControls unitControls;
 	PathingModule pathingModule;
 
-	
-
 	// Appearance
 	Color defaultClearColor = HoloGL.rbg(255, 236, 179);
 	Color clearColor = defaultClearColor;
 
 	// Logic
 	Timer timer = new Timer();
-
-	
-	
-
-
 
 	public PathfindingDemo(final Holowyth game) {
 		this.game = game;
@@ -97,7 +91,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		batch = game.batch;
 
 		pathingModule = new PathingModule(camera, shapeRenderer);
-		
+
 		createUI();
 	}
 
@@ -111,7 +105,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		camera.update();
 
 		pathingModule.renderGraph(false);
-		//renderDynamicGraph(false);
+		// renderDynamicGraph(false);
 
 		if (this.map != null) {
 			// renderExpandedPolygons();
@@ -121,11 +115,11 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		}
 
 		renderPaths(false);
-		for(PFDemoUnit u: units){
+		for (PFDemoUnit u : units) {
 			u.renderNextWayPoint(shapeRenderer);
 		}
 		renderUnitDestinations(Color.GREEN);
-		
+
 		unitControls.renderCirclesOnSelectedUnits();
 		renderUnits();
 
@@ -146,15 +140,13 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
 		// Testing area
 
-		
-		
 		// for (Vertex v : nearbyPathable) {
 		// HoloGL.renderCircle(v.ix * CELL_SIZE, v.iy * CELL_SIZE, shapeRenderer, Color.RED);
 		// }
 
 		// render expanded hit bodies
 		for (PFDemoUnit u : units) {
-			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + Holo.UNIT_RADIUS, shapeRenderer, Color.GRAY);
+			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + Holo.UNIT_RADIUS, Color.GRAY);
 		}
 
 		// pathing.stepAStar();
@@ -182,12 +174,12 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 	private void renderMapPolygons() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
 		shapeRenderer.setColor(Color.BLACK);
-		HoloGL.renderPolygons(map.polys, shapeRenderer);
+		HoloGL.renderPolygons(map.polys);
 	}
 
 	private void renderMapBoundaries() {
 		shapeRenderer.setProjectionMatrix(camera.combined);
-		HoloGL.renderMapBoundaries(map, shapeRenderer);
+		HoloGL.renderMapBoundaries(map);
 	}
 
 	@Override
@@ -248,7 +240,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
 		// Add Widgets here
 
-//		createParameterWindow();
+		// createParameterWindow();
 
 		root.debug();
 
@@ -266,7 +258,8 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
 		// root.add(new TextButton("test", skin));
 		stage.addActor(testing);
-		HoloUI.parameterSlider(0.01f, 10f, "COLLISION_CLEARANCE_DISTANCE", testing, skin, (Float f) -> Holo.collisionClearanceDistance = f);
+		HoloUI.parameterSlider(0.01f, 10f, "COLLISION_CLEARANCE_DISTANCE", testing, skin,
+				(Float f) -> Holo.collisionClearanceDistance = f);
 		HoloUI.parameterSlider(0, Holo.defaultUnitMoveSpeed, "initialMoveSpeed", testing, skin,
 				(Float f) -> playerUnit.initialMoveSpeed = f);
 		testing.pack();
@@ -279,49 +272,46 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		coordInfo.setPosition(Gdx.graphics.getWidth() - coordInfo.getWidth() - 4, 4);
 	}
 
-
 	// Expanded Geometry
-
-
 
 	// Rendering
 	private void renderPaths(boolean renderIntermediatePaths) {
 		// Render Path
-		
-		if(renderIntermediatePaths){
+
+		if (renderIntermediatePaths) {
 			pathingModule.renderIntermediateAndFinalPaths(units);
-		}else{
-			for(PFDemoUnit unit: units){
-				if(unit.path != null){
+		} else {
+			for (PFDemoUnit unit : units) {
+				if (unit.path != null) {
 					renderPath(unit.path, Color.GRAY, false);
 				}
 			}
 		}
-		
-		
+
 	}
 
 	float pathThickness = 2f;
+
 	private void renderPath(Path path, Color color, boolean renderPoints) {
 		HoloPF.renderPath(path, color, renderPoints, pathThickness, shapeRenderer);
 	}
 
 	private void renderUnitDestinations(Color color) {
-		
-		for (PFDemoUnit unit: units){
-			if(unit.path != null){
+
+		for (PFDemoUnit unit : units) {
+			if (unit.path != null) {
 				Point finalPoint = unit.path.get(unit.path.size() - 1);
 				shapeRenderer.begin(ShapeType.Filled);
 				shapeRenderer.setColor(color);
 				shapeRenderer.circle(finalPoint.x, finalPoint.y, 4f);
 				shapeRenderer.end();
-				
+
 				shapeRenderer.begin(ShapeType.Line);
 				shapeRenderer.setColor(Color.BLACK);
 				shapeRenderer.circle(finalPoint.x, finalPoint.y, 4f);
 				shapeRenderer.end();
 			}
-			
+
 		}
 	}
 
@@ -350,10 +340,10 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
 	}
 
-	
 	// *** Run on Map Load (Important!) ***//
 
 	int CELL_SIZE = Holo.CELL_SIZE;
+
 	/**
 	 * Logically initializes a bunch of components necessary to run the map
 	 */
@@ -366,12 +356,9 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		multiplexer.addProcessor(unitControls);
 
 		// Pathfinding Graph
-		
+
 		pathingModule.initForMap(map);
 		// Pathing
-		
-
-
 
 		//// ---------Test Area---------////:
 
@@ -390,7 +377,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		units.add(new PFDemoUnit(550, 122 - Holo.UNIT_RADIUS, this));
 		units.add(new PFDemoUnit(750, 450, this));
 	}
-	
+
 	// Unit Logic Related
 
 	ArrayList<PFDemoUnit> units = new ArrayList<PFDemoUnit>();
@@ -399,27 +386,27 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 	public void orderMoveTo(PFDemoUnit u, float dx, float dy) {
 		u.orderMove(dx, dy);
 	}
-	
+
 	private void tickLogicForUnits() {
 		for (PFDemoUnit u : units) {
 			u.handleGeneralLogic();
 		}
 	}
-	
+
 	private void moveUnits() {
 		for (PFDemoUnit u : units) {
-			
+
 			// Validate the motion by checking against other colliding bodies.
-			
+
 			float dx = u.x + u.vx;
 			float dy = u.y + u.vy;
-			
-			if(u.vx == 0 && u.vy == 0){
+
+			if (u.vx == 0 && u.vy == 0) {
 				continue;
 			}
-			
+
 			Segment motion = new Segment(u.x, u.y, dx, dy);
-			
+
 			ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
 			for (PFDemoUnit a : units) {
 				if (u.equals(a)) { // don't consider the unit's own collision body
@@ -432,57 +419,58 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 				c.unitRadius = a.getRadius();
 				colBodies.add(c);
 			}
-			ArrayList<CBInfo> collisions = HoloPF.getUnitCollisions(motion.x1, motion.y1, motion.x2, motion.y2, colBodies, u.getRadius());
-			if(collisions.isEmpty()){
+			ArrayList<CBInfo> collisions = HoloPF.getUnitCollisions(motion.x1, motion.y1, motion.x2, motion.y2,
+					colBodies, u.getRadius());
+			if (collisions.isEmpty()) {
 				u.x += u.vx;
 				u.y += u.vy;
-			}else{
-				
-				//if line intersects with one or more other units. (should be max two, since units should not be overlapped)
-				if(collisions.size() > 2){
+			} else {
+
+				// if line intersects with one or more other units. (should be max two, since units should not be
+				// overlapped)
+				if (collisions.size() > 2) {
 					System.out.println("Wierd case, unit colliding with more than 2 units");
 				}
-				//TODO: handle case where velocity is 0,0
-				
+				// TODO: handle case where velocity is 0,0
+
 				float curDestx = u.x + u.vx;
 				float curDesty = u.y + u.vy;
-				//Vector2 curVel = new Vector2(u.vx, u.vy);
-				
-				System.out.format("%s is colliding with %s bodies%n", u, collisions.size());
-				
-				
-				
-				
-				for(CBInfo cb: collisions){
-					Vector2 dist = new Vector2(curDestx-cb.x, curDesty - cb.y);
+				// Vector2 curVel = new Vector2(u.vx, u.vy);
 
-					// At first, dist is smaller than the combined radius, but previous push outs might have changed this.
-					if(dist.len() > cb.unitRadius + u.getRadius()){
+				System.out.format("%s is colliding with %s bodies%n", u, collisions.size());
+
+				for (CBInfo cb : collisions) {
+					Vector2 dist = new Vector2(curDestx - cb.x, curDesty - cb.y);
+
+					// At first, dist is smaller than the combined radius, but previous push outs might have changed
+					// this.
+					if (dist.len() > cb.unitRadius + u.getRadius()) {
 						continue;
 					}
 
 					// expand
-					Vector2 pushedOut = new Vector2(dist).setLength(cb.unitRadius + u.getRadius() + Holo.collisionClearanceDistance);
+					Vector2 pushedOut = new Vector2(dist)
+							.setLength(cb.unitRadius + u.getRadius() + Holo.collisionClearanceDistance);
 					// TODO: handle edge case here dist is 0
-					
+
 					curDestx = cb.x + pushedOut.x;
 					curDesty = cb.y + pushedOut.y;
 				}
-				
-				// Take this motion if it's valid, otherwise don't move unit.				
-				if(HoloPF.isEdgePathable(u.x, u.y, curDestx, curDesty, pathingModule.getExpandedMapPolys(), colBodies, u.getRadius())){
+
+				// Take this motion if it's valid, otherwise don't move unit.
+				if (HoloPF.isEdgePathable(u.x, u.y, curDestx, curDesty, pathingModule.getExpandedMapPolys(), colBodies,
+						u.getRadius())) {
 					u.x = curDestx;
 					u.y = curDesty;
 				}
-				//return; //debugging, step for every movement that has collisions
-				
+				// return; //debugging, step for every movement that has collisions
+
 			}
-			
+
 		}
-		
-		
+
 	}
-	
+
 	/* vvvvvvv Boilerplate code vvvvvvv */
 
 	// UI and Disk
@@ -626,7 +614,6 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		return false;
 	}
 
-	
 	@Override
 	public ArrayList<PFDemoUnit> getUnits() {
 		return this.units;
@@ -636,6 +623,5 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 	public PathingModule getPathingModule() {
 		return this.pathingModule;
 	}
-
 
 }
