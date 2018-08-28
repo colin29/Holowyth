@@ -8,6 +8,7 @@ import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
@@ -72,7 +73,25 @@ public class World implements WorldInfo {
 	 * detection.
 	 */
 	private void moveUnits() {
+
+		Polygons expandedMapPolys = HoloPF.expandPolygons(map.polys, Holo.UNIT_RADIUS);
+
 		for (Unit u : units) {
+
+			ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
+			for (Unit other : units) {
+				if (u.equals(other)) { // don't consider the unit's own collision body
+					continue;
+				}
+
+				CBInfo c = new CBInfo(other);
+				colBodies.add(c);
+			}
+
+			if (u.motion.isBeingKnockBacked()) {
+				resolveKnockbackMotion(u, expandedMapPolys, colBodies);
+				continue;
+			}
 
 			// Validate the motion by checking against other colliding bodies.
 
@@ -85,19 +104,6 @@ public class World implements WorldInfo {
 
 			Segment motion = new Segment(u.x, u.y, destX, destY);
 
-			ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
-			for (Unit a : units) {
-				if (u.equals(a)) { // don't consider the unit's own collision
-									// body
-					continue;
-				}
-
-				CBInfo c = new CBInfo();
-				c.x = a.x;
-				c.y = a.y;
-				c.unitRadius = a.getRadius();
-				colBodies.add(c);
-			}
 			ArrayList<CBInfo> collisions = HoloPF.getUnitCollisions(motion.x1, motion.y1, motion.x2, motion.y2,
 					colBodies, u.getRadius());
 			if (collisions.isEmpty()) {
@@ -162,6 +168,21 @@ public class World implements WorldInfo {
 
 	}
 
+	/**
+	 * Resolves motion for a single unit that is being knocked back
+	 * 
+	 * @param u
+	 * @param expandedMapPolys
+	 * @param colBodies
+	 */
+	private void resolveKnockbackMotion(Unit u, Polygons expandedMapPolys, ArrayList<CBInfo> colBodies) {
+
+		// Unit should bounce off walls
+
+		// Find the first target the unit hits. Basically do a raycast.
+
+	}
+
 	private float getCollisionClearanceDistance(Unit u) {
 		return Holo.collisionClearanceDistance * (u.motion.getVelocity() / Holo.defaultUnitMoveSpeed);
 	}
@@ -196,7 +217,7 @@ public class World implements WorldInfo {
 			playerUnit.stats.prepareUnit();
 			playerUnit.stats.printInfo();
 
-			playerUnit.motion.setSpeed(Holo.defaultUnitMoveSpeed * 5);
+			playerUnit.motion.setSpeedAndRelatedVars(Holo.defaultUnitMoveSpeed * 5);
 
 			return playerUnit;
 		} else {

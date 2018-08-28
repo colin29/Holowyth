@@ -29,6 +29,17 @@ public class HoloGL {
 		}
 	}
 
+	public static void renderSegment(Segment s, Color color, boolean renderEndpoints) {
+		renderSegment(s, color);
+		if (renderEndpoints) {
+			shapeRenderer.begin(ShapeType.Filled);
+			shapeRenderer.setColor(Color.BLACK);
+			shapeRenderer.circle(s.x1, s.y1, 2);
+			shapeRenderer.circle(s.x2, s.y2, 2);
+			shapeRenderer.end();
+		}
+	}
+
 	public static void renderPolygons(Polygons polys, Color color) {
 		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setColor(color);

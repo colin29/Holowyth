@@ -2,6 +2,7 @@ package com.mygdx.holowyth.pathfinding;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -9,11 +10,12 @@ import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.util.data.Segment;
 
-import de.lighti.clipper.Point.LongPoint;
 import de.lighti.clipper.Clipper.EndType;
 import de.lighti.clipper.Clipper.JoinType;
 import de.lighti.clipper.ClipperOffset;
+import de.lighti.clipper.Point.LongPoint;
 
 /**
  * Contains helper functions related to pathfinding and geometry
@@ -55,6 +57,36 @@ public class HoloPF {
 			}
 		}
 		return !intersects;
+	}
+
+	/**
+	 * If the edge given collides with a polygon, returns a segment describing that collision
+	 * 
+	 * @return
+	 */
+	public static Segment rayCastAgainstPolygons(float x, float y, float x2, float y2, Polygons polys) {
+		ArrayList<Segment> segs = new ArrayList<Segment>();
+		boolean intersects = false;
+		if (polys != null) {
+			for (Polygon polygon : polys) {
+				for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
+					if (Line2D.linesIntersect(x, y, x2, y2, polygon.floats[i], polygon.floats[i + 1],
+							polygon.floats[(i + 2) % polygon.count], polygon.floats[(i + 3) % polygon.count])) {
+						segs.add(new Segment(polygon.floats[i], polygon.floats[i + 1],
+								polygon.floats[(i + 2) % polygon.count], polygon.floats[(i + 3) % polygon.count]));
+						intersects = true;
+					}
+				}
+			}
+		}
+		if (intersects) {
+			// Find the first seg to intersect
+			// TODO:
+
+			return null;
+		} else {
+			return null;
+		}
 	}
 
 	public static ArrayList<CBInfo> getUnitCollisions(float x, float y, float x2, float y2, ArrayList<CBInfo> cbs,

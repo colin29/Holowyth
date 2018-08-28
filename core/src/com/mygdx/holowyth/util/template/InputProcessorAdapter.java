@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.combatDemo;
+package com.mygdx.holowyth.util.template;
 
 import com.badlogic.gdx.InputProcessor;
 

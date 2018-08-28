@@ -58,8 +58,7 @@ public class PathingModule {
 		this.map = map;
 
 		expandedMapPolys = HoloPF.expandPolygons(map.polys, Holo.UNIT_RADIUS); // We require one set for each distinct
-																				// size of unit, for now just
-		// one.
+																				// size of unit, for now just one.
 		createGraph();
 		floodFillGraph();
 

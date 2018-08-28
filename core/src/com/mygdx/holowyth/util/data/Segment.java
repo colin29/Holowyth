@@ -48,4 +48,18 @@ public class Segment {
 		float newY2 = y1 + dy * factor;
 		return new Segment(x1, y1, newX2, newY2);
 	}
+
+	/**
+	 * Modifying point does not affect the original Segment
+	 */
+	public Point startPoint() {
+		return new Point(x1, y1);
+	}
+
+	/**
+	 * Modifying point does not affect the original Segment
+	 */
+	public Point endPoint() {
+		return new Point(x2, y2);
+	}
 }

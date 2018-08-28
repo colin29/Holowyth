@@ -31,5 +31,4 @@ public class HoloUtil {
 	public static TextureRegionDrawable drawableFromTexture(Texture texture) {
 		return new TextureRegionDrawable(new TextureRegion(texture));
 	}
-
 }

@@ -44,11 +44,11 @@ public class UnitMotion {
 	private float maxAccelFactor = 5;
 
 	/**
-	 * The variables below all depend on speed and are modified by {@link UnitMotion#setSpeed(float)}
+	 * The variables below all depend on speed and are modified by {@link UnitMotion#setSpeedAndRelatedVars(float)}
 	 */
-	private float speed = defaultUnitMoveSpeed;
+	private float speed;
 	{
-		setSpeed(speed);
+		setSpeedAndRelatedVars(defaultUnitMoveSpeed);
 	}
 
 	private float startingSpeed;
@@ -363,13 +363,13 @@ public class UnitMotion {
 	 * 
 	 * @param speed
 	 */
-	public void setSpeed(float speed) {
+	public void setSpeedAndRelatedVars(float speed) {
 		this.speed = speed;
 		this.accelRate = defaultAccelRate * (speed / defaultUnitMoveSpeed);
 		this.decelRate = defaultDecelRate * (speed / defaultUnitMoveSpeed);
 
 		this.startingSpeed = defaultStartingSpeed * (speed / defaultUnitMoveSpeed);
-		this.targetFinalSpeed = defaultTargetFinalSpeed * (float) Math.pow((speed / defaultUnitMoveSpeed), 1.4);
+		this.targetFinalSpeed = defaultTargetFinalSpeed * (float) Math.pow((speed / defaultUnitMoveSpeed), 1.6);
 
 	}
 
@@ -419,6 +419,10 @@ public class UnitMotion {
 
 	public void applyKnockBack(float direction, float initSpeed) {
 		this.knockback = new KnockBack(direction, initSpeed);
+	}
+
+	public boolean isBeingKnockBacked() {
+		return this.knockback != null;
 	}
 
 	public class KnockBack {

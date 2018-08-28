@@ -107,11 +107,11 @@ public class Renderer {
 
 		// 1: Render Map
 
-		if (this.map != null) {
-			renderMapPolygons();
-			// pathingModule.renderExpandedMapPolygons();
-			renderMapBoundaries();
-		}
+		// if (this.map != null) {
+		// renderMapPolygons();
+		// pathingModule.renderExpandedMapPolygons();
+		// renderMapBoundaries();
+		// }
 
 		// 2: Render unit paths
 		// renderPaths(false);
@@ -130,12 +130,23 @@ public class Renderer {
 			renderCirclesAroundBusyRetreatingUnits();
 			renderCirclesAroundBusyCastingUnits();
 		}
+
 		// renderPaths(false); // temp, delete this after use
 		renderPlayerUnreachedWaypoints(Color.FIREBRICK);
 
 		for (Unit u : world.units) {
 			u.renderAttackingArrow();
 		}
+		renderDotAtUnitCenters();
+
+		// 1: Render Map
+
+		if (this.map != null) {
+			renderMapPolygons();
+			pathingModule.renderExpandedMapPolygons();
+			renderMapBoundaries();
+		}
+
 		// renderPlayerVelocity();
 
 		// Render effects
@@ -284,7 +295,17 @@ public class Renderer {
 				shapeRenderer.end();
 			}
 		}
+	}
 
+	@SuppressWarnings("unused")
+	private void renderDotAtUnitCenters() {
+		// Render a red dot at the center of the unit
+		for (Unit unit : world.units) {
+			shapeRenderer.begin(ShapeType.Filled);
+			shapeRenderer.setColor(Color.RED);
+			shapeRenderer.circle(unit.x, unit.y, 1);
+			shapeRenderer.end();
+		}
 	}
 
 	@SuppressWarnings("unused")

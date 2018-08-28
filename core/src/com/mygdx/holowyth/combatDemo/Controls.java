@@ -31,6 +31,7 @@ import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 import com.mygdx.holowyth.util.debug.DebugStore;
 import com.mygdx.holowyth.util.debug.DebugValues;
+import com.mygdx.holowyth.util.template.InputProcessorAdapter;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
 
 /**
