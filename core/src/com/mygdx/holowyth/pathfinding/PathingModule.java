@@ -250,7 +250,7 @@ public class PathingModule {
 	ArrayList<Vertex> blocked = new ArrayList<Vertex>();
 
 	/**
-	 * Modifies the graph by restricting vertices according to the additional
+	 * Modifies the graph by restricting vertices (and their edges) according to the additional colliding bodies given
 	 * 
 	 * @param infos
 	 *            List of the expanded polygons of units, excluding the pathing unit, with some extra information.

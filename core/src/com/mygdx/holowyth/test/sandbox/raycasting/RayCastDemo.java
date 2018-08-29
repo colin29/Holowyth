@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.HoloGL;
+import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.data.Segment;
 import com.mygdx.holowyth.util.template.DemoScreen;
 
@@ -22,7 +23,7 @@ public class RayCastDemo extends DemoScreen {
 		draggablePoints.addAll(DraggablePoint.getDraggablePointsFrom(wallSegment));
 	}
 
-	Color clearColor = HoloGL.rbg(255, 236, 179); // HoloGL.rbg(79, 121, 66);
+	Color clearColor = HoloGL.rbg(200, 180, 120); // HoloGL.rbg(79, 121, 66);
 
 	public final float pointSelectLeniency = 10;
 
@@ -32,6 +33,8 @@ public class RayCastDemo extends DemoScreen {
 	ArrayList<DraggablePoint> draggablePoints = new ArrayList<>();
 
 	DraggablePoint draggedPoint = null;
+
+	Point collision = new Point(200, 600);
 
 	@Override
 	public void render(float delta) {
@@ -44,6 +47,52 @@ public class RayCastDemo extends DemoScreen {
 
 		HoloGL.renderSegment(wallSegment, Color.RED, true);
 		HoloGL.renderArrow(unitMotion.startPoint(), unitMotion.endPoint(), Color.GREEN);
+
+		calcCollision();
+		if (collision != null) {
+			HoloGL.renderCircleOutline(collision.x, collision.y, 6, Color.CYAN);
+		}
+	}
+
+	private void calcCollision() {
+		collision = lineSegsIntersect(unitMotion, wallSegment);
+	}
+
+	public Point lineSegsIntersect(Segment s1, Segment s2) {
+
+		float a1, a2, b1, b2, c1, c2;
+
+		a1 = s1.y2 - s1.y1;
+		b1 = s1.x1 - s1.x2;
+		c1 = a1 * s1.x1 + b1 * s1.y1;
+
+		a2 = s2.y2 - s2.y1;
+		b2 = s2.x1 - s2.x2;
+		c2 = a2 * s2.x1 + b2 * s2.y1;
+
+		float det = a1 * b2 - a2 * b1;
+		float x, y;
+		if (det == 0) {
+		} else {
+			x = (b2 * c1 - b1 * c2) / det;
+			y = (a1 * c2 - a2 * c1) / det;
+
+			// Check if the point is on both line segments
+			float EPS = 0.001f; // tolerance (From brief testing I saw roundings errors of 0.000031 for x = 400, 30
+								// times less than this. However rounding errors are proportional to size of x, thus
+								// the large safety factor)
+
+			// System.out.printf("%f, %f, %f %n", Math.min(s2.y1, s2.y2) - EPS, y, Math.max(s2.y1, s2.y2) + EPS);
+
+			if (Math.min(s1.x1, s1.x2) - EPS <= x && x <= Math.max(s1.x1, s1.x2) + EPS
+					&& Math.min(s1.y1, s1.y2) - EPS <= y && y <= Math.max(s1.y1, s1.y2 + EPS)
+					&& Math.min(s2.x1, s2.x2) - EPS <= x && x <= Math.max(s2.x1, s2.x2) + EPS
+					&& Math.min(s2.y1, s2.y2) - EPS <= y && y <= Math.max(s2.y1, s2.y2) + EPS) {
+				return new Point(x, y);
+			}
+			return null;
+		}
+		return null;
 	}
 
 	@Override
