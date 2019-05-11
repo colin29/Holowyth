@@ -108,7 +108,7 @@ public abstract class DemoScreen implements Screen, InputProcessor {
 		camera.position.set(newMap.width() / 2, newMap.height() / 2, 0);
 	}
 
-	protected void displayTitleBarInformation() {
+	protected void updateTitleBarInformation() {
 		if (this.map == null) {
 			Gdx.graphics.setTitle(Holo.titleName + " --- " + "No map loaded");
 		} else {
@@ -145,8 +145,6 @@ public abstract class DemoScreen implements Screen, InputProcessor {
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override

@@ -105,7 +105,6 @@ public class Unit implements UnitInterPF, UnitInfo {
 
 		this.stats = new UnitStats(this);
 
-		System.out.println(this.side.toString());
 		if (this.side == Side.PLAYER) {
 			DebugValues debugValues = this.getWorldMutable().getDebugStore().registerComponent("Player unit");
 			debugValues.add(new DebugValue("sp", () -> stats.getSp() + "/" + stats.getMaxSp()));

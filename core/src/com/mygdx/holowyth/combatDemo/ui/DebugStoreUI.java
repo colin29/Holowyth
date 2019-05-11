@@ -22,7 +22,7 @@ public class DebugStoreUI {
 
 	Stage stage;
 
-	Table debugInfo;
+	Table debugInfo = new Table();
 
 	ValueLabelMapping valueLabelMapping;
 
@@ -90,6 +90,10 @@ public class DebugStoreUI {
 
 	public DebugStore getDebugStore() {
 		return debugStore;
+	}
+
+	public Table getDebugInfo() {
+		return debugInfo;
 	}
 
 	public void createDebugInfoDisplay() {

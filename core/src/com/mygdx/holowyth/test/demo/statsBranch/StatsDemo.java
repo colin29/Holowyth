@@ -16,14 +16,11 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.holowyth.test.demo.statsBranch.UnitStatsSB.UnitType;
 import com.mygdx.holowyth.unit.Item;
-import com.mygdx.holowyth.unit.UnitStats;
 import com.mygdx.holowyth.unit.Item.EquipType;
 import com.mygdx.holowyth.unit.Item.ItemType;
-import com.mygdx.holowyth.util.misc.HoloMisc;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
 
 public class StatsDemo extends ApplicationAdapter implements InputProcessor {
@@ -50,13 +47,12 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 		multiplexer.addProcessor(stage);
 		multiplexer.addProcessor(this);
 		Gdx.input.setInputProcessor(multiplexer);
-		
+
 		createTestUnits();
-		
+
 		// Bind hotkeys
-		functionBindings.bindFunctionToKey(()-> unit.attack(unitB), Keys.G);
+		functionBindings.bindFunctionToKey(() -> unit.attack(unitB), Keys.G);
 	}
-	
 
 	private void createTestUnits() {
 		unit = new UnitStatsSB("Arthur");
@@ -65,15 +61,11 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 		loadSomeEquipment(unit);
 		unit.prepareUnit();
 
-		unit.printInfo();
-		
-
 		unitB = new UnitStatsSB("Bob");
 		loadUnitStats2(unitB);
 		loadArmor(unitB);
-		
+
 		unitB.prepareUnit();
-		unitB.printInfo();
 	}
 
 	public static void loadUnitStats(UnitStatsSB unit) {
@@ -81,63 +73,63 @@ public class StatsDemo extends ApplicationAdapter implements InputProcessor {
 		unit.baseAgi = 5;
 		unit.baseFort = 6;
 		unit.basePercep = 6;
-	
+
 		unit.baseMaxHp = 100;
 		unit.baseMaxSp = 50;
-	
+
 		unit.baseMoveSpeed = 2.3f;
-	
+
 		unit.level = 3;
-	
+
 		unit.unitType = UnitType.PLAYER;
 	}
 
 	public static void loadUnitStats2(UnitStatsSB unit) {
-	
+
 		unit.baseStr = 5;
 		unit.baseAgi = 5;
 		unit.baseFort = 5;
 		unit.basePercep = 5;
-	
+
 		unit.baseMaxHp = 100;
 		unit.baseMaxSp = 50;
-	
+
 		unit.baseMoveSpeed = 2.3f;
-	
+
 		unit.level = 1;
-	
+
 		unit.unitType = UnitType.PLAYER;
 	}
 
 	public static void loadSomeEquipment(UnitStatsSB unit) {
 		Item sword = new Item("Red Sword");
-	
+
 		sword.damage = 8;
-	
+
 		sword.atkBonus = 2;
 		sword.defBonus = 2;
 		sword.accBonus = 4;
 		sword.armorNegationBonus = 0.1f;
-	
+
 		sword.itemType = ItemType.EQUIPMENT;
 		sword.equipType = EquipType.WEAPON;
-	
+
 		Item ring = new Item("Stone Ring");
 		ring.itemType = ItemType.EQUIPMENT;
 		ring.equipType = EquipType.ACCESSORY;
 		ring.fortBonus = 2;
 		ring.percepBonus = 1;
-	
+
 		unit.getEquip().mainHand = sword;
 		unit.getEquip().accessory1 = ring;
 	}
-	
+
 	public static void loadArmor(UnitStatsSB unit) {
 		Item armor = new Item("Steel Plate", EquipType.ARMOR);
-		
+
 		armor.armorBonus = 6;
 		armor.dmgReductionBonus = 0.35f;
-		
+
 		unit.getEquip().torso = armor;
 	}
 

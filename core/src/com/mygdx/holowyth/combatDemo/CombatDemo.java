@@ -8,15 +8,11 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.combatDemo.effects.EffectsHandler;
-import com.mygdx.holowyth.combatDemo.ui.DebugStoreUI;
+import com.mygdx.holowyth.combatDemo.ui.CombatDemoUI;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
@@ -42,10 +38,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	Renderer renderer;
 
 	// UI
-	DebugStoreUI ui;
+	CombatDemoUI combatDemoUI;
 
 	// Scene2D
-	private Table root;
 	Skin skin;
 
 	// Game Components
@@ -78,8 +73,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		initializeAppLifetimeComponents();
 
-		ui = new DebugStoreUI(stage, debugStore);
-		createUI();
+		combatDemoUI = new CombatDemoUI(stage, debugStore, skin);
 
 		// Configure Input
 		multiplexer.addProcessor(stage);
@@ -89,8 +83,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		loadMapFromDisk(Holo.mapsDirectory + Holo.editorInitialMap);
 
-		initGameComponentsForMapStartup();
+		mapStartup();
 
+		Table debugInfo = combatDemoUI.getDebugInfo();
 		functionBindings.bindFunctionToKey(() -> debugInfo.setVisible(!debugInfo.isVisible()), Keys.GRAVE); // tilde key
 	}
 
@@ -105,15 +100,15 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	public void render(float delta) {
 		renderer.render(delta);
 
-		displayTitleBarInformation();
-
-		// Cursor related
+		updateTitleBarInformation();
 		renderCursor();
 
-		// update debug display
-		ui.updateDebugValueDisplay();
+		combatDemoUI.onRender();
 
-		// Game logic
+		ifTimeElapsedTickWorld();
+	}
+
+	private void ifTimeElapsedTickWorld() {
 		timer.start(1000 / 60);
 
 		if (timer.taskReady()) {
@@ -134,62 +129,15 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	public void dispose() {
 	}
 
-	private void createUI() {
-		stage = new Stage(new ScreenViewport());
-
-		root = new Table();
-		root.setFillParent(true);
-		stage.addActor(root);
-		root.top().left();
-		stage.addActor(root);
-
-		root.debug();
-
-		// Add Widgets here
-		createCoordinateText();
-		ui.createDebugInfoDisplay();
-	}
-
-	Window parameterWindow;
-
-	@SuppressWarnings("unused")
-	/**
-	 * A parameter window produces a slider which can be used to adjust variables dynamically
-	 */
-	private void createParameterWindow() {
-
-		parameterWindow = new Window("Parameters", skin);
-		parameterWindow.setPosition(0, 100);
-
-		// root.add(new TextButton("test", skin));
-		stage.addActor(parameterWindow);
-		// HoloUI.parameterSlider(0, Holo.defaultUnitMoveSpeed,
-		// "initialMoveSpeed", testing, skin,
-		// (Float f) -> playerUnit.initialMoveSpeed = f);
-		parameterWindow.pack();
-	}
-
-	Label coordInfo;
-
-	/**
-	 * Adds a small coordinate text that displays the mouse cursor position in world coordinates
-	 */
-	private void createCoordinateText() {
-		coordInfo = new Label("(000, 000)\n", skin);
-		coordInfo.setColor(Color.BLACK);
-		stage.addActor(coordInfo);
-		coordInfo.setPosition(Gdx.graphics.getWidth() - coordInfo.getWidth() - 4, 4);
-	}
-
-	Table debugInfo;
-
 	Unit playerUnit;
 
 	/**
 	 * Initializes neccesary game components. <br>
+	 * Creates map-lifetime components and sets up application-lifetime components. <br>
+	 * The map in question is {@link #map} <br>
 	 * Call after loading a new map. The mirror function is mapShutdown.
 	 */
-	private void initGameComponentsForMapStartup() {
+	protected void mapStartup() {
 
 		effects = new EffectsHandler(game, camera, debugStore);
 
@@ -211,6 +159,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		renderer.setUnitControls(unitControls);
 		renderer.setEffectsHandler(effects);
 
+		// UI
+		combatDemoUI.onMapStartup();
+
 		/* Test Area */
 
 		// Create test units
@@ -219,14 +170,13 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		world.spawnSomeEnemyUnits();
 
 		// playerUnit.orderMove(CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
-		ui.populateDebugValueDisplay();
 
 	}
 
 	@Override
 	protected void mapShutdown() {
 		System.out.println("test");
-		debugInfo.clear();
+		combatDemoUI.getDebugInfo().clear();
 	}
 
 	/* Input methods */
@@ -271,9 +221,10 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	private void updateMouseCoordLabel(int screenX, int screenY) {
 		Point p = HoloUtil.getCursorInWorldCoords(camera);
-		coordInfo.setText(
+		combatDemoUI.getCoordInfo().setText(
 				"(" + (int) (p.x) + ", " + (int) (p.y) + ")\n" + "(" + (int) (p.x) / Holo.CELL_SIZE + ", "
 						+ (int) (p.y) / Holo.CELL_SIZE + ")");
 
 	}
+
 }

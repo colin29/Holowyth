@@ -215,7 +215,7 @@ public class World implements WorldInfo {
 			PresetUnits.loadSomeEquipment(playerUnit.stats);
 			PresetUnits.loadArmor(playerUnit.stats);
 			playerUnit.stats.prepareUnit();
-			playerUnit.stats.printInfo();
+			// playerUnit.stats.printInfo();
 
 			playerUnit.motion.setSpeedAndRelatedVars(Holo.defaultUnitMoveSpeed * 5);
 

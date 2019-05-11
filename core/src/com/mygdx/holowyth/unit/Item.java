@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.unit;
 
-import static com.mygdx.holowyth.util.DataUtil.*;
+import static com.mygdx.holowyth.util.DataUtil.getAsPercentage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,9 +27,10 @@ public class Item {
 	public int damage;
 
 	public int strBonus, agiBonus, fortBonus, percepBonus;
-	public int atkBonus, defBonus, forceBonus, stabBonus, accBonus, dodgeBonus; // conditional bonuses are handled manually in
-																			// the combat simulator, for now.
-	
+	public int atkBonus, defBonus, forceBonus, stabBonus, accBonus, dodgeBonus; // conditional bonuses are handled
+																				// manually in
+	// the combat simulator, for now.
+
 	public int armorBonus;
 	public float dmgReductionBonus; // is a percentage reduction
 
@@ -44,22 +45,18 @@ public class Item {
 		this(name, ItemType.EQUIPMENT);
 		this.equipType = equipType;
 	}
-	
+
 	public Item(String name, ItemType itemType) {
 		this(name);
 		this.itemType = itemType;
 	}
-	
+
 	public Item(String name) {
 		this.name = name;
 	}
 
 	public Item() {
 		this("Untitled Item");
-	}
-
-	public void test() {
-		System.out.println(itemType);
 	}
 
 	public void printInfo() {
@@ -69,7 +66,7 @@ public class Item {
 	public String getInfo() {
 		String s = "";
 		s += String.format("[%s]  %s%n", name, getCompleteItemType());
-		if(damage>0) {
+		if (damage > 0) {
 			s += String.format(" Damage: %d%n", damage);
 		}
 		s += " " + getListOfEquipBonuses();
@@ -96,7 +93,7 @@ public class Item {
 			m.put(statBonusLabel, statValue);
 			ordering.add(statBonusLabel);
 		};
-	
+
 		registerStat.accept("str", strBonus);
 		registerStat.accept("agi", agiBonus);
 		registerStat.accept("fort", fortBonus);
@@ -111,7 +108,7 @@ public class Item {
 
 		registerStat.accept("Armor", armorBonus);
 		registerStat.accept("DR", dmgReductionBonus);
-		
+
 		registerStat.accept("AP", armorPiercingBonus);
 		registerStat.accept("Armor Negate", armorNegationBonus);
 
@@ -119,20 +116,21 @@ public class Item {
 
 		for (String statBonusLabel : ordering) {
 			Object statBonus = m.get(statBonusLabel);
-			if(statBonus instanceof Integer) {
+			if (statBonus instanceof Integer) {
 				int sbInt = (Integer) statBonus;
 				if (sbInt != 0) {
 					String sign = sbInt > 0 ? "+" : "-";
 					s += statBonusLabel + sign + Math.abs(sbInt) + ", ";
 				}
-			}else if(statBonus instanceof Float) {
+			} else if (statBonus instanceof Float) {
 				float sbFloat = (Float) statBonus;
 				if (sbFloat != 0) {
 					String sign = sbFloat > 0 ? "+" : "-";
 					s += statBonusLabel + " " + sign + getAsPercentage(Math.abs(sbFloat)) + ", ";
 				}
-			}else {
-				System.out.printf("Invalid data type %s for label %s%n", statBonus.getClass().getSimpleName(), statBonusLabel);
+			} else {
+				System.out.printf("Invalid data type %s for label %s%n", statBonus.getClass().getSimpleName(),
+						statBonusLabel);
 			}
 		}
 		s = StringUtils.removeEnd(s, ", ");
