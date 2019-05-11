@@ -10,8 +10,8 @@ import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.combatDemo.effects.particle.ParticleEffect;
 import com.mygdx.holowyth.combatDemo.effects.particle.ParticleEffectPool;
 import com.mygdx.holowyth.combatDemo.effects.particle.ParticleEffectPool.PooledEffect;
-import com.mygdx.holowyth.combatDemo.effects.particle.ParticleEmitter;
 import com.mygdx.holowyth.util.debug.DebugStore;
+import com.mygdx.holowyth.combatDemo.effects.particle.ParticleEmitter;
 
 public class SparksEffectHandler {
 

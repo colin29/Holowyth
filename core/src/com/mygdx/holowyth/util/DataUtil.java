@@ -4,7 +4,7 @@ import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 /**
- * Add methods sparingly Allows one point of control for how data should be displayed
+ * Add methods sparingly Allows one point of control for how data should be displayed project-wide
  * 
  * @author Colin Ta
  *

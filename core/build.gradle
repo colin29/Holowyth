@@ -1,27 +1,24 @@
-apply plugin: "java"
-
 sourceCompatibility = 1.8
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
 
 
-visuiVersion = '1.3.0'
+def visuiVersion = '1.3.0'
 
 dependencies {
+	
+	// UI
 	compile "com.kotcrab.vis:vis-ui:$visuiVersion"
-	compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"	
 
+	compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"	
+	
+	// Pathfinding
 	compile files('lib/clipper.jar')
-	// https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+
+	// Util
 	compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
-	// https://mvnrepository.com/artifact/org.apache.commons/commons-collections4
 	compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.0'
 	
-}
-
-
-eclipse.project {
-    name = appName + "-core"
 }

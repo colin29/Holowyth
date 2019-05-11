@@ -46,7 +46,7 @@ public class Holo {
 	public static String editorInitialMap = "/complexMap.map"; // "/blankMap.map";
 
 	// Debug display
-
+	public static boolean debugPanelShowAtStartup = false;
 	public static Color debugFontColor = Color.BLACK;
 
 	// Debug settings

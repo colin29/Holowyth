@@ -34,7 +34,7 @@ public class Holowyth extends Game {
 	public BitmapFont font_goth12;
 	public BitmapFont font_goth36;
 
-	public BitmapFont debugFont;
+	public static BitmapFont debugFont;
 
 	public BitmapFont damageEffectFont;
 
@@ -152,6 +152,15 @@ public class Holowyth extends Game {
 				| InvocationTargetException e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Workaround until I replace this with using the Asset manager
+	 * 
+	 * @return
+	 */
+	public static BitmapFont getDebugFont() {
+		return debugFont;
 	}
 
 }

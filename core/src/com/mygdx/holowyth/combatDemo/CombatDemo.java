@@ -1,11 +1,5 @@
 package com.mygdx.holowyth.combatDemo;
 
-import static com.mygdx.holowyth.util.DataUtil.getAsPercentage;
-import static com.mygdx.holowyth.util.DataUtil.getRoundedString;
-
-import java.util.ArrayList;
-import java.util.Map;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
@@ -13,17 +7,16 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.combatDemo.effects.EffectsHandler;
+import com.mygdx.holowyth.combatDemo.ui.DebugStoreUI;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
@@ -31,9 +24,6 @@ import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.HoloUtil;
 import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.debug.DebugStore;
-import com.mygdx.holowyth.util.debug.DebugValue;
-import com.mygdx.holowyth.util.debug.DebugValues;
-import com.mygdx.holowyth.util.debug.ValueLabelMapping;
 import com.mygdx.holowyth.util.template.DemoScreen;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
 import com.mygdx.holowyth.util.tools.Timer;
@@ -49,40 +39,36 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	// Rendering and pipeline variables
 	ShapeRenderer shapeRenderer;
+	Renderer renderer;
 
-	// Input
-	private InputMultiplexer multiplexer = new InputMultiplexer();
+	// UI
+	DebugStoreUI ui;
 
 	// Scene2D
 	private Table root;
 	Skin skin;
 
 	// Game Components
-
 	Controls unitControls;
 	PathingModule pathingModule;
-	EffectsHandler effects; // keeps track of vfx effects
 
+	// Game state
 	World world;
 
-	// Appearance
-	Color initialClearColor = HoloGL.rbg(255, 236, 179);
-	{
-		// initialClearColor = Color.FOREST;
-		initialClearColor = HoloGL.rbg(79, 121, 66);
-	}
+	// Graphical Components
+	EffectsHandler effects; // keeps track of vfx effects
 
-	// Misc.
-	FPSLogger fps = new FPSLogger();
-
-	// Settings
+	// Input
+	private InputMultiplexer multiplexer = new InputMultiplexer();
 
 	// Frame rate control
 	Timer timer = new Timer();
 
-	private FunctionBindings functionBindings = new FunctionBindings();
+	Color backgroundColor = HoloGL.rbg(79, 121, 66); // HoloGL.rbg(255, 236, 179);
 
-	Renderer renderer;
+	// For debugging and playtesting
+	DebugStore debugStore = new DebugStore();
+	private FunctionBindings functionBindings = new FunctionBindings();
 
 	public CombatDemo(final Holowyth game) {
 		super(game);
@@ -90,8 +76,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		skin = game.skin;
 		shapeRenderer = game.shapeRenderer;
 
-		pathingModule = new PathingModule(camera, shapeRenderer);
+		initializeAppLifetimeComponents();
 
+		ui = new DebugStoreUI(stage, debugStore);
 		createUI();
 
 		// Configure Input
@@ -102,13 +89,16 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		loadMapFromDisk(Holo.mapsDirectory + Holo.editorInitialMap);
 
-		// Init Renderer
-		renderer = new Renderer(game, camera, stage, pathingModule);
-		renderer.setClearColor(initialClearColor);
-
 		initGameComponentsForMapStartup();
 
 		functionBindings.bindFunctionToKey(() -> debugInfo.setVisible(!debugInfo.isVisible()), Keys.GRAVE); // tilde key
+	}
+
+	private void initializeAppLifetimeComponents() {
+		pathingModule = new PathingModule(camera, shapeRenderer);
+
+		renderer = new Renderer(game, camera, stage, pathingModule);
+		renderer.setClearColor(backgroundColor);
 	}
 
 	@Override
@@ -121,7 +111,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		renderCursor();
 
 		// update debug display
-		updateDebugValueDisplay();
+		ui.updateDebugValueDisplay();
 
 		// Game logic
 		timer.start(1000 / 60);
@@ -151,28 +141,22 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		root.setFillParent(true);
 		stage.addActor(root);
 		root.top().left();
-
 		stage.addActor(root);
-
-		// Add Widgets here
-
-		// createParameterWindow();
 
 		root.debug();
 
+		// Add Widgets here
 		createCoordinateText();
-
-		// createParameterWindow();
-
-		createDebugInfoDisplay();
-
+		ui.createDebugInfoDisplay();
 	}
 
 	Window parameterWindow;
 
 	@SuppressWarnings("unused")
+	/**
+	 * A parameter window produces a slider which can be used to adjust variables dynamically
+	 */
 	private void createParameterWindow() {
-		// Create a table for adjusting parameters
 
 		parameterWindow = new Window("Parameters", skin);
 		parameterWindow.setPosition(0, 100);
@@ -187,6 +171,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	Label coordInfo;
 
+	/**
+	 * Adds a small coordinate text that displays the mouse cursor position in world coordinates
+	 */
 	private void createCoordinateText() {
 		coordInfo = new Label("(000, 000)\n", skin);
 		coordInfo.setColor(Color.BLACK);
@@ -196,23 +183,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	Table debugInfo;
 
-	private void createDebugInfoDisplay() {
-		debugInfo = new Table();
-		debugInfo.setFillParent(true);
-
-		debugInfo.top().left();
-		debugInfo.pad(4);
-		// debugInfo.debug();
-
-		debugInfo.defaults().spaceRight(20).left();
-
-		stage.addActor(debugInfo);
-	}
-
-	// *** Run on Map Load (Important!) ***//
-
 	Unit playerUnit;
-	DebugStore debugStore = new DebugStore();
 
 	/**
 	 * Initializes neccesary game components. <br>
@@ -248,63 +219,8 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		world.spawnSomeEnemyUnits();
 
 		// playerUnit.orderMove(CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
-		populateDebugValueDisplay();
+		ui.populateDebugValueDisplay();
 
-	}
-
-	ValueLabelMapping valueLabelMapping;
-
-	private void populateDebugValueDisplay() {
-		valueLabelMapping = new ValueLabelMapping();
-
-		LabelStyle debugStyle = new LabelStyle(game.debugFont, Holo.debugFontColor);
-
-		for (Map.Entry<String, DebugValues> entry : debugStore.getStore().entrySet()) {
-			String componentName = entry.getKey();
-			debugInfo.add(new Label(componentName, debugStyle));
-			debugInfo.row();
-			ArrayList<DebugValue> listOfValues = entry.getValue();
-
-			for (DebugValue v : listOfValues) {
-				Label n = new Label(" -" + v.getName(), debugStyle);
-				Label l = new Label("", debugStyle);
-				debugInfo.add(n, l);
-				debugInfo.row();
-				valueLabelMapping.registerLabel(v, l);
-			}
-		}
-	}
-
-	private void updateDebugValueDisplay() {
-		if (valueLabelMapping != null) {
-			valueLabelMapping.forEach(CombatDemo::updateLabel);
-		}
-	}
-
-	private static void updateLabel(DebugValue v, Label l) {
-		String str;
-
-		switch (v.getValueType()) {
-		case FLOAT:
-			if (v.shouldDisplayAsPercentage()) {
-				str = getAsPercentage(v.getFloatValue());
-			} else {
-				str = getRoundedString(v.getFloatValue());
-			}
-			break;
-		case INT:
-			str = String.valueOf(v.getIntValue());
-			break;
-		case STRING:
-			str = v.getStringValue();
-			break;
-		default:
-			System.out.println("Unsupported debug value type");
-			str = null;
-			break;
-		}
-
-		l.setText(str);
 	}
 
 	@Override
