@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.GroundSkill;
 import com.mygdx.holowyth.skill.NoneSkill;
 import com.mygdx.holowyth.skill.Skill;
@@ -25,14 +26,13 @@ import com.mygdx.holowyth.skill.Skill.Targeting;
 import com.mygdx.holowyth.skill.Skills;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.HoloGL;
 import com.mygdx.holowyth.util.HoloUtil;
-import com.mygdx.holowyth.util.data.Point;
-import com.mygdx.holowyth.util.data.Segment;
-import com.mygdx.holowyth.util.debug.DebugStore;
-import com.mygdx.holowyth.util.debug.DebugValues;
-import com.mygdx.holowyth.util.template.InputProcessorAdapter;
+import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.util.dataobjects.Segment;
+import com.mygdx.holowyth.util.template.adapters.InputProcessorAdapter;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
+import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
+import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
 /**
  * Accepts player input to select and order units to move (and other behaviour later on). <br>

@@ -2,7 +2,7 @@ package com.mygdx.holowyth.combatDemo;
 
 import java.util.ArrayList;
 
-import com.mygdx.holowyth.combatDemo.effects.EffectsHandler;
+import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
 

@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.util;
+package com.mygdx.holowyth.graphics;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -8,8 +8,8 @@ import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.unit.UnitInfo;
-import com.mygdx.holowyth.util.data.Point;
-import com.mygdx.holowyth.util.data.Segment;
+import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.util.dataobjects.Segment;
 
 /**
  * Utility class with various basic rendering/visualization functions. One should set shapeRenderer's projection matrix

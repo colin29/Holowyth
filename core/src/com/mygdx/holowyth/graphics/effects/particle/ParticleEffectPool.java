@@ -14,11 +14,11 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.mygdx.holowyth.combatDemo.effects.particle;
+package com.mygdx.holowyth.graphics.effects.particle;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
-import com.mygdx.holowyth.combatDemo.effects.particle.ParticleEffectPool.PooledEffect;
+import com.mygdx.holowyth.graphics.effects.particle.ParticleEffectPool.PooledEffect;
 
 public class ParticleEffectPool extends Pool<PooledEffect> {
 	private final ParticleEffect effect;

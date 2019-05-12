@@ -17,8 +17,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
-import com.mygdx.holowyth.util.data.Point;
-import com.mygdx.holowyth.util.data.Segment;
+import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.util.dataobjects.Segment;
 
 public class PolygonDemo implements Screen, InputProcessor {
 

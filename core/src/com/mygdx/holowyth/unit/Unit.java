@@ -11,15 +11,15 @@ import java.util.Set;
 import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.combatDemo.WorldInfo;
+import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitInterPF;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skill.Status;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.HoloGL;
-import com.mygdx.holowyth.util.data.Point;
-import com.mygdx.holowyth.util.debug.DebugValue;
-import com.mygdx.holowyth.util.debug.DebugValues;
+import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.util.tools.debugstore.DebugValue;
+import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
 /**
  * 

@@ -11,16 +11,16 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.combatDemo.effects.EffectsHandler;
 import com.mygdx.holowyth.combatDemo.ui.CombatDemoUI;
+import com.mygdx.holowyth.graphics.HoloGL;
+import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.HoloGL;
-import com.mygdx.holowyth.util.debug.DebugStore;
 import com.mygdx.holowyth.util.template.DemoScreen;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
 import com.mygdx.holowyth.util.tools.Timer;
+import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
 /**
  * The main class that runs the game.

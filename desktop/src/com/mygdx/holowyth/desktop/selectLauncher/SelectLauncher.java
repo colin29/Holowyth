@@ -18,7 +18,7 @@ import com.mygdx.holowyth.test.sandbox.FooGame;
 import com.mygdx.holowyth.test.sandbox.holowyth.Test1;
 import com.mygdx.holowyth.test.sandbox.holowyth.Test2;
 import com.mygdx.holowyth.test.ui.UIDemo;
-import com.mygdx.holowyth.util.debug.DebugDemo;
+import com.mygdx.holowyth.util.tools.debugstore.DebugDemo;
 
 public class SelectLauncher {
 

@@ -13,10 +13,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.debug.DebugStore;
-import com.mygdx.holowyth.util.debug.DebugValue;
-import com.mygdx.holowyth.util.debug.DebugValues;
-import com.mygdx.holowyth.util.debug.ValueLabelMapping;
+import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
+import com.mygdx.holowyth.util.tools.debugstore.DebugValue;
+import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
+import com.mygdx.holowyth.util.tools.debugstore.ValueLabelMapping;
 
 public class DebugStoreUI {
 

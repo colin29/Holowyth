@@ -10,8 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloUtil;
-import com.mygdx.holowyth.util.data.Point;
-import com.mygdx.holowyth.util.debug.DebugStore;
+import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
 public class CombatDemoUI {
 

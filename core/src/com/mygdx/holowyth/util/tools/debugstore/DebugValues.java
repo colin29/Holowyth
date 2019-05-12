@@ -1,10 +1,10 @@
-package com.mygdx.holowyth.util.debug;
+package com.mygdx.holowyth.util.tools.debugstore;
 
 import java.util.ArrayList;
 import java.util.function.IntSupplier;
 
-import com.mygdx.holowyth.util.debug.DebugValue.FloatSupplier;
-import com.mygdx.holowyth.util.debug.DebugValue.StringSupplier;
+import com.mygdx.holowyth.util.tools.debugstore.DebugValue.FloatSupplier;
+import com.mygdx.holowyth.util.tools.debugstore.DebugValue.StringSupplier;
 
 public class DebugValues extends ArrayList<DebugValue> {
 	

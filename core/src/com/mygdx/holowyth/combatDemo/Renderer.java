@@ -12,7 +12,9 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.combatDemo.effects.EffectsHandler;
+import com.mygdx.holowyth.graphics.HoloGL;
+import com.mygdx.holowyth.graphics.HoloSprite;
+import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
@@ -25,8 +27,7 @@ import com.mygdx.holowyth.unit.UnitInfo;
 import com.mygdx.holowyth.unit.UnitMotion;
 import com.mygdx.holowyth.unit.UnitStatsInfo;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.HoloGL;
-import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
  * Handles all of CombatDemo's rendering <br>

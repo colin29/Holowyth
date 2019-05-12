@@ -3,7 +3,7 @@ package com.mygdx.holowyth.unit;
 import com.mygdx.holowyth.skill.SkillInfo;
 import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.Unit.Side;
-import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.util.dataobjects.Point;
 
 public interface UnitInfo {
 

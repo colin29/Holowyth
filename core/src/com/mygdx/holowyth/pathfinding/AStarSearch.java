@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.PriorityQueue;
 
 import com.mygdx.holowyth.polygon.Polygons;
-import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
  * Currently the result of an AStarSearch can be extracted from ancestor.

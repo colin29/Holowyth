@@ -9,10 +9,11 @@ import com.badlogic.gdx.InputProcessor;
 /**
  * Tracks whether given keys are being pressed down or not. <br>
  * 
- * Note: If using Libgdx, use Gdx.input.isButtonPressed instead
+ * @deprecated Gdx.input.isButtonPressed exists, use that instead
  * 
  * @usage Construct a KeyTracker with the keys you would like to track.
  */
+@Deprecated
 public class KeyTracker implements InputProcessor {
 
 	private Map<Integer, Boolean> keyIsDown = new HashMap<Integer, Boolean>();
@@ -21,7 +22,7 @@ public class KeyTracker implements InputProcessor {
 		for (int keycode : keysToTrack) {
 			keyIsDown.put(keycode, false);
 		}
-		
+
 		multiplexer.addProcessor(0, this);
 	}
 

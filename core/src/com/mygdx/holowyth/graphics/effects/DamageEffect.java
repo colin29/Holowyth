@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.combatDemo.effects;
+package com.mygdx.holowyth.graphics.effects;
 
 import com.badlogic.gdx.graphics.Color;
 

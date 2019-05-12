@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.combatDemo.effects;
+package com.mygdx.holowyth.graphics.effects;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -7,11 +7,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.combatDemo.effects.particle.ParticleEffect;
-import com.mygdx.holowyth.combatDemo.effects.particle.ParticleEffectPool;
-import com.mygdx.holowyth.combatDemo.effects.particle.ParticleEffectPool.PooledEffect;
-import com.mygdx.holowyth.util.debug.DebugStore;
-import com.mygdx.holowyth.combatDemo.effects.particle.ParticleEmitter;
+import com.mygdx.holowyth.graphics.effects.particle.ParticleEffect;
+import com.mygdx.holowyth.graphics.effects.particle.ParticleEffectPool;
+import com.mygdx.holowyth.graphics.effects.particle.ParticleEmitter;
+import com.mygdx.holowyth.graphics.effects.particle.ParticleEffectPool.PooledEffect;
+import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
 public class SparksEffectHandler {
 

@@ -9,7 +9,7 @@ import com.mygdx.holowyth.skill.Skill.Targeting;
 import com.mygdx.holowyth.skill.effect.UnitEffect;
 import com.mygdx.holowyth.skill.effect.UnitGroundEffect;
 import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
  * Static class that holds a collection of skills

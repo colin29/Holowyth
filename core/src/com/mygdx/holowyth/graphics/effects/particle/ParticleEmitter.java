@@ -14,7 +14,7 @@
  * limitations under the License.
  ******************************************************************************/
 
-package com.mygdx.holowyth.combatDemo.effects.particle;
+package com.mygdx.holowyth.graphics.effects.particle;
 
 import java.io.BufferedReader;
 import java.io.IOException;

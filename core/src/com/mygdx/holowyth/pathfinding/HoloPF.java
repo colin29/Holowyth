@@ -9,8 +9,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.data.Point;
-import com.mygdx.holowyth.util.data.Segment;
+import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.util.dataobjects.Segment;
 
 import de.lighti.clipper.Clipper.EndType;
 import de.lighti.clipper.Clipper.JoinType;

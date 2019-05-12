@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.util.debug;
+package com.mygdx.holowyth.util.tools.debugstore;
 
 import java.util.HashMap;
 import java.util.Map;

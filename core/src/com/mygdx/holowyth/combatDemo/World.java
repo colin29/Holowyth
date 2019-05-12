@@ -3,7 +3,7 @@ package com.mygdx.holowyth.combatDemo;
 import java.util.ArrayList;
 
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.combatDemo.effects.EffectsHandler;
+import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
@@ -13,9 +13,9 @@ import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.data.Segment;
-import com.mygdx.holowyth.util.debug.DebugStore;
-import com.mygdx.holowyth.util.debug.DebugValues;
+import com.mygdx.holowyth.util.dataobjects.Segment;
+import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
+import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
 /**
  * Has map lifetime

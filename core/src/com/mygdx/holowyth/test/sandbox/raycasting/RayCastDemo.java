@@ -7,9 +7,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.util.HoloGL;
-import com.mygdx.holowyth.util.data.Point;
-import com.mygdx.holowyth.util.data.Segment;
+import com.mygdx.holowyth.graphics.HoloGL;
+import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.template.DemoScreen;
 
 public class RayCastDemo extends DemoScreen {

@@ -2,7 +2,7 @@ package com.mygdx.holowyth.pathfinding;
 
 import java.util.ArrayList;
 
-import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
  * typedef for ArrayList<Pair<Integer, Integer>>

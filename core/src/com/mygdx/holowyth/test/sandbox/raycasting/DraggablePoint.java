@@ -2,7 +2,7 @@ package com.mygdx.holowyth.test.sandbox.raycasting;
 
 import java.util.ArrayList;
 
-import com.mygdx.holowyth.util.data.Segment;
+import com.mygdx.holowyth.util.dataobjects.Segment;
 
 public class DraggablePoint {
 

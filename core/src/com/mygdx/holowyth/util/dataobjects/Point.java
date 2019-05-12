@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.util.data;
+package com.mygdx.holowyth.util.dataobjects;
 
 /**
  * Data struct holding x and y.

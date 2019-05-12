@@ -18,7 +18,7 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.mygdx.holowyth.editor.PolyMapEditor;
-import com.mygdx.holowyth.util.HoloGL;
+import com.mygdx.holowyth.graphics.HoloGL;
 
 public class Holowyth extends Game {
 

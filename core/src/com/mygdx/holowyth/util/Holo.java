@@ -2,6 +2,12 @@ package com.mygdx.holowyth.util;
 
 import com.badlogic.gdx.graphics.Color;
 
+/**
+ * Contains all the global settings for Holowyth
+ * 
+ * @author Colin Ta
+ *
+ */
 public class Holo {
 
 	// Paths

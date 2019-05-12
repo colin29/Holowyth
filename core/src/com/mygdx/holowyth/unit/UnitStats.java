@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.holowyth.combatDemo.effects.EffectsHandler;
-import com.mygdx.holowyth.util.data.Pair;
-import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.graphics.effects.EffectsHandler;
+import com.mygdx.holowyth.util.dataobjects.Pair;
+import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
  * Simple stat fields are exposed public, while those which may trigger extra handling will be exposed through getters

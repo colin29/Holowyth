@@ -5,14 +5,14 @@ import java.util.ArrayList;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.combatDemo.WorldInfo;
+import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.HoloGL;
-import com.mygdx.holowyth.util.data.Point;
-import com.mygdx.holowyth.util.debug.DebugValues;
+import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
 public class UnitMotion {
 

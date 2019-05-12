@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.util.data;
+package com.mygdx.holowyth.util.dataobjects;
 
 public class Pair<F, S> {
     private F first; //first member of pair

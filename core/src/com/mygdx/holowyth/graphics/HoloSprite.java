@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.combatDemo;
+package com.mygdx.holowyth.graphics;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;

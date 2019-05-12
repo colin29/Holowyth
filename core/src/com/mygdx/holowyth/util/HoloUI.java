@@ -14,7 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 
 /**
- * Utility methods related to GUI elements
+ * Utility methods for creating GUI's in Scene2D
  * 
  * @author Colin Ta
  *

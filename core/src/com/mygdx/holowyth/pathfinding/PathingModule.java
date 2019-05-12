@@ -9,13 +9,13 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Queue;
+import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.PathSmoother.PathsInfo;
 import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.HoloGL;
-import com.mygdx.holowyth.util.data.Coord;
-import com.mygdx.holowyth.util.data.Point;
+import com.mygdx.holowyth.util.dataobjects.Coord;
+import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
  * Handles pathfinding for the app's needs <br>

@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.util.template;
+package com.mygdx.holowyth.util.template.adapters;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;

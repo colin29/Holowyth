@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.combatDemo.effects;
+package com.mygdx.holowyth.graphics.effects;
 
 import java.util.ArrayList;
 import java.util.ListIterator;
@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.unit.UnitInfo;
 import com.mygdx.holowyth.util.DataUtil;
-import com.mygdx.holowyth.util.debug.DebugStore;
+import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
 /**
  * Manages all effects for the game

@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.util.debug;
+package com.mygdx.holowyth.util.tools.debugstore;
 
 import static com.mygdx.holowyth.util.DataUtil.*;
 
@@ -12,7 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
-import com.mygdx.holowyth.util.template.ApplicationListenerAdapter;
+import com.mygdx.holowyth.util.template.adapters.ApplicationListenerAdapter;
 
 /**
  * Testing class: Simulates roughly the main usage case for the DebugStore

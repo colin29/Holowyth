@@ -18,7 +18,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.mygdx.holowyth.util.misc.HoloMisc;
+import com.mygdx.holowyth.util.DebugUtil;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
 
 public class Test2 extends ApplicationAdapter implements InputProcessor {
@@ -91,7 +91,7 @@ public class Test2 extends ApplicationAdapter implements InputProcessor {
 		root.add(b1);
 		root.add(b2);
 		
-		HoloMisc.printDirectory(".\\");
+		DebugUtil.printDirectory(".\\");
 		
 		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts\\fantasy_one.ttf"));
 		
