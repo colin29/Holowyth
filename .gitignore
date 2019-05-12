@@ -23,7 +23,8 @@ hs_err_pid*
 .settings/
 .loadpath
 .externalToolBuilders/
-*.launch
+*.laun
+/**/.classpath
 
 tmp/**
 
@@ -33,7 +34,12 @@ hs_err_pid*
 
 ### Gradle ###
 .gradle
+
+### Build directories ###
+
 /build/
+/core/build/
+/desktop/build/
 
 # Ignore Gradle GUI config
 gradle-app.setting

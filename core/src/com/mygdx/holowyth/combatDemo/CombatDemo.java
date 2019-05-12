@@ -17,16 +17,15 @@ import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloGL;
-import com.mygdx.holowyth.util.HoloUtil;
-import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.debug.DebugStore;
 import com.mygdx.holowyth.util.template.DemoScreen;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
 import com.mygdx.holowyth.util.tools.Timer;
 
 /**
- * Is responsible for the startup construction of the UI, and setting up the other components on both creation and map
- * load
+ * The main class that runs the game.
+ * 
+ * Is responsible for setting up the all the other components.
  * 
  * @author Colin Ta
  *
@@ -110,7 +109,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	private void ifTimeElapsedTickWorld() {
 		timer.start(1000 / 60);
-
 		if (timer.taskReady()) {
 			world.tick();
 			effects.tick();
@@ -209,22 +207,14 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
-		updateMouseCoordLabel(screenX, screenY);
+		combatDemoUI.updateMouseCoordLabel(screenX, screenY, camera);
 		return false;
 	}
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		updateMouseCoordLabel(screenX, screenY);
+		combatDemoUI.updateMouseCoordLabel(screenX, screenY, camera);
 		return false;
-	}
-
-	private void updateMouseCoordLabel(int screenX, int screenY) {
-		Point p = HoloUtil.getCursorInWorldCoords(camera);
-		combatDemoUI.getCoordInfo().setText(
-				"(" + (int) (p.x) + ", " + (int) (p.y) + ")\n" + "(" + (int) (p.x) / Holo.CELL_SIZE + ", "
-						+ (int) (p.y) / Holo.CELL_SIZE + ")");
-
 	}
 
 }

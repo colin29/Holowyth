@@ -132,12 +132,11 @@ public class Renderer {
 		}
 
 		// renderPaths(false); // temp, delete this after use
-		renderPlayerUnreachedWaypoints(Color.FIREBRICK);
+		// renderPlayerUnreachedWaypoints(Color.FIREBRICK);
 
 		for (Unit u : world.units) {
 			u.renderAttackingArrow();
 		}
-		renderDotAtUnitCenters();
 
 		// 1: Render Map
 
@@ -299,7 +298,6 @@ public class Renderer {
 
 	@SuppressWarnings("unused")
 	private void renderDotAtUnitCenters() {
-		// Render a red dot at the center of the unit
 		for (Unit unit : world.units) {
 			shapeRenderer.begin(ShapeType.Filled);
 			shapeRenderer.setColor(Color.RED);

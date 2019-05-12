@@ -1,12 +1,16 @@
 package com.mygdx.holowyth.combatDemo.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.HoloUtil;
+import com.mygdx.holowyth.util.data.Point;
 import com.mygdx.holowyth.util.debug.DebugStore;
 
 public class CombatDemoUI {
@@ -91,6 +95,14 @@ public class CombatDemoUI {
 
 	public void onRender() {
 		debugStoreUI.updateDebugValueDisplay();
+	}
+
+	public void updateMouseCoordLabel(int screenX, int screenY, Camera camera) {
+		Point p = HoloUtil.getCursorInWorldCoords(camera);
+		getCoordInfo().setText(
+				"(" + (int) (p.x) + ", " + (int) (p.y) + ")\n" + "(" + (int) (p.x) / Holo.CELL_SIZE + ", "
+						+ (int) (p.y) / Holo.CELL_SIZE + ")");
+
 	}
 
 }
