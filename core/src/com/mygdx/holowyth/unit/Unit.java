@@ -21,13 +21,18 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugValue;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
 /**
- * 
- * Implements commands like move, attackMove, attack target unit. <br>
- * Also controls automatic behavior of units.
- * 
+ * Responsibilities:<br>
+ * <ol>
+ * <li>Be the main class, delegate functionality to subcomponents such as UnitMotion, UnitStats</li>
+ * <li>Be the implementer for interfaces, such as UnitInfo or UnitOrderable</li>
+ * <li>Hold some basic unit information that isn't delegated to other subcomponents (hp, position, side)</li>
+ * <li>Handle Order Logic (both at the moment of ordering and onFrame logic)</li>
+ * </ol>
+ *
  * @author Colin Ta
  * 
  */
+
 public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	public float x, y;
