@@ -15,7 +15,7 @@ import com.mygdx.holowyth.util.dataobjects.Point;
  * @author Colin Ta
  *
  */
-public class HoloUtil {
+public class MiscUtil {
 
 	public static Point getCursorInWorldCoords(Camera worldCamera) {
 		Vector3 vec = new Vector3();

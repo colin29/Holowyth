@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.HoloUtil;
+import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
@@ -98,7 +98,7 @@ public class CombatDemoUI {
 	}
 
 	public void updateMouseCoordLabel(int screenX, int screenY, Camera camera) {
-		Point p = HoloUtil.getCursorInWorldCoords(camera);
+		Point p = MiscUtil.getCursorInWorldCoords(camera);
 		getCoordInfo().setText(
 				"(" + (int) (p.x) + ", " + (int) (p.y) + ")\n" + "(" + (int) (p.x) / Holo.CELL_SIZE + ", "
 						+ (int) (p.y) / Holo.CELL_SIZE + ")");

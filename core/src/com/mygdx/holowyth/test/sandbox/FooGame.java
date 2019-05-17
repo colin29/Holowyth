@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.kotcrab.vis.ui.VisUI;
-import com.mygdx.holowyth.util.HoloUtil;
+import com.mygdx.holowyth.util.MiscUtil;
 
 public class FooGame extends Game {
 
@@ -63,7 +63,7 @@ public class FooGame extends Game {
 		FreeTypeFontGenerator generator	= new FreeTypeFontGenerator(Gdx.files.internal("fonts/MS_Gothic.ttf"));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = 36;
-		HoloUtil.addJapaneseCharacters(parameter);
+		MiscUtil.addJapaneseCharacters(parameter);
 		parameter.color = Color.WHITE;
 		this.font_goth36 = generator.generateFont(parameter);
 		

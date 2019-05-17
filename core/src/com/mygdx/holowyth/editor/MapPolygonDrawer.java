@@ -1,8 +1,8 @@
 package com.mygdx.holowyth.editor;
 
 import com.badlogic.gdx.graphics.Camera;
+import com.mygdx.holowyth.editor.polydrawer.PolygonDrawer;
 import com.mygdx.holowyth.map.Field;
-import com.mygdx.holowyth.polygon.PolygonDrawer;
 
 /**
  * Similar to a PolygonDrawer but requires a map and sets the map's altered flag upon making changes

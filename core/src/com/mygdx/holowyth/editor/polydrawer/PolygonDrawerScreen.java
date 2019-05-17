@@ -1,47 +1,118 @@
-package com.mygdx.holowyth.polygon;
+package com.mygdx.holowyth.editor.polydrawer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.graphics.Camera;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.polygon.Polygon;
+import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 
 //Called by a parent screen to allow the user to draw Polygons for other use, before returning to previous Screen
-public class PolygonDrawer implements InputProcessor {
-	
-	public Camera parentCamera;
+public class PolygonDrawerScreen implements Screen, InputProcessor {
+
+	final Holowyth game;
+
+	// Rendering and pipeline variables
+	OrthographicCamera camera;
+	ShapeRenderer shapeRenderer;
+	SpriteBatch batch;
+
+	// App Fields
+	Screen parentScreen;
 
 	// Polygons
-	public Polygons polys;
+	public Polygons polys = new Polygons();
 
-	public PolygonDrawer(Camera parentCamera) {
-		//this.polys = polys;
-		
-		this.parentCamera = parentCamera;
+	public PolygonDrawerScreen(final Holowyth game, Screen parentScreen) {
+		this.game = game;
+
+		// create a camera for this screen.
+		camera = new OrthographicCamera();
+		camera.setToOrtho(false, game.resX, game.resY);
+
+		shapeRenderer = game.shapeRenderer;
+
+		batch = game.batch;
+
+		this.parentScreen = parentScreen;
+	}
+
+	@Override
+	public void render(float delta) {
+
+		// Clear the screen
+		Gdx.gl.glClearColor(0.8f, 1f, 0.8f, 1);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT
+				| (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
+
+		// Tell the camera to update its matrices.
+		camera.update();
+
+		// Tell the SpriteBatch to render in the coordinate system specified by
+		// the camera.
+		batch.setProjectionMatrix(camera.combined);
+		shapeRenderer.setProjectionMatrix(camera.combined);
+
+		renderPolygonDemo();
+
+	}
+
+	@Override
+	public void resize(int width, int height) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void pause() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void resume() {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void show() {
+		System.out.println("Entered Polygon Drawer");
+		Gdx.input.setInputProcessor(this);
+	}
+
+	@Override
+	public void hide() {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void dispose() {
 	}
 
 	/* vvvvvvv User Methods vvvvvvv */
-	
-	/**
-	 * Renders the polygonDrawer (partial polygons only). Drawing is done as is using world coordinates, so usually you'd want to set the batch matrix
-	 * to the main camera
-	 * @param shapeRenderer shapeRenderer to use. Batch shouldn't be active when calling.
-	 */
-	public void render(ShapeRenderer shapeRenderer) {
+
+	private void renderPolygonDemo() {
 		shapeRenderer.setColor(0, 0, 0, 1);
 
-//		shapeRenderer.begin(ShapeType.Line);
-//		for (Polygon p : polys) {
-//			shapeRenderer.polygon(p.vertexes, 0, p.count);
-//		}
-//		shapeRenderer.end();
+		shapeRenderer.begin(ShapeType.Line);
+		for (Polygon p : polys) {
+			shapeRenderer.polygon(p.floats, 0, p.count);
+		}
+		shapeRenderer.end();
 
 		
 		shapeRenderer.begin(ShapeType.Line);
@@ -97,20 +168,13 @@ public class PolygonDrawer implements InputProcessor {
 		points.add(new Point(x, y));
 	}
 
-	protected void completePolygon() {
+	private void completePolygon() {
 		if (vertexCount >= 6) {
 			Polygon p = new Polygon(vertexes, vertexCount);
 			polys.add(p);
 		} else {
 			System.out.println("Less than 3 edges in polygon");
 		}
-		vertexCount = 0;
-		Arrays.fill(vertexes, 0);
-		segs.clear();
-		points.clear();
-	}
-	
-	public void clearPartiallyDrawnPolygons(){
 		vertexCount = 0;
 		Arrays.fill(vertexes, 0);
 		segs.clear();
@@ -123,7 +187,10 @@ public class PolygonDrawer implements InputProcessor {
 	public boolean keyDown(int keycode) {
 		if (keycode == Keys.SPACE) {
 			completePolygon();
-			return true;
+		}
+		if (keycode == Keys.D) {
+			game.setScreen(parentScreen);
+			System.out.println("Exited Polygon Drawer");
 		}
 		return false;
 	}
@@ -138,8 +205,7 @@ public class PolygonDrawer implements InputProcessor {
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		System.out.println(screenX + " " + screenY);
 		if (button == Input.Buttons.LEFT && pointer == 0) {
-			vec = parentCamera.unproject(vec.set(screenX, screenY, 0));
-			
+			vec = camera.unproject(vec.set(screenX, screenY, 0));
 			System.out.println(vec.x + " " + vec.y);
 			addVertex(vec.x, vec.y);
 			return true;
