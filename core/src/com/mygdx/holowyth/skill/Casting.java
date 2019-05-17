@@ -1,7 +1,7 @@
 package com.mygdx.holowyth.skill;
 
 import com.mygdx.holowyth.skill.Skill.Status;
-import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.UnitOrderable;
 
 /**
  * Component of Skill.
@@ -22,7 +22,7 @@ public class Casting implements Cloneable, CastingInfo {
 		this.parent = parent;
 	}
 	
-	public void begin(Unit caste) {
+	public void begin(UnitOrderable caste) {
 		
 		this.castTimeRemaining = castTime;
 		onBeginCast();

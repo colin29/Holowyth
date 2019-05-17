@@ -1,11 +1,9 @@
 package com.mygdx.holowyth.unit;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Set;
 
 import com.badlogic.gdx.graphics.Color;
@@ -16,6 +14,7 @@ import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitInterPF;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skill.Status;
+import com.mygdx.holowyth.unit.behaviours.AggroIfIsEnemyUnit;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValue;
@@ -29,7 +28,7 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
  * @author Colin Ta
  * 
  */
-public class Unit implements UnitInterPF, UnitInfo {
+public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	public float x, y;
 
@@ -126,6 +125,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 
 	// Orders
 
+	@Override
 	public void orderMove(float dx, float dy) {
 		if (!isMoveOrderAllowed()) {
 			return;
@@ -140,7 +140,10 @@ public class Unit implements UnitInterPF, UnitInfo {
 	 * @param unit
 	 * @return Whether the command was valid and accepted
 	 */
-	public boolean orderAttackUnit(Unit unit) {
+	@Override
+	public boolean orderAttackUnit(UnitOrderable unitOrd) {
+		Unit unit = (Unit) unitOrd; // underlying objects must hold the same type
+
 		if (!isAttackOrderAllowed(unit)) {
 			return false;
 		}
@@ -156,6 +159,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 		return true;
 	}
 
+	@Override
 	public void orderAttackMove(float x, float y) {
 		if (!isAttackMoveOrderAllowed()) {
 			return;
@@ -164,6 +168,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 
 	}
 
+	@Override
 	public void orderRetreat(float x, float y) {
 		if (!isRetreatOrderAllowed()) {
 			return;
@@ -187,6 +192,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 	/**
 	 * A stop order stops a unit's motion and current order. You cannot use stop to cancel your own casting atm.
 	 */
+	@Override
 	public void orderStop() {
 		if (!isStopOrderAllowed()) {
 			return;
@@ -195,6 +201,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 		clearOrder();
 	}
 
+	@Override
 	public void orderUseSkill(Skill skill) {
 
 		if (!isUseSkillAllowed()) {
@@ -216,6 +223,45 @@ public class Unit implements UnitInterPF, UnitInfo {
 		motion.stopCurrentMovement();
 	}
 
+	// @formatter:off
+		private boolean isAttackOrderAllowed(Unit target) {
+			return !stats.isDead()
+					&& attacking == null
+					&& target.side != this.side
+					&& !isRetreatCooldownActive()
+					&& !(isCasting() || isChannelling());
+		}
+
+		private boolean isMoveOrderAllowed() {
+			return !stats.isDead()
+					&& attacking == null
+					&& !isRetreatCooldownActive()
+					&& !(isCasting() || isChannelling());
+		}
+
+		private boolean isAttackMoveOrderAllowed() {
+			return isMoveOrderAllowed();
+		}
+		private boolean isRetreatOrderAllowed() {
+			return !stats.isDead()
+					&& this.attacking != null
+					&& this.currentOrder != Order.RETREAT
+					&& !(isCasting() || isChannelling());
+		}
+		private boolean isStopOrderAllowed() {
+			return !stats.isDead()
+					&& !isRetreatCooldownActive()
+					&& !(isCasting() || isChannelling());
+		}
+		private boolean isUseSkillAllowed() {
+			return !stats.isDead()
+					&& !isRetreatCooldownActive()
+					&& !(isCasting() || isChannelling())
+					&& !areSkillsOnCooldown();
+		}
+		
+		// @formatter:on
+
 	/**
 	 * Clears any current order on this unit. For internal use.
 	 */
@@ -223,6 +269,20 @@ public class Unit implements UnitInterPF, UnitInfo {
 		currentOrder = Order.IDLE;
 		target = null;
 	}
+
+	public boolean isCasting() {
+		return this.activeSkill != null && activeSkill.getStatus() == Status.CASTING;
+	}
+
+	public boolean isChannelling() {
+		return this.activeSkill != null && activeSkill.getStatus() == Status.CHANNELING;
+	}
+
+	@Override
+	public boolean isRetreatCooldownActive() {
+		return currentOrder == Order.RETREAT && retreatDurationRemaining > 0;
+	}
+	// @formatter:on
 
 	/**
 	 * Caused by normal attacking or stun effects. Interrupts any casting or channeling spell
@@ -240,7 +300,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 	 */
 	public void handleLogic() {
 		motion.tick();
-		aggroIfIsEnemyUnit();
+		AggroIfIsEnemyUnit.runOn(this, world);
 		if (currentOrder == Order.RETREAT)
 			retreatDurationRemaining -= 1;
 
@@ -310,7 +370,7 @@ public class Unit implements UnitInterPF, UnitInfo {
 
 	}
 
-	private float getAttackingSameTargetAtkspdPenalty(Unit target) {
+	private float getAttackingSameTargetAtkspdPenalty(UnitOrderable target) {
 		int n = unitsAttacking.get(target).size();
 
 		if (n <= 1) {
@@ -350,81 +410,6 @@ public class Unit implements UnitInterPF, UnitInfo {
 		return attacking != null;
 	}
 
-	// @formatter:off
-	private boolean isAttackOrderAllowed(Unit target) {
-		return !stats.isDead()
-				&& attacking == null
-				&& target.side != this.side
-				&& !isRetreatCooldownActive()
-				&& !(isCasting() || isChannelling());
-	}
-
-	private boolean isMoveOrderAllowed() {
-		return !stats.isDead()
-				&& attacking == null
-				&& !isRetreatCooldownActive()
-				&& !(isCasting() || isChannelling());
-	}
-
-	private boolean isAttackMoveOrderAllowed() {
-		return isMoveOrderAllowed();
-	}
-	private boolean isRetreatOrderAllowed() {
-		return !stats.isDead()
-				&& this.attacking != null
-				&& this.currentOrder != Order.RETREAT
-				&& !(isCasting() || isChannelling());
-	}
-	private boolean isStopOrderAllowed() {
-		return !stats.isDead()
-				&& !isRetreatCooldownActive()
-				&& !(isCasting() || isChannelling());
-	}
-	private boolean isUseSkillAllowed() {
-		return !stats.isDead()
-				&& !isRetreatCooldownActive()
-				&& !(isCasting() || isChannelling())
-				&& !areSkillsOnCooldown();
-	}
-	
-	public boolean isCasting() {
-		return this.activeSkill != null && activeSkill.getStatus() == Status.CASTING;
-	}
-	public boolean isChannelling() {
-		return this.activeSkill != null && activeSkill.getStatus() == Status.CHANNELING;
-	}
-	
-	@Override
-	public boolean isRetreatCooldownActive() {
-		return currentOrder == Order.RETREAT && retreatDurationRemaining >0;
-	}
-	// @formatter:on
-
-	// Automatic Unit Behaviour
-
-	/**
-	 * Makes this unit aggro to the closest target if it is an enemy faction unit
-	 */
-	private void aggroIfIsEnemyUnit() {
-		if (this.side == Side.ENEMY && currentOrder == Order.IDLE) {
-
-			PriorityQueue<Unit> closestTargets = new PriorityQueue<Unit>(closestUnitComp);
-			for (Unit u : units) {
-				if (u == this)
-					continue;
-				if (u.side != Side.ENEMY) {
-					closestTargets.add(u);
-				}
-			}
-			if (!closestTargets.isEmpty()) {
-				Unit closestEnemy = closestTargets.remove();
-				if (getDist(this, closestEnemy) <= Holo.idleAggroRange) {
-					this.orderAttackUnit(closestEnemy);
-				}
-			}
-		}
-	}
-
 	// Debug
 	private static int getNextId() {
 		return curId++;
@@ -462,16 +447,6 @@ public class Unit implements UnitInterPF, UnitInfo {
 	public static float getDist(Unit u1, Unit u2) {
 		return Point.calcDistance(u1.getPos(), u2.getPos());
 	}
-
-	// Tools
-	private Comparator<Unit> closestUnitComp = (Unit u1, Unit u2) -> {
-		if (Point.calcDistanceSqr(this.getPos(), u1.getPos())
-				- Point.calcDistanceSqr(this.getPos(), u2.getPos()) >= 0) {
-			return -1;
-		} else {
-			return 1;
-		}
-	};
 
 	// Getters
 	@Override

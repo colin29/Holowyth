@@ -12,6 +12,7 @@ import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
+import com.mygdx.holowyth.unit.UnitOrderable;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
@@ -175,7 +176,7 @@ public class World implements WorldInfo {
 	 * @param expandedMapPolys
 	 * @param colBodies
 	 */
-	private void resolveKnockbackMotion(Unit u, Polygons expandedMapPolys, ArrayList<CBInfo> colBodies) {
+	private void resolveKnockbackMotion(UnitOrderable u, Polygons expandedMapPolys, ArrayList<CBInfo> colBodies) {
 
 		// Unit should bounce off walls
 

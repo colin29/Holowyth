@@ -1,5 +1,6 @@
 package com.mygdx.holowyth.pathfinding;
 
+import com.mygdx.holowyth.unit.UnitOrderable;
 import com.mygdx.holowyth.unit.Unit;
 
 /**
@@ -8,7 +9,7 @@ import com.mygdx.holowyth.unit.Unit;
 public class CBInfo {
 	public float x, y;
 	public float unitRadius;
-	public Unit unit;
+	public UnitOrderable unit;
 
 	public CBInfo() {
 	}
@@ -20,7 +21,7 @@ public class CBInfo {
 		unit.y = unit.getY();
 	}
 
-	public Unit getUnit() {
+	public UnitOrderable getUnit() {
 		return this.unit;
 	}
 }

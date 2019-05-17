@@ -24,6 +24,7 @@ import com.mygdx.holowyth.skill.NoneSkill;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skill.Targeting;
 import com.mygdx.holowyth.skill.Skills;
+import com.mygdx.holowyth.unit.UnitOrderable;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.MiscUtil;
@@ -301,7 +302,7 @@ public class Controls extends InputProcessorAdapter {
 		}
 
 		if (target != null) {
-			for (Unit u : selectedUnits) {
+			for (UnitOrderable u : selectedUnits) {
 				boolean valid = u.orderAttackUnit(target);
 				if (!valid) {
 					u.orderMove(x, y);
@@ -315,7 +316,7 @@ public class Controls extends InputProcessorAdapter {
 
 	private void handleRetreatCommand(float x, float y) {
 		clearContext();
-		for (Unit u : selectedUnits) {
+		for (UnitOrderable u : selectedUnits) {
 			u.orderRetreat(x, y);
 		}
 	}
@@ -367,7 +368,7 @@ public class Controls extends InputProcessorAdapter {
 
 	private void handleMoveCommand(float x, float y) {
 		clearContext();
-		for (Unit u : selectedUnits) {
+		for (UnitOrderable u : selectedUnits) {
 			u.orderMove(x, y);
 		}
 	}
@@ -396,11 +397,11 @@ public class Controls extends InputProcessorAdapter {
 			// check distance of the click to the center of the circle
 		}
 		if (target != null) {
-			for (Unit u : selectedUnits) {
+			for (UnitOrderable u : selectedUnits) {
 				u.orderAttackUnit(target);
 			}
 		} else { // if no unit is under the cursor, then treat as an attackMove
-			for (Unit u : selectedUnits) {
+			for (UnitOrderable u : selectedUnits) {
 				u.orderAttackMove(x, y);
 			}
 		}
