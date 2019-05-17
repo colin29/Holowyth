@@ -9,6 +9,7 @@ import java.util.Map;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
+import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.util.dataobjects.Pair;
 import com.mygdx.holowyth.util.dataobjects.Point;
 

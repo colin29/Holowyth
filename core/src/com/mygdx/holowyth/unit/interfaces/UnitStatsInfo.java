@@ -1,5 +1,6 @@
-package com.mygdx.holowyth.unit;
+package com.mygdx.holowyth.unit.interfaces;
 
+import com.mygdx.holowyth.unit.UnitStats;
 import com.mygdx.holowyth.unit.UnitStats.Stance;
 import com.mygdx.holowyth.unit.UnitStats.StunState;
 

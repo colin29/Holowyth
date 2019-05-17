@@ -6,7 +6,7 @@ import java.util.PriorityQueue;
 import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.Unit.Side;
-import com.mygdx.holowyth.unit.UnitOrderable;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 

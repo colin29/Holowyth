@@ -25,7 +25,7 @@ import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skill.Targeting;
 import com.mygdx.holowyth.skill.Skills;
 import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.unit.UnitOrderable;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.template.adapters.InputProcessorAdapter;

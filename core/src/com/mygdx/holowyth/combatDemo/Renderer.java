@@ -23,9 +23,9 @@ import com.mygdx.holowyth.skill.Skill.Status;
 import com.mygdx.holowyth.skill.SkillInfo;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
-import com.mygdx.holowyth.unit.UnitInfo;
 import com.mygdx.holowyth.unit.UnitMotion;
-import com.mygdx.holowyth.unit.UnitStatsInfo;
+import com.mygdx.holowyth.unit.interfaces.UnitInfo;
+import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
@@ -63,8 +63,6 @@ public class Renderer {
 	private Color clearColor = Color.BLACK;
 
 	// Graphic flags:
-
-	public boolean renderUnitExpandedHitBodies = false;
 
 	private Controls unitControls;
 
@@ -307,16 +305,6 @@ public class Renderer {
 				shapeRenderer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
 				shapeRenderer.end();
 			}
-		}
-	}
-
-	@SuppressWarnings("unused")
-	private void renderDotAtUnitCenters() {
-		for (Unit unit : world.units) {
-			shapeRenderer.begin(ShapeType.Filled);
-			shapeRenderer.setColor(Color.RED);
-			shapeRenderer.circle(unit.x, unit.y, 1);
-			shapeRenderer.end();
 		}
 	}
 
