@@ -12,7 +12,6 @@ import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
-import com.mygdx.holowyth.unit.UnitOrderable;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
@@ -77,34 +76,37 @@ public class World implements WorldInfo {
 
 		Polygons expandedMapPolys = HoloPF.expandPolygons(map.polys, Holo.UNIT_RADIUS);
 
-		for (Unit u : units) {
+		for (Unit thisUnit : units) {
 
+			// Get all other colliding bodies
 			ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
-			for (Unit other : units) {
-				if (u.equals(other)) { // don't consider the unit's own collision body
-					continue;
-				}
-
-				CBInfo c = new CBInfo(other);
-				colBodies.add(c);
+			for (Unit u : units) {
+				if (!thisUnit.equals(u))
+					colBodies.add(new CBInfo(u));
 			}
 
 			// Validate the motion by checking against other colliding bodies.
 
-			float destX = u.x + u.motion.vx;
-			float destY = u.y + u.motion.vy;
-
-			if (u.motion.vx == 0 && u.motion.vy == 0) {
+			if (thisUnit.motion.vx == 0 && thisUnit.motion.vy == 0) {
 				continue;
 			}
 
-			Segment motion = new Segment(u.x, u.y, destX, destY);
+			float destX = thisUnit.x + thisUnit.motion.vx;
+			float destY = thisUnit.y + thisUnit.motion.vy;
+
+			Segment motion = new Segment(thisUnit.x, thisUnit.y, destX, destY);
 
 			ArrayList<CBInfo> collisions = HoloPF.getUnitCollisions(motion.x1, motion.y1, motion.x2, motion.y2,
-					colBodies, u.getRadius());
+					colBodies, thisUnit.getRadius());
+			thisUnit.debugNumOfUnitsCollidingWith = collisions.size();
+			if (collisions.size() > 0) {
+				int x;
+				x = 3 + 4;
+			}
+
 			if (collisions.isEmpty()) {
-				u.x += u.motion.vx;
-				u.y += u.motion.vy;
+				thisUnit.x += thisUnit.motion.vx;
+				thisUnit.y += thisUnit.motion.vy;
 			} else { // Push this unit outwards and try to keep going towards the waypoint
 
 				// The majority of the time a unit should only be colliding with one unit at a time since we are drawing
@@ -114,8 +116,8 @@ public class World implements WorldInfo {
 					System.out.println("Wierd case, unit colliding with more than 2 units");
 				}
 
-				float curDestx = u.x + u.motion.vx;
-				float curDesty = u.y + u.motion.vy;
+				float curDestx = thisUnit.x + thisUnit.motion.vx;
+				float curDesty = thisUnit.y + thisUnit.motion.vy;
 
 				// System.out.format("%s is colliding with %s bodies%n", u,
 				// collisions.size());
@@ -125,13 +127,13 @@ public class World implements WorldInfo {
 
 					// We do a "push out" for every unit. Subsequent push outs may lead to a suggested location that is
 					// collides with an earlier unit, the alternative location is simply rejected
-					if (dist.len() > cb.unitRadius + u.getRadius()) {
+					if (dist.len() > cb.unitRadius + thisUnit.getRadius()) {
 						continue;
 					}
 
 					// expand
 					Vector2 pushedOut = new Vector2(dist)
-							.setLength(cb.unitRadius + u.getRadius() + getCollisionClearanceDistance(u));
+							.setLength(cb.unitRadius + thisUnit.getRadius() + getCollisionClearanceDistance(thisUnit));
 					// TODO: handle edge case here dist is 0
 
 					curDestx = cb.x + pushedOut.x;
@@ -147,35 +149,23 @@ public class World implements WorldInfo {
 				 * Determines how "impatient" the algorithm will be for signalling blocked for a slow-resolving or
 				 * non-resolving push situation
 				 */
-				final float minProgress = 0.20f * u.motion.getVelocity();
+				final float minProgress = 0.20f * thisUnit.motion.getVelocity();
 
-				if (HoloPF.isEdgePathable(u.x, u.y, curDestx, curDesty, pathingModule.getExpandedMapPolys(), colBodies,
-						u.getRadius()) && new Segment(u.x, u.y, curDestx, curDesty).getLength() > 0.05 * minProgress) {
+				if (HoloPF.isEdgePathable(thisUnit.x, thisUnit.y, curDestx, curDesty,
+						pathingModule.getExpandedMapPolys(), colBodies,
+						thisUnit.getRadius())
+						&& new Segment(thisUnit.x, thisUnit.y, curDestx, curDesty).getLength() > 0.05 * minProgress) {
 					// System.out.println("block distance" + new Segment(u.x, u.y, curDestx, curDesty).getLength());
-					u.x = curDestx;
-					u.y = curDesty;
+					thisUnit.x = curDestx;
+					thisUnit.y = curDesty;
 				} else {
-					u.motion.onBlocked(); // notify the unit that it is blocked
+					System.out.println("Unit is blocked");
+					thisUnit.motion.onBlocked(); // notify the unit that it is blocked
 				}
 
 			}
 
 		}
-
-	}
-
-	/**
-	 * Resolves motion for a single unit that is being knocked back
-	 * 
-	 * @param u
-	 * @param expandedMapPolys
-	 * @param colBodies
-	 */
-	private void resolveKnockbackMotion(UnitOrderable u, Polygons expandedMapPolys, ArrayList<CBInfo> colBodies) {
-
-		// Unit should bounce off walls
-
-		// Find the first target the unit hits. Basically do a raycast.
 
 	}
 

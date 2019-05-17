@@ -134,6 +134,8 @@ public class Renderer {
 			renderUnits();
 		}
 
+		// renderUnitDebugText();
+
 		// renderPaths(false); // temp, delete this after use
 		// renderPlayerUnreachedWaypoints(Color.FIREBRICK);
 
@@ -160,6 +162,14 @@ public class Renderer {
 		stage.act(delta);
 		stage.draw();
 
+	}
+
+	private void renderUnitDebugText() {
+		batch.begin();
+		for (Unit u : world.getUnits()) {
+			game.borderedDebugFont.draw(batch, String.valueOf(u.debugNumOfUnitsCollidingWith), u.getX(), u.getY());
+		}
+		batch.end();
 	}
 
 	private void renderCirclesAroundBusyRetreatingUnits() {

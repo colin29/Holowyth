@@ -35,6 +35,7 @@ public class Holowyth extends Game {
 	public BitmapFont font_goth36;
 
 	public static BitmapFont debugFont;
+	public BitmapFont borderedDebugFont;
 
 	public BitmapFont damageEffectFont;
 
@@ -107,6 +108,7 @@ public class Holowyth extends Game {
 		font_goth36 = generateFont("fonts/MS_Gothic.ttf", Color.WHITE, 36);
 
 		debugFont = generateFont("fonts/OpenSans.ttf", Color.WHITE, 16);
+		borderedDebugFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 16, Color.BLACK, 1.5f);
 
 		damageEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 16, Color.BLACK, 1.5f);
 		missEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 15, Color.GRAY, 0.5f);

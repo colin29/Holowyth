@@ -51,7 +51,11 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	private static int curId = 0;
 	private final int ID;
 
+	/**
+	 * todo
+	 */
 	public boolean debugIsOnIllegalLocation = false;
+	public int debugNumOfUnitsCollidingWith = 0;
 
 	// Orders
 	Order currentOrder = Order.IDLE;

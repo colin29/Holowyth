@@ -1,7 +1,7 @@
 package com.mygdx.holowyth.pathfinding;
 
-import com.mygdx.holowyth.unit.UnitOrderable;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.UnitOrderable;
 
 /**
  * Contains information about a unit's collision body.
@@ -17,8 +17,8 @@ public class CBInfo {
 	public CBInfo(Unit unit) {
 		this.unit = unit;
 		unitRadius = unit.getRadius();
-		unit.x = unit.getX();
-		unit.y = unit.getY();
+		x = unit.getX();
+		y = unit.getY();
 	}
 
 	public UnitOrderable getUnit() {
