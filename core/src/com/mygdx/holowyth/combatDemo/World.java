@@ -89,11 +89,6 @@ public class World implements WorldInfo {
 				colBodies.add(c);
 			}
 
-			if (u.motion.isBeingKnockBacked()) {
-				resolveKnockbackMotion(u, expandedMapPolys, colBodies);
-				continue;
-			}
-
 			// Validate the motion by checking against other colliding bodies.
 
 			float destX = u.x + u.motion.vx;
@@ -192,7 +187,7 @@ public class World implements WorldInfo {
 		ArrayList<Unit> someUnits = new ArrayList<Unit>();
 		someUnits.add(spawnUnit(480, 253, Unit.Side.ENEMY));
 		someUnits.add(spawnUnit(450, 300, Unit.Side.ENEMY));
-		someUnits.add(spawnUnit(400, 350, Unit.Side.ENEMY));
+		// someUnits.add(spawnUnit(400, 350, Unit.Side.ENEMY));
 
 		for (Unit unit : someUnits) {
 			PresetUnits.loadUnitStats2(unit.stats);

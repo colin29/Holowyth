@@ -115,21 +115,23 @@ public class Renderer {
 		// }
 
 		// 2: Render unit paths
-		// renderPaths(false);
+		renderPaths(false);
 
 		renderUnitDestinations(Color.GREEN);
 
 		// 3: Render units and selection indicators
 
-		if (unitControls == null) {
-			renderUnits();
-		} else {
+		if (unitControls != null) {
 			unitControls.clearDeadUnitsFromSelection();
 			unitControls.renderCirclesOnSelectedUnits();
+			renderUnitExpandedHitBodies();
+
 			renderUnits();
 			unitControls.renderSelectionBox(Controls.defaultSelectionBoxColor);
 			renderCirclesAroundBusyRetreatingUnits();
 			renderCirclesAroundBusyCastingUnits();
+		} else {
+			renderUnits();
 		}
 
 		// renderPaths(false); // temp, delete this after use
@@ -270,6 +272,7 @@ public class Renderer {
 			renderUnitsWithTestSprites();
 		} else {
 
+			// Render unit circles
 			for (Unit unit : world.units) {
 
 				shapeRenderer.begin(ShapeType.Filled);

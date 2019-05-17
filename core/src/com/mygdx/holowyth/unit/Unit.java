@@ -51,6 +51,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	private static int curId = 0;
 	private final int ID;
 
+	public boolean debugIsOnIllegalLocation = false;
+
 	// Orders
 	Order currentOrder = Order.IDLE;
 	Unit target; // target for the current command.
@@ -375,7 +377,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	}
 
-	private float getAttackingSameTargetAtkspdPenalty(UnitOrderable target) {
+	private float getAttackingSameTargetAtkspdPenalty(Unit target) {
 		int n = unitsAttacking.get(target).size();
 
 		if (n <= 1) {

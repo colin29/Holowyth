@@ -34,9 +34,9 @@ public class Holo {
 												// some cases
 	static {
 		if (largeSize) {
-			defaultUnitMoveSpeed = 15f;
+			defaultUnitMoveSpeed = 10f;
 			collisionClearanceDistance = defaultUnitMoveSpeed / 5;
-			UNIT_RADIUS = 30;
+			UNIT_RADIUS = 20;
 		}
 	}
 
