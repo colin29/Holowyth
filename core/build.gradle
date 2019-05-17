@@ -21,4 +21,9 @@ dependencies {
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 	compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.0'
 	
+	// Logging
+	compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
+	compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+
+	
 }

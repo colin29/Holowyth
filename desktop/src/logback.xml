@@ -1,0 +1,25 @@
+<configuration>
+
+	<appender
+		name="CONSOLE"
+		class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<Pattern>
+				%d{HH:mm:ss.SSS} %-5level %logger{25} - %msg%n
+			</Pattern>
+		</encoder>
+	</appender>
+
+	<root level="DEBUG">
+		<appender-ref ref="CONSOLE" />
+	</root>
+
+	<!-- Particular classes which we want extra info from -->
+	<logger
+		name="org.springframework.web.servlet.DispatcherServlet"
+		level="DEBUG"></logger>
+
+
+
+
+</configuration>
