@@ -1,8 +1,6 @@
 package com.mygdx.holowyth.knockback;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.util.template.DemoScreen;
@@ -12,23 +10,27 @@ public class KnockBackDemo extends DemoScreen {
 
 	KnockBackSimulation knockbackSimulation = new KnockBackSimulation();
 	Timer timer = new Timer();
+	private Renderer renderer;
+
+	Color backgroundColor = HoloGL.rbg(179, 221, 166);
 
 	public KnockBackDemo(final Holowyth game) {
 		super(game);
-	}
+		renderer = new Renderer(game, camera, stage);
+		renderer.setKnockBackSimulation(knockbackSimulation);
+		renderer.setClearColor(backgroundColor);
 
-	Color backgroundColor = HoloGL.rbg(79, 121, 66);
+		knockbackSimulation.addInitialObjects();
+	}
 
 	@Override
 	public void render(float delta) {
-		Gdx.gl.glClearColor(backgroundColor.r, backgroundColor.g, backgroundColor.b, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT
-				| (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
-		Gdx.gl.glEnable(GL20.GL_BLEND);
+		renderer.render(delta);
 
-		camera.update();
-		batch.setProjectionMatrix(camera.combined);
+		ifTimeElapsedTickSimulation();
+	}
 
+	private void ifTimeElapsedTickSimulation() {
 		if (timer.taskReady()) {
 			knockbackSimulation.tick();
 		}
