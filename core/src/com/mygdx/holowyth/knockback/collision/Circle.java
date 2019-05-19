@@ -2,6 +2,8 @@ package com.mygdx.holowyth.knockback.collision;
 
 import org.slf4j.LoggerFactory;
 
+import com.badlogic.gdx.math.Vector2;
+
 public class Circle {
 	private float radius;
 	public float x, y;
@@ -22,5 +24,12 @@ public class Circle {
 		} else {
 			this.radius = radius;
 		}
+	}
+
+	/**
+	 * Creates a vector with the center coordinates
+	 */
+	public Vector2 getCenter() {
+		return new Vector2(x, y);
 	}
 }

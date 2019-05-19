@@ -27,7 +27,7 @@ public class LineCircleDemo extends BaseScreen {
 		super(game);
 
 		renderer = new Renderer(game, camera, stage, world);
-		renderer.setClearColor(PALE_GREEN);
+		renderer.setClearColor(Color.WHITE);
 
 		multiplexer.addProcessor(myInputProcessor);
 
