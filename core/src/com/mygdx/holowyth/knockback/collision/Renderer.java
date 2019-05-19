@@ -13,10 +13,12 @@ public class Renderer extends BaseRenderer {
 
 	World world;
 	private final Color CIRCLE_COLOR = Color.BLACK;
+	private Stage stage;
 
 	public Renderer(Holowyth game, Camera worldCamera, Stage stage, World world) {
 		super(game, worldCamera, stage);
 		this.world = world;
+		this.stage = stage;
 	}
 
 	@Override
@@ -32,6 +34,8 @@ public class Renderer extends BaseRenderer {
 		for (Circle circle : world.getCircles()) {
 			renderCircleOutline(circle.x, circle.y, circle.getRadius(), CIRCLE_COLOR);
 		}
+
+		stage.draw();
 
 	}
 

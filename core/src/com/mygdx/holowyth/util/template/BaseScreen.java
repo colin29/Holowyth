@@ -14,7 +14,7 @@ public class BaseScreen implements Screen {
 	protected OrthographicCamera camera;
 
 	protected Stage stage;
-	private Table root;
+	protected Table root;
 	private OrthographicCamera fixedCam;
 
 	public BaseScreen(final Holowyth game) {

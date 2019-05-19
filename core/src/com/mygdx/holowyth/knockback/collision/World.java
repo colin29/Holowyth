@@ -3,13 +3,20 @@ package com.mygdx.holowyth.knockback.collision;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
+import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
+import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
 public class World {
+
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	private List<Circle> circles = new ArrayList<Circle>();
 	private final Segment segment = new Segment(0, 0, 0, 0);
 	private Circle keyCircle;
@@ -26,8 +33,17 @@ public class World {
 
 	private Vector2 intersectPoint = new Vector2();
 
+	public World(DebugStore debugStore) {
+		DebugValues debugValues = debugStore.registerComponent("World");
+		debugValues.add("Intersect point", () -> getRoundedString(intersectPoint));
+	}
+
 	List<Circle> getCircles() {
 		return circles;
+	}
+
+	public String getRoundedString(Vector2 point) {
+		return String.format("%s %s", DataUtil.getRoundedString(point.x), DataUtil.getRoundedString(point.y));
 	}
 
 	public void setKeyCircle(Circle circle) {
