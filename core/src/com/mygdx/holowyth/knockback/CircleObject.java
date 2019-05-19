@@ -2,11 +2,13 @@ package com.mygdx.holowyth.knockback;
 
 import com.mygdx.holowyth.util.dataobjects.Point;
 
-public class CircleObject {
+public class CircleObject implements ObjectInfo {
+	public final int id;
 	private CircleCB colBody;
 
 	public CircleObject(float x, float y, float radius) {
 		colBody = new CircleCB(x, y, radius);
+		this.id = getNextId();
 	}
 
 	public CircleCB getColBody() {
@@ -14,40 +16,38 @@ public class CircleObject {
 	}
 
 	public float getX() {
-		return colBody.getPos().x;
+		return colBody.pos.x;
 	}
 
 	public float getY() {
-		return colBody.getPos().y;
+		return colBody.pos.y;
 	}
 
 	public float getVx() {
-		return colBody.getVx();
+		return colBody.vx;
 	}
 
 	public float getVy() {
-		return colBody.getVy();
-	}
-
-	public void setVx(float vx) {
-		colBody.setVx(vx);
-	}
-
-	public void setVy(float vy) {
-		colBody.setVx(vy);
+		return colBody.vy;
 	}
 
 	public Point getPos() {
-		return colBody.getPos();
+		return colBody.pos;
 	}
 
 	public void setPosition(float x, float y) {
-		colBody.getPos().x = x;
-		colBody.getPos().y = y;
+		colBody.pos.x = x;
+		colBody.pos.y = y;
 	}
 
 	public void setVelocity(float vx, float vy) {
 		colBody.setVelocity(vx, vy);
+	}
+
+	private static int nextId = 1;
+
+	private static int getNextId() {
+		return nextId++;
 	}
 
 }

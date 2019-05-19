@@ -48,8 +48,10 @@ public class Renderer {
 
 		shapeRenderer.setProjectionMatrix(worldCamera.combined);
 
-		if (this.simulation != null)
+		if (this.simulation != null) {
 			renderSimulationObjects();
+			renderObjectIds();
+		}
 
 	}
 
@@ -69,6 +71,14 @@ public class Renderer {
 			renderCircleOutline(o.getX(), o.getY(), simulation.COLLISION_BODY_RADIUS, circleOutlineColor);
 		}
 
+	}
+
+	private void renderObjectIds() {
+		batch.begin();
+		for (CircleObject o : simulation.getCircleObjects()) {
+			game.borderedDebugFont.draw(batch, String.valueOf(o.id), o.getX(), o.getY());
+		}
+		batch.end();
 	}
 
 	public void setKnockBackSimulation(KnockBackSimulation simulation) {
