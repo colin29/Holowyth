@@ -3,11 +3,11 @@ package com.mygdx.holowyth.util.dataobjects;
 public class Segment {
 	public float x1, y1, x2, y2;
 
-	public Segment(float sx, float sy, float dx, float dy) {
-		this.x1 = sx;
-		this.y1 = sy;
-		this.x2 = dx;
-		this.y2 = dy;
+	public Segment(float x1, float y1, float x2, float y2) {
+		this.x1 = x1;
+		this.y1 = y1;
+		this.x2 = x2;
+		this.y2 = y2;
 	}
 
 	public Segment(Point a, Point b) {
@@ -15,6 +15,20 @@ public class Segment {
 		this.y1 = a.y;
 		this.x2 = b.x;
 		this.y2 = b.y;
+	}
+
+	public Segment(Segment source) {
+		this.x1 = source.x1;
+		this.y1 = source.y1;
+		this.x2 = source.x2;
+		this.y2 = source.y2;
+	}
+
+	public void set(float x1, float y1, float x2, float y2) {
+		this.x1 = x1;
+		this.y1 = y1;
+		this.x2 = x2;
+		this.y2 = y2;
 	}
 
 	public float getLength() {
@@ -50,14 +64,14 @@ public class Segment {
 	}
 
 	/**
-	 * Modifying point does not affect the original Segment
+	 * Modifying returned point does not affect the original Segment
 	 */
 	public Point startPoint() {
 		return new Point(x1, y1);
 	}
 
 	/**
-	 * Modifying point does not affect the original Segment
+	 * Modifying returned point does not affect the original Segment
 	 */
 	public Point endPoint() {
 		return new Point(x2, y2);

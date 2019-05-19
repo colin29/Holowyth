@@ -1,0 +1,26 @@
+package com.mygdx.holowyth.knockback.collision;
+
+import org.slf4j.LoggerFactory;
+
+public class Circle {
+	private float radius;
+	public float x, y;
+
+	public Circle(float x, float y, float radius) {
+		this.x = x;
+		this.y = y;
+		setRadius(radius);
+	}
+
+	public float getRadius() {
+		return radius;
+	}
+
+	public void setRadius(float radius) {
+		if (radius < 0) {
+			LoggerFactory.getLogger(this.getClass()).warn("Circle radius cannot be negative, set ignored");
+		} else {
+			this.radius = radius;
+		}
+	}
+}

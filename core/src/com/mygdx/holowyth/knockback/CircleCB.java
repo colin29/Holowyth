@@ -3,8 +3,10 @@ package com.mygdx.holowyth.knockback;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
- * Circle collision body
- * 
+ * Circle Collision body <br>
+ *
+ * Simple data class
+ *
  * @author Colin Ta
  *
  */
