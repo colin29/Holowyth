@@ -3,8 +3,7 @@ package com.mygdx.holowyth.util.tools.debugstore;
 import java.util.function.IntSupplier;
 
 /**
- * The user should run a switch statement on the valueType, and call the
- * appropriate value.
+ * For updating the values, the user should run a switch statement on the valueType, and call the appropriate value.
  * 
  * @author Colin Ta
  *
@@ -17,6 +16,12 @@ public class DebugValue {
 	StringSupplier stringGetter;
 	private boolean formatPercentage = false;
 
+	/**
+	 * Marks whether this entry is just a spacing marker, and is to be treated as such.
+	 */
+	private final boolean isASpacingEntry;
+	public static final String SPACING_ENTRY_IDENTIFER = " ";
+
 	public enum ValueType {
 		FLOAT, INT, STRING
 	};
@@ -24,18 +29,24 @@ public class DebugValue {
 	ValueType valueType;
 
 	public DebugValue(String name, FloatSupplier getter) {
+		isASpacingEntry = name.equals(SPACING_ENTRY_IDENTIFER);
+
 		this.name = name;
 		this.floatGetter = getter;
 		valueType = ValueType.FLOAT;
 	}
 
 	public DebugValue(String name, IntSupplier getter) {
+		isASpacingEntry = name.equals(SPACING_ENTRY_IDENTIFER);
+
 		this.name = name;
 		this.intGetter = getter;
 		valueType = ValueType.INT;
 	}
 
 	public DebugValue(String name, StringSupplier getter) {
+		isASpacingEntry = name.equals(SPACING_ENTRY_IDENTIFER);
+
 		this.name = name;
 		this.stringGetter = getter;
 		valueType = ValueType.STRING;
@@ -77,6 +88,10 @@ public class DebugValue {
 	@FunctionalInterface
 	public abstract interface StringSupplier {
 		abstract String getAsString();
+	}
+
+	public boolean isASpacingEntry() {
+		return isASpacingEntry;
 	}
 
 }

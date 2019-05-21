@@ -29,6 +29,6 @@ public class DebugValues extends ArrayList<DebugValue> {
 	 * Adds an empty debug entry that will space out the entries
 	 */
 	public void space() {
-		this.add(new DebugValue(" ", () -> ""));
+		this.add(new DebugValue(DebugValue.SPACING_ENTRY_IDENTIFER, () -> ""));
 	}
 }

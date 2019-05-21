@@ -48,11 +48,16 @@ public class DebugStoreUI {
 			ArrayList<DebugValue> listOfValues = entry.getValue();
 
 			for (DebugValue v : listOfValues) {
-				Label n = new Label(" -" + v.getName(), debugStyle);
-				Label l = new Label("", debugStyle);
-				debugInfo.add(n, l);
-				debugInfo.row();
-				valueLabelMapping.registerLabel(v, l);
+				if (v.isASpacingEntry()) {
+					debugInfo.add(new Label("", debugStyle));
+					debugInfo.row();
+				} else {
+					Label n = new Label(" -" + v.getName(), debugStyle);
+					Label l = new Label("", debugStyle);
+					debugInfo.add(n, l);
+					debugInfo.row();
+					valueLabelMapping.registerLabel(v, l);
+				}
 			}
 		}
 	}
