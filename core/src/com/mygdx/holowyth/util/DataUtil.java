@@ -5,6 +5,8 @@ import java.text.DecimalFormat;
 
 import org.slf4j.LoggerFactory;
 
+import com.badlogic.gdx.math.Vector2;
+
 /**
  * Add methods sparingly Allows one point of control for how data should be displayed project-wide
  * 
@@ -12,6 +14,10 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class DataUtil {
+
+	public static String getRoundedString(Vector2 point) {
+		return String.format("%s %s", DataUtil.getRoundedString(point.x), DataUtil.getRoundedString(point.y));
+	}
 
 	public static String getRoundedString(float value) {
 		if (isNotFinite(value))

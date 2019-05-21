@@ -7,19 +7,28 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugValue.FloatSupplier;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValue.StringSupplier;
 
 public class DebugValues extends ArrayList<DebugValue> {
-	
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
-	public void add(String name, FloatSupplier getter){
+
+	public void add(String name, FloatSupplier getter) {
 		this.add(new DebugValue(name, getter));
 	}
-	public void add(String name, IntSupplier getter){
+
+	public void add(String name, IntSupplier getter) {
 		this.add(new DebugValue(name, getter));
 	}
-	public void add(String name, StringSupplier getter){
+
+	public void add(String name, StringSupplier getter) {
 		this.add(new DebugValue(name, getter));
+	}
+
+	/**
+	 * Adds an empty debug entry that will space out the entries
+	 */
+	public void space() {
+		this.add(new DebugValue(" ", () -> ""));
 	}
 }

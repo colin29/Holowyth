@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.knockback.CircleCB;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
@@ -49,10 +48,10 @@ public class World {
 
 	public World(DebugStore debugStore) {
 		DebugValues debugValues = debugStore.registerComponent("World");
-		debugValues.add("Intersect point", () -> getRoundedString(intersectPoint));
-		debugValues.add("Initial", () -> getRoundedString(new Vector2(segment.x1, segment.y1)));
-		debugValues.add("Final", () -> getRoundedString(new Vector2(segment.x2, segment.y2)));
-		debugValues.add("Delta", () -> getRoundedString(delta));
+		debugValues.add("Intersect point", () -> DataUtil.getRoundedString(intersectPoint));
+		debugValues.add("Initial", () -> DataUtil.getRoundedString(new Vector2(segment.x1, segment.y1)));
+		debugValues.add("Final", () -> DataUtil.getRoundedString(new Vector2(segment.x2, segment.y2)));
+		debugValues.add("Delta", () -> DataUtil.getRoundedString(delta));
 		debugValues.add("P of Intersect point", () -> DataUtil.getRoundedString(pOfIntersectPoint));
 		debugValues.add("Angle at intersect (degrees)",
 				() -> DataUtil.getRoundedString(angleOfCircleAtIntersect * RADS_TO_DEGREES));
@@ -61,10 +60,6 @@ public class World {
 
 	List<Circle> getCircles() {
 		return circles;
-	}
-
-	public String getRoundedString(Vector2 point) {
-		return String.format("%s %s", DataUtil.getRoundedString(point.x), DataUtil.getRoundedString(point.y));
 	}
 
 	public void setKeyCircle(Circle circle) {
@@ -131,24 +126,6 @@ public class World {
 					- Math.acos(circleCenterToIntersect.x / keyCircle.getRadius()));
 		}
 
-	}
-
-	/**
-	 * Takes in a motion segment, the current collisionBody, and all the other collisionBodies
-	 * 
-	 * @return
-	 */
-	private CollisionInfo getFirstCollision(Segment segment, CircleCB curBody, List<CircleCB> others) {
-		return null;
-	}
-
-	/**
-	 * Takes in the current collisionBody
-	 * 
-	 * @return
-	 */
-	private CollisionInfo getCollision() {
-		return null;
 	}
 
 	public Segment getInitialToCircleCenter() {

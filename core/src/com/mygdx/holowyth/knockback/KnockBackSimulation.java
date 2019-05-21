@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.knockback.collision.Circle;
 import com.mygdx.holowyth.knockback.collision.CollisionInfo;
+import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
@@ -26,9 +27,34 @@ public class KnockBackSimulation {
 
 	public final float COLLISION_BODY_RADIUS = 40;
 
+	private IntersectDebugInfo intersectDebugInfo = new IntersectDebugInfo();
+
 	public KnockBackSimulation(DebugStore debugStore) {
 		DebugValues debugValues = debugStore.registerComponent("Knockback Sim");
-		debugValues.add("test", () -> 5);
+		addDebugEntries(debugValues);
+	}
+
+	private void addDebugEntries(DebugValues debugValues) {
+		debugValues.add("initial", () -> DataUtil.getRoundedString(intersectDebugInfo.initial));
+		debugValues.add("delta", () -> DataUtil.getRoundedString(intersectDebugInfo.delta));
+		debugValues.add("deltaNormalized", () -> DataUtil.getRoundedString(intersectDebugInfo.deltaNormalized));
+		debugValues.space();
+
+		debugValues.add("initialToCircleCenter",
+				() -> DataUtil.getRoundedString(intersectDebugInfo.initialToCircleCenter));
+		debugValues.add("initialToClosestPoint",
+				() -> DataUtil.getRoundedString(intersectDebugInfo.initialToClosestPoint));
+		debugValues.space();
+
+		debugValues.add("closestPoint", () -> DataUtil.getRoundedString(intersectDebugInfo.closestPoint));
+		debugValues.add("closestDistToCenter", () -> intersectDebugInfo.closestDistToCenter);
+		debugValues.space();
+
+		debugValues.add("intersectPoint", () -> DataUtil.getRoundedString(intersectDebugInfo.intersectPoint));
+		debugValues.add("pOfIntersectPoint", () -> DataUtil.getRoundedString(intersectDebugInfo.pOfIntersectPoint));
+		debugValues.space();
+
+		debugValues.add("angleOfCircleAtIntersect", () -> intersectDebugInfo.angleOfCircleAtIntersectDegrees);
 	}
 
 	public void tick() {
@@ -159,7 +185,7 @@ public class KnockBackSimulation {
 
 		// We can represent two circles colliding with that of a line segment intersecting with an expanded circle.
 		// The intersectPoint will be different of course, but the angle of collision will be the same
-		Circle keyCircle = new Circle(curBody.pos.x, curBody.pos.y, curBody.radius + other.radius);
+		Circle keyCircle = new Circle(other.pos.x, other.pos.y, curBody.radius + other.radius);
 
 		Vector2 initial = new Vector2();
 		Vector2 delta = new Vector2();
@@ -232,6 +258,23 @@ public class KnockBackSimulation {
 			angleOfCircleAtIntersect = (float) (2 * Math.PI
 					- Math.acos(circleCenterToIntersect.x / keyCircle.getRadius()));
 		}
+
+		// set debugInformation
+		intersectDebugInfo.initial.set(initial);
+		intersectDebugInfo.delta.set(delta);
+		intersectDebugInfo.deltaNormalized.set(deltaNormalized);
+
+		intersectDebugInfo.initialToCircleCenter.set(initialToCircleCenter);
+		intersectDebugInfo.initialToClosestPoint.set(initialToClosestPoint);
+
+		intersectDebugInfo.closestPoint.set(closestPoint);
+		intersectDebugInfo.closestDistToCenter = closestDistToCenter;
+
+		intersectDebugInfo.intersectPoint.set(intersectPoint);
+
+		intersectDebugInfo.pOfIntersectPoint = pOfIntersectPoint;
+
+		intersectDebugInfo.angleOfCircleAtIntersectDegrees = angleOfCircleAtIntersect * RADS_TO_DEGREES;
 
 		return new CollisionInfo(other, pOfIntersectPoint, angleOfCircleAtIntersect);
 	}
