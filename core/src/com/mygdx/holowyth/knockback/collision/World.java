@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.holowyth.knockback.CircleCB;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
@@ -33,9 +34,29 @@ public class World {
 
 	private Vector2 intersectPoint = new Vector2();
 
+	final float RADS_TO_DEGREES = (float) (180 / Math.PI);
+
+	/**
+	 * Describes how far intersectPoint is along the motion line segment. Within [0,1] means it lies on the motion
+	 * segment
+	 */
+	private float pOfIntersectPoint;
+
+	/**
+	 * Is the angle in rads, from circle center to intersect point, 0 degrees is at (0,radius), spinning CCW
+	 */
+	private float angleOfCircleAtIntersect; //
+
 	public World(DebugStore debugStore) {
 		DebugValues debugValues = debugStore.registerComponent("World");
 		debugValues.add("Intersect point", () -> getRoundedString(intersectPoint));
+		debugValues.add("Initial", () -> getRoundedString(new Vector2(segment.x1, segment.y1)));
+		debugValues.add("Final", () -> getRoundedString(new Vector2(segment.x2, segment.y2)));
+		debugValues.add("Delta", () -> getRoundedString(delta));
+		debugValues.add("P of Intersect point", () -> DataUtil.getRoundedString(pOfIntersectPoint));
+		debugValues.add("Angle at intersect (degrees)",
+				() -> DataUtil.getRoundedString(angleOfCircleAtIntersect * RADS_TO_DEGREES));
+
 	}
 
 	List<Circle> getCircles() {
@@ -73,7 +94,7 @@ public class World {
 
 		initial.set(x1, y1);
 		delta.set(x2 - x1, y2 - y1);
-		deltaNormalized = delta.nor();
+		deltaNormalized.set(delta).nor();
 
 		initialToCircleCenter.setZero().add(keyCircle.getCenter()).sub(initial);
 
@@ -84,12 +105,50 @@ public class World {
 
 		closestDistToCenter = (keyCircle.getCenter().sub(closestPoint)).len();
 
+		// if distance is greater than center, there is no collision
+		if (closestDistToCenter > keyCircle.getRadius()) {
+			logger.warn("No collision -- line does not intersect circle");
+		}
+
 		float radius = keyCircle.getRadius();
 		float lengthOfHalfChord = (float) Math.sqrt((radius * radius - closestDistToCenter * closestDistToCenter));
 
 		// There are two intersect points, but we only get the first one, by backtracking along the segment line
 		intersectPoint.set(closestPoint).add(deltaNormalized.scl(-1 * lengthOfHalfChord));
 
+		if (Math.abs(delta.x) > Math.abs(delta.y)) {
+			pOfIntersectPoint = (intersectPoint.x - initial.x) / delta.x;
+		} else {
+			pOfIntersectPoint = (intersectPoint.y - initial.y) / delta.y;
+		}
+
+		Vector2 circleCenterToIntersect = new Vector2(intersectPoint.x - keyCircle.x, intersectPoint.y - keyCircle.y);
+
+		if (circleCenterToIntersect.y > 0) {
+			angleOfCircleAtIntersect = (float) (Math.acos(circleCenterToIntersect.x / keyCircle.getRadius()));
+		} else {
+			angleOfCircleAtIntersect = (float) (2 * Math.PI
+					- Math.acos(circleCenterToIntersect.x / keyCircle.getRadius()));
+		}
+
+	}
+
+	/**
+	 * Takes in a motion segment, the current collisionBody, and all the other collisionBodies
+	 * 
+	 * @return
+	 */
+	private CollisionInfo getFirstCollision(Segment segment, CircleCB curBody, List<CircleCB> others) {
+		return null;
+	}
+
+	/**
+	 * Takes in the current collisionBody
+	 * 
+	 * @return
+	 */
+	private CollisionInfo getCollision() {
+		return null;
 	}
 
 	public Segment getInitialToCircleCenter() {
@@ -102,6 +161,10 @@ public class World {
 
 	public Point getIntersectPoint() {
 		return new Point(intersectPoint.x, intersectPoint.y);
+	}
+
+	public float getPofIntersectPoint() {
+		return pOfIntersectPoint;
 	}
 
 }

@@ -45,13 +45,14 @@ public class Renderer {
 
 		worldCamera.update();
 		batch.setProjectionMatrix(worldCamera.combined);
-
 		shapeRenderer.setProjectionMatrix(worldCamera.combined);
 
 		if (this.simulation != null) {
 			renderSimulationObjects();
 			renderObjectIds();
 		}
+
+		stage.draw();
 
 	}
 

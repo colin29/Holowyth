@@ -2,14 +2,9 @@ package com.mygdx.holowyth.util.template;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
-import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
@@ -30,28 +25,15 @@ import com.mygdx.holowyth.util.exception.HoloException;
  * @author Colin Ta
  *
  */
-public abstract class DemoScreen implements Screen, InputProcessor {
+public abstract class DemoScreen extends BaseScreen implements InputProcessor {
 
-	protected Holowyth game;
-	protected Field map; // currently loaded map
-
-	protected Stage stage;
-
-	protected OrthographicCamera camera; // Used for rendering world objects (that use world coordinates)
-	protected OrthographicCamera fixedCam; // Used for rendering objects on the screen coordinate.
-
-	protected SpriteBatch batch;
+	/**
+	 * The currently loaded map
+	 */
+	protected Field map;
 
 	protected DemoScreen(Holowyth game) {
-		this.game = game;
-		this.camera = new OrthographicCamera();
-		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		this.fixedCam = new OrthographicCamera();
-		fixedCam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-
-		batch = game.batch;
-
-		stage = new Stage(new ScreenViewport());
+		super(game);
 	}
 
 	@SuppressWarnings("unused")
@@ -138,30 +120,8 @@ public abstract class DemoScreen implements Screen, InputProcessor {
 	/* Inherited methods */
 
 	@Override
-	public abstract void show();
-
-	@Override
-	public abstract void render(float delta);
-
-	@Override
-	public void resize(int width, int height) {
-	}
-
-	@Override
-	public void pause() {
-	}
-
-	@Override
-	public void resume() {
-	}
-
-	@Override
 	public void hide() {
 		Gdx.input.setInputProcessor(null);
-	}
-
-	@Override
-	public void dispose() {
 	}
 
 	@Override

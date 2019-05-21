@@ -1,5 +1,5 @@
 
-package com.mygdx.holowyth.knockback.collision;
+package com.mygdx.holowyth.knockback;
 
 import static com.mygdx.holowyth.util.DataUtil.getAsPercentage;
 import static com.mygdx.holowyth.util.DataUtil.getRoundedString;
