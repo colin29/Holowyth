@@ -103,17 +103,16 @@ public class KnockBackSimulation {
 				continue;
 			} else {
 
-				// Determine the first collision (we only deal with the first collision)
-				CollisionInfo collision = getFirstCollision(motion, thisObject.getColBody(), collisions);
+				CollisionInfo collision = getFirstCollisionInfo(motion, thisObject.getColBody(), collisions);
 
-				// 2. Resolve that collision, adjusting velocity.
+				resolveCollision(collision);
 
 			}
 
 		}
 	}
 
-	public static ArrayList<CircleCB> getCollisionsAlongLineSegment(float ix, float iy, float dx, float dy,
+	private static ArrayList<CircleCB> getCollisionsAlongLineSegment(float ix, float iy, float dx, float dy,
 			float unitRadius,
 			List<CircleCB> cbs) {
 		ArrayList<CircleCB> collisions = new ArrayList<CircleCB>();
@@ -135,9 +134,9 @@ public class KnockBackSimulation {
 	 *            The colBodies being collided into, each of these must actually be intersecting with curBody. Should
 	 *            contain at least one colliding body
 	 * 
-	 * @return Information about the collision and the colBody in question.
+	 * @return Information about the first collision along curBody's motion
 	 */
-	private CollisionInfo getFirstCollision(Segment segment, CircleCB curBody, List<CircleCB> collisions) {
+	private CollisionInfo getFirstCollisionInfo(Segment segment, CircleCB curBody, List<CircleCB> collisions) {
 
 		List<CollisionInfo> colInfos = new ArrayList<CollisionInfo>();
 		for (CircleCB other : collisions) {
@@ -152,7 +151,7 @@ public class KnockBackSimulation {
 			return null;
 		}
 
-		// Compare the p value of all collisions, return the one with the least
+		// Compare the p value of all collisions, return the one with smallest p
 		Comparator<CollisionInfo> ascendingPOrder = (CollisionInfo c1, CollisionInfo c2) -> {
 			if (c1.pOfCollisionPoint <= c2.pOfCollisionPoint) {
 				return -1;
@@ -177,7 +176,7 @@ public class KnockBackSimulation {
 	 * @param other
 	 *            A colBody which is colliding with curBody. other must actually be intersecting with curBody
 	 * 
-	 * @return Information about the collision. Can return null, but only due to improper input
+	 * @return Information about the collision. Can return null, but only due to improper input.
 	 */
 	private CollisionInfo getCollisionInfo(Segment segment, CircleCB curBody, CircleCB other) {
 
@@ -259,7 +258,7 @@ public class KnockBackSimulation {
 					- Math.acos(circleCenterToIntersect.x / keyCircle.getRadius()));
 		}
 
-		// set debugInformation
+		// Set debug information
 		intersectDebugInfo.initial.set(initial);
 		intersectDebugInfo.delta.set(delta);
 		intersectDebugInfo.deltaNormalized.set(deltaNormalized);
@@ -276,7 +275,80 @@ public class KnockBackSimulation {
 
 		intersectDebugInfo.angleOfCircleAtIntersectDegrees = angleOfCircleAtIntersect * RADS_TO_DEGREES;
 
-		return new CollisionInfo(other, pOfIntersectPoint, angleOfCircleAtIntersect);
+		return new CollisionInfo(curBody, other, pOfIntersectPoint, angleOfCircleAtIntersect);
+	}
+
+	/**
+	 * Resolves collision, updating velocities (and possibly location).
+	 * 
+	 * @param collision
+	 */
+	private void resolveCollision(CollisionInfo collision) {
+
+		// 1. Determine unit's velocities in terms of the normalized collision normal vector. Set aside the
+		// perpendicular components. We now have 2 1-d velocity vectors
+
+		CircleCB thisBody = collision.cur;
+		CircleCB other = collision.other;
+
+		Vector2 normalNorm = new Vector2((float) Math.cos(collision.collisionAngle),
+				(float) Math.sin(collision.collisionAngle));
+		Vector2 v1 = new Vector2(thisBody.vx, thisBody.vy);
+		Vector2 v1Norm = new Vector2(v1).nor();
+
+		Vector2 v2 = new Vector2(other.vx, other.vy);
+		Vector2 v2Norm = new Vector2(v2).nor();
+
+		float v1ColAxis = v1.len() * v1Norm.dot(normalNorm);
+		float v2ColAxis = v2.len() * v2Norm.dot(normalNorm);
+
+		// 2. Transform the problem into the zero momentum frame
+
+		final float MASS_BODY = 3; // system supports mass but game doesn't use it yet
+
+		final float m1 = MASS_BODY;
+		final float m2 = MASS_BODY;
+
+		float M1ColAxis = v1ColAxis * m1;
+		float M2ColAxis = v2ColAxis * m2;
+
+		float MSystemColAxis = M1ColAxis + M2ColAxis;
+		float VSystemColAxis = MSystemColAxis / (m1 + m2);
+
+		float v1ZeroFrame = v1ColAxis - VSystemColAxis;
+		float v2ZeroFrame = v2ColAxis - VSystemColAxis;
+
+		// 3. Solve the problem with the zero momentum frame
+		// 1. Use derived formula to compute v1'
+
+		final float elasticity = 1; // goes from [0,1], is equal to the ratio of KE conserved. 1 is a perfectly elastic
+									// collision
+
+		float v1FinalZeroFrame = (float) Math
+				.sqrt(elasticity * (m1 * (v1ZeroFrame * v1ZeroFrame) + m2 * (v2ZeroFrame * v2ZeroFrame))
+						/ (m1 * (1 + m1 / m2)));
+
+		// 2. Plugin to momentum equation to get v2'
+
+		float v2FinalZeroFrame = -1 * v1FinalZeroFrame * m1 / m2;
+
+		// 3. Subtract from initial velocities to get the change in velocity along the collision normal vector
+
+		float dv1ColAxis = v1FinalZeroFrame - v1ZeroFrame;
+		float dv2ColAxis = v2FinalZeroFrame - v2ZeroFrame;
+
+		// 4. Convert change in velocity into standard coordinates and modify both body's velocities by that much,
+		// respectively.
+
+		Vector2 dv1 = new Vector2(normalNorm).scl(dv1ColAxis);
+		Vector2 dv2 = new Vector2(normalNorm).scl(dv2ColAxis);
+
+		thisBody.vx += dv1.x;
+		thisBody.vy += dv1.y;
+
+		other.vx += dv2.x;
+		other.vy += dv2.y;
+
 	}
 
 	public CircleObject addCircleObject(float x, float y) {
