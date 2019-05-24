@@ -42,6 +42,7 @@ public class Holowyth extends Game {
 	/* Skins */
 	public Skin skin;
 
+	public final String ASSETS_PATH = "assets/";
 	public AssetManager assets;
 	// IO
 	public FileChooser fileChooser;
@@ -65,10 +66,10 @@ public class Holowyth extends Game {
 		VisUI.load();
 		skin = VisUI.getSkin();
 
-		this.assets = new AssetManager();
+		this.assets = new PrefixingAssetManager(ASSETS_PATH);
 
 		initFileChoosers();
-		initializeSharedResources();
+		initRendering();
 		initFonts();
 
 		LoadingScreen loadingScreen = new LoadingScreen(this);
@@ -95,15 +96,16 @@ public class Holowyth extends Game {
 		font_goth36.dispose();
 	}
 
-	private void initializeSharedResources() {
+	private void initRendering() {
 		batch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
 		HoloGL.setShapeRenderer(shapeRenderer);
-
-		font = new BitmapFont(); // Use LibGDX's default Arial font.
 	}
 
 	private void initFonts() {
+
+		font = new BitmapFont(); // Default Arial font.
+
 		font_goth12 = generateFont("fonts/MS_Gothic.ttf", Color.WHITE, 12);
 		font_goth36 = generateFont("fonts/MS_Gothic.ttf", Color.WHITE, 36);
 
@@ -117,7 +119,7 @@ public class Holowyth extends Game {
 	private BitmapFont generateFontWithBorder(String path, Color color, int size, Color borderColor,
 			float borderWidth) {
 		FreeTypeFontGenerator.setMaxTextureSize(FreeTypeFontGenerator.NO_MAXIMUM);
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(path));
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(ASSETS_PATH + path));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = size;
 		parameter.borderWidth = borderWidth;
@@ -129,8 +131,9 @@ public class Holowyth extends Game {
 	}
 
 	private BitmapFont generateFont(String path, Color color, int size) {
+
 		FreeTypeFontGenerator.setMaxTextureSize(FreeTypeFontGenerator.NO_MAXIMUM);
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(path));
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(ASSETS_PATH + path));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = size;
 		// HoloUI.addJapaneseCharacters(parameter);

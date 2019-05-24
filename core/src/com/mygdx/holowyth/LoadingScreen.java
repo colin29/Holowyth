@@ -3,6 +3,9 @@ package com.mygdx.holowyth;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
@@ -17,6 +20,8 @@ public class LoadingScreen implements Screen {
 
 	private final Holowyth game;
 	private Camera camera;
+
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public LoadingScreen(final Holowyth game) {
 		this.game = game;
@@ -81,7 +86,7 @@ public class LoadingScreen implements Screen {
 	}
 
 	public void queueAssets() {
-		
+
 		game.assets.load("ui/uiskin.atlas", TextureAtlas.class);
 		game.assets.load("img/touhou_kagerou.jpg", Texture.class);
 		game.assets.load("icons/cursors/cursor.png", Texture.class);
@@ -90,16 +95,20 @@ public class LoadingScreen implements Screen {
 		// game.assets.load("img/witch.png", Texture.class);
 		// game.assets.load("img/witchresized.png", Texture.class);
 
-		//Load all png files in this directory
-		File dir = new File("img/");
+		// Load all png files in this directory
+		File dir = new File(game.ASSETS_PATH + "img/");
 
 		File[] images = dir.listFiles(new FilenameFilter() {
+			@Override
 			public boolean accept(File dir, String filename) {
 				return filename.endsWith(".png");
 			}
 		});
-		for(File image: images){
-//			System.out.println(image.getName());
+
+		logger.debug("array of files " + images);
+
+		for (File image : images) {
+			System.out.println(image.getName());
 			TextureParameter param = new TextureParameter();
 			param.genMipMaps = true;
 			game.assets.load("img/" + image.getName(), Texture.class, param);
