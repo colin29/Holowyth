@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test.sandbox.holowyth;
+package com.mygdx.holowyth.test.sandbox;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;

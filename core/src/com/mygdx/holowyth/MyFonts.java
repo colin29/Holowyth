@@ -14,6 +14,7 @@ public class MyFonts {
 
 	BitmapFont font;
 	BitmapFont font_goth12;
+	BitmapFont font_goth24;
 
 	MyFonts() {
 	}
@@ -28,6 +29,7 @@ public class MyFonts {
 
 		font = new BitmapFont(); // Default Arial font.
 		font_goth12 = generateFont("fonts/MS_Gothic.ttf", Color.WHITE, 12);
+		font_goth24 = generateFont("fonts/MS_Gothic.ttf", Color.WHITE, 24);
 	}
 
 	BitmapFont generateFontWithBorder(String path, Color color, int size, Color borderColor,
@@ -79,6 +81,10 @@ public class MyFonts {
 
 	public BitmapFont font_goth12() {
 		return font_goth12;
+	}
+
+	public BitmapFont moderateFont() {
+		return font_goth24;
 	}
 
 }

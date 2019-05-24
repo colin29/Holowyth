@@ -16,8 +16,8 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.holowyth.test.demos.stats.StatsDemo;
 import com.mygdx.holowyth.test.demos.ui.UIDemo;
 import com.mygdx.holowyth.test.foogame.FooGame;
-import com.mygdx.holowyth.test.sandbox.holowyth.Test1;
-import com.mygdx.holowyth.test.sandbox.holowyth.Test2;
+import com.mygdx.holowyth.test.sandbox.Test1;
+import com.mygdx.holowyth.test.sandbox.Test2;
 import com.mygdx.holowyth.util.tools.debugstore.DebugDemo;
 
 public class SelectLauncher {

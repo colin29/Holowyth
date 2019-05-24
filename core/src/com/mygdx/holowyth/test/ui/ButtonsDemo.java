@@ -9,12 +9,13 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.kotcrab.vis.ui.VisUI;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.template.BaseScreen;
@@ -47,20 +48,41 @@ public class ButtonsDemo extends BaseScreen {
 				| (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 
-		batch.begin();
-
-		BitmapFont font = Holowyth.fonts.font();
-		font.setColor(Color.ORANGE);
-
-		Holowyth.fonts.font().draw(batch, "Screen: Loading", MiscUtil.getCursorInWorldCoords(camera).x,
-				MiscUtil.getCursorInWorldCoords(camera).y);
-		batch.end();
-
 		stage.draw();
 	}
 
 	private void createUIElements() {
-		HoloUI.textButton(root, "hello", VisUI.getSkin(), () -> logger.debug("hello"));
+		root.debugAll();
+
+		root.bottom().left();
+		root.pad(10);
+
+		root.row().space(20).fill();
+
+		TextButtonStyle style = new TextButtonStyle(VisUI.getSkin().get(TextButtonStyle.class));
+
+		style.font = Holowyth.fonts.moderateFont();
+		style.fontColor = Color.FOREST;
+
+		TextButton b1 = new TextButton("test button", game.skin);
+		TextButton b2 = new TextButton("test button", game.skin);
+		TextButton b3 = new TextButton("test button", game.skin);
+
+		float topPad = 3;
+		float leftPad = 10;
+		float rightPad = 10;
+		float botPad = 5;
+
+		b1.pad(topPad, leftPad, botPad, rightPad);
+		b2.pad(topPad, leftPad, botPad, rightPad);
+		b3.pad(topPad, leftPad, botPad, rightPad);
+
+		root.add(b1, b2, b3);
+
+		b1.addListener((Event e) -> {
+			e.getListenerActor();
+			return true;
+		});
 	}
 
 	/**

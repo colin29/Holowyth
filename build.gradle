@@ -17,6 +17,8 @@ allprojects {
         box2DLightsVersion = '1.4'
         ashleyVersion = '1.7.0'
         aiVersion = '1.8.0'
+
+        visuiVersion = '1.4.1'
     }
 
     task listJars {
@@ -46,7 +48,7 @@ project(':core'){
     compile "com.badlogicgames.gdx:gdx:$gdxVersion"
     compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
     compile "com.badlogicgames.box2dlights:box2dlights:$box2DLightsVersion"
-    compile "com.kotcrab.vis:vis-ui:1.3.0"
+    compile "com.kotcrab.vis:vis-ui:$visuiVersion"
     }
 }
 
