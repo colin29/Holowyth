@@ -33,9 +33,13 @@ public class DebugStoreUI {
 		this.stage = stage;
 		this.debugStore = debugStore;
 
-		createDebugInfoDisplay();
+		createUI();
 	}
 
+	/**
+	 * This may not work for loading a second map, atm. Nonetheless, this still needs to be called after debug values
+	 * are added from all components -- at the end of component creation
+	 */
 	public void populateDebugValueDisplay() {
 		valueLabelMapping = new ValueLabelMapping();
 
@@ -100,6 +104,10 @@ public class DebugStoreUI {
 
 	public Table getDebugInfo() {
 		return debugInfo;
+	}
+
+	private void createUI() {
+		createDebugInfoDisplay();
 	}
 
 	public void createDebugInfoDisplay() {

@@ -83,11 +83,13 @@ public abstract class DemoScreen extends BaseScreen implements InputProcessor {
 			return;
 		}
 
-		System.out.println("New map loaded");
 		this.map = newMap;
 		newMap.hasUnsavedChanges = false;
-
 		camera.position.set(newMap.width() / 2, newMap.height() / 2, 0);
+
+		System.out.println("New map loaded");
+
+		mapStartup();
 	}
 
 	protected void updateTitleBarInformation() {
@@ -100,6 +102,8 @@ public abstract class DemoScreen extends BaseScreen implements InputProcessor {
 					Holo.titleName + " --- " + map.name + " [" + map.width() + "x" + map.height() + "] " + starText);
 		}
 	}
+
+	protected abstract void mapStartup();
 
 	protected abstract void mapShutdown();
 

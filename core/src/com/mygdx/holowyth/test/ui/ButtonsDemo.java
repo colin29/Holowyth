@@ -9,13 +9,17 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
 import com.kotcrab.vis.ui.VisUI;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.template.BaseScreen;
@@ -76,6 +80,10 @@ public class ButtonsDemo extends BaseScreen {
 		b1.pad(topPad, leftPad, botPad, rightPad);
 		b2.pad(topPad, leftPad, botPad, rightPad);
 		b3.pad(topPad, leftPad, botPad, rightPad);
+
+		Cell cell = HoloUI.textButton(root, "hi", style, (ChangeEvent event, Actor actor) -> {
+			logger.debug("msg");
+		});
 
 		root.add(b1, b2, b3);
 

@@ -100,6 +100,10 @@ public class RayCastDemo extends DemoScreen {
 	}
 
 	@Override
+	protected void mapStartup() {
+	}
+
+	@Override
 	protected void mapShutdown() {
 	}
 

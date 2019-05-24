@@ -1,5 +1,7 @@
 package com.mygdx.holowyth.knockback;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.graphics.HoloGL;
@@ -9,15 +11,16 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
 public class KnockBackDemo extends DemoScreen {
 
-	private Renderer renderer;
-	DebugStore debugStore = new DebugStore();
-	DebugStoreUI debugStoreUI = new DebugStoreUI(stage, debugStore);
-
-	KnockBackSimulation knockbackSim = new KnockBackSimulation(debugStore);
+	private DebugStore debugStore = new DebugStore();
 
 	Timer timer = new Timer();
-
 	Color backgroundColor = HoloGL.rbg(179, 221, 166);
+	InputMultiplexer multiplexer = new InputMultiplexer();
+
+	// Components
+	private Renderer renderer;
+	private KnockBackDemoUI knockBackDemoUI;
+	private KnockBackSimulation knockbackSim = new KnockBackSimulation(debugStore);
 
 	public KnockBackDemo(final Holowyth game) {
 		super(game);
@@ -25,11 +28,13 @@ public class KnockBackDemo extends DemoScreen {
 		renderer.setKnockBackSimulation(knockbackSim);
 		renderer.setClearColor(backgroundColor);
 
-		debugStoreUI.populateDebugValueDisplay();
-		root.add(debugStoreUI.getDebugInfo());
-		root.pack();
+		knockBackDemoUI = new KnockBackDemoUI(stage, debugStore, game.skin, camera);
 
 		addInitialObjects();
+
+		multiplexer.addProcessor(stage);
+		multiplexer.addProcessor(knockBackDemoUI.getInputProcessor());
+
 	}
 
 	private void addInitialObjects() {
@@ -41,7 +46,7 @@ public class KnockBackDemo extends DemoScreen {
 	public void render(float delta) {
 		renderer.render(delta);
 
-		debugStoreUI.updateDebugValueDisplay();
+		knockBackDemoUI.onRender();
 		ifTimeElapsedTickSimulation();
 	}
 
@@ -52,12 +57,17 @@ public class KnockBackDemo extends DemoScreen {
 	}
 
 	@Override
+	protected void mapStartup() {
+	}
+
+	@Override
 	protected void mapShutdown() {
 	}
 
 	@Override
 	public void show() {
 		timer.start(1000 / 60);
+		Gdx.input.setInputProcessor(multiplexer);
 	}
 
 }
