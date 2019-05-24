@@ -30,10 +30,12 @@ public class KnockBackSimulation {
 	private IntersectDebugInfo intersectDebugInfo = new IntersectDebugInfo();
 
 	public KnockBackSimulation(DebugStore debugStore) {
+		@SuppressWarnings("unused")
 		DebugValues debugValues = debugStore.registerComponent("Knockback Sim");
-		addDebugEntries(debugValues);
+		// addDebugEntries(debugValues);
 	}
 
+	@SuppressWarnings("unused")
 	private void addDebugEntries(DebugValues debugValues) {
 		debugValues.add("initial", () -> DataUtil.getRoundedString(intersectDebugInfo.initial));
 		debugValues.add("delta", () -> DataUtil.getRoundedString(intersectDebugInfo.delta));

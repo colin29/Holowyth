@@ -1,6 +1,6 @@
-package com.mygdx.holowyth.test.demo.statsBranch;
+package com.mygdx.holowyth.test.demos.stats;
 
-import com.mygdx.holowyth.test.demo.statsBranch.UnitStatsSB.UnitType;
+import com.mygdx.holowyth.test.demos.stats.UnitStatsSB.UnitType;
 import com.mygdx.holowyth.unit.Item;
 import com.mygdx.holowyth.unit.Item.EquipType;
 import com.mygdx.holowyth.unit.Item.ItemType;

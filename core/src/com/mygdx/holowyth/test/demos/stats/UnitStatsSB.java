@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test.demo.statsBranch;
+package com.mygdx.holowyth.test.demos.stats;
 
 import static com.mygdx.holowyth.util.DataUtil.*;
 

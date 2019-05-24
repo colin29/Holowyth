@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test.ui;
+package com.mygdx.holowyth.test.demos.ui;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -20,7 +20,6 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
-import com.mygdx.holowyth.test.gdx.ActorListener;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 
 public class MainMenu implements Screen {

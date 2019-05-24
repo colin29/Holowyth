@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test.gdx;
+package com.mygdx.holowyth.test.demos.ui;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;

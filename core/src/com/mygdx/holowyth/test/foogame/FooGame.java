@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test.sandbox;
+package com.mygdx.holowyth.test.foogame;
 
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
@@ -32,13 +32,12 @@ public class FooGame extends Game {
 
 		this.assets = new AssetManager();
 		initFonts();
-		
+
 		VisUI.load();
 		initializeSharedResources();
 
-		
 		loadCommonAssets();
-		this.setScreen(new FooScreen2(this));
+		this.setScreen(new FooScreen(this));
 	}
 
 	@Override
@@ -58,18 +57,19 @@ public class FooGame extends Game {
 		shapeRenderer = new ShapeRenderer();
 		font = new BitmapFont(); // Use LibGDX's default Arial font.
 	}
+
 	private void initFonts() {
 		FreeTypeFontGenerator.setMaxTextureSize(FreeTypeFontGenerator.NO_MAXIMUM);
-		FreeTypeFontGenerator generator	= new FreeTypeFontGenerator(Gdx.files.internal("fonts/MS_Gothic.ttf"));
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/MS_Gothic.ttf"));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = 36;
 		MiscUtil.addJapaneseCharacters(parameter);
 		parameter.color = Color.WHITE;
 		this.font_goth36 = generator.generateFont(parameter);
-		
+
 	}
-	
-	private void loadCommonAssets(){
+
+	private void loadCommonAssets() {
 		assets.load("ui/uiskin.atlas", TextureAtlas.class);
 		assets.finishLoading();
 	}

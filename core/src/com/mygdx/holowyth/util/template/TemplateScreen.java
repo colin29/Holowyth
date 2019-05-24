@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.mygdx.holowyth.test.sandbox.FooGame;
+import com.mygdx.holowyth.test.foogame.FooGame;
 
 /**
  * Meant to be copy-pasted, not sub-classed

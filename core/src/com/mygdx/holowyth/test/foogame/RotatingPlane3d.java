@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test.sandbox;
+package com.mygdx.holowyth.test.foogame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -13,7 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
-public class FooScreen3 implements Screen {
+public class RotatingPlane3d implements Screen {
 
 	private final FooGame game;
 	private Camera camera;
@@ -25,7 +25,7 @@ public class FooScreen3 implements Screen {
 	/**
 	 * Uses a perspective camera to look at a shape that is transformed or rotated
 	 */
-	public FooScreen3(final FooGame game) {
+	public RotatingPlane3d(final FooGame game) {
 		this.game = game;
 		this.camera = new PerspectiveCamera(67
 				, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());

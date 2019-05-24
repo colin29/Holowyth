@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test.ui;
+package com.mygdx.holowyth.test.demos.ui;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test.sandbox;
+package com.mygdx.holowyth.test.foogame;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;

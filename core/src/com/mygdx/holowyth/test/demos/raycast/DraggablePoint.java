@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test.sandbox.raycasting;
+package com.mygdx.holowyth.test.demos.raycast;
 
 import java.util.ArrayList;
 

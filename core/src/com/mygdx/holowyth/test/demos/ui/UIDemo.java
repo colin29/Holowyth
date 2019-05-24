@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test.ui;
+package com.mygdx.holowyth.test.demos.ui;
 
 import com.badlogic.gdx.Game;
 import com.kotcrab.vis.ui.VisUI;
