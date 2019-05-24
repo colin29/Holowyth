@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.Color;
 public class Holo {
 
 	// Paths
-	public static String mapsDirectory = HoloIO.getCanonicalPathElseNull("./../saveFiles/");
+	public static String mapsDirectory = HoloIO.getCanonicalPathElseNull("./saveFiles/");
 
 	// Initial Settings (only apply at startup)
 	public static boolean enableCursorGrabbing = false;

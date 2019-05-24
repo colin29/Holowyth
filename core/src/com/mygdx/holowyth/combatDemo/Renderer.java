@@ -165,7 +165,8 @@ public class Renderer {
 	private void renderUnitDebugText() {
 		batch.begin();
 		for (Unit u : world.getUnits()) {
-			game.borderedDebugFont.draw(batch, String.valueOf(u.debugNumOfUnitsCollidingWith), u.getX(), u.getY());
+			Holowyth.fonts.borderedDebugFont().draw(batch, String.valueOf(u.debugNumOfUnitsCollidingWith), u.getX(),
+					u.getY());
 		}
 		batch.end();
 	}

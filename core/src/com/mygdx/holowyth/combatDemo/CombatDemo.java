@@ -7,7 +7,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.holowyth.Holowyth;
@@ -33,7 +32,6 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	// Rendering and pipeline variables
-	ShapeRenderer shapeRenderer;
 	Renderer renderer;
 
 	// UI

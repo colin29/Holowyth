@@ -57,10 +57,10 @@ public class PFUnitControls implements InputProcessor {
 		this.camera = camera;
 		this.units = units;
 
-		this.font = game.debugFont;
+		this.font = game.fonts.debugFont();
 		this.skin = game.skin;
 
-		labelStyle = new LabelStyle(game.debugFont, Holo.debugFontColor);
+		labelStyle = new LabelStyle(game.fonts.debugFont(), Holo.debugFontColor);
 
 		createDebugTable();
 	}

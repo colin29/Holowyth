@@ -4,14 +4,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.kotcrab.vis.ui.VisUI;
@@ -29,35 +24,30 @@ public class Holowyth extends Game {
 	public SpriteBatch batch;
 	public ShapeRenderer shapeRenderer;
 
+	public static final String ASSETS_PATH = "assets/";
+	public final AssetManager assets;
+
 	/* Fonts */
-	public BitmapFont font;
-	public BitmapFont font_goth12;
-	public BitmapFont font_goth36;
 
-	public static BitmapFont debugFont;
-	public BitmapFont borderedDebugFont;
-
-	public BitmapFont damageEffectFont;
+	public final static MyFonts fonts = new MyFonts();
 
 	/* Skins */
 	public Skin skin;
 
-	public final String ASSETS_PATH = "assets/";
-	public AssetManager assets;
 	// IO
 	public FileChooser fileChooser;
 
+	Class<?> screenToLoad;
+
 	public Holowyth() {
-		screenToLoad = PolyMapEditor.class;
+		this(PolyMapEditor.class);
 	}
 
-	Class<?> screenToLoad;
-	public BitmapFont missEffectFont;
+	public Holowyth(Class<? extends Screen> clazz) {
 
-	/* vvvvvvv User Methods vvvvvvv */
-	public Holowyth(Class<? extends Screen> c) { // takes in screen to open
-		screenToLoad = c;
+		assets = new PrefixingAssetManager(ASSETS_PATH);
 
+		screenToLoad = clazz;
 	}
 
 	@Override
@@ -66,17 +56,22 @@ public class Holowyth extends Game {
 		VisUI.load();
 		skin = VisUI.getSkin();
 
-		this.assets = new PrefixingAssetManager(ASSETS_PATH);
-
-		initFileChoosers();
 		initRendering();
+		initFileChoosers();
 		initFonts();
 
 		LoadingScreen loadingScreen = new LoadingScreen(this);
+
 		loadingScreen.queueAssets();
 		this.assets.finishLoading();
 		setScreenToGivenClass();
 
+	}
+
+	private void initRendering() {
+		batch = new SpriteBatch();
+		shapeRenderer = new ShapeRenderer();
+		HoloGL.setShapeRenderer(shapeRenderer);
 	}
 
 	private void initFileChoosers() {
@@ -92,55 +87,10 @@ public class Holowyth extends Game {
 	@Override
 	public void dispose() {
 		batch.dispose();
-		font.dispose();
-		font_goth36.dispose();
-	}
-
-	private void initRendering() {
-		batch = new SpriteBatch();
-		shapeRenderer = new ShapeRenderer();
-		HoloGL.setShapeRenderer(shapeRenderer);
 	}
 
 	private void initFonts() {
-
-		font = new BitmapFont(); // Default Arial font.
-
-		font_goth12 = generateFont("fonts/MS_Gothic.ttf", Color.WHITE, 12);
-		font_goth36 = generateFont("fonts/MS_Gothic.ttf", Color.WHITE, 36);
-
-		debugFont = generateFont("fonts/OpenSans.ttf", Color.WHITE, 16);
-		borderedDebugFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 16, Color.BLACK, 1.5f);
-
-		damageEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 16, Color.BLACK, 1.5f);
-		missEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 15, Color.GRAY, 0.5f);
-	}
-
-	private BitmapFont generateFontWithBorder(String path, Color color, int size, Color borderColor,
-			float borderWidth) {
-		FreeTypeFontGenerator.setMaxTextureSize(FreeTypeFontGenerator.NO_MAXIMUM);
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(ASSETS_PATH + path));
-		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
-		parameter.size = size;
-		parameter.borderWidth = borderWidth;
-		parameter.borderColor = borderColor;
-		parameter.color = color;
-		BitmapFont font = generator.generateFont(parameter);
-		generator.dispose();
-		return font;
-	}
-
-	private BitmapFont generateFont(String path, Color color, int size) {
-
-		FreeTypeFontGenerator.setMaxTextureSize(FreeTypeFontGenerator.NO_MAXIMUM);
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(ASSETS_PATH + path));
-		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
-		parameter.size = size;
-		// HoloUI.addJapaneseCharacters(parameter);
-		parameter.color = color;
-		BitmapFont font = generator.generateFont(parameter);
-		generator.dispose();
-		return font;
+		fonts.init();
 	}
 
 	private void setScreenToGivenClass() {
@@ -157,15 +107,6 @@ public class Holowyth extends Game {
 				| InvocationTargetException e) {
 			e.printStackTrace();
 		}
-	}
-
-	/**
-	 * Workaround until I replace this with using the Asset manager
-	 * 
-	 * @return
-	 */
-	public static BitmapFont getDebugFont() {
-		return debugFont;
 	}
 
 }

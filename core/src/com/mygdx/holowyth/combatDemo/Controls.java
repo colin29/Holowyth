@@ -75,10 +75,10 @@ public class Controls extends InputProcessorAdapter {
 		this.world = world;
 		this.units = units;
 
-		this.font = game.debugFont;
+		this.font = Holowyth.fonts.debugFont();
 		this.skin = game.skin;
 
-		labelStyle = new LabelStyle(game.debugFont, Holo.debugFontColor);
+		labelStyle = new LabelStyle(Holowyth.fonts.debugFont(), Holo.debugFontColor);
 
 		DebugValues debugValues = debugStore.registerComponent("Controls");
 		debugValues.add("Order Context", () -> getCurrentContextText());

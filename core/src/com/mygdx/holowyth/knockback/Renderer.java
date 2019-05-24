@@ -77,7 +77,7 @@ public class Renderer {
 	private void renderObjectIds() {
 		batch.begin();
 		for (CircleObject o : simulation.getCircleObjects()) {
-			game.borderedDebugFont.draw(batch, String.valueOf(o.id), o.getX(), o.getY());
+			game.fonts.borderedDebugFont().draw(batch, String.valueOf(o.id), o.getX(), o.getY());
 		}
 		batch.end();
 	}
