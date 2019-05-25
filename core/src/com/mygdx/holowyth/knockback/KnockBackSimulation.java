@@ -19,6 +19,7 @@ import com.mygdx.holowyth.knockback.collision.CollisionInfo;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
+import com.mygdx.holowyth.util.exceptions.HoloOperationException;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
@@ -113,10 +114,15 @@ public class KnockBackSimulation {
 				continue;
 			} else {
 
-				CollisionInfo collision = getFirstCollisionInfo(motion, thisObject.getColBody(), collisions);
-
-				resolveCollision(collision);
-
+				try {
+					CollisionInfo collision = getFirstCollisionInfo(motion, thisObject.getColBody(), collisions);
+					resolveCollision(collision);
+				} catch (HoloOperationException e) {
+					logger.warn(e.getMessage());
+					logger.trace(e.getFromMessage());
+					logger.warn("Skipping resolving this object's collision");
+					// Skip resolving this collision
+				}
 			}
 
 		}
@@ -150,15 +156,21 @@ public class KnockBackSimulation {
 
 		List<CollisionInfo> colInfos = new ArrayList<CollisionInfo>();
 		for (CircleCB other : collisions) {
-			CollisionInfo info = getCollisionInfo(segment, curBody, other);
-			if (info != null) {
-				colInfos.add(info);
+			try {
+				CollisionInfo info = getCollisionInfo(segment, curBody, other);
+				if (info != null) {
+					colInfos.add(info);
+				}
+			} catch (HoloOperationException e) {
+				logger.warn(e.getMessage());
+				logger.trace(e.getFromMessage());
+				logger.warn("Skipping adding this collision's info");
 			}
+
 		}
 
 		if (colInfos.isEmpty()) {
-			logger.warn("All collisions provided were invalid, so no info could be returned");
-			return null;
+			throw (new HoloOperationException("All collisions provided were invalid, so no info could be returned"));
 		}
 
 		// Compare the p value of all collisions, return the one with smallest p
@@ -189,6 +201,11 @@ public class KnockBackSimulation {
 	 * @return Information about the collision. Can return null, but only due to improper input.
 	 */
 	private CollisionInfo getCollisionInfo(Segment segment, CircleCB curBody, CircleCB other) {
+
+		if (curBody.vx == 0 && curBody.vy == 0) {
+			throw new HoloOperationException(
+					"Given curBody has velocity 0, cannot compute collision info. Based on arguments, it appears that curBody is already colliding with something, which is invalid state.");
+		}
 
 		final float x1, y1, x2, y2;
 
@@ -361,26 +378,26 @@ public class KnockBackSimulation {
 	private void resolveObjectMapBoundaryCollisions() {
 		float[] horizontalWalls = new float[2];
 		float[] verticalWalls = new float[2];
-	
+
 		horizontalWalls[0] = 0;
 		horizontalWalls[1] = getMapHeight(); // horizontal walls restrict y position
 		verticalWalls[0] = 0;
 		verticalWalls[1] = getMapWidth();
-	
+
 		for (CircleObject thisObject : circleObjects) {
-	
+
 			final float x, y, vx, vy;
-	
+
 			x = thisObject.getX();
 			y = thisObject.getY();
 			vx = thisObject.getVx();
 			vy = thisObject.getVy();
-	
+
 			Segment motion = new Segment(x, y, x + vx, y + vy);
-	
+
 			boolean collidesWithHorizontalWall = false;
 			boolean collidesWithVerticalWall = false;
-	
+
 			for (float horizontalWall : horizontalWalls) {
 				if (isNumberInBounds(horizontalWall, motion.y1, motion.y2, thisObject.getRadius())) {
 					collidesWithHorizontalWall = true;
@@ -391,16 +408,16 @@ public class KnockBackSimulation {
 					collidesWithVerticalWall = true;
 				}
 			}
-	
+
 			if (collidesWithHorizontalWall) {
 				thisObject.setVelocity(vx, -1 * vy);
 			}
 			if (collidesWithVerticalWall) {
 				thisObject.setVelocity(-1 * vx, vy);
 			}
-	
+
 		}
-	
+
 	}
 
 	private boolean isNumberInBounds(float value, float bound1, float bound2, float addedPadding) {
@@ -431,7 +448,7 @@ public class KnockBackSimulation {
 
 	public void clearAllCircles() {
 		circleObjects.clear();
-		logger.debug("Simulation cleared");
+		logger.info("Simulation cleared");
 	}
 
 	private final float screenCenterX = Gdx.graphics.getWidth() / 2;
@@ -495,6 +512,16 @@ public class KnockBackSimulation {
 				circleObjects.add(o);
 			}
 		}
+	}
+
+	void restartWithIllegalUnitPlacement() {
+		clearAllCircles();
+
+		CircleObject o1 = makeCircleObjectWithOffset(screenCenter, 0, 0);
+		CircleObject o2 = makeCircleObjectWithOffset(screenCenter, this.COLLISION_BODY_RADIUS / 2, 0);
+		circleObjects.add(o1);
+		circleObjects.add(o2);
+
 	}
 
 	private boolean isAreaClear(Point point, float radius) {

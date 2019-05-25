@@ -97,6 +97,7 @@ public class KnockBackDemoUI {
 			knockbackSim.restartWithManyObjects();
 		});
 		HoloUI.textButton(root2, "Invalid placing test", skin, padding, () -> {
+			knockbackSim.restartWithIllegalUnitPlacement();
 		});
 
 		root2.row();
