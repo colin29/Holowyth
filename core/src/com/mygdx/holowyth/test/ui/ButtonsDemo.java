@@ -61,7 +61,7 @@ public class ButtonsDemo extends BaseScreen {
 		root.bottom().left();
 		root.pad(10);
 
-		root.row().space(20).fill();
+		root.row().space(20);
 
 		TextButtonStyle style = new TextButtonStyle(VisUI.getSkin().get(TextButtonStyle.class));
 

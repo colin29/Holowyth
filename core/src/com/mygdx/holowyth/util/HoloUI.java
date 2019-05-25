@@ -38,6 +38,46 @@ public class HoloUI {
 		public void accept(ChangeEvent e, Actor actor);
 	}
 
+	public static class PaddingValues {
+		public float left, right, bot, top;
+
+		public PaddingValues(float top, float left, float bot, float right) {
+			this.top = top;
+			this.left = left;
+			this.bot = bot;
+			this.right = right;
+		}
+	}
+
+	// Widget Functions
+	public static Cell<TextButton> textButton(Table table, String text, Skin skin, PaddingValues padding,
+			VoidInterface action) {
+		Cell<TextButton> c = textButton(table, text, skin, action);
+		pad(c.getActor(), padding);
+		return c;
+	}
+
+	public static Cell<TextButton> textButton(Table table, String text, TextButtonStyle style, PaddingValues padding,
+			VoidInterface action) {
+		Cell<TextButton> c = textButton(table, text, style, action);
+		pad(c.getActor(), padding);
+		return c;
+	}
+
+	public static Cell<TextButton> textButton(Table table, String text, Skin skin, PaddingValues padding,
+			ChangeEventInterface listener) {
+		Cell<TextButton> c = textButton(table, text, skin, listener);
+		pad(c.getActor(), padding);
+		return c;
+	}
+
+	public static Cell<TextButton> textButton(Table table, String text, PaddingValues padding, TextButtonStyle style,
+			ChangeEventInterface listener) {
+		Cell<TextButton> c = textButton(table, text, style, listener);
+		pad(c.getActor(), padding);
+		return c;
+	}
+
 	// Widget Functions
 	public static Cell<TextButton> textButton(Table table, String text, Skin skin, VoidInterface action) {
 		return textButton(table, text, skin, new ChangeListener() {
@@ -86,6 +126,10 @@ public class HoloUI {
 		TextButton button = new TextButton(text, style);
 		button.addListener(listener);
 		return table.add(button);
+	}
+
+	public static void pad(Table table, PaddingValues values) {
+		table.pad(values.top, values.left, values.bot, values.right);
 	}
 
 	/**

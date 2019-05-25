@@ -5,10 +5,12 @@ import com.mygdx.holowyth.util.dataobjects.Point;
 public class CircleObject implements ObjectInfo {
 	public final int id;
 	private CircleCB colBody;
+	private float radius;
 
 	public CircleObject(float x, float y, float radius) {
 		colBody = new CircleCB(x, y, radius);
 		this.id = getNextId();
+		this.radius = radius;
 	}
 
 	public CircleCB getColBody() {
@@ -48,6 +50,10 @@ public class CircleObject implements ObjectInfo {
 
 	private static int getNextId() {
 		return nextId++;
+	}
+
+	public float getRadius() {
+		return radius;
 	}
 
 }

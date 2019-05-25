@@ -2,6 +2,7 @@ package com.mygdx.holowyth.knockback;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -11,10 +12,12 @@ import java.util.PriorityQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.knockback.collision.Circle;
 import com.mygdx.holowyth.knockback.collision.CollisionInfo;
 import com.mygdx.holowyth.util.DataUtil;
+import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
@@ -25,7 +28,7 @@ public class KnockBackSimulation {
 
 	List<CircleObject> circleObjects = new ArrayList<CircleObject>();
 
-	public final float COLLISION_BODY_RADIUS = 40;
+	public final float COLLISION_BODY_RADIUS = 30;
 
 	private IntersectDebugInfo intersectDebugInfo = new IntersectDebugInfo();
 
@@ -60,7 +63,6 @@ public class KnockBackSimulation {
 	}
 
 	public void tick() {
-		logger.debug("ticked");
 
 		for (CircleObject o : circleObjects) {
 			if (o.getColBody().radius != COLLISION_BODY_RADIUS) {
@@ -72,6 +74,12 @@ public class KnockBackSimulation {
 		for (CircleObject o : circleObjects) {
 			bodyToObject.put(o.getColBody(), o);
 		}
+
+		resolveObjectObjectCollisions(Collections.unmodifiableMap(bodyToObject));
+		resolveObjectMapBoundaryCollisions();
+	}
+
+	private void resolveObjectObjectCollisions(Map<CircleCB, CircleObject> bodyToObject) {
 
 		// Collision resolution is run once for every unit. It is possible that a later unit's velocity was modified
 		// earlier this tick.
@@ -92,7 +100,7 @@ public class KnockBackSimulation {
 
 			Segment motion = new Segment(x, y, x + vx, y + vy);
 
-			List<CircleCB> collisions = getCollisionsAlongLineSegment(motion.x1, motion.y1, motion.x2, motion.y2,
+			List<CircleCB> collisions = getObjectCollisionsAlongLineSegment(motion.x1, motion.y1, motion.x2, motion.y2,
 					thisObject.getColBody().radius, allOtherBodies);
 
 			for (CircleCB colidee : collisions) {
@@ -114,13 +122,13 @@ public class KnockBackSimulation {
 		}
 	}
 
-	private static ArrayList<CircleCB> getCollisionsAlongLineSegment(float ix, float iy, float dx, float dy,
-			float unitRadius,
+	private static ArrayList<CircleCB> getObjectCollisionsAlongLineSegment(float ix, float iy, float dx, float dy,
+			float thisRadius,
 			List<CircleCB> cbs) {
 		ArrayList<CircleCB> collisions = new ArrayList<CircleCB>();
 		for (CircleCB cb : cbs) {
-			if (Line2D.ptSegDistSq(ix, iy, dx, dy, cb.pos.x, cb.pos.y) < (cb.radius + unitRadius)
-					* (cb.radius + unitRadius)) {
+			if (Line2D.ptSegDistSq(ix, iy, dx, dy, cb.pos.x, cb.pos.y) < (cb.radius + thisRadius)
+					* (cb.radius + thisRadius)) {
 				collisions.add(cb);
 			}
 		}
@@ -323,9 +331,6 @@ public class KnockBackSimulation {
 		// 3. Solve the problem with the zero momentum frame
 		// 1. Use derived formula to compute v1'
 
-		final float elasticity = 1; // goes from [0,1], is equal to the ratio of KE conserved. 1 is a perfectly elastic
-									// collision
-
 		float v1FinalZeroFrame = (float) Math
 				.sqrt(elasticity * (m1 * (v1ZeroFrame * v1ZeroFrame) + m2 * (v2ZeroFrame * v2ZeroFrame))
 						/ (m1 * (1 + m1 / m2)));
@@ -353,6 +358,65 @@ public class KnockBackSimulation {
 
 	}
 
+	private void resolveObjectMapBoundaryCollisions() {
+		float[] horizontalWalls = new float[2];
+		float[] verticalWalls = new float[2];
+	
+		horizontalWalls[0] = 0;
+		horizontalWalls[1] = getMapHeight(); // horizontal walls restrict y position
+		verticalWalls[0] = 0;
+		verticalWalls[1] = getMapWidth();
+	
+		for (CircleObject thisObject : circleObjects) {
+	
+			final float x, y, vx, vy;
+	
+			x = thisObject.getX();
+			y = thisObject.getY();
+			vx = thisObject.getVx();
+			vy = thisObject.getVy();
+	
+			Segment motion = new Segment(x, y, x + vx, y + vy);
+	
+			boolean collidesWithHorizontalWall = false;
+			boolean collidesWithVerticalWall = false;
+	
+			for (float horizontalWall : horizontalWalls) {
+				if (isNumberInBounds(horizontalWall, motion.y1, motion.y2, thisObject.getRadius())) {
+					collidesWithHorizontalWall = true;
+				}
+			}
+			for (float verticalWall : verticalWalls) {
+				if (isNumberInBounds(verticalWall, motion.x1, motion.x2, thisObject.getRadius())) {
+					collidesWithVerticalWall = true;
+				}
+			}
+	
+			if (collidesWithHorizontalWall) {
+				thisObject.setVelocity(vx, -1 * vy);
+			}
+			if (collidesWithVerticalWall) {
+				thisObject.setVelocity(-1 * vx, vy);
+			}
+	
+		}
+	
+	}
+
+	private boolean isNumberInBounds(float value, float bound1, float bound2, float addedPadding) {
+		float lowerBound = Math.min(bound1, bound2) - addedPadding;
+		float upperBound = Math.max(bound1, bound2) + addedPadding;
+		return (lowerBound <= value && value <= upperBound);
+	}
+
+	private float getMapHeight() {
+		return Gdx.graphics.getHeight();
+	}
+
+	private float getMapWidth() {
+		return Gdx.graphics.getWidth();
+	}
+
 	public CircleObject addCircleObject(float x, float y) {
 		CircleObject o = new CircleObject(x, y, COLLISION_BODY_RADIUS);
 		circleObjects.add(o);
@@ -360,11 +424,119 @@ public class KnockBackSimulation {
 	}
 
 	public void addCircleObject(float x, float y, float vx, float vy) {
-		circleObjects.add(new CircleObject(x, y, COLLISION_BODY_RADIUS));
+		CircleObject o = new CircleObject(x, y, COLLISION_BODY_RADIUS);
+		o.setVelocity(vx, vy);
+		circleObjects.add(o);
+	}
+
+	public void clearAllCircles() {
+		circleObjects.clear();
+		logger.debug("Simulation cleared");
+	}
+
+	private final float screenCenterX = Gdx.graphics.getWidth() / 2;
+	private final float screenCenterY = Gdx.graphics.getHeight() / 2;
+
+	private final Point screenCenter = new Point(screenCenterX, screenCenterY);
+
+	private float elasticity = 1;
+
+	void restartWithSingleCollision() {
+		clearAllCircles();
+		this.addCircleObject(screenCenterX, screenCenterY, 5, 0);
+		this.addCircleObject(screenCenterX + 200, screenCenterY, 0, 0);
+	}
+
+	void restartWith3WayCollision() {
+
+		float offset = 200;
+		float speed = 3;
+
+		clearAllCircles();
+
+		for (int i = 0; i < 3; i++) {
+			float angle = 360f * i / 3;
+			circleObjects.add((makeCircleObjectWithOffset(screenCenter, offset, angle, speed, angle + 180)));
+		}
+	}
+
+	void restartWith8WayCollision() {
+
+		float offset = 200;
+		float speed = 3;
+
+		clearAllCircles();
+
+		for (int i = 0; i < 8; i++) {
+			float angle = 360f * i / 8;
+			circleObjects.add((makeCircleObjectWithOffset(screenCenter, offset, angle, speed, angle + 180 + 10)));
+		}
+	}
+
+	void restartWithManyObjects() {
+
+		float speed = 3;
+
+		float NUM_OBJECTS_TO_CREATE = 30;
+		float radius = COLLISION_BODY_RADIUS;
+		final int MAX_TRIES = 100;
+
+		clearAllCircles();
+		Point newPos = new Point();
+		int objectsCreated = 0;
+		for (int i = 0; i < MAX_TRIES && objectsCreated < NUM_OBJECTS_TO_CREATE; i++) {
+			newPos.x = (float) Math.random() * (getMapWidth() - 2 * radius) + radius;
+			newPos.y = (float) Math.random() * (getMapHeight() - 2 * radius) + radius;
+
+			if (isAreaClear(newPos, COLLISION_BODY_RADIUS)) {
+				CircleObject o = new CircleObject(newPos.x, newPos.y, radius);
+				float angle = (float) Math.random() * 360;
+				setVelocity(o, speed, angle);
+				circleObjects.add(o);
+			}
+		}
+	}
+
+	private boolean isAreaClear(Point point, float radius) {
+
+		for (CircleObject o : circleObjects) {
+			if (Point.calcDistance(point, o.getPos()) <= radius + o.getRadius()) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private CircleObject makeCircleObjectWithOffset(Point point, float offset, float angleDegrees, float speed,
+			float velAngleDegrees) {
+		CircleObject c = makeCircleObjectWithOffset(point, offset, angleDegrees);
+		setVelocity(c, speed, velAngleDegrees);
+		return c;
+	}
+
+	private CircleObject makeCircleObjectWithOffset(Point point, float offset, float angleDegrees) {
+		float angle = (float) (angleDegrees / 180 * Math.PI);
+		CircleObject c = new CircleObject((float) (point.x + offset * Math.cos(angle)),
+				(float) (point.y + offset * Math.sin(angle)), COLLISION_BODY_RADIUS);
+		return c;
+	}
+
+	private void setVelocity(CircleObject c, float speed, float angleDegrees) {
+		float angle = (float) (angleDegrees / 180 * Math.PI);
+		c.setVelocity((float) (speed * Math.cos(angle)), (float) (speed * Math.sin(angle)));
 	}
 
 	public List<CircleObject> getCircleObjects() {
 		return circleObjects;
+	}
+
+	void setElasticity(float elasticity) {
+		if (elasticity >= 0 && elasticity <= 1) {
+			this.elasticity = elasticity;
+		} else {
+			logger.warn("Invalid value {} given. Elasticity must be between 0 and 1", elasticity);
+		}
+
 	}
 
 }

@@ -28,7 +28,7 @@ public class KnockBackDemo extends DemoScreen {
 		renderer.setKnockBackSimulation(knockbackSim);
 		renderer.setClearColor(backgroundColor);
 
-		knockBackDemoUI = new KnockBackDemoUI(stage, debugStore, game.skin, camera);
+		knockBackDemoUI = new KnockBackDemoUI(stage, debugStore, game.skin, camera, knockbackSim);
 
 		addInitialObjects();
 
