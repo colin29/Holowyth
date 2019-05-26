@@ -115,7 +115,7 @@ public class KnockBackSimulation {
 			} else {
 
 				try {
-					CollisionInfo collision = getFirstCollisionInfo(motion, thisObject.getColBody(), collisions);
+					CollisionInfo collision = getFirstCollisionInfo(thisObject.getColBody(), collisions);
 					resolveCollision(collision);
 				} catch (HoloOperationException e) {
 					logger.warn(e.getMessage());
@@ -124,7 +124,6 @@ public class KnockBackSimulation {
 					// Skip resolving this collision
 				}
 			}
-
 		}
 	}
 
@@ -152,7 +151,11 @@ public class KnockBackSimulation {
 	 * 
 	 * @return Information about the first collision along curBody's motion
 	 */
-	private CollisionInfo getFirstCollisionInfo(Segment segment, CircleCB curBody, List<CircleCB> collisions) {
+	private CollisionInfo getFirstCollisionInfo(CircleCB curBody, List<CircleCB> collisions) {
+
+		Segment segment = new Segment(curBody.pos.x, curBody.pos.y,
+				curBody.pos.x + curBody.vx,
+				curBody.pos.y + curBody.vy);
 
 		List<CollisionInfo> colInfos = new ArrayList<CollisionInfo>();
 		for (CircleCB other : collisions) {

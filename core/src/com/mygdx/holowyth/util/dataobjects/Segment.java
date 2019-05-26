@@ -1,5 +1,7 @@
 package com.mygdx.holowyth.util.dataobjects;
 
+import com.mygdx.holowyth.util.exceptions.HoloAssertException;
+
 public class Segment {
 	public float x1, y1, x2, y2;
 
@@ -58,7 +60,7 @@ public class Segment {
 		float dx = x2 - x1;
 		float dy = y2 - y1;
 
-		float newX2 = x1 + dy * factor;
+		float newX2 = x1 + dx * factor;
 		float newY2 = y1 + dy * factor;
 		return new Segment(x1, y1, newX2, newY2);
 	}
@@ -75,5 +77,14 @@ public class Segment {
 	 */
 	public Point endPoint() {
 		return new Point(x2, y2);
+	}
+
+	/**
+	 * Warning: Comparison is exact, does not use margin of error
+	 */
+	public void assertEquals(Segment other) {
+		if (this.x1 != other.x1 || this.y1 != other.y1 || this.x2 != other.x2 || this.y2 != other.y2) {
+			throw new HoloAssertException("segments are not (exactly) equal in value");
+		}
 	}
 }
