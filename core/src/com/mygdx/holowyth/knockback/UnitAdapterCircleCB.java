@@ -9,11 +9,11 @@ import com.mygdx.holowyth.unit.Unit;
  * 
  * It isn't used for resolving the collision itself (mass).
  */
-public class UnitAdapterColBody implements CircleCBInfo {
+public class UnitAdapterCircleCB implements CircleCBInfo {
 
 	Unit unit;
 
-	public UnitAdapterColBody(Unit unit) {
+	public UnitAdapterCircleCB(Unit unit) {
 		this.unit = unit;
 	}
 
@@ -29,20 +29,17 @@ public class UnitAdapterColBody implements CircleCBInfo {
 
 	@Override
 	public float getVx() {
-		return 0; // unit.motion.getVx();
-					// TODO
+		return unit.motion.getKnockBackVx();
 	}
 
 	@Override
 	public float getVy() {
-		return 0; // unit.motion.getVy();
-					// TODO
+		return unit.motion.getKnockBackVy();
 	}
 
 	@Override
 	public float getRadius() {
-		// TODO Auto-generated method stub
-		return 0;
+		return unit.getRadius();
 	}
 
 }

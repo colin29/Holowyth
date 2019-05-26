@@ -243,10 +243,10 @@ public class Renderer {
 	@SuppressWarnings("unused")
 	private void renderPlayerVelocity() {
 		for (Unit u : world.getUnits()) {
-			if (u.isPlayerCharacter() && u.motion.getVelocity() > 0.01f) {
+			if (u.isPlayerCharacter() && u.motion.getVelocityMagnitude() > 0.01f) {
 				UnitMotion m = u.motion;
 				float scale = 15; // enlargen the velocity so we can see it
-				HoloGL.renderArrow(u.getPos(), u.getPos().add(m.vx * scale, m.vy * scale), Color.GREEN);
+				HoloGL.renderArrow(u.getPos(), u.getPos().add(m.getVx() * scale, m.getVy() * scale), Color.GREEN);
 			}
 		}
 	}

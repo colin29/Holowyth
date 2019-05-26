@@ -90,12 +90,12 @@ public class World implements WorldInfo {
 
 			// Validate the motion by checking against other colliding bodies.
 
-			if (thisUnit.motion.vx == 0 && thisUnit.motion.vy == 0) {
+			if (thisUnit.motion.getVx() == 0 && thisUnit.motion.getVy() == 0) {
 				continue;
 			}
 
-			float destX = thisUnit.x + thisUnit.motion.vx;
-			float destY = thisUnit.y + thisUnit.motion.vy;
+			float destX = thisUnit.x + thisUnit.motion.getVx();
+			float destY = thisUnit.y + thisUnit.motion.getVy();
 
 			Segment motion = new Segment(thisUnit.x, thisUnit.y, destX, destY);
 
@@ -108,8 +108,8 @@ public class World implements WorldInfo {
 			}
 
 			if (collisions.isEmpty()) {
-				thisUnit.x += thisUnit.motion.vx;
-				thisUnit.y += thisUnit.motion.vy;
+				thisUnit.x += thisUnit.motion.getVx();
+				thisUnit.y += thisUnit.motion.getVy();
 			} else { // Push this unit outwards and try to keep going towards the waypoint
 
 				// The majority of the time a unit should only be colliding with one unit at a time since we are drawing
@@ -119,8 +119,8 @@ public class World implements WorldInfo {
 					System.out.println("Wierd case, unit colliding with more than 2 units");
 				}
 
-				float curDestx = thisUnit.x + thisUnit.motion.vx;
-				float curDesty = thisUnit.y + thisUnit.motion.vy;
+				float curDestx = thisUnit.x + thisUnit.motion.getVx();
+				float curDesty = thisUnit.y + thisUnit.motion.getVy();
 
 				// System.out.format("%s is colliding with %s bodies%n", u,
 				// collisions.size());
@@ -152,7 +152,7 @@ public class World implements WorldInfo {
 				 * Determines how "impatient" the algorithm will be for signalling blocked for a slow-resolving or
 				 * non-resolving push situation
 				 */
-				final float minProgress = 0.20f * thisUnit.motion.getVelocity();
+				final float minProgress = 0.20f * thisUnit.motion.getVelocityMagnitude();
 
 				if (HoloPF.isEdgePathable(thisUnit.x, thisUnit.y, curDestx, curDesty,
 						pathingModule.getExpandedMapPolys(), colBodies,
@@ -173,7 +173,7 @@ public class World implements WorldInfo {
 	}
 
 	private float getCollisionClearanceDistance(Unit u) {
-		return Holo.collisionClearanceDistance * (u.motion.getVelocity() / Holo.defaultUnitMoveSpeed);
+		return Holo.collisionClearanceDistance * (u.motion.getVelocityMagnitude() / Holo.defaultUnitMoveSpeed);
 	}
 
 	void spawnSomeEnemyUnits() {

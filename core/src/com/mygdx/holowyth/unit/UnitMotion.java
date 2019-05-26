@@ -30,8 +30,7 @@ public class UnitMotion {
 
 	private static float defaultUnitMoveSpeed = Holo.defaultUnitMoveSpeed;
 
-	public float vx, vy;
-
+	private float vx, vy;
 	// Default movement values
 	private static final float defaultTargetFinalSpeed = 0.2f;
 	private static final float defaultDecelRate = 0.02f;
@@ -70,6 +69,11 @@ public class UnitMotion {
 	Unit self;
 	List<Unit> units;
 	private PathingModule pathing;
+
+	// Knockback variables
+	private float knockBackVx;
+	private float knockBackVy;
+	private boolean isBeingKnockedBack = false;
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -371,12 +375,11 @@ public class UnitMotion {
 	}
 
 	/**
-	 * Returns the velocity, which is the actual speed the unit is trying to travel. Contrast to "speed", which is how
-	 * fast the unit can move
+	 * Velocity refers to the same thing as vx and vy, that is the current speed of the unit
 	 * 
 	 * @return
 	 */
-	public float getVelocity() {
+	public float getVelocityMagnitude() {
 		return (float) Math.sqrt(vx * vx + vy * vy);
 	}
 
@@ -400,21 +403,38 @@ public class UnitMotion {
 		}
 	}
 
-	private float knockBackVx;
-	private float knockBackVy;
-	private boolean isBeingKnockedBack = false;
-
 	public boolean isBeingKnockedBack() {
 		return isBeingKnockedBack;
 	}
 
-	private void beginKnockback(float initialVx, float initialVy) {
+	public void beginKnockback(float initialVx, float initialVy) {
 		if (isBeingKnockedBack) {
 			logger.warn("beginKnockback() called but unit is already in knockback state. Skipping.");
 			return;
 		}
-
 		isBeingKnockedBack = true;
+		knockBackVx = initialVx;
+		knockBackVy = initialVy;
+
+		// TODO: need to terminate regular movement behaviour
+	}
+
+	public void setKnockbackVx(float knockBackVx) {
+		if (this.isBeingKnockedBack) {
+			this.knockBackVx = knockBackVx;
+		} else {
+			logger.warn(
+					"setKnockbackVx, but unit is not in knockbackState. This would suggest bad logic. Ignoring set");
+		}
+	}
+
+	public void setKnockbackVy(float knockBackVy) {
+		if (this.isBeingKnockedBack) {
+			this.knockBackVy = knockBackVy;
+		} else {
+			logger.warn(
+					"setKnockbackVy, but unit is not in knockbackState. This would suggest bad logic. Ignoring set");
+		}
 	}
 
 	public Point getDest() {
@@ -437,6 +457,14 @@ public class UnitMotion {
 
 	public float getKnockBackVy() {
 		return knockBackVy;
+	}
+
+	public float getVx() {
+		return vx;
+	}
+
+	public float getVy() {
+		return vy;
 	}
 
 }
