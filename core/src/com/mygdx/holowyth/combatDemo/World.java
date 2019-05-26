@@ -1,7 +1,6 @@
 package com.mygdx.holowyth.combatDemo;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
@@ -35,7 +34,7 @@ public class World implements WorldInfo {
 	EffectsHandler effects;
 	DebugStore debugStore;
 
-	private ArrayList<Unit> units = new ArrayList<Unit>();
+	private UnitCollection units = new UnitCollection();
 
 	Unit playerUnit;
 
@@ -61,13 +60,13 @@ public class World implements WorldInfo {
 	}
 
 	private void tickLogicForUnits() {
-		for (Unit u : units) {
+		for (Unit u : units.getUnits()) {
 			u.handleLogic();
 		}
 	}
 
 	private void handleCombatLogic() {
-		for (Unit u : units) {
+		for (Unit u : units.getUnits()) {
 			u.handleCombatLogic();
 		}
 	}
@@ -80,11 +79,11 @@ public class World implements WorldInfo {
 
 		Polygons expandedMapPolys = HoloPF.expandPolygons(map.polys, Holo.UNIT_RADIUS);
 
-		for (Unit thisUnit : units) {
+		for (Unit thisUnit : units.getUnits()) {
 
 			// Get all other colliding bodies
 			ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
-			for (Unit u : units) {
+			for (Unit u : units.getUnits()) {
 				if (!thisUnit.equals(u))
 					colBodies.add(new CBInfo(u));
 			}
@@ -219,17 +218,16 @@ public class World implements WorldInfo {
 
 	public Unit spawnUnit(float x, float y, Side side, String name) {
 		Unit u = new Unit(x, y, this, side, name);
-		addUnit(u);
+		units.addUnit(u);
 		return u;
 	}
 
-	private void addUnit(Unit u) {
-		this.units.add(u);
-	}
-
+	/**
+	 * The list itself is read-only, though elements can be modified
+	 */
 	@Override
 	public List<Unit> getUnits() {
-		return Collections.unmodifiableList(units);
+		return units.getUnits();
 	}
 
 	@Override

@@ -3,6 +3,9 @@ package com.mygdx.holowyth.unit;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.combatDemo.WorldInfo;
@@ -67,6 +70,8 @@ public class UnitMotion {
 	Unit self;
 	List<Unit> units;
 	private PathingModule pathing;
+
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
 	 * This class merely sets planned unit velocities, it is up to the World class to accept/resolve movements
@@ -395,6 +400,23 @@ public class UnitMotion {
 		}
 	}
 
+	private float knockBackVx;
+	private float knockBackVy;
+	private boolean isBeingKnockedBack = false;
+
+	public boolean isBeingKnockedBack() {
+		return isBeingKnockedBack;
+	}
+
+	private void beginKnockback(float initialVx, float initialVy) {
+		if (isBeingKnockedBack) {
+			logger.warn("beginKnockback() called but unit is already in knockback state. Skipping.");
+			return;
+		}
+
+		isBeingKnockedBack = true;
+	}
+
 	public Point getDest() {
 		if (path == null)
 			return null;
@@ -407,6 +429,14 @@ public class UnitMotion {
 
 	public float getCurPlannedSpeed() {
 		return curPlannedSpeed;
+	}
+
+	public float getKnockBackVx() {
+		return knockBackVx;
+	}
+
+	public float getKnockBackVy() {
+		return knockBackVy;
 	}
 
 }

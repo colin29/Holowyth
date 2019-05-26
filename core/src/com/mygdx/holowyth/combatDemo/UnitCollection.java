@@ -7,7 +7,14 @@ import java.util.List;
 import com.mygdx.holowyth.knockback.CircleCB;
 import com.mygdx.holowyth.unit.Unit;
 
+/**
+ * Holds units plus some related collections. Keeps these collections in sync.
+ * 
+ * @author Colin Ta
+ *
+ */
 public class UnitCollection {
+
 	List<Unit> units = new ArrayList<Unit>();
 	List<CircleCB> colBodies = new ArrayList<CircleCB>();
 
@@ -21,10 +28,16 @@ public class UnitCollection {
 		// TODO:
 	}
 
+	/**
+	 * The list itself is read-only, though elements can be modified
+	 */
 	public List<Unit> getUnits() {
 		return Collections.unmodifiableList(units);
 	}
 
+	/**
+	 * The list itself is read-only, though elements can be modified
+	 */
 	public List<CircleCB> getColBodies() {
 		return Collections.unmodifiableList(colBodies);
 	}
