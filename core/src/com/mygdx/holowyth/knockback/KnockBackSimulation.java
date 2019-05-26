@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.knockback.collision.Circle;
-import com.mygdx.holowyth.knockback.collision.CollisionInfo;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;

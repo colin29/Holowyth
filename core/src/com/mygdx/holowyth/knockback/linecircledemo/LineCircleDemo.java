@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.knockback.collision;
+package com.mygdx.holowyth.knockback.linecircledemo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

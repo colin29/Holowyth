@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.knockback.collision;
+package com.mygdx.holowyth.knockback.linecircledemo;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -9,7 +9,7 @@ import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.template.BaseRenderer;
 
-public class Renderer extends BaseRenderer {
+class Renderer extends BaseRenderer {
 
 	World world;
 	private final Color CIRCLE_COLOR = Color.BLACK;

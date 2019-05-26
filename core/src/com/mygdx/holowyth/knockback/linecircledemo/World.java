@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.knockback.collision;
+package com.mygdx.holowyth.knockback.linecircledemo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +13,7 @@ import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
-public class World {
+class World {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 

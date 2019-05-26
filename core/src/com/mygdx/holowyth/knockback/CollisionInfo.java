@@ -1,6 +1,4 @@
-package com.mygdx.holowyth.knockback.collision;
-
-import com.mygdx.holowyth.knockback.CircleCB;
+package com.mygdx.holowyth.knockback;
 
 /**
  * Carries info about a collision, including both colBody's involved
