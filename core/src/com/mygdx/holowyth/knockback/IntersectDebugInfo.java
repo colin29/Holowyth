@@ -2,7 +2,7 @@ package com.mygdx.holowyth.knockback;
 
 import com.badlogic.gdx.math.Vector2;
 
-public class IntersectDebugInfo {
+class IntersectDebugInfo {
 	public final Vector2 initial = new Vector2();
 	public final Vector2 delta = new Vector2();
 	public final Vector2 deltaNormalized = new Vector2();

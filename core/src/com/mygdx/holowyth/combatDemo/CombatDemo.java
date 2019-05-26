@@ -133,6 +133,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	 * The map in question is {@link #map} <br>
 	 * Call after loading a new map. The mirror function is mapShutdown.
 	 */
+	@Override
 	protected void mapStartup() {
 
 		effects = new EffectsHandler(game, camera, debugStore);
@@ -147,7 +148,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		if (unitControls != null) {
 			multiplexer.removeProcessor(unitControls);
 		}
-		unitControls = new Controls(game, camera, fixedCam, world.units, debugStore, world);
+		unitControls = new Controls(game, camera, fixedCam, world.getUnits(), debugStore, world);
 		multiplexer.addProcessor(unitControls);
 
 		// Set Renderer to render world and other map-lifetime components

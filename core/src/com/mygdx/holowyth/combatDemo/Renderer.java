@@ -137,7 +137,7 @@ public class Renderer {
 		// renderPaths(false); // temp, delete this after use
 		// renderPlayerUnreachedWaypoints(Color.FIREBRICK);
 
-		for (Unit u : world.units) {
+		for (Unit u : world.getUnits()) {
 			u.renderAttackingArrow();
 		}
 
@@ -172,7 +172,7 @@ public class Renderer {
 	}
 
 	private void renderCirclesAroundBusyRetreatingUnits() {
-		for (UnitInfo u : world.units) {
+		for (UnitInfo u : world.getUnits()) {
 			if (u.isRetreatCooldownActive()) {
 				Color color = HoloGL.rbg(30, 144, 255);
 				shapeRenderer.setProjectionMatrix(worldCamera.combined);
@@ -184,7 +184,7 @@ public class Renderer {
 	}
 
 	private void renderCirclesAroundBusyCastingUnits() {
-		for (UnitInfo u : world.units) {
+		for (UnitInfo u : world.getUnits()) {
 			if (u.getActiveSkill() == null)
 				continue;
 			if (u.getActiveSkill().getStatus() == Status.CASTING
@@ -205,23 +205,23 @@ public class Renderer {
 		// Render Path
 
 		if (renderIntermediatePaths) {
-			pathingModule.renderIntermediateAndFinalPaths(world.units);
+			pathingModule.renderIntermediateAndFinalPaths(world.getUnits());
 		} else {
-			for (Unit unit : world.units) {
+			for (Unit unit : world.getUnits()) {
 				if (unit.motion.getPath() != null) {
 					renderPath(unit.motion.getPath(), Color.GRAY, false);
 				}
 			}
 		}
 
-		for (Unit u : world.units) {
+		for (Unit u : world.getUnits()) {
 			u.motion.renderNextWayPoint();
 		}
 
 	}
 
 	private void renderPlayerUnreachedWaypoints(Color color) {
-		for (Unit unit : world.units) {
+		for (Unit unit : world.getUnits()) {
 			if (unit.isPlayerCharacter() && unit.motion.getPath() != null) {
 				Path path = unit.motion.getPath();
 				for (int i = unit.motion.getWayPointIndex(); i < path.size(); i++) {
@@ -242,7 +242,7 @@ public class Renderer {
 
 	@SuppressWarnings("unused")
 	private void renderPlayerVelocity() {
-		for (Unit u : world.units) {
+		for (Unit u : world.getUnits()) {
 			if (u.isPlayerCharacter() && u.motion.getVelocity() > 0.01f) {
 				UnitMotion m = u.motion;
 				float scale = 15; // enlargen the velocity so we can see it
@@ -253,7 +253,7 @@ public class Renderer {
 
 	private void renderUnitDestinations(Color color) {
 
-		for (Unit unit : world.units) {
+		for (Unit unit : world.getUnits()) {
 			if (unit.isPlayerCharacter() && unit.motion.getPath() != null) {
 
 				Path path = unit.motion.getPath();
@@ -282,7 +282,7 @@ public class Renderer {
 		} else {
 
 			// Render unit circles
-			for (Unit unit : world.units) {
+			for (Unit unit : world.getUnits()) {
 
 				shapeRenderer.begin(ShapeType.Filled);
 
@@ -299,7 +299,7 @@ public class Renderer {
 			}
 
 			// Render an outline around the unit
-			for (Unit unit : world.units) {
+			for (Unit unit : world.getUnits()) {
 				shapeRenderer.begin(ShapeType.Line);
 				shapeRenderer.setColor(Color.BLACK);
 				shapeRenderer.getColor().a = unit.stats.isDead() ? 0.5f : 1;
@@ -311,7 +311,7 @@ public class Renderer {
 
 	@SuppressWarnings("unused")
 	private void renderUnitExpandedHitBodies() {
-		for (Unit u : world.units) {
+		for (Unit u : world.getUnits()) {
 			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + Holo.UNIT_RADIUS, Color.GRAY);
 		}
 	}
@@ -321,7 +321,7 @@ public class Renderer {
 		TextureRegion witchTex = new TextureRegion(game.assets.get("img/witch.png", Texture.class));
 		witchTex.getTexture().setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Nearest);
 
-		for (Unit unit : world.units) {
+		for (Unit unit : world.getUnits()) {
 			if (unit.isPlayerCharacter()) {
 				HoloSprite player = new HoloSprite(witchTex, unit.x, unit.y, 30, 0, 20);
 				player.draw(batch);
@@ -358,7 +358,7 @@ public class Renderer {
 
 		shapeRenderer.setProjectionMatrix(worldCamera.combined);
 
-		for (UnitInfo unit : world.units) {
+		for (UnitInfo unit : world.getUnits()) {
 
 			UnitStatsInfo unitStats = unit.getStats();
 			float maxHp = unitStats.getMaxHp();
@@ -414,7 +414,7 @@ public class Renderer {
 
 	private void renderCastingBars() {
 
-		for (UnitInfo unit : world.units) {
+		for (UnitInfo unit : world.getUnits()) {
 
 			SkillInfo skill = unit.getActiveSkill();
 			if (skill != null && skill.getStatus() == Status.CASTING) {

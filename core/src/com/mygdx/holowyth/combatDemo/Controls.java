@@ -3,6 +3,7 @@ package com.mygdx.holowyth.combatDemo;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import com.badlogic.gdx.Gdx;
@@ -49,7 +50,7 @@ public class Controls extends InputProcessorAdapter {
 	private ShapeRenderer shapeRenderer;
 
 	World world;
-	ArrayList<Unit> units;
+	List<Unit> units;
 
 	private FunctionBindings functionBindings = new FunctionBindings();
 
@@ -67,7 +68,7 @@ public class Controls extends InputProcessorAdapter {
 	Skin skin;
 	LabelStyle labelStyle;
 
-	public Controls(Holowyth game, Camera camera, Camera fixedCam, ArrayList<Unit> units, DebugStore debugStore,
+	public Controls(Holowyth game, Camera camera, Camera fixedCam, List<Unit> units, DebugStore debugStore,
 			World world) {
 		this.shapeRenderer = game.shapeRenderer;
 		this.camera = camera;

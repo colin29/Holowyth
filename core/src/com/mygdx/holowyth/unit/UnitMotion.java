@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.unit;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
@@ -64,7 +65,7 @@ public class UnitMotion {
 	// Application References
 
 	Unit self;
-	ArrayList<Unit> units;
+	List<Unit> units;
 	private PathingModule pathing;
 
 	/**

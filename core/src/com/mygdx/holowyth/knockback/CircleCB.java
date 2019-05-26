@@ -8,17 +8,7 @@ package com.mygdx.holowyth.knockback;
  * @author Colin Ta
  *
  */
-public interface CircleCB {
-
-	float getX();
-
-	float getY();
-
-	float getVx();
-
-	float getVy();
-
-	float getRadius();
+public interface CircleCB extends CircleCBInfo {
 
 	void setPosition(float x, float y);
 

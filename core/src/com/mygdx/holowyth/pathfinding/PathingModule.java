@@ -3,6 +3,7 @@ package com.mygdx.holowyth.pathfinding;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -76,7 +77,7 @@ public class PathingModule {
 
 	// Unit pathfinding
 
-	public Path findPathForUnit(UnitInterPF unit, float dx, float dy, ArrayList<? extends UnitInterPF> units) {
+	public Path findPathForUnit(UnitInterPF unit, float dx, float dy, List<? extends UnitInterPF> units) {
 
 		// For pathfinding, need to get expanded geometry of unit collision bodies as well
 
@@ -437,7 +438,7 @@ public class PathingModule {
 	/**
 	 * Render intermediate paths for all units in the list
 	 */
-	public void renderIntermediateAndFinalPaths(ArrayList<? extends UnitInterPF> units) {
+	public void renderIntermediateAndFinalPaths(List<? extends UnitInterPF> units) {
 		for (UnitInterPF unit : units) {
 			PathsInfo info = intermediatePaths.get(unit);
 			if (info != null && (unit.getPath() != null || Holo.continueShowingPathAfterArrival)) {

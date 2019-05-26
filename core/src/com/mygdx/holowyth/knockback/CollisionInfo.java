@@ -11,14 +11,14 @@ public class CollisionInfo {
 	 * The current colBody that is being processed. <br>
 	 * Original reference, user may modify
 	 */
-	public final CircleCB cur;
-	public final CircleCB other;
+	public final CircleCBInfo cur;
+	public final CircleCBInfo other;
 
 	// public final Vector2 collisionPoint;
 	public final float pOfCollisionPoint;
 	public final float collisionAngle;
 
-	public CollisionInfo(CircleCB curBody, CircleCB other, float pOfCollisionPoint, float collisionAngle) {
+	public CollisionInfo(CircleCBInfo curBody, CircleCBInfo other, float pOfCollisionPoint, float collisionAngle) {
 		this.cur = curBody;
 		this.other = other;
 		// this.collisionPoint = new Vector2(x, y);

@@ -1,8 +1,8 @@
 package com.mygdx.holowyth.unit;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -45,7 +45,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	public final UnitStats stats;
 
 	// World Fields
-	ArrayList<Unit> units;
+	List<Unit> units;
 
 	// Collision Detection
 	private float radius = Holo.UNIT_RADIUS;

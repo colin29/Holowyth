@@ -70,11 +70,11 @@ public class KnockBackSimulation {
 			bodyToObject.put(o.getColBody(), o);
 		}
 
-		resolveObjectObjectCollisions(Collections.unmodifiableMap(bodyToObject));
-		resolveObjectMapBoundaryCollisions();
+		detectAndResolveObjectObjectCollisions(Collections.unmodifiableMap(bodyToObject));
+		detectAndResolveObjectMapBoundaryCollisions();
 	}
 
-	private void resolveObjectObjectCollisions(Map<CircleCB, CircleObject> bodyToObject) {
+	private void detectAndResolveObjectObjectCollisions(Map<CircleCB, CircleObject> bodyToObject) {
 
 		// Collision resolution is run once for every unit. It is possible that a later unit's velocity (or possibly
 		// position) was modified earlier this tick.
@@ -98,7 +98,7 @@ public class KnockBackSimulation {
 			List<CircleCB> collisions = getObjectCollisionsAlongLineSegment(motion.x1, motion.y1, motion.x2, motion.y2,
 					thisObject.getColBody().getRadius(), allOtherBodies);
 
-			for (CircleCB colidee : collisions) {
+			for (CircleCBInfo colidee : collisions) {
 				logger.debug("Collision between units id [{} {}]", thisObject.id, bodyToObject.get(colidee).id);
 			}
 
@@ -197,7 +197,7 @@ public class KnockBackSimulation {
 	 * 
 	 * @return Information about the collision. Can return null, but only due to improper input.
 	 */
-	private CollisionInfo getCollisionInfo(Segment segment, CircleCB curBody, CircleCB other) {
+	private CollisionInfo getCollisionInfo(Segment segment, CircleCBInfo curBody, CircleCBInfo other) {
 
 		if (curBody.getVx() == 0 && curBody.getVy() == 0) {
 			throw new HoloOperationException(
@@ -312,8 +312,8 @@ public class KnockBackSimulation {
 		// 1. Determine unit's velocities in terms of the normalized collision normal vector. Set aside the
 		// perpendicular components. We now have 2 1-d velocity vectors
 
-		CircleCB thisBody = collision.cur;
-		CircleCB other = collision.other;
+		CircleCB thisBody = (CircleCB) collision.cur;
+		CircleCB other = (CircleCB) collision.other;
 
 		Vector2 normalNorm = new Vector2((float) Math.cos(collision.collisionAngle),
 				(float) Math.sin(collision.collisionAngle));
@@ -380,7 +380,7 @@ public class KnockBackSimulation {
 
 	}
 
-	private void resolveObjectMapBoundaryCollisions() {
+	private void detectAndResolveObjectMapBoundaryCollisions() {
 		float[] horizontalWalls = new float[2];
 		float[] verticalWalls = new float[2];
 

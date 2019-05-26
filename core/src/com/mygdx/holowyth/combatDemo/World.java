@@ -1,6 +1,8 @@
 package com.mygdx.holowyth.combatDemo;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
@@ -33,6 +35,10 @@ public class World implements WorldInfo {
 	EffectsHandler effects;
 	DebugStore debugStore;
 
+	private ArrayList<Unit> units = new ArrayList<Unit>();
+
+	Unit playerUnit;
+
 	public World(Field map, PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects) {
 		this.map = map;
 		this.pathingModule = pathingModule;
@@ -53,8 +59,6 @@ public class World implements WorldInfo {
 		handleCombatLogic();
 
 	}
-
-	ArrayList<Unit> units = new ArrayList<Unit>();
 
 	private void tickLogicForUnits() {
 		for (Unit u : units) {
@@ -187,8 +191,6 @@ public class World implements WorldInfo {
 		}
 	}
 
-	Unit playerUnit;
-
 	/**
 	 * Create a custom player unit. Calling multiple times will just return the existing player unit.
 	 * 
@@ -212,20 +214,22 @@ public class World implements WorldInfo {
 	}
 
 	public Unit spawnUnit(float x, float y, Side side) {
-		Unit newUnit = new Unit(x, y, this, side);
-		units.add(newUnit);
-		return newUnit;
+		return spawnUnit(x, y, side, "Unnamed Unit");
 	}
 
 	public Unit spawnUnit(float x, float y, Side side, String name) {
-		Unit newUnit = spawnUnit(x, y, side);
-		newUnit.setName(name);
-		return newUnit;
+		Unit u = new Unit(x, y, this, side, name);
+		addUnit(u);
+		return u;
+	}
+
+	private void addUnit(Unit u) {
+		this.units.add(u);
 	}
 
 	@Override
-	public ArrayList<Unit> getUnits() {
-		return units;
+	public List<Unit> getUnits() {
+		return Collections.unmodifiableList(units);
 	}
 
 	@Override
