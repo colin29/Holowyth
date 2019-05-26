@@ -98,7 +98,7 @@ public class KnockBackSimulation {
 			Segment motion = new Segment(x, y, x + vx, y + vy);
 
 			List<CircleCB> collisions = getObjectCollisionsAlongLineSegment(motion.x1, motion.y1, motion.x2, motion.y2,
-					thisObject.getColBody().radius, allOtherBodies);
+					thisObject.getColBody().getRadius(), allOtherBodies);
 
 			for (CircleCB colidee : collisions) {
 				logger.debug("Collision between units id [{} {}]", thisObject.id, bodyToObject.get(colidee).id);
@@ -128,8 +128,8 @@ public class KnockBackSimulation {
 			List<CircleCB> cbs) {
 		ArrayList<CircleCB> collisions = new ArrayList<CircleCB>();
 		for (CircleCB cb : cbs) {
-			if (Line2D.ptSegDistSq(ix, iy, dx, dy, cb.pos.x, cb.pos.y) < (cb.radius + thisRadius)
-					* (cb.radius + thisRadius)) {
+			if (Line2D.ptSegDistSq(ix, iy, dx, dy, cb.getX(), cb.getY()) < (cb.getRadius() + thisRadius)
+					* (cb.getRadius() + thisRadius)) {
 				collisions.add(cb);
 			}
 		}
@@ -149,9 +149,9 @@ public class KnockBackSimulation {
 	 */
 	private CollisionInfo getFirstCollisionInfo(CircleCB curBody, List<CircleCB> collisions) {
 
-		Segment segment = new Segment(curBody.pos.x, curBody.pos.y,
-				curBody.pos.x + curBody.vx,
-				curBody.pos.y + curBody.vy);
+		Segment segment = new Segment(curBody.getX(), curBody.getY(),
+				curBody.getX() + curBody.getVx(),
+				curBody.getY() + curBody.getVy());
 
 		List<CollisionInfo> colInfos = new ArrayList<CollisionInfo>();
 		for (CircleCB other : collisions) {
@@ -201,7 +201,7 @@ public class KnockBackSimulation {
 	 */
 	private CollisionInfo getCollisionInfo(Segment segment, CircleCB curBody, CircleCB other) {
 
-		if (curBody.vx == 0 && curBody.vy == 0) {
+		if (curBody.getVx() == 0 && curBody.getVy() == 0) {
 			throw new HoloOperationException(
 					"Given curBody has velocity 0, cannot compute collision info. Based on arguments, it appears that curBody is already colliding with something, which is invalid state.");
 		}
@@ -210,7 +210,7 @@ public class KnockBackSimulation {
 
 		// We can represent two circles colliding with that of a line segment intersecting with an expanded circle.
 		// The intersectPoint will be different of course, but the angle of collision will be the same
-		Circle keyCircle = new Circle(other.pos.x, other.pos.y, curBody.radius + other.radius);
+		Circle keyCircle = new Circle(other.getX(), other.getY(), curBody.getRadius() + other.getRadius());
 
 		Vector2 initial = new Vector2();
 		Vector2 delta = new Vector2();
@@ -319,10 +319,10 @@ public class KnockBackSimulation {
 
 		Vector2 normalNorm = new Vector2((float) Math.cos(collision.collisionAngle),
 				(float) Math.sin(collision.collisionAngle));
-		Vector2 v1 = new Vector2(thisBody.vx, thisBody.vy);
+		Vector2 v1 = new Vector2(thisBody.getVx(), thisBody.getVy());
 		Vector2 v1Norm = new Vector2(v1).nor();
 
-		Vector2 v2 = new Vector2(other.vx, other.vy);
+		Vector2 v2 = new Vector2(other.getVx(), other.getVy());
 		Vector2 v2Norm = new Vector2(v2).nor();
 
 		float v1ColAxis = v1.len() * v1Norm.dot(normalNorm);
@@ -366,11 +366,19 @@ public class KnockBackSimulation {
 		Vector2 dv1 = new Vector2(normalNorm).scl(dv1ColAxis);
 		Vector2 dv2 = new Vector2(normalNorm).scl(dv2ColAxis);
 
-		thisBody.vx += dv1.x;
-		thisBody.vy += dv1.y;
+		thisBody.setVelocity(
+				thisBody.getVx() + dv1.x,
+				thisBody.getVy() + dv1.y);
 
-		other.vx += dv2.x;
-		other.vy += dv2.y;
+		other.setVelocity(
+				other.getVx() + dv2.x,
+				other.getVy() + dv2.y);
+
+		// thisBody.vx += dv1.x;
+		// thisBody.vy += dv1.y;
+		//
+		// other.vx += dv2.x;
+		// other.vy += dv2.y;
 
 	}
 

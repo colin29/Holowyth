@@ -8,7 +8,7 @@ public class CircleObject implements ObjectInfo {
 	private float radius;
 
 	public CircleObject(float x, float y, float radius) {
-		colBody = new CircleCB(x, y, radius);
+		colBody = new CircleCBImpl(x, y, radius);
 		this.id = getNextId();
 		this.radius = radius;
 	}
@@ -18,28 +18,30 @@ public class CircleObject implements ObjectInfo {
 	}
 
 	public float getX() {
-		return colBody.pos.x;
+		return colBody.getX();
 	}
 
 	public float getY() {
-		return colBody.pos.y;
+		return colBody.getY();
 	}
 
 	public float getVx() {
-		return colBody.vx;
+		return colBody.getVx();
 	}
 
 	public float getVy() {
-		return colBody.vy;
+		return colBody.getVy();
 	}
 
+	/**
+	 * Returns a new copy
+	 */
 	public Point getPos() {
-		return colBody.pos;
+		return new Point(getX(), getY());
 	}
 
 	public void setPosition(float x, float y) {
-		colBody.pos.x = x;
-		colBody.pos.y = y;
+		colBody.setPosition(x, y);
 	}
 
 	public void setVelocity(float vx, float vy) {
