@@ -64,12 +64,12 @@ public class Renderer {
 		shapeRenderer.setColor(circleRenderColor);
 		for (CircleObject o : simulation.getCircleObjects()) {
 			shapeRenderer.begin(ShapeType.Filled);
-			shapeRenderer.circle(o.getX(), o.getY(), simulation.COLLISION_BODY_RADIUS);
+			shapeRenderer.circle(o.getX(), o.getY(), o.getRadius());
 			shapeRenderer.end();
 		}
 
 		for (CircleObject o : simulation.getCircleObjects()) {
-			renderCircleOutline(o.getX(), o.getY(), simulation.COLLISION_BODY_RADIUS, circleOutlineColor);
+			renderCircleOutline(o.getX(), o.getY(), o.getRadius(), circleOutlineColor);
 		}
 
 	}

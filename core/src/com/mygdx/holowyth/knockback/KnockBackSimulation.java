@@ -29,7 +29,9 @@ public class KnockBackSimulation {
 
 	List<CircleObject> circleObjects = new ArrayList<CircleObject>();
 
-	public final float COLLISION_BODY_RADIUS = 30;
+	// public final float COLLISION_BODY_RADIUS = 30;
+
+	public final float USUAL_RADIUS = 25;
 
 	private IntersectDebugInfo intersectDebugInfo = new IntersectDebugInfo();
 
@@ -65,12 +67,6 @@ public class KnockBackSimulation {
 
 	public void tick() {
 
-		for (CircleObject o : circleObjects) {
-			if (o.getColBody().radius != COLLISION_BODY_RADIUS) {
-				logger.warn("Multiple unit radiuses not supported [id={}]", o.id);
-			}
-		}
-
 		Map<CircleCB, CircleObject> bodyToObject = new HashMap<CircleCB, CircleObject>();
 		for (CircleObject o : circleObjects) {
 			bodyToObject.put(o.getColBody(), o);
@@ -82,8 +78,8 @@ public class KnockBackSimulation {
 
 	private void resolveObjectObjectCollisions(Map<CircleCB, CircleObject> bodyToObject) {
 
-		// Collision resolution is run once for every unit. It is possible that a later unit's velocity was modified
-		// earlier this tick.
+		// Collision resolution is run once for every unit. It is possible that a later unit's velocity (or possibly
+		// position) was modified earlier this tick.
 		for (CircleObject thisObject : circleObjects) {
 
 			final float x, y, vx, vy;
@@ -438,13 +434,13 @@ public class KnockBackSimulation {
 	}
 
 	public CircleObject addCircleObject(float x, float y) {
-		CircleObject o = new CircleObject(x, y, COLLISION_BODY_RADIUS);
+		CircleObject o = new CircleObject(x, y, USUAL_RADIUS);
 		circleObjects.add(o);
 		return o;
 	}
 
 	public void addCircleObject(float x, float y, float vx, float vy) {
-		CircleObject o = new CircleObject(x, y, COLLISION_BODY_RADIUS);
+		CircleObject o = new CircleObject(x, y, USUAL_RADIUS);
 		o.setVelocity(vx, vy);
 		circleObjects.add(o);
 	}
@@ -498,17 +494,20 @@ public class KnockBackSimulation {
 		float speed = 3;
 
 		float NUM_OBJECTS_TO_CREATE = 30;
-		float radius = COLLISION_BODY_RADIUS;
 		final int MAX_TRIES = 100;
 
 		clearAllCircles();
 		Point newPos = new Point();
 		int objectsCreated = 0;
+
 		for (int i = 0; i < MAX_TRIES && objectsCreated < NUM_OBJECTS_TO_CREATE; i++) {
+			float variation = 5;
+			float radius = (float) (USUAL_RADIUS + Math.random() * variation * 2 - variation);
+
 			newPos.x = (float) Math.random() * (getMapWidth() - 2 * radius) + radius;
 			newPos.y = (float) Math.random() * (getMapHeight() - 2 * radius) + radius;
 
-			if (isAreaClear(newPos, COLLISION_BODY_RADIUS)) {
+			if (isAreaClear(newPos, radius)) {
 				CircleObject o = new CircleObject(newPos.x, newPos.y, radius);
 				float angle = (float) Math.random() * 360;
 				setVelocity(o, speed, angle);
@@ -521,7 +520,7 @@ public class KnockBackSimulation {
 		clearAllCircles();
 
 		CircleObject o1 = makeCircleObjectWithOffset(screenCenter, 0, 0);
-		CircleObject o2 = makeCircleObjectWithOffset(screenCenter, this.COLLISION_BODY_RADIUS / 2, 0);
+		CircleObject o2 = makeCircleObjectWithOffset(screenCenter, USUAL_RADIUS / 2, 0);
 		circleObjects.add(o1);
 		circleObjects.add(o2);
 
@@ -547,7 +546,7 @@ public class KnockBackSimulation {
 	private CircleObject makeCircleObjectWithOffset(Point point, float offset, float angleDegrees) {
 		float angle = (float) (angleDegrees / 180 * Math.PI);
 		CircleObject c = new CircleObject((float) (point.x + offset * Math.cos(angle)),
-				(float) (point.y + offset * Math.sin(angle)), COLLISION_BODY_RADIUS);
+				(float) (point.y + offset * Math.sin(angle)), USUAL_RADIUS);
 		return c;
 	}
 
