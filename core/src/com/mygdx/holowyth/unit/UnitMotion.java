@@ -152,7 +152,7 @@ public class UnitMotion {
 	 * Repath regularly if unit is ordered to attack but is not attacking yet
 	 */
 	private void handleRepathing() {
-		if (self.currentOrder == Order.ATTACKUNIT && self.attacking == null) {
+		if (self.currentOrder == Order.ATTACKUNIT && self.isAttacking()) {
 			framesUntilAttackRepath -= 1;
 			if (framesUntilAttackRepath <= 0) {
 				pathFindForAttackOrder();
@@ -437,6 +437,7 @@ public class UnitMotion {
 
 		stopCurrentMovement();
 		self.clearOrder();
+		self.stopAttacking();
 
 	}
 

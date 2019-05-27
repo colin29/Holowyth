@@ -1,11 +1,7 @@
 package com.mygdx.holowyth.skill;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.collections4.CollectionUtils;
 
@@ -15,7 +11,8 @@ import com.mygdx.holowyth.skill.effect.UnitEffect;
 import com.mygdx.holowyth.unit.Unit;
 
 /**
- * Represents a skill instance that is cast and then produces effects. A skill manages its effects through it's lifetime.
+ * Represents a skill instance that is cast and then produces effects. A skill manages its effects through it's
+ * lifetime.
  * 
  * A skill instance also functions as a identifier (ie. that for marking that key is bound to that particular skill)
  * (When the skill is actually to be used, a clone should be used)
@@ -29,15 +26,14 @@ import com.mygdx.holowyth.unit.Unit;
 public class Skill implements Cloneable, SkillInfo {
 
 	public float cooldown; // in game frames
-	
+
 	public int spCost;
-	
 
 	public String name = "Skill name";
 
 	// Components
 	Unit caster;
-	
+
 	// References
 	World world;
 
@@ -82,17 +78,16 @@ public class Skill implements Cloneable, SkillInfo {
 			System.out.println("Effects not finalized yet " + this.name);
 			return;
 		}
-			
 
 		this.caster = caster;
 		this.world = caster.getWorldMutable();
 
 		status = Status.CASTING;
-		
+
 		casting.begin(caster);
 		tick();
 		// If skill was not insta-cast, we need to stop motion and actions
-		if(status == Status.CASTING || status == Status.CHANNELING) {
+		if (status == Status.CASTING || status == Status.CHANNELING) {
 			caster.stopUnit();
 		}
 	}
@@ -102,21 +97,21 @@ public class Skill implements Cloneable, SkillInfo {
 		if (status == Status.CASTING) {
 			casting.tick();
 			if (casting.isComplete()) {
-				
+
 				// Check that sp is sufficient, if not, abort.
-				
+
 				// Calculate actual sp cost here
-				
-				if(!hasEnoughSp()) {
+
+				if (!hasEnoughSp()) {
 					status = Status.DONE;
 					return;
-				}else {
+				} else {
 					caster.stats.subtractSp(spCost);
 				}
-				
+
 				// update cooldown
 				caster.setSkillCooldown(Math.round(cooldown));
-				
+
 				if (hasChannelingBehaviour) {
 					status = Status.CHANNELING;
 				} else {
@@ -147,48 +142,61 @@ public class Skill implements Cloneable, SkillInfo {
 		}
 
 	}
+
 	public void interrupt() {
 		System.out.println("Interrupted: " + this.name);
 		status = Status.DONE;
 		caster.setActiveSkill(null);
-		if(status == Status.CASTING) {
+		if (status == Status.CASTING) {
 			casting.onInterrupt();
 		}
-		if(status == Status.CHANNELING) {
+		if (status == Status.CHANNELING) {
 			this.onChannellingInterrupt();
 		}
 	}
+
 	public void onChannellingInterrupt() {
 	}
-	
+
 	private boolean hasEnoughSp() {
 		return hasEnoughSp(caster);
 	}
+
 	public boolean hasEnoughSp(Unit unit) {
 		return unit.stats.getSp() >= spCost;
 	}
 
 	private void onFinishCasting() {
-		
-		
+
 		// Start all effects
 		for (Effect effect : effects) {
 			effect.begin();
 		}
 	}
 
-	public void setEffect(List<UnitEffect> effects) {
+	/**
+	 * Sets effects as a single effect
+	 */
+	public void setEffects(UnitEffect effect) {
+		this.effects = new ArrayList<UnitEffect>();
+		this.effects.add(effect);
+	}
+
+	public void setEffects(List<UnitEffect> effects) {
 		this.effects = effects;
 	}
 
+	@Override
 	public boolean areEffectsSet() {
 		return effects != null;
 	}
 
+	@Override
 	public Status getStatus() {
 		return status;
 	}
 
+	@Override
 	public Targeting getTargeting() {
 		return targeting;
 	}

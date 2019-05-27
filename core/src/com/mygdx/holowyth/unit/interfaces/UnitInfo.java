@@ -1,7 +1,6 @@
 package com.mygdx.holowyth.unit.interfaces;
 
 import com.mygdx.holowyth.skill.SkillInfo;
-import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -23,6 +22,8 @@ public interface UnitInfo {
 	public Order getCurrentOrder();
 
 	public UnitInfo getTarget();
+
+	public boolean isAttacking();
 
 	public UnitInfo getAttacking();
 

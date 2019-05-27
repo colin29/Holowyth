@@ -14,6 +14,7 @@ import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.HoloAssert;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
@@ -55,8 +56,19 @@ public class World implements WorldInfo {
 	public void tick() {
 		tickLogicForUnits();
 		moveUnits();
+		moveKnockedBackedUnitsAndResolveCollisions();
 		handleCombatLogic();
 
+	}
+
+	public void moveKnockedBackedUnitsAndResolveCollisions() {
+		// TODO: stub
+		for (Unit u : units.getUnits()) {
+			if (u.motion.isBeingKnockedBack()) {
+				u.x += u.motion.getKnockBackVx();
+				u.y += u.motion.getKnockBackVy();
+			}
+		}
 	}
 
 	private void tickLogicForUnits() {
@@ -79,19 +91,31 @@ public class World implements WorldInfo {
 
 		Polygons expandedMapPolys = HoloPF.expandPolygons(map.polys, Holo.UNIT_RADIUS);
 
+		/**
+		 * For this processing, each unit on its iteration should only modify its x,y and no others. vx,vy should not be
+		 * modified.
+		 */
 		for (Unit thisUnit : units.getUnits()) {
+
+			// Validate the motion by checking against other colliding bodies.
+
+			if (thisUnit.motion.isBeingKnockedBack()) {
+				// knocked back units do not have voluntary motion, skip
+				HoloAssert.assertEquals(thisUnit.motion.getVx(), 0);
+				HoloAssert.assertEquals(thisUnit.motion.getVy(), 0);
+				HoloAssert.assertIsNull(thisUnit.motion.getPath());
+				continue;
+			}
+
+			if (thisUnit.motion.getVx() == 0 && thisUnit.motion.getVy() == 0) {
+				continue;
+			}
 
 			// Get all other colliding bodies
 			ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
 			for (Unit u : units.getUnits()) {
 				if (!thisUnit.equals(u))
 					colBodies.add(new CBInfo(u));
-			}
-
-			// Validate the motion by checking against other colliding bodies.
-
-			if (thisUnit.motion.getVx() == 0 && thisUnit.motion.getVy() == 0) {
-				continue;
 			}
 
 			float destX = thisUnit.x + thisUnit.motion.getVx();
@@ -128,8 +152,8 @@ public class World implements WorldInfo {
 				for (CBInfo cb : collisions) {
 					Vector2 dist = new Vector2(curDestx - cb.x, curDesty - cb.y);
 
-					// We do a "push out" for every unit. Subsequent push outs may lead to a suggested location that is
-					// collides with an earlier unit, the alternative location is simply rejected
+					// We do a "push out" for every unit. Subsequent push outs may lead to a suggested location that
+					// collides with an earlier unit, if so we reject the alternative location
 					if (dist.len() > cb.unitRadius + thisUnit.getRadius()) {
 						continue;
 					}
@@ -180,7 +204,7 @@ public class World implements WorldInfo {
 		ArrayList<Unit> someUnits = new ArrayList<Unit>();
 		someUnits.add(spawnUnit(480, 253, Unit.Side.ENEMY));
 		someUnits.add(spawnUnit(450, 300, Unit.Side.ENEMY));
-		// someUnits.add(spawnUnit(400, 350, Unit.Side.ENEMY));
+		someUnits.add(spawnUnit(400, 350, Unit.Side.ENEMY));
 
 		for (Unit unit : someUnits) {
 			PresetUnits.loadUnitStats2(unit.stats);

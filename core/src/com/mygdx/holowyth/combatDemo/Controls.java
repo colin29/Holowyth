@@ -6,6 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
@@ -23,7 +26,6 @@ import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.GroundSkill;
 import com.mygdx.holowyth.skill.NoneSkill;
 import com.mygdx.holowyth.skill.Skill;
-import com.mygdx.holowyth.skill.Skill.Targeting;
 import com.mygdx.holowyth.skill.Skills;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
@@ -68,6 +70,8 @@ public class Controls extends InputProcessorAdapter {
 	Skin skin;
 	LabelStyle labelStyle;
 
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	public Controls(Holowyth game, Camera camera, Camera fixedCam, List<Unit> units, DebugStore debugStore,
 			World world) {
 		this.shapeRenderer = game.shapeRenderer;
@@ -96,17 +100,23 @@ public class Controls extends InputProcessorAdapter {
 			}
 		});
 
-		// debugValues.add("SelectX1", () -> selectionX1);
-		// debugValues.add("SelectY1", () -> selectionY1);
-		// debugValues.add("SelectX2", () -> selectionX2);
-		// debugValues.add("SelectY2", () -> selectionY2);
+		// functionBindings.bindFunctionToKey(() -> useSkillInSlot(1), Keys.NUM_1);
+		// functionBindings.bindFunctionToKey(() -> useSkillInSlot(2), Keys.NUM_2);
+		// functionBindings.bindFunctionToKey(() -> useSkillInSlot(3), Keys.NUM_3);
 
-		functionBindings.bindFunctionToKey(() -> useSkillInSlot(1), Keys.NUM_1);
-		functionBindings.bindFunctionToKey(() -> useSkillInSlot(2), Keys.NUM_2);
-		functionBindings.bindFunctionToKey(() -> useSkillInSlot(3), Keys.NUM_3);
+		bindNumberKeysToSkills();
 
 		functionBindings.bindFunctionToKey(() -> setSPToMax(), Keys.Q);
 
+	}
+
+	private void bindNumberKeysToSkills() {
+
+		for (int offset = 0; offset < 9; offset++) { // bind keys 1-9
+			final int slotNumber = 1 + offset;
+			functionBindings.bindFunctionToKey(() -> useSkillInSlot(slotNumber), Keys.NUM_1 + offset);
+		}
+		functionBindings.bindFunctionToKey(() -> useSkillInSlot(10), Keys.NUM_0); // also bind the 0 key
 	}
 
 	float clickX, clickY; // Current click in world coordinates
@@ -114,11 +124,15 @@ public class Controls extends InputProcessorAdapter {
 	Skill skillToUse = new Skills.Explosion();
 	Skill curSkill = null;
 
-	Skill[] skills = new Skill[10];
+	/**
+	 * Slot 0 is unused atm, but can be used.
+	 */
+	Skill[] skills = new Skill[11];
 	{
 		skills[1] = new Skills.Explosion();
 		skills[2] = new Skills.ExplosionLongCast();
 		skills[3] = new Skills.NovaFlare();
+		skills[4] = new Skills.Implosion();
 	}
 
 	private void setSPToMax() {
@@ -132,7 +146,12 @@ public class Controls extends InputProcessorAdapter {
 	 */
 	private void useSkillInSlot(int slotNumber) {
 
-		if (slotNumber < 0 || slotNumber > 9) {
+		if (slotNumber < 0 || slotNumber > 10) {
+			return;
+		}
+
+		if (skills[slotNumber] == null) {
+			logger.debug("Tried to use skill slot [{}] but no skill was assigned", slotNumber);
 			return;
 		}
 
@@ -165,10 +184,6 @@ public class Controls extends InputProcessorAdapter {
 				default:
 					break;
 
-				}
-
-				if (curSkill.getTargeting() == Targeting.GROUND) {
-					context = Context.SKILL_GROUND;
 				}
 
 			} catch (CloneNotSupportedException e) {

@@ -67,7 +67,6 @@ public class Casting implements Cloneable, CastingInfo {
 		try {
 			return super.clone();
 		} catch (CloneNotSupportedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return null;
 		}

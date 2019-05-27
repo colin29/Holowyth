@@ -1,18 +1,15 @@
 package com.mygdx.holowyth.skill;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import com.mygdx.holowyth.combatDemo.World;
-import com.mygdx.holowyth.skill.Skill.Targeting;
+import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.skill.effect.UnitEffect;
 import com.mygdx.holowyth.skill.effect.UnitGroundEffect;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
- * Static class that holds a collection of skills
+ * Static class that holds a collection of skills as well as their associated effects
  * 
  * @author Colin Ta
  *
@@ -83,15 +80,15 @@ public class Skills {
 			cooldown = 60;
 		}
 
+		@Override
 		public void pluginTargeting(Unit caster) {
-			setEffect(new ArrayList<UnitEffect>(Arrays.asList(new NovaFlareEffect(caster))));
+			setEffects(new NovaFlareEffect(caster));
 		}
 	}
 
 	private static class ExplosionEffect extends UnitGroundEffect {
 		public ExplosionEffect(Unit caster, float x, float y) {
 			super(caster, x, y);
-			System.out.println(x + " " + y);
 		}
 
 		int mainDamage = 25;
@@ -138,10 +135,10 @@ public class Skills {
 
 		@Override
 		public void pluginTargeting(Unit caster, float x, float y) {
-			setEffect(new ArrayList<UnitEffect>(Arrays.asList(new ExplosionEffect(caster, x, y))));
+			setEffects(new ExplosionEffect(caster, x, y));
 		}
 	}
-	
+
 	public static class ExplosionLongCast extends GroundSkill {
 		public ExplosionLongCast() {
 			super();
@@ -153,8 +150,75 @@ public class Skills {
 
 		@Override
 		public void pluginTargeting(Unit caster, float x, float y) {
-			setEffect(new ArrayList<UnitEffect>(Arrays.asList(new ExplosionEffect(caster, x, y))));
+			setEffects(new ExplosionEffect(caster, x, y));
 		}
 	}
+
+	/**
+	 * Skill that knocks back nearby enemies towards the focal point
+	 * 
+	 * @author Colin Ta
+	 *
+	 */
+	public static class Implosion extends GroundSkill {
+		public Implosion() {
+			super();
+			name = "Implosion";
+			casting.castTime = 0;
+			spCost = 0;
+			cooldown = 20;
+		}
+
+		@Override
+		public void pluginTargeting(Unit caster, float x, float y) {
+			setEffects(new ImplosionEffect(caster, x, y));
+		}
+	}
+
+	private static class ImplosionEffect extends UnitGroundEffect {
+		public ImplosionEffect(Unit caster, float x, float y) {
+			super(caster, x, y);
+		}
+
+		int damage = 10;
+		float effectRadius = 200;
+		boolean tickedOnce;
+
+		@Override
+		public void begin() {
+		}
+
+		@Override
+		public void tick() {
+			knockBackEnemiesInRadiusTowardsCenter(x, y, effectRadius, damage);
+			tickedOnce = true;
+		}
+
+		public void knockBackEnemiesInRadiusTowardsCenter(float effectX, float effectY, float effectRadius,
+				int damage) {
+			List<Unit> units = source.getWorldMutable().getUnits();
+
+			final float knockbackSpeed = 3;
+
+			Point effectCenter = new Point(effectX, effectY);
+			for (Unit unit : units) {
+				if (Point.calcDistance(effectCenter, unit.getPos()) <= effectRadius) {
+					if (unit.getSide() != source.getSide()) {
+						// knockback the units
+
+						Vector2 unitToEffectCenter = new Vector2(effectX - unit.x, effectY - unit.y);
+						Vector2 knockBackVel = new Vector2(unitToEffectCenter).nor().scl(knockbackSpeed);
+
+						unit.motion.beginKnockback(knockBackVel.x, knockBackVel.y);
+					}
+				}
+			}
+		}
+
+		@Override
+		public boolean isComplete() {
+			return tickedOnce;
+		}
+	};
 
 }

@@ -66,7 +66,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	// Combat
 	/** The unit this unit is attacking. Attacking a unit <--> being engaged. */
-	Unit attacking;
+	private Unit attacking;
 	/**
 	 * Maps from a unit to a list of units attacking that one unit. Other classes should use {@link #getAttackers()}
 	 */
@@ -329,7 +329,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	 */
 	public void handleLogic() {
 		motion.tick();
-		AggroIfIsEnemyUnit.runOn(this, world);
+		AggroIfIsEnemyUnit.applyTo(this, world);
 		if (currentOrder == Order.RETREAT)
 			retreatDurationRemaining -= 1;
 
@@ -428,15 +428,11 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	/**
 	 * Disengages a unit.
 	 */
-	private void stopAttacking() {
+	void stopAttacking() {
 		if (isAttacking()) {
 			unitsAttacking.get(attacking).remove(this);
 			attacking = null;
 		}
-	}
-
-	private boolean isAttacking() {
-		return attacking != null;
 	}
 
 	// Debug
@@ -521,6 +517,11 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	@Override
 	public UnitInfo getTarget() {
 		return target;
+	}
+
+	@Override
+	public boolean isAttacking() {
+		return attacking != null;
 	}
 
 	@Override

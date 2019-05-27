@@ -11,7 +11,7 @@ import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class AggroIfIsEnemyUnit {
-	public static void runOn(UnitOrderable thisUnit, WorldInfo world) {
+	public static void applyTo(UnitOrderable thisUnit, WorldInfo world) {
 
 		if (thisUnit.getSide() == Side.ENEMY && thisUnit.getCurrentOrder() == Order.IDLE) {
 
