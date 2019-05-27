@@ -4,8 +4,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import com.mygdx.holowyth.knockback.CircleCB;
+import org.apache.commons.collections4.BidiMap;
+import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+
+import com.mygdx.holowyth.knockback.CircleCBInfo;
+import com.mygdx.holowyth.knockback.UnitAdapterCircleCB;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.util.HoloAssert;
 
 /**
  * Holds units plus some related collections. Keeps these collections in sync.
@@ -16,16 +21,37 @@ import com.mygdx.holowyth.unit.Unit;
 public class UnitCollection {
 
 	List<Unit> units = new ArrayList<Unit>();
-	List<CircleCB> colBodies = new ArrayList<CircleCB>();
+	List<UnitAdapterCircleCB> colBodies = new ArrayList<UnitAdapterCircleCB>();
+	List<CircleCBInfo> circleCBInfoView = new ArrayList<CircleCBInfo>();
+	BidiMap<Unit, CircleCBInfo> unitToColBody = new DualHashBidiMap<Unit, CircleCBInfo>();
 
 	public void addUnit(Unit u) {
+
+		UnitAdapterCircleCB cb = new UnitAdapterCircleCB(u);
+
 		units.add(u);
-		colBodies.add(null);
-		// TODO:
+		colBodies.add(cb);
+		circleCBInfoView.add(cb);
+
+		unitToColBody.put(u, cb);
+
+		assertDataStructsAreEqualLength();
 	}
 
 	public void removeUnit(Unit u) {
-		// TODO:
+		units.remove(u);
+		colBodies.remove(unitToColBody.get(u));
+		circleCBInfoView.remove(unitToColBody.get(u));
+
+		unitToColBody.remove(u);
+
+		assertDataStructsAreEqualLength();
+	}
+
+	private void assertDataStructsAreEqualLength() {
+		HoloAssert.assertEquals(units.size(), colBodies.size());
+		HoloAssert.assertEquals(units.size(), circleCBInfoView.size());
+		HoloAssert.assertEquals(units.size(), unitToColBody.size());
 	}
 
 	/**
@@ -38,7 +64,7 @@ public class UnitCollection {
 	/**
 	 * The list itself is read-only, though elements can be modified
 	 */
-	public List<CircleCB> getColBodies() {
-		return Collections.unmodifiableList(colBodies);
+	public List<CircleCBInfo> getColBodies() {
+		return Collections.unmodifiableList(circleCBInfoView);
 	}
 }

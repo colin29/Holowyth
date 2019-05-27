@@ -240,40 +240,54 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	// @formatter:off
 		private boolean isAttackOrderAllowed(Unit target) {
-			return !stats.isDead()
-					&& attacking == null
-					&& target.side != this.side
-					&& !isRetreatCooldownActive()
-					&& !(isCasting() || isChannelling());
+			return isGeneralOrderAllowed()
+					&& !isAttacking()
+					&& target.side != this.side;
 		}
 
 		private boolean isMoveOrderAllowed() {
-			return !stats.isDead()
-					&& attacking == null
-					&& !isRetreatCooldownActive()
-					&& !(isCasting() || isChannelling());
+			return isGeneralOrderAllowed()
+					&& !isAttacking();
 		}
 
 		private boolean isAttackMoveOrderAllowed() {
-			return isMoveOrderAllowed();
+			return isGeneralOrderAllowed()
+					&& !isAttacking();
 		}
 		private boolean isRetreatOrderAllowed() {
-			return !stats.isDead()
-					&& this.attacking != null
+			return isAnyOrderAllowed()
+					&& isAttacking()
 					&& this.currentOrder != Order.RETREAT
 					&& !(isCasting() || isChannelling());
 		}
 		private boolean isStopOrderAllowed() {
-			return !stats.isDead()
+			return isGeneralOrderAllowed();
+		}
+
+		
+		private boolean isUseSkillAllowed() {
+			return isGeneralOrderAllowed()
+					&& !areSkillsOnCooldown();
+		}
+		
+		/**
+		 * Returns the conditions which are shared by most ordinary orders
+		 * @return
+		 */
+		private boolean isGeneralOrderAllowed() {
+			return isAnyOrderAllowed()
 					&& !isRetreatCooldownActive()
 					&& !(isCasting() || isChannelling());
 		}
-		private boolean isUseSkillAllowed() {
+		/**
+		 * Returns the conditions which are shared by all orders
+		 * @return
+		 */
+		private boolean isAnyOrderAllowed() {
 			return !stats.isDead()
-					&& !isRetreatCooldownActive()
-					&& !(isCasting() || isChannelling())
-					&& !areSkillsOnCooldown();
+			&& !motion.isBeingKnockedBack();
 		}
+		
 		
 		// @formatter:on
 
@@ -341,7 +355,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	/** Handles the combat logic for a unit for one frame */
 	public void handleCombatLogic() {
 
-		if (attacking != null && attacking.stats.isDead()) {
+		if (isAttacking() && attacking.stats.isDead()) {
 			stopAttacking();
 		}
 
@@ -378,7 +392,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 		if (this.mode == Mode.ENGAGE) {
 			Set<Unit> attackingMe = unitsAttacking.get(this);
-			if (!attackingMe.isEmpty() && attacking == null) {
+			if (!attackingMe.isEmpty() && !isAttacking()) {
 				orderAttackUnit(attackingMe.iterator().next());
 			}
 		}
@@ -415,8 +429,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	 * Disengages a unit.
 	 */
 	private void stopAttacking() {
-		if (this.attacking != null) {
-			unitsAttacking.get(this.attacking).remove(this);
+		if (isAttacking()) {
+			unitsAttacking.get(attacking).remove(this);
 			attacking = null;
 		}
 	}
@@ -432,8 +446,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	// Debug Rendering
 	public void renderAttackingArrow() {
-		if (this.attacking != null) {
-			HoloGL.renderArrow(this, this.attacking, Color.RED);
+		if (isAttacking()) {
+			HoloGL.renderArrow(this, attacking, Color.RED);
 		}
 	}
 
@@ -442,7 +456,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		this.clearOrder();
 
 		// Stop this (now-dead) unit from attacking
-		if (attacking != null) {
+		if (isAttacking()) {
 			stopAttacking();
 		}
 	}
