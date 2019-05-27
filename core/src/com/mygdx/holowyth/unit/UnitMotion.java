@@ -35,15 +35,15 @@ public class UnitMotion {
 	private static final float defaultTargetFinalSpeed = 0.2f;
 	private static final float defaultDecelRate = 0.02f;
 
-	private final static float defaultStartingSpeed = Holo.defaultUnitMoveSpeed * 0.4f;
-	private final static float defaultAccelRate = 0.01f;
-
 	// Accel/Decel shared variables
+	private final static float defaultStartingSpeedRatio = 0.4f;
+	private final static float defaultStartingSpeed = Holo.defaultUnitMoveSpeed * defaultStartingSpeedRatio;
+	private final static float defaultAccelRate = 0.01f;
 
 	/**
 	 * The speed the unit is planning to travel towards a waypoint. Corresponds to acceleration and deceleration.
 	 */
-	private float curPlannedSpeed;
+	private float plannedSpeed;
 	private float maxAccelFactor = 5;
 
 	/**
@@ -104,25 +104,33 @@ public class UnitMotion {
 		determineMovement();
 	}
 
-	public void pathForAttackingUnit() {
+	/**
+	 * Looks for a path in a manner suitable for a move order. If it finds one, the unit's motion adopts that path
+	 * 
+	 * Since a unitMotion will periodically repath for a unit on attack order, even if the initial path fails, this
+	 * method does not report a failure.
+	 */
+	public void pathFindForAttackOrder() {
 		// find path as normal, except for pathing ignore the target's collision
 		// body
 		ArrayList<Unit> someUnits = new ArrayList<Unit>(units);
 		someUnits.remove(self.target);
 
-		Path path = pathing.findPathForUnit(self, self.target.x, self.target.y, someUnits);
-		if (path != null) {
-			this.setPath(path);
+		Path newPath = pathing.findPathForUnit(self, self.target.x, self.target.y, someUnits);
+		if (newPath != null) {
+			this.setPath(newPath);
 		}
 	}
 
 	/**
+	 * Looks for a path in a manner suitable for a move order. If it finds one, the unit's motion adopts that path. If
+	 * it doesn't, nothing happens
 	 * 
 	 * @param dx
 	 * @param dy
-	 * @return true if the move order was successful
+	 * @return true if pathfind was successful and unitMotion has adopted that path. False if not.
 	 */
-	public boolean orderMove(float dx, float dy) {
+	public boolean pathFindForMoveOrder(float dx, float dy) {
 		Path path = pathing.findPathForUnit(self, dx, dy, units);
 		if (path != null) {
 			setPath(path);
@@ -131,6 +139,11 @@ public class UnitMotion {
 		return false;
 	}
 
+	/**
+	 * Stop the current normal movement. This applies to normal voluntary movement, and does not affect knockback
+	 * motion. It is valid to give when a unit is being knocked back, though the unit's normal movement should already
+	 * be cleared
+	 */
 	public void stopCurrentMovement() {
 		clearPath();
 	}
@@ -142,7 +155,7 @@ public class UnitMotion {
 		if (self.currentOrder == Order.ATTACKUNIT && self.attacking == null) {
 			framesUntilAttackRepath -= 1;
 			if (framesUntilAttackRepath <= 0) {
-				pathForAttackingUnit();
+				pathFindForAttackOrder();
 				framesUntilAttackRepath = attackPathfindingInterval;
 			}
 		}
@@ -162,75 +175,80 @@ public class UnitMotion {
 	 * movement. When movement is complete, a unit's path is set to null.
 	 */
 	private void determineMovement() {
-
+		if (path == null) {
+			vx = 0;
+			vy = 0;
+			return;
+		}
 		switch (self.currentOrder) {
 		case MOVE:
 			determineMovementForMoveOrder();
+			break;
 		case RETREAT:
 			determineMovementForMoveOrder();
+			break;
 		case ATTACKUNIT:
 			determineMovementForAttackOrder();
+			break;
 		default:
 			break;
 		}
 	}
 
+	/**
+	 * Determines the unit's velocity based on path (and related state variables). Path must not be null
+	 */
 	private void determineMovementForMoveOrder() {
 
-		if (path != null) {
-			// Apply acceleration if the unit is not already at full speed.
-			// Acceleration is proportional to the current speed of the unit,
-			// but is capped at maxAccelFactor times the base rate.
-			if (curPlannedSpeed < speed && !isDecelerating) {
-				curPlannedSpeed = Math.min(curPlannedSpeed + Math.min(accelRate / curPlannedSpeed,
-						accelRate * maxAccelFactor), speed);
-				// curSpeed = Math.min(curSpeed + (speed-curSpeed)*factorAccel,
-				// speed);
-			}
-
-			// System.out.println("CurSpeed: " + curSpeed);
-
-			Point curWaypoint = path.get(waypointIndex);
-
-			float dist = getDistanceToNextWayPoint();
-
-			float wx = curWaypoint.x;
-			float wy = curWaypoint.y;
-			float dx = wx - self.x;
-			float dy = wy - self.y;
-
-			// Apply deceleration if the unit is approaching the final goal
-
-			if (waypointIndex == path.size() - 1) {
-				curPlannedSpeed = getSpeedApproachingGoal(dist);
-			}
-
-			// Check if reached waypoint
-			if (dist < waypointMinDistance) {
-				waypointIndex += 1;
-				// check if completed path
-				if (waypointIndex == path.size()) {
-					self.clearOrder();
-					clearPath();
-				}
-			}
-
-			// Determine unit movement
-			if (dist > curPlannedSpeed) {
-				float sin = dy / dist;
-				float cos = dx / dist;
-
-				this.vx = cos * curPlannedSpeed;
-				this.vy = sin * curPlannedSpeed;
-			} else {
-				this.vx = dx;
-				this.vy = dy;
-			}
-
-		} else {
-			vx = 0;
-			vy = 0;
+		// Apply acceleration if the unit is not already at full speed.
+		// Acceleration is proportional to the current speed of the unit,
+		// but is capped at maxAccelFactor times the base rate.
+		if (plannedSpeed < speed && !isDecelerating) {
+			plannedSpeed = Math.min(plannedSpeed + Math.min(accelRate / plannedSpeed,
+					accelRate * maxAccelFactor), speed);
+			// curSpeed = Math.min(curSpeed + (speed-curSpeed)*factorAccel,
+			// speed);
 		}
+
+		// System.out.println("CurSpeed: " + curSpeed);
+
+		Point curWaypoint = path.get(waypointIndex);
+
+		float dist = getDistanceToNextWayPoint();
+
+		float wx = curWaypoint.x;
+		float wy = curWaypoint.y;
+		float dx = wx - self.x;
+		float dy = wy - self.y;
+
+		// Apply deceleration if the unit is approaching the final goal
+
+		if (waypointIndex == path.size() - 1) {
+			plannedSpeed = getSpeedApproachingGoal(dist);
+		}
+
+		// Check if reached waypoint
+		if (dist < waypointMinDistance) {
+			waypointIndex += 1;
+			// check if completed path
+			if (waypointIndex == path.size()) {
+				self.clearOrder();
+				clearPath();
+			}
+		}
+
+		// Determine unit movement
+		if (dist > plannedSpeed) {
+			float sin = dy / dist;
+			float cos = dx / dist;
+
+			this.vx = cos * plannedSpeed;
+			this.vy = sin * plannedSpeed;
+		} else {
+			this.vx = dx;
+			this.vy = dy;
+		}
+
 	}
 
 	/**
@@ -252,14 +270,15 @@ public class UnitMotion {
 		}
 	}
 
+	/**
+	 * Path must not be null
+	 */
 	private void determineMovementForAttackOrder() {
-		if (path != null) {
-			determineMovementForMoveOrder();
-			// TODO:
-			// Can add extra code this so that units don't enter too deeply into the engage range. The math is simple
-			// but the fact that the units can't be aware of the other's movement makes it non-trivial
+		determineMovementForMoveOrder();
+		// TODO:
+		// Can add extra code this so that units don't enter too deeply into the engage range. The math is simple
+		// but the fact that the units can't be aware of the other's movement makes it non-trivial
 
-		}
 	}
 
 	// Unit Movement
@@ -272,7 +291,7 @@ public class UnitMotion {
 	 */
 	private float getInitialSpeed() {
 
-		if (curPlannedSpeed < startingSpeed || curPlannedSpeed < 0.001) {
+		if (plannedSpeed < startingSpeed || plannedSpeed < 0.001) {
 			return startingSpeed;
 		}
 
@@ -288,7 +307,7 @@ public class UnitMotion {
 		p.nor();
 		float cross = v.dot(p);
 
-		float s = Math.min(startingSpeed + curPlannedSpeed * cross, curPlannedSpeed);
+		float s = Math.min(startingSpeed + plannedSpeed * cross, plannedSpeed);
 		s = Math.max(s, startingSpeed);
 		// System.out.println("initial move speed: " + s);
 
@@ -306,28 +325,28 @@ public class UnitMotion {
 	 */
 	private float getSpeedApproachingGoal(float distanceToGoal) {
 
-		if (curPlannedSpeed <= targetFinalSpeed) {
-			return curPlannedSpeed;
+		if (plannedSpeed <= targetFinalSpeed) {
+			return plannedSpeed;
 		}
 		distanceToDecel = 0;
 		float dSpeed = 0; // is negative
 
 		// sum up distance required to achieve desired speed
-		for (float s = curPlannedSpeed; s > targetFinalSpeed; s -= decelRate * (1 / s)) {
+		for (float s = plannedSpeed; s > targetFinalSpeed; s -= decelRate * (1 / s)) {
 			distanceToDecel += s - decelRate / s;
 		}
-		dSpeed = -1 * decelRate * curPlannedSpeed;
+		dSpeed = -1 * decelRate * plannedSpeed;
 
 		// System.out.format("curSpeed %s, Time to Decel %s, Distance %s, Decel dist %s, %n", curSpeed, timeToDecel,
 		// distanceToGoal, distanceToDecel);
 
 		if (distanceToGoal < distanceToDecel) {
 			// System.out.println("Decelling");
-			curPlannedSpeed = Math.max(curPlannedSpeed + dSpeed, targetFinalSpeed);
+			plannedSpeed = Math.max(plannedSpeed + dSpeed, targetFinalSpeed);
 			isDecelerating = true;
 		}
 
-		return curPlannedSpeed;
+		return plannedSpeed;
 	}
 
 	/**
@@ -337,7 +356,7 @@ public class UnitMotion {
 	private void setPath(Path path) {
 		this.path = path;
 		waypointIndex = 0;
-		curPlannedSpeed = getInitialSpeed();
+		plannedSpeed = getInitialSpeed();
 		isDecelerating = false;
 	}
 
@@ -369,7 +388,7 @@ public class UnitMotion {
 		this.accelRate = defaultAccelRate * (speed / defaultUnitMoveSpeed);
 		this.decelRate = defaultDecelRate * (speed / defaultUnitMoveSpeed);
 
-		this.startingSpeed = defaultStartingSpeed * (speed / defaultUnitMoveSpeed);
+		this.startingSpeed = speed * defaultStartingSpeedRatio;
 		this.targetFinalSpeed = defaultTargetFinalSpeed * (float) Math.pow((speed / defaultUnitMoveSpeed), 1.6);
 
 	}
@@ -393,9 +412,9 @@ public class UnitMotion {
 		System.out.println("onBlocked called");
 		switch (self.currentOrder) {
 		case MOVE:
-			orderMove(getDest().x, getDest().y);
+			pathFindForMoveOrder(getDest().x, getDest().y);
 		case RETREAT:
-			orderMove(getDest().x, getDest().y);
+			pathFindForMoveOrder(getDest().x, getDest().y);
 		case ATTACKUNIT:
 			determineMovementForAttackOrder();
 		default:
@@ -416,7 +435,9 @@ public class UnitMotion {
 		knockBackVx = initialVx;
 		knockBackVy = initialVy;
 
-		// TODO: need to terminate regular movement behaviour
+		stopCurrentMovement();
+		self.clearOrder();
+
 	}
 
 	public void setKnockbackVx(float knockBackVx) {
@@ -448,7 +469,7 @@ public class UnitMotion {
 	}
 
 	public float getCurPlannedSpeed() {
-		return curPlannedSpeed;
+		return plannedSpeed;
 	}
 
 	public float getKnockBackVx() {

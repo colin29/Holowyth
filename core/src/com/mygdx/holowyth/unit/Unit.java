@@ -144,7 +144,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		if (!isMoveOrderAllowed()) {
 			return;
 		}
-		if (motion.orderMove(dx, dy)) {
+		if (motion.pathFindForMoveOrder(dx, dy)) {
 			clearOrder();
 			currentOrder = Order.MOVE;
 		}
@@ -169,7 +169,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		this.currentOrder = Order.ATTACKUNIT;
 		this.target = unit;
 
-		this.motion.pathForAttackingUnit();
+		this.motion.pathFindForAttackOrder();
 		return true;
 	}
 
@@ -189,7 +189,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		}
 
 		retreatDurationRemaining = retreatDuration;
-		if (motion.orderMove(x, y)) {
+		if (motion.pathFindForMoveOrder(x, y)) {
 			stopAttacking();
 			clearOrder();
 			this.currentOrder = Order.RETREAT;
@@ -230,7 +230,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * Stops a unit's motion and halts any current orders. Unlike orderStop, is not affected by order restrictions.
+	 * Stops a unit's motion and halts any current orders. Unlike orderStop, is not affected by order restrictions. As
+	 * such, it should be for backend and not player use.
 	 */
 	public void stopUnit() {
 		clearOrder();
