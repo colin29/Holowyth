@@ -458,7 +458,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	}
 
 	// For now we allow multiple player characters
-	public boolean isPlayerCharacter() {
+	public boolean isAPlayerCharacter() {
 		return side == Side.PLAYER;
 	}
 
@@ -562,6 +562,19 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	public int getId() {
 		return id;
+	}
+
+	@Override
+	public boolean isCastingOrChanneling() {
+		if (getActiveSkill() == null)
+			return false;
+		return (getActiveSkill().getStatus() == Status.CASTING
+				|| getActiveSkill().getStatus() == Status.CHANNELING);
+	}
+
+	@Override
+	public UnitMotion getMotion() {
+		return motion;
 	}
 
 }

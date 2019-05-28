@@ -1,5 +1,8 @@
 package com.mygdx.holowyth.combatDemo;
 
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
@@ -23,7 +26,6 @@ import com.mygdx.holowyth.skill.Skill.Status;
 import com.mygdx.holowyth.skill.SkillInfo;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
-import com.mygdx.holowyth.unit.UnitMotion;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.util.Holo;
@@ -131,11 +133,11 @@ public class Renderer {
 		} else {
 			renderUnits();
 		}
+		renderCirclesAroundKnockbackedUnits();
 
-		// renderUnitDebugText();
+		// 3.5: Render arrows
 
-		// renderPaths(false); // temp, delete this after use
-		// renderPlayerUnreachedWaypoints(Color.FIREBRICK);
+		renderUnitKnockbackVelocities();
 
 		for (Unit u : world.getUnits()) {
 			u.renderAttackingArrow();
@@ -149,8 +151,6 @@ public class Renderer {
 			renderMapBoundaries();
 		}
 
-		// renderPlayerVelocity();
-
 		// Render effects
 
 		effects.renderDamageEffects();
@@ -162,38 +162,45 @@ public class Renderer {
 
 	}
 
-	private void renderUnitDebugText() {
-		batch.begin();
-		for (Unit u : world.getUnits()) {
-			Holowyth.fonts.borderedDebugFont().draw(batch, String.valueOf(u.debugNumOfUnitsCollidingWith), u.getX(),
-					u.getY());
-		}
-		batch.end();
-	}
-
 	private void renderCirclesAroundBusyRetreatingUnits() {
-		for (UnitInfo u : world.getUnits()) {
-			if (u.isRetreatCooldownActive()) {
-				Color color = HoloGL.rbg(30, 144, 255);
-				shapeRenderer.setProjectionMatrix(worldCamera.combined);
-				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, color);
-				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 3.25f, color);
-				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 4, color);
-			}
-		}
+		renderThickOutlineAroundCertainUnits(HoloGL.rbg(30, 144, 255), (UnitInfo u) -> {
+			return u.isRetreatCooldownActive();
+		});
 	}
 
 	private void renderCirclesAroundBusyCastingUnits() {
-		for (UnitInfo u : world.getUnits()) {
-			if (u.getActiveSkill() == null)
-				continue;
-			if (u.getActiveSkill().getStatus() == Status.CASTING
-					|| u.getActiveSkill().getStatus() == Status.CHANNELING) {
-				Color color = HoloGL.rbg(30, 144, 255);
-				shapeRenderer.setProjectionMatrix(worldCamera.combined);
-				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, color);
-				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 3.25f, color);
-				HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 4, color);
+		renderThickOutlineAroundCertainUnits(HoloGL.rbg(30, 144, 255), (UnitInfo u) -> {
+			return u.isCastingOrChanneling();
+		});
+	}
+
+	private void renderCirclesAroundKnockbackedUnits() {
+		renderModerateWidthOutlineAroundCertainUnits(Color.ORANGE, (UnitInfo u) -> {
+			return u.getMotion().isBeingKnockedBack();
+		});
+	}
+
+	private void renderThickOutlineAroundCertainUnits(Color color, Predicate<UnitInfo> predicate) {
+		doForAllUnits(predicate, (UnitInfo u) -> {
+			shapeRenderer.setProjectionMatrix(worldCamera.combined);
+			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, color);
+			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 3.25f, color);
+			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 4, color);
+		});
+	}
+
+	private void renderModerateWidthOutlineAroundCertainUnits(Color color, Predicate<UnitInfo> predicate) {
+		doForAllUnits(predicate, (UnitInfo u) -> {
+			shapeRenderer.setProjectionMatrix(worldCamera.combined);
+			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, color);
+			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 3.0f, color);
+		});
+	}
+
+	private void doForAllUnits(Predicate<UnitInfo> predicate, Consumer<UnitInfo> task) {
+		for (UnitInfo unit : world.getUnits()) {
+			if (predicate.test(unit)) {
+				task.accept(unit);
 			}
 		}
 	}
@@ -222,7 +229,7 @@ public class Renderer {
 
 	private void renderPlayerUnreachedWaypoints(Color color) {
 		for (Unit unit : world.getUnits()) {
-			if (unit.isPlayerCharacter() && unit.motion.getPath() != null) {
+			if (unit.isAPlayerCharacter() && unit.motion.getPath() != null) {
 				Path path = unit.motion.getPath();
 				for (int i = unit.motion.getWayPointIndex(); i < path.size(); i++) {
 					Point waypoint = path.get(i);
@@ -241,20 +248,29 @@ public class Renderer {
 	}
 
 	@SuppressWarnings("unused")
-	private void renderPlayerVelocity() {
-		for (Unit u : world.getUnits()) {
-			if (u.isPlayerCharacter() && u.motion.getVelocityMagnitude() > 0.01f) {
-				UnitMotion m = u.motion;
-				float scale = 15; // enlargen the velocity so we can see it
-				HoloGL.renderArrow(u.getPos(), u.getPos().add(m.getVx() * scale, m.getVy() * scale), Color.GREEN);
-			}
-		}
+	private void renderPlayerVelocityArrow() {
+		doForAllUnits((UnitInfo u) -> (u.isAPlayerCharacter() && u.getMotion().getVelocityMagnitude() > 0.01f),
+				(UnitInfo u) -> {
+					float scale = 15;
+					HoloGL.renderArrow(u.getPos(), u.getMotion().getVelocity().setLength(scale), Color.GREEN);
+				});
+	}
+
+	private void renderUnitKnockbackVelocities() {
+		doForAllUnits(
+				(UnitInfo u) -> (u.getMotion().isBeingKnockedBack()
+						&& u.getMotion().getKnockBackVelocity().len() > 0.01f),
+				(UnitInfo u) -> {
+					float scale = 15;
+					HoloGL.renderArrow(u.getPos(),
+							u.getMotion().getKnockBackVelocity().setLength(scale), Color.ORANGE);
+				});
 	}
 
 	private void renderUnitDestinations(Color color) {
 
 		for (Unit unit : world.getUnits()) {
-			if (unit.isPlayerCharacter() && unit.motion.getPath() != null) {
+			if (unit.isAPlayerCharacter() && unit.motion.getPath() != null) {
 
 				Path path = unit.motion.getPath();
 				Point finalPoint = path.get(path.size() - 1);
@@ -286,7 +302,7 @@ public class Renderer {
 
 				shapeRenderer.begin(ShapeType.Filled);
 
-				if (unit.isPlayerCharacter()) {
+				if (unit.isAPlayerCharacter()) {
 					shapeRenderer.setColor(Color.PURPLE);
 				} else {
 					shapeRenderer.setColor(Color.YELLOW);
@@ -322,7 +338,7 @@ public class Renderer {
 		witchTex.getTexture().setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Nearest);
 
 		for (Unit unit : world.getUnits()) {
-			if (unit.isPlayerCharacter()) {
+			if (unit.isAPlayerCharacter()) {
 				HoloSprite player = new HoloSprite(witchTex, unit.x, unit.y, 30, 0, 20);
 				player.draw(batch);
 			} else {

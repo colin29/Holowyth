@@ -139,6 +139,11 @@ public class HoloGL {
 
 	}
 
+	public static void renderArrow(Point start, Vector2 vector, Color arrowColor) {
+		Point end = new Point(start.x + vector.x, start.y + vector.y);
+		renderArrow(start, end, arrowColor);
+	}
+
 	public static void renderArrow(Point start, Point end, Color arrowColor) {
 
 		final float wingLength = 8f;

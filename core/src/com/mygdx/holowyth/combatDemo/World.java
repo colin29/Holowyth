@@ -48,7 +48,7 @@ public class World implements WorldInfo {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private float knockBackCollisionElasticity = 1;
-	private float knockBackUnitFriction = 0.01f; // 0.02 is a realistic number
+	private float knockBackUnitFriction = 0.005f; // 0.01-0.02 is a realistic number
 	private float velocityThresholdToEndKnockback = 0.2f; // 0.03f;
 
 	public World(Field map, PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects) {

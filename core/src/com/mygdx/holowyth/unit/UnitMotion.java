@@ -521,4 +521,8 @@ public class UnitMotion {
 		return vy;
 	}
 
+	public Vector2 getVelocity() {
+		return new Vector2(vx, vy);
+	}
+
 }
