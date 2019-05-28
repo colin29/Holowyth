@@ -276,7 +276,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		 */
 		private boolean isGeneralOrderAllowed() {
 			return isAnyOrderAllowed()
-					&& !isRetreatCooldownActive()
+					&& !isBusyRetreating()
 					&& !(isCasting() || isChannelling());
 		}
 		/**
@@ -308,7 +308,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	}
 
 	@Override
-	public boolean isRetreatCooldownActive() {
+	public boolean isBusyRetreating() {
 		return currentOrder == Order.RETREAT && retreatDurationRemaining > 0;
 	}
 	// @formatter:on

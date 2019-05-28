@@ -10,12 +10,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.combatDemo.rendering.Renderer;
 import com.mygdx.holowyth.combatDemo.ui.CombatDemoUI;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.skill.GroundSkill;
-import com.mygdx.holowyth.skill.Skills;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.template.DemoScreen;
@@ -168,9 +167,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		unitControls.selectedUnits.add(playerUnit);
 		world.spawnSomeEnemyUnits();
 
-		GroundSkill implosion = new Skills.Implosion();
-		implosion.pluginTargeting(playerUnit, 428, 281);
-		playerUnit.orderUseSkill(implosion);
+		// GroundSkill implosion = new Skills.Implosion();
+		// implosion.pluginTargeting(playerUnit, 428, 281);
+		// playerUnit.orderUseSkill(implosion);
 
 		// playerUnit.orderMove(CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
 

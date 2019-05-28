@@ -35,7 +35,7 @@ public interface UnitInfo {
 	/**
 	 * For a short time when a unit starts retreating they can't be given any other commands
 	 */
-	public boolean isRetreatCooldownActive();
+	public boolean isBusyRetreating();
 
 	public UnitMotion getMotion();
 
