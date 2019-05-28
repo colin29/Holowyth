@@ -48,6 +48,8 @@ public class World implements WorldInfo {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private float knockBackCollisionElasticity = 1;
+	private float knockBackUnitFriction = 0.01f; // 0.02 is a realistic number
+	private float velocityThresholdToEndKnockback = 0.2f; // 0.03f;
 
 	public World(Field map, PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects) {
 		this.map = map;
@@ -227,7 +229,34 @@ public class World implements WorldInfo {
 						// Skip resolving this collision
 					}
 				}
+				applyFriction(thisUnit);
+				endKnockbackForUnitsBelowVelocityThreshold();
 
+			}
+		}
+	}
+
+	private void applyFriction(Unit unit) {
+		if (unit.motion.isBeingKnockedBack()) {
+			float vx = unit.motion.getKnockBackVx();
+			float vy = unit.motion.getKnockBackVy();
+
+			float vxPolarity = vx >= 0 ? 1 : -1;
+			float vyPolarity = vy >= 0 ? 1 : -1;
+
+			float newVx = Math.max(0, (Math.abs(vx) - knockBackUnitFriction)) * vxPolarity;
+			float newVy = Math.max(0, (Math.abs(vy) - knockBackUnitFriction)) * vyPolarity;
+
+			unit.motion.setKnockbackVelocity(newVx, newVy);
+		}
+	}
+
+	private void endKnockbackForUnitsBelowVelocityThreshold() {
+		for (Unit unit : units.getUnits()) {
+			if (unit.motion.isBeingKnockedBack()) {
+				if (unit.motion.getKnockBackVelocity().len() < velocityThresholdToEndKnockback) {
+					unit.motion.endKnockback();
+				}
 			}
 		}
 	}
@@ -294,22 +323,11 @@ public class World implements WorldInfo {
 		Vector2 dv1 = new Vector2(normalNorm).scl(dv1ColAxis);
 		Vector2 dv2 = new Vector2(normalNorm).scl(dv2ColAxis);
 
-		Unit curUnit = units.colBodyToUnit().get(thisBody);
+		Unit thisUnit = units.colBodyToUnit().get(thisBody);
 		Unit otherUnit = units.colBodyToUnit().get(otherBody);
 
-		float thisVxFinal = thisBody.getVx() + dv1.x;
-		float thisVyFinal = thisBody.getVy() + dv1.y;
-
-		float otherVxFinal = otherBody.getVx() + dv2.x;
-		float otherVyFinal = otherBody.getVy() + dv2.y;
-
-		curUnit.motion.setKnockbackVelocity(thisVxFinal, thisVyFinal);
-
-		if (!otherUnit.motion.isBeingKnockedBack()) {
-			otherUnit.motion.beginKnockback(otherVxFinal, otherVyFinal);
-		} else {
-			otherUnit.motion.setKnockbackVelocity(otherVxFinal, otherVyFinal);
-		}
+		thisUnit.motion.applyKnockBackVelocity(dv1.x, dv1.y);
+		otherUnit.motion.applyKnockBackVelocity(dv2.x, dv2.y);
 
 		// thisBody.vx += dv1.x;
 		// thisBody.vy += dv1.y;

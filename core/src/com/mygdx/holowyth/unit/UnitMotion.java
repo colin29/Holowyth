@@ -441,6 +441,29 @@ public class UnitMotion {
 
 	}
 
+	public void endKnockback() {
+		if (!isBeingKnockedBack) {
+			logger.warn("endKnockback called, but unit is not being knocked back. No effect.");
+			return;
+		}
+		knockBackVx = 0;
+		knockBackVy = 0;
+		isBeingKnockedBack = false;
+	}
+
+	/**
+	 * If the unit is not in knockback state, sets it to knockback state with this velocity. If it is already being
+	 * knocked back, adds this to its velocity.
+	 */
+	public void applyKnockBackVelocity(float dx, float dy) {
+		if (isBeingKnockedBack) {
+			setKnockbackVelocity(knockBackVx + dx, knockBackVy + dy);
+		} else {
+			beginKnockback(dx, dy);
+		}
+
+	}
+
 	public void setKnockbackVx(float knockBackVx) {
 		if (this.isBeingKnockedBack) {
 			this.knockBackVx = knockBackVx;
@@ -484,6 +507,10 @@ public class UnitMotion {
 
 	public float getKnockBackVy() {
 		return knockBackVy;
+	}
+
+	public Vector2 getKnockBackVelocity() {
+		return new Vector2(knockBackVx, knockBackVy);
 	}
 
 	public float getVx() {

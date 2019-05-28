@@ -209,7 +209,7 @@ public class Skills {
 						Vector2 unitToEffectCenter = new Vector2(effectX - unit.x, effectY - unit.y);
 						Vector2 knockBackVel = new Vector2(unitToEffectCenter).nor().scl(knockbackSpeed);
 
-						unit.motion.beginKnockback(knockBackVel.x, knockBackVel.y);
+						unit.motion.applyKnockBackVelocity(knockBackVel.x, knockBackVel.y);
 					}
 				}
 			}
