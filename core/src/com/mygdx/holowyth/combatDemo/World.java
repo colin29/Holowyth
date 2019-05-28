@@ -3,8 +3,14 @@ package com.mygdx.holowyth.combatDemo;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
+import com.mygdx.holowyth.knockback.CircleCBInfo;
+import com.mygdx.holowyth.knockback.CollisionInfo;
+import com.mygdx.holowyth.knockback.KnockBackSimulation;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
@@ -16,6 +22,7 @@ import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloAssert;
 import com.mygdx.holowyth.util.dataobjects.Segment;
+import com.mygdx.holowyth.util.exceptions.HoloOperationException;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
@@ -38,6 +45,8 @@ public class World implements WorldInfo {
 	private UnitCollection units = new UnitCollection();
 
 	Unit playerUnit;
+
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public World(Field map, PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects) {
 		this.map = map;
@@ -62,13 +71,141 @@ public class World implements WorldInfo {
 	}
 
 	public void moveKnockedBackedUnitsAndResolveCollisions() {
-		// TODO: stub
-		for (Unit u : units.getUnits()) {
-			if (u.motion.isBeingKnockedBack()) {
-				u.x += u.motion.getKnockBackVx();
-				u.y += u.motion.getKnockBackVy();
+		for (Unit thisUnit : units.getUnits()) {
+			if (thisUnit.motion.isBeingKnockedBack()) {
+
+				final float x, y, vx, vy;
+
+				x = thisUnit.getX();
+				y = thisUnit.getY();
+				vx = thisUnit.motion.getKnockBackVx();
+				vy = thisUnit.motion.getKnockBackVy();
+
+				CircleCBInfo thisColBody = units.unitToColBody.get(thisUnit);
+
+				List<CircleCBInfo> allOtherBodies = new ArrayList<CircleCBInfo>();
+				allOtherBodies.addAll(units.colBodies);
+				allOtherBodies.remove(thisColBody);
+
+				Segment motion = new Segment(x, y, x + vx, y + vy);
+
+				List<CircleCBInfo> collisions = KnockBackSimulation.getObjectCollisionsAlongLineSegment(motion.x1,
+						motion.y1, motion.x2, motion.y2,
+						thisColBody.getRadius(), allOtherBodies);
+
+				for (CircleCBInfo colidee : collisions) {
+					logger.debug("Collision between units id [{} {}]", thisUnit.getId(),
+							units.unitToColBody.inverseBidiMap().get(colidee).getId());
+				}
+
+				if (collisions.isEmpty()) {
+					// Move object normally
+					thisUnit.x += vx;
+					thisUnit.y += vy;
+				} else {
+
+					try {
+						CollisionInfo collision = KnockBackSimulation.getFirstCollisionInfo(thisColBody, collisions,
+								null);
+						resolveUnitUnitKnockbackCollision(collision);
+					} catch (HoloOperationException e) {
+						logger.warn(e.getMessage());
+						logger.trace(e.getFromMessage());
+						logger.warn("Skipping resolving this object's collision");
+						// Skip resolving this collision
+					}
+				}
+
 			}
 		}
+	}
+
+	private float elasticity = 1;
+
+	private void resolveUnitUnitKnockbackCollision(CollisionInfo collision) {
+		// The collision info takes
+		// the opposite's vx/vy is either their normal movement speed, or their knockback
+		// at the end, if the target wasn't in knockback state, automatically turn it into knockback state (stub
+		// functionality)
+
+		// 1. Determine unit's velocities in terms of the normalized collision normal vector. Set aside the
+		// perpendicular components. We now have 2 1-d velocity vectors
+
+		final CircleCBInfo thisBody = collision.cur;
+		final CircleCBInfo otherBody = collision.other;
+
+		Vector2 normalNorm = new Vector2((float) Math.cos(collision.collisionAngle),
+				(float) Math.sin(collision.collisionAngle));
+		Vector2 v1 = new Vector2(thisBody.getVx(), thisBody.getVy());
+		Vector2 v1Norm = new Vector2(v1).nor();
+
+		Vector2 v2 = new Vector2(otherBody.getVx(), otherBody.getVy());
+		Vector2 v2Norm = new Vector2(v2).nor();
+
+		float v1ColAxis = v1.len() * v1Norm.dot(normalNorm);
+		float v2ColAxis = v2.len() * v2Norm.dot(normalNorm);
+
+		// 2. Transform the problem into the zero momentum frame
+
+		final float MASS_BODY = 3; // system supports mass but game doesn't use it yet
+
+		final float m1 = MASS_BODY;
+		final float m2 = MASS_BODY;
+
+		float M1ColAxis = v1ColAxis * m1;
+		float M2ColAxis = v2ColAxis * m2;
+
+		float MSystemColAxis = M1ColAxis + M2ColAxis;
+		float VSystemColAxis = MSystemColAxis / (m1 + m2);
+
+		float v1ZeroFrame = v1ColAxis - VSystemColAxis;
+		float v2ZeroFrame = v2ColAxis - VSystemColAxis;
+
+		// 3. Solve the problem with the zero momentum frame
+		// 1. Use derived formula to compute v1'
+
+		float v1FinalZeroFrame = (float) Math
+				.sqrt(elasticity * (m1 * (v1ZeroFrame * v1ZeroFrame) + m2 * (v2ZeroFrame * v2ZeroFrame))
+						/ (m1 * (1 + m1 / m2)));
+
+		// 2. Plugin to momentum equation to get v2'
+
+		float v2FinalZeroFrame = -1 * v1FinalZeroFrame * m1 / m2;
+
+		// 3. Subtract from initial velocities to get the change in velocity along the collision normal vector
+
+		float dv1ColAxis = v1FinalZeroFrame - v1ZeroFrame;
+		float dv2ColAxis = v2FinalZeroFrame - v2ZeroFrame;
+
+		// 4. Convert change in velocity into standard coordinates and modify both body's velocities by that much,
+		// respectively.
+
+		Vector2 dv1 = new Vector2(normalNorm).scl(dv1ColAxis);
+		Vector2 dv2 = new Vector2(normalNorm).scl(dv2ColAxis);
+
+		Unit curUnit = units.unitToColBody.inverseBidiMap().get(thisBody);
+		Unit otherUnit = units.unitToColBody.inverseBidiMap().get(otherBody);
+
+		float thisVxFinal = thisBody.getVx() + dv1.x;
+		float thisVyFinal = thisBody.getVy() + dv1.y;
+
+		float otherVxFinal = otherBody.getVx() + dv2.x;
+		float otherVyFinal = otherBody.getVy() + dv2.y;
+
+		curUnit.motion.setKnockbackVelocity(thisVxFinal, thisVyFinal);
+
+		if (!otherUnit.motion.isBeingKnockedBack()) {
+			otherUnit.motion.beginKnockback(otherVxFinal, otherVyFinal);
+		} else {
+			otherUnit.motion.setKnockbackVelocity(otherVxFinal, otherVyFinal);
+		}
+
+		// thisBody.vx += dv1.x;
+		// thisBody.vy += dv1.y;
+		//
+		// other.vx += dv2.x;
+		// other.vy += dv2.y;
+
 	}
 
 	private void tickLogicForUnits() {

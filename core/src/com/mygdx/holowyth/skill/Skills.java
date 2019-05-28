@@ -184,6 +184,8 @@ public class Skills {
 		float effectRadius = 200;
 		boolean tickedOnce;
 
+		final float knockbackSpeed = 2;
+
 		@Override
 		public void begin() {
 		}
@@ -197,8 +199,6 @@ public class Skills {
 		public void knockBackEnemiesInRadiusTowardsCenter(float effectX, float effectY, float effectRadius,
 				int damage) {
 			List<Unit> units = source.getWorldMutable().getUnits();
-
-			final float knockbackSpeed = 3;
 
 			Point effectCenter = new Point(effectX, effectY);
 			for (Unit unit : units) {

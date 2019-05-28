@@ -459,6 +459,11 @@ public class UnitMotion {
 		}
 	}
 
+	public void setKnockbackVelocity(float knockBackVx, float knockBackVy) {
+		setKnockbackVx(knockBackVx);
+		setKnockbackVy(knockBackVy);
+	}
+
 	public Point getDest() {
 		if (path == null)
 			return null;

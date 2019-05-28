@@ -23,7 +23,7 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
 public class KnockBackSimulation {
 
-	Logger logger = LoggerFactory.getLogger(KnockBackSimulation.class);
+	static Logger logger = LoggerFactory.getLogger(KnockBackSimulation.class);
 
 	List<CircleObject> circleObjects = new ArrayList<CircleObject>();
 
@@ -87,7 +87,7 @@ public class KnockBackSimulation {
 			vx = thisObject.getVx();
 			vy = thisObject.getVy();
 
-			List<CircleCB> allOtherBodies = new ArrayList<CircleCB>();
+			List<CircleCBInfo> allOtherBodies = new ArrayList<CircleCBInfo>();
 			for (CircleObject o : circleObjects) {
 				if (o != thisObject)
 					allOtherBodies.add(o.getColBody());
@@ -95,7 +95,8 @@ public class KnockBackSimulation {
 
 			Segment motion = new Segment(x, y, x + vx, y + vy);
 
-			List<CircleCB> collisions = getObjectCollisionsAlongLineSegment(motion.x1, motion.y1, motion.x2, motion.y2,
+			List<CircleCBInfo> collisions = getObjectCollisionsAlongLineSegment(motion.x1, motion.y1, motion.x2,
+					motion.y2,
 					thisObject.getColBody().getRadius(), allOtherBodies);
 
 			for (CircleCBInfo colidee : collisions) {
@@ -105,11 +106,11 @@ public class KnockBackSimulation {
 			if (collisions.isEmpty()) {
 				// Move object normally
 				thisObject.setPosition(x + vx, y + vy);
-				continue;
 			} else {
 
 				try {
-					CollisionInfo collision = getFirstCollisionInfo(thisObject.getColBody(), collisions);
+					CollisionInfo collision = getFirstCollisionInfo(thisObject.getColBody(), collisions,
+							this.intersectDebugInfo);
 					resolveCollision(collision);
 				} catch (HoloOperationException e) {
 					logger.warn(e.getMessage());
@@ -121,11 +122,11 @@ public class KnockBackSimulation {
 		}
 	}
 
-	private static ArrayList<CircleCB> getObjectCollisionsAlongLineSegment(float ix, float iy, float dx, float dy,
+	public static ArrayList<CircleCBInfo> getObjectCollisionsAlongLineSegment(float ix, float iy, float dx, float dy,
 			float thisRadius,
-			List<CircleCB> cbs) {
-		ArrayList<CircleCB> collisions = new ArrayList<CircleCB>();
-		for (CircleCB cb : cbs) {
+			List<CircleCBInfo> cbs) {
+		ArrayList<CircleCBInfo> collisions = new ArrayList<CircleCBInfo>();
+		for (CircleCBInfo cb : cbs) {
 			if (Line2D.ptSegDistSq(ix, iy, dx, dy, cb.getX(), cb.getY()) < (cb.getRadius() + thisRadius)
 					* (cb.getRadius() + thisRadius)) {
 				collisions.add(cb);
@@ -142,19 +143,22 @@ public class KnockBackSimulation {
 	 * @param collisions
 	 *            The colBodies being collided into, each of these must actually be intersecting with curBody. Should
 	 *            contain at least one colliding body
+	 * @param intersectDebugInfo
+	 *            optional
 	 * 
 	 * @return Information about the first collision along curBody's motion
 	 */
-	private CollisionInfo getFirstCollisionInfo(CircleCB curBody, List<CircleCB> collisions) {
+	public static CollisionInfo getFirstCollisionInfo(CircleCBInfo curBody, List<CircleCBInfo> collisions,
+			IntersectDebugInfo intersectDebugInfo) {
 
 		Segment segment = new Segment(curBody.getX(), curBody.getY(),
 				curBody.getX() + curBody.getVx(),
 				curBody.getY() + curBody.getVy());
 
 		List<CollisionInfo> colInfos = new ArrayList<CollisionInfo>();
-		for (CircleCB other : collisions) {
+		for (CircleCBInfo other : collisions) {
 			try {
-				CollisionInfo info = getCollisionInfo(segment, curBody, other);
+				CollisionInfo info = getCollisionInfo(segment, curBody, other, intersectDebugInfo);
 				if (info != null) {
 					colInfos.add(info);
 				}
@@ -197,7 +201,8 @@ public class KnockBackSimulation {
 	 * 
 	 * @return Information about the collision. Can return null, but only due to improper input.
 	 */
-	private CollisionInfo getCollisionInfo(Segment segment, CircleCBInfo curBody, CircleCBInfo other) {
+	private static CollisionInfo getCollisionInfo(Segment segment, CircleCBInfo curBody, CircleCBInfo other,
+			IntersectDebugInfo intersectDebugInfo) {
 
 		if (curBody.getVx() == 0 && curBody.getVy() == 0) {
 			throw new HoloOperationException(
@@ -283,21 +288,23 @@ public class KnockBackSimulation {
 		}
 
 		// Set debug information
-		intersectDebugInfo.initial.set(initial);
-		intersectDebugInfo.delta.set(delta);
-		intersectDebugInfo.deltaNormalized.set(deltaNormalized);
+		if (intersectDebugInfo != null) {
+			intersectDebugInfo.initial.set(initial);
+			intersectDebugInfo.delta.set(delta);
+			intersectDebugInfo.deltaNormalized.set(deltaNormalized);
 
-		intersectDebugInfo.initialToCircleCenter.set(initialToCircleCenter);
-		intersectDebugInfo.initialToClosestPoint.set(initialToClosestPoint);
+			intersectDebugInfo.initialToCircleCenter.set(initialToCircleCenter);
+			intersectDebugInfo.initialToClosestPoint.set(initialToClosestPoint);
 
-		intersectDebugInfo.closestPoint.set(closestPoint);
-		intersectDebugInfo.closestDistToCenter = closestDistToCenter;
+			intersectDebugInfo.closestPoint.set(closestPoint);
+			intersectDebugInfo.closestDistToCenter = closestDistToCenter;
 
-		intersectDebugInfo.intersectPoint.set(intersectPoint);
+			intersectDebugInfo.intersectPoint.set(intersectPoint);
 
-		intersectDebugInfo.pOfIntersectPoint = pOfIntersectPoint;
+			intersectDebugInfo.pOfIntersectPoint = pOfIntersectPoint;
 
-		intersectDebugInfo.angleOfCircleAtIntersectDegrees = angleOfCircleAtIntersect * RADS_TO_DEGREES;
+			intersectDebugInfo.angleOfCircleAtIntersectDegrees = angleOfCircleAtIntersect * RADS_TO_DEGREES;
+		}
 
 		return new CollisionInfo(curBody, other, pOfIntersectPoint, angleOfCircleAtIntersect);
 	}

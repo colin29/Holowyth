@@ -52,7 +52,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	// Debug
 	private static int curId = 0;
-	private final int ID;
+	private final int id;
 
 	/**
 	 * todo
@@ -103,7 +103,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	private Skill activeSkill;
 
 	public Unit(float x, float y, WorldInfo world, Side side) {
-		this.ID = Unit.getNextId();
+		this.id = Unit.getNextId();
 		this.x = x;
 		this.y = y;
 		this.side = side;
@@ -464,7 +464,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public String toString() {
-		return String.format("Unit[ID: %s]", this.ID);
+		return String.format("Unit[ID: %s]", this.id);
 
 	}
 
@@ -558,6 +558,10 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	public void setSkillCooldown(int value) {
 		skillCooldown = value;
+	}
+
+	public int getId() {
+		return id;
 	}
 
 }

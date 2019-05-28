@@ -261,10 +261,10 @@ public class Controls extends InputProcessorAdapter {
 			new Exception("Selected units is not exactly one: " + selectedUnits.size()).printStackTrace();
 			return;
 		}
-		GroundSkill c = (GroundSkill) this.curSkill;
+		GroundSkill skill = (GroundSkill) this.curSkill;
 		Unit caster = selectedUnits.iterator().next();
-		c.pluginTargeting(caster, x, y);
-		caster.orderUseSkill(c);
+		skill.pluginTargeting(caster, x, y);
+		caster.orderUseSkill(skill);
 		clearContext();
 	}
 

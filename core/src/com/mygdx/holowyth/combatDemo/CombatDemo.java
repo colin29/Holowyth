@@ -14,6 +14,8 @@ import com.mygdx.holowyth.combatDemo.ui.CombatDemoUI;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.skill.GroundSkill;
+import com.mygdx.holowyth.skill.Skills;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.template.DemoScreen;
@@ -165,6 +167,10 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		playerUnit = world.createPlayerUnit();
 		unitControls.selectedUnits.add(playerUnit);
 		world.spawnSomeEnemyUnits();
+
+		GroundSkill implosion = new Skills.Implosion();
+		implosion.pluginTargeting(playerUnit, 428, 281);
+		playerUnit.orderUseSkill(implosion);
 
 		// playerUnit.orderMove(CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
 
