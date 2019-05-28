@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.knockback.linecircledemo;
+package com.mygdx.holowyth.collision.linecircledemo;
 
 import java.util.ArrayList;
 import java.util.List;

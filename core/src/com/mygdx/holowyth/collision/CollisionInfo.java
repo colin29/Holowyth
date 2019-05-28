@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.knockback;
+package com.mygdx.holowyth.collision;
 
 /**
  * Carries info about a collision, including both colBody's involved

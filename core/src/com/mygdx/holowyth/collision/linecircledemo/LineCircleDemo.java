@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.knockback.linecircledemo;
+package com.mygdx.holowyth.collision.linecircledemo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,8 +8,8 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.collision.DebugStoreUI;
 import com.mygdx.holowyth.graphics.HoloGL;
-import com.mygdx.holowyth.knockback.DebugStoreUI;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;

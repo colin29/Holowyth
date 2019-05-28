@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.knockback;
+package com.mygdx.holowyth.collision;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +21,7 @@ public class Renderer {
 	private ShapeRenderer shapeRenderer;
 	private SpriteBatch batch;
 
-	private KnockBackSimulation simulation;
+	private CollisionSimulation simulation;
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	private Color clearColor = Color.BLACK;
@@ -82,7 +82,7 @@ public class Renderer {
 		batch.end();
 	}
 
-	public void setKnockBackSimulation(KnockBackSimulation simulation) {
+	public void setKnockBackSimulation(CollisionSimulation simulation) {
 		this.simulation = simulation;
 	}
 

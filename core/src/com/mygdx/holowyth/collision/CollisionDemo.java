@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.knockback;
+package com.mygdx.holowyth.collision;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -9,7 +9,7 @@ import com.mygdx.holowyth.util.template.DemoScreen;
 import com.mygdx.holowyth.util.tools.Timer;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
-public class KnockBackDemo extends DemoScreen {
+public class CollisionDemo extends DemoScreen {
 
 	private DebugStore debugStore = new DebugStore();
 
@@ -19,16 +19,16 @@ public class KnockBackDemo extends DemoScreen {
 
 	// Components
 	private Renderer renderer;
-	private KnockBackDemoUI knockBackDemoUI;
-	private KnockBackSimulation knockbackSim = new KnockBackSimulation(debugStore);
+	private CollisionDemoUI knockBackDemoUI;
+	private CollisionSimulation knockbackSim = new CollisionSimulation(debugStore);
 
-	public KnockBackDemo(final Holowyth game) {
+	public CollisionDemo(final Holowyth game) {
 		super(game);
 		renderer = new Renderer(game, camera, stage);
 		renderer.setKnockBackSimulation(knockbackSim);
 		renderer.setClearColor(backgroundColor);
 
-		knockBackDemoUI = new KnockBackDemoUI(stage, debugStore, game.skin, camera, knockbackSim);
+		knockBackDemoUI = new CollisionDemoUI(stage, debugStore, game.skin, camera, knockbackSim);
 
 		addInitialObjects();
 

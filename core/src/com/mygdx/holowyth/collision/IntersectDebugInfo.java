@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.knockback;
+package com.mygdx.holowyth.collision;
 
 import com.badlogic.gdx.math.Vector2;
 

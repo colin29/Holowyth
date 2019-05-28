@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.knockback;
+package com.mygdx.holowyth.collision;
 
 import com.mygdx.holowyth.util.dataobjects.Point;
 

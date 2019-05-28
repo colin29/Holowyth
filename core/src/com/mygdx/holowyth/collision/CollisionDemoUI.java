@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.knockback;
+package com.mygdx.holowyth.collision;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -22,10 +22,10 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
  * @author Colin Ta
  *
  */
-public class KnockBackDemoUI {
+public class CollisionDemoUI {
 
 	// Component references
-	private KnockBackSimulation knockbackSim;
+	private CollisionSimulation knockbackSim;
 
 	// Sub-components
 	DebugStoreUI debugStoreUI;
@@ -47,8 +47,8 @@ public class KnockBackDemoUI {
 	/**
 	 * UI class is responsible for creation and updating of UI elements
 	 */
-	public KnockBackDemoUI(Stage stage, DebugStore debugStore, Skin skin, Camera worldCamera,
-			KnockBackSimulation knockbackSim) {
+	public CollisionDemoUI(Stage stage, DebugStore debugStore, Skin skin, Camera worldCamera,
+			CollisionSimulation knockbackSim) {
 		this.skin = skin;
 		this.stage = stage;
 		this.knockbackSim = knockbackSim;

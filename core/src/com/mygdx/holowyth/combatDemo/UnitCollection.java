@@ -7,8 +7,8 @@ import java.util.List;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
-import com.mygdx.holowyth.knockback.CircleCBInfo;
-import com.mygdx.holowyth.knockback.UnitAdapterCircleCB;
+import com.mygdx.holowyth.collision.CircleCBInfo;
+import com.mygdx.holowyth.collision.UnitAdapterCircleCB;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.HoloAssert;
 

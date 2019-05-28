@@ -3,7 +3,7 @@ package com.mygdx.holowyth.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.knockback.linecircledemo.LineCircleDemo;
+import com.mygdx.holowyth.collision.linecircledemo.LineCircleDemo;
 
 public class LineCircleLauncher {
 	public static void main(String[] arg) {

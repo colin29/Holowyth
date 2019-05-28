@@ -1,10 +1,10 @@
-package com.mygdx.holowyth.knockback;
+package com.mygdx.holowyth.collision.linecircledemo;
 
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
 
-public class Circle {
+class Circle {
 	private float radius;
 	public float x, y;
 

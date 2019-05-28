@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.knockback.linecircledemo;
+package com.mygdx.holowyth.collision.linecircledemo;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
