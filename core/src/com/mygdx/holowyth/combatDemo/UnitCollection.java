@@ -3,6 +3,7 @@ package com.mygdx.holowyth.combatDemo;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
@@ -20,10 +21,9 @@ import com.mygdx.holowyth.util.HoloAssert;
  */
 public class UnitCollection {
 
-	List<Unit> units = new ArrayList<Unit>();
-	List<UnitAdapterCircleCB> colBodies = new ArrayList<UnitAdapterCircleCB>();
-	List<CircleCBInfo> circleCBInfoView = new ArrayList<CircleCBInfo>();
-	BidiMap<Unit, CircleCBInfo> unitToColBody = new DualHashBidiMap<Unit, CircleCBInfo>();
+	private List<Unit> units = new ArrayList<Unit>();
+	private List<UnitAdapterCircleCB> colBodies = new ArrayList<UnitAdapterCircleCB>();
+	private BidiMap<Unit, CircleCBInfo> unitToColBody = new DualHashBidiMap<Unit, CircleCBInfo>();
 
 	public void addUnit(Unit u) {
 
@@ -31,7 +31,6 @@ public class UnitCollection {
 
 		units.add(u);
 		colBodies.add(cb);
-		circleCBInfoView.add(cb);
 
 		unitToColBody.put(u, cb);
 
@@ -41,7 +40,6 @@ public class UnitCollection {
 	public void removeUnit(Unit u) {
 		units.remove(u);
 		colBodies.remove(unitToColBody.get(u));
-		circleCBInfoView.remove(unitToColBody.get(u));
 
 		unitToColBody.remove(u);
 
@@ -50,7 +48,6 @@ public class UnitCollection {
 
 	private void assertDataStructsAreEqualLength() {
 		HoloAssert.assertEquals(units.size(), colBodies.size());
-		HoloAssert.assertEquals(units.size(), circleCBInfoView.size());
 		HoloAssert.assertEquals(units.size(), unitToColBody.size());
 	}
 
@@ -64,7 +61,16 @@ public class UnitCollection {
 	/**
 	 * The list itself is read-only, though elements can be modified
 	 */
-	public List<CircleCBInfo> getColBodies() {
-		return Collections.unmodifiableList(circleCBInfoView);
+	public List<UnitAdapterCircleCB> getColBodies() {
+		return Collections.unmodifiableList(colBodies);
 	}
+
+	public Map<Unit, CircleCBInfo> unitToColBody() {
+		return Collections.unmodifiableMap(unitToColBody);
+	}
+
+	public Map<CircleCBInfo, Unit> colBodyToUnit() {
+		return Collections.unmodifiableMap(unitToColBody.inverseBidiMap());
+	}
+
 }

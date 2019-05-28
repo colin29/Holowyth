@@ -15,7 +15,6 @@ import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
@@ -48,6 +47,8 @@ public class World implements WorldInfo {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	private float knockBackCollisionElasticity = 1;
+
 	public World(Field map, PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects) {
 		this.map = map;
 		this.pathingModule = pathingModule;
@@ -75,8 +76,6 @@ public class World implements WorldInfo {
 	 * detection.
 	 */
 	private void moveNormallyMovingUnits() {
-
-		Polygons expandedMapPolys = HoloPF.expandPolygons(map.polys, Holo.UNIT_RADIUS);
 
 		/**
 		 * For this processing, each unit on its iteration should only modify its x,y and no others. vx,vy should not be
@@ -194,10 +193,10 @@ public class World implements WorldInfo {
 				vx = thisUnit.motion.getKnockBackVx();
 				vy = thisUnit.motion.getKnockBackVy();
 
-				CircleCBInfo thisColBody = units.unitToColBody.get(thisUnit);
+				CircleCBInfo thisColBody = units.unitToColBody().get(thisUnit);
 
 				List<CircleCBInfo> allOtherBodies = new ArrayList<CircleCBInfo>();
-				allOtherBodies.addAll(units.colBodies);
+				allOtherBodies.addAll(units.getColBodies());
 				allOtherBodies.remove(thisColBody);
 
 				Segment motion = new Segment(x, y, x + vx, y + vy);
@@ -208,7 +207,7 @@ public class World implements WorldInfo {
 
 				for (CircleCBInfo colidee : collisions) {
 					logger.debug("Collision between units id [{} {}]", thisUnit.getId(),
-							units.unitToColBody.inverseBidiMap().get(colidee).getId());
+							units.colBodyToUnit().get(colidee).getId());
 				}
 
 				if (collisions.isEmpty()) {
@@ -232,8 +231,6 @@ public class World implements WorldInfo {
 			}
 		}
 	}
-
-	private float elasticity = 1;
 
 	private void resolveUnitUnitKnockbackCollision(CollisionInfo collision) {
 		// The collision info takes
@@ -278,7 +275,8 @@ public class World implements WorldInfo {
 		// 1. Use derived formula to compute v1'
 
 		float v1FinalZeroFrame = (float) Math
-				.sqrt(elasticity * (m1 * (v1ZeroFrame * v1ZeroFrame) + m2 * (v2ZeroFrame * v2ZeroFrame))
+				.sqrt(knockBackCollisionElasticity
+						* (m1 * (v1ZeroFrame * v1ZeroFrame) + m2 * (v2ZeroFrame * v2ZeroFrame))
 						/ (m1 * (1 + m1 / m2)));
 
 		// 2. Plugin to momentum equation to get v2'
@@ -296,8 +294,8 @@ public class World implements WorldInfo {
 		Vector2 dv1 = new Vector2(normalNorm).scl(dv1ColAxis);
 		Vector2 dv2 = new Vector2(normalNorm).scl(dv2ColAxis);
 
-		Unit curUnit = units.unitToColBody.inverseBidiMap().get(thisBody);
-		Unit otherUnit = units.unitToColBody.inverseBidiMap().get(otherBody);
+		Unit curUnit = units.colBodyToUnit().get(thisBody);
+		Unit otherUnit = units.colBodyToUnit().get(otherBody);
 
 		float thisVxFinal = thisBody.getVx() + dv1.x;
 		float thisVyFinal = thisBody.getVy() + dv1.y;
