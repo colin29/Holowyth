@@ -72,7 +72,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 	PathingModule pathingModule;
 
 	// Appearance
-	Color defaultClearColor = HoloGL.rbg(255, 236, 179);
+	Color defaultClearColor = HoloGL.rgb(255, 236, 179);
 	Color clearColor = defaultClearColor;
 
 	// Logic

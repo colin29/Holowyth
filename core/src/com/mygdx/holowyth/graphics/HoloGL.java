@@ -189,7 +189,7 @@ public class HoloGL {
 	 * 
 	 * @return
 	 */
-	public static Color rbg(int r, int g, int b) {
+	public static Color rgb(int r, int g, int b) {
 		return new Color((float) r / 256, (float) g / 256, (float) b / 256, 1);
 	}
 

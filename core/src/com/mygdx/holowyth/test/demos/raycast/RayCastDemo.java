@@ -23,7 +23,7 @@ public class RayCastDemo extends DemoScreen {
 		draggablePoints.addAll(DraggablePoint.getDraggablePointsFrom(wallSegment));
 	}
 
-	Color clearColor = HoloGL.rbg(200, 180, 120); // HoloGL.rbg(79, 121, 66);
+	Color clearColor = HoloGL.rgb(200, 180, 120); // HoloGL.rbg(79, 121, 66);
 
 	public final float pointSelectLeniency = 10;
 

@@ -14,7 +14,7 @@ public class CollisionDemo extends DemoScreen {
 	private DebugStore debugStore = new DebugStore();
 
 	Timer timer = new Timer();
-	Color backgroundColor = HoloGL.rbg(179, 221, 166);
+	Color backgroundColor = HoloGL.rgb(179, 221, 166);
 	InputMultiplexer multiplexer = new InputMultiplexer();
 
 	// Components

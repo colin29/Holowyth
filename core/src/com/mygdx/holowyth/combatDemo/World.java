@@ -208,8 +208,8 @@ public class World implements WorldInfo {
 						thisColBody.getRadius(), allOtherBodies);
 
 				for (CircleCBInfo colidee : collisions) {
-					logger.debug("Collision between units id [{} {}]", thisUnit.getId(),
-							units.colBodyToUnit().get(colidee).getId());
+					logger.debug("Collision between units id [{} {}]", thisUnit.getID(),
+							units.colBodyToUnit().get(colidee).getID());
 				}
 
 				if (collisions.isEmpty()) {

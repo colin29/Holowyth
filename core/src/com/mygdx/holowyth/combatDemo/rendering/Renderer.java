@@ -140,8 +140,9 @@ public class Renderer {
 			renderOutlineAroundBusyRetreatingUnits();
 			renderOutlineAroundBusyCastingUnits();
 		}
-
 		renderOutlineAroundKnockbackedUnits();
+
+		debug.renderUnitIdsOnUnits();
 
 		// 3.5: Render arrows
 
@@ -151,7 +152,7 @@ public class Renderer {
 			u.renderAttackingArrow();
 		}
 
-		// 1: Render Map
+		// 1: Render Obstacle Lines
 
 		if (this.map != null) {
 			renderMapObstacles();
@@ -160,7 +161,6 @@ public class Renderer {
 		}
 
 		// Render effects
-
 		effects.renderDamageEffects();
 		effects.renderBlockEffects(delta);
 
@@ -309,13 +309,13 @@ public class Renderer {
 	}
 
 	private void renderOutlineAroundBusyRetreatingUnits() {
-		renderThickOutlineIfTrueForAllUnits(HoloGL.rbg(30, 144, 255), (UnitInfo u) -> {
+		renderThickOutlineIfTrueForAllUnits(HoloGL.rgb(30, 144, 255), (UnitInfo u) -> {
 			return u.isBusyRetreating();
 		});
 	}
 
 	private void renderOutlineAroundBusyCastingUnits() {
-		renderThickOutlineIfTrueForAllUnits(HoloGL.rbg(30, 144, 255), (UnitInfo u) -> {
+		renderThickOutlineIfTrueForAllUnits(HoloGL.rgb(30, 144, 255), (UnitInfo u) -> {
 			return u.isCastingOrChanneling();
 		});
 	}
@@ -330,9 +330,9 @@ public class Renderer {
 	private float hpBarWidthMax = 2 * hpBarWidthBase;
 	private float hpBarWidthMin = 0.5f * hpBarWidthBase;
 
-	private Color spBarColor = HoloGL.rbg(204, 224, 255);
+	private Color spBarColor = HoloGL.rgb(204, 224, 255);
 
-	private Color castBarColor = HoloGL.rbg(204, 224, 255);
+	private Color castBarColor = HoloGL.rgb(204, 224, 255);
 
 	public void setUnitControls(Controls unitControls) {
 		this.unitControls = unitControls;

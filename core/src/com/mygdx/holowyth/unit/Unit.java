@@ -211,8 +211,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		if (!isStopOrderAllowed()) {
 			return;
 		}
-		motion.stopCurrentMovement();
-		clearOrder();
+		stopUnit();
 	}
 
 	@Override
@@ -230,8 +229,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * Stops a unit's motion and halts any current orders. Unlike orderStop, is not affected by order restrictions. As
-	 * such, it should be for backend and not player use.
+	 * Stops a unit's motion and halts any current orders. It does not disengage a unit that is attacking, though..
+	 * Unlike orderStop, is not affected by order restrictions. As such, it should be for backend and not player use.
 	 */
 	public void stopUnit() {
 		clearOrder();
@@ -458,6 +457,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	}
 
 	// For now we allow multiple player characters
+	@Override
 	public boolean isAPlayerCharacter() {
 		return side == Side.PLAYER;
 	}
@@ -560,7 +560,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		skillCooldown = value;
 	}
 
-	public int getId() {
+	public int getID() {
 		return id;
 	}
 

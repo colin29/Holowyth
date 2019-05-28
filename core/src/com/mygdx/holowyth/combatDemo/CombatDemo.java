@@ -57,7 +57,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	// Frame rate control
 	Timer timer = new Timer();
 
-	Color backgroundColor = HoloGL.rbg(79, 121, 66); // HoloGL.rbg(255, 236, 179);
+	Color backgroundColor = HoloGL.rgb(79, 121, 66); // HoloGL.rbg(255, 236, 179);
 
 	// For debugging and playtesting
 	DebugStore debugStore = new DebugStore();

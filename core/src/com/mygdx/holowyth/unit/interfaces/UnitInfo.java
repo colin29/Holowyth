@@ -40,4 +40,6 @@ public interface UnitInfo {
 	public UnitMotion getMotion();
 
 	public boolean isAPlayerCharacter();
+
+	public int getID();
 }

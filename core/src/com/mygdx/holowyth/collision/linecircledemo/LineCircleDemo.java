@@ -21,7 +21,7 @@ public class LineCircleDemo extends BaseScreen {
 
 	Renderer renderer;
 
-	private final Color PALE_GREEN = HoloGL.rbg(229, 255, 216);
+	private final Color PALE_GREEN = HoloGL.rgb(229, 255, 216);
 	private final Color backgroundColor = Color.WHITE;
 
 	private final float CIRCLE_RADIUS = 100;
