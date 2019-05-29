@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.combatDemo.WorldInfo;
@@ -102,6 +105,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	 */
 	private Skill activeSkill;
 
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	public Unit(float x, float y, WorldInfo world, Side side) {
 		this.id = Unit.getNextId();
 		idToUnit.put(id, this);
@@ -178,9 +183,9 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	@Override
 	public void orderAttackMove(float x, float y) {
 		if (!isAttackMoveOrderAllowed()) {
+			logger.debug("Attack move given but is not implemented yet");
 			return;
 		}
-		// TODO:
 
 	}
 

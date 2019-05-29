@@ -4,8 +4,13 @@ import com.mygdx.holowyth.combatDemo.World;
 
 public abstract class Effect {
 
-	private boolean completed = false;
+	/**
+	 * The default marker for complete status. A subclass can override isComplete and define their own definition
+	 */
+	private boolean markedAsComplete = false;
 	private String name = "Untitled Effect";
+
+	private
 
 	World world;
 
@@ -24,6 +29,12 @@ public abstract class Effect {
 	/**
 	 * An effect that has isComplete() true after tick() can rely on being removed without another tick() being called.
 	 */
-	public abstract boolean isComplete();
+	public boolean isComplete() {
+		return markedAsComplete;
+	}
+
+	protected void markAsComplete() {
+		markedAsComplete = true;
+	}
 
 }

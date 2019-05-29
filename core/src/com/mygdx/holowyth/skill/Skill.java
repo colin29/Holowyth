@@ -6,8 +6,8 @@ import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 
 import com.mygdx.holowyth.combatDemo.World;
+import com.mygdx.holowyth.skill.effect.CasterEffect;
 import com.mygdx.holowyth.skill.effect.Effect;
-import com.mygdx.holowyth.skill.effect.UnitEffect;
 import com.mygdx.holowyth.unit.Unit;
 
 /**
@@ -56,19 +56,19 @@ public class Skill implements Cloneable, SkillInfo {
 	 *
 	 */
 	public enum Targeting {
-		GROUND, UNIT, NONE
+		GROUND, UNIT, UNIT_GROUND, NONE
 	}
 
 	private final Targeting targeting; // determines what types of effects can be entered
 
-	private List<UnitEffect> effects; // if this is set, then all the effects are instantiated and the skill is fully
+	private List<CasterEffect> effects; // if this is set, then all the effects are instantiated and the skill is fully
 										// defined.
 
 	public Skill(Targeting targeting) {
 		this.targeting = targeting;
 	}
 
-	public Skill(Targeting targeting, List<UnitEffect> effects) {
+	public Skill(Targeting targeting, List<CasterEffect> effects) {
 		this.targeting = targeting;
 		this.effects = effects;
 	}
@@ -177,12 +177,12 @@ public class Skill implements Cloneable, SkillInfo {
 	/**
 	 * Sets effects as a single effect
 	 */
-	public void setEffects(UnitEffect effect) {
-		this.effects = new ArrayList<UnitEffect>();
+	public void setEffects(CasterEffect effect) {
+		this.effects = new ArrayList<CasterEffect>();
 		this.effects.add(effect);
 	}
 
-	public void setEffects(List<UnitEffect> effects) {
+	public void setEffects(List<CasterEffect> effects) {
 		this.effects = effects;
 	}
 

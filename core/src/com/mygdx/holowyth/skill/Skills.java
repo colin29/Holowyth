@@ -3,8 +3,9 @@ package com.mygdx.holowyth.skill;
 import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.skill.effect.UnitEffect;
-import com.mygdx.holowyth.skill.effect.UnitGroundEffect;
+import com.mygdx.holowyth.skill.effect.CasterEffect;
+import com.mygdx.holowyth.skill.effect.CasterGroundEffect;
+import com.mygdx.holowyth.skill.effect.CasterUnitGroundEffect;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
@@ -21,7 +22,7 @@ public class Skills {
 	 * 
 	 * @param unit
 	 */
-	private static class NovaFlareEffect extends UnitEffect {
+	private static class NovaFlareEffect extends CasterEffect {
 		public NovaFlareEffect(Unit caster) {
 			super(caster);
 		}
@@ -86,7 +87,7 @@ public class Skills {
 		}
 	}
 
-	private static class ExplosionEffect extends UnitGroundEffect {
+	private static class ExplosionEffect extends CasterGroundEffect {
 		public ExplosionEffect(Unit caster, float x, float y) {
 			super(caster, x, y);
 		}
@@ -175,14 +176,13 @@ public class Skills {
 		}
 	}
 
-	private static class ImplosionEffect extends UnitGroundEffect {
+	private static class ImplosionEffect extends CasterGroundEffect {
 		public ImplosionEffect(Unit caster, float x, float y) {
 			super(caster, x, y);
 		}
 
 		int damage = 10;
 		float effectRadius = 200;
-		boolean tickedOnce;
 
 		final float knockbackSpeed = 2;
 
@@ -193,7 +193,7 @@ public class Skills {
 		@Override
 		public void tick() {
 			knockBackEnemiesInRadiusTowardsCenter(x, y, effectRadius, damage);
-			tickedOnce = true;
+			markAsComplete();
 		}
 
 		public void knockBackEnemiesInRadiusTowardsCenter(float effectX, float effectY, float effectRadius,
@@ -215,10 +215,44 @@ public class Skills {
 			}
 		}
 
-		@Override
-		public boolean isComplete() {
-			return tickedOnce;
-		}
 	};
+
+	public static class ForcePush extends UnitGroundSkill {
+		{
+			name = "Force Push";
+		}
+
+		@Override
+		public void pluginTargeting(Unit caster, Unit target, float x, float y) {
+			setEffects(new ForcePushEffect(caster, target, x, y));
+		}
+	}
+
+	public static class ForcePushEffect extends CasterUnitGroundEffect {
+
+		final float knockbackSpeedBase = 0.75f;
+
+		protected ForcePushEffect(Unit caster, Unit target, float x, float y) {
+			super(caster, target, x, y);
+		}
+
+		@Override
+		public void begin() {
+			Vector2 targetToPoint = new Vector2(x - target.x, y - target.y);
+
+			final float knockBackSpeed = knockbackSpeedBase * targetToPoint.len() / 100;
+			Vector2 knockBackVel = new Vector2(targetToPoint).nor().scl(knockBackSpeed);
+			if (knockBackVel.isZero()) // cover degenerate case
+				targetToPoint.set(knockBackSpeed, 0);
+
+			target.motion.applyKnockBackVelocity(knockBackVel.x, knockBackVel.y);
+			markAsComplete();
+		}
+
+		@Override
+		public void tick() {
+		}
+
+	}
 
 }

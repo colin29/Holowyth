@@ -27,6 +27,8 @@ import com.mygdx.holowyth.skill.GroundSkill;
 import com.mygdx.holowyth.skill.NoneSkill;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skills;
+import com.mygdx.holowyth.skill.UnitGroundSkill;
+import com.mygdx.holowyth.skill.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.Holo;
@@ -60,7 +62,7 @@ public class Controls extends InputProcessorAdapter {
 	boolean leftMouseKeyDown = false;
 
 	public enum Context {
-		NONE, ATTACK, RETREAT, SKILL_GROUND, SKILL_UNIT
+		NONE, ATTACK, RETREAT, SKILL_GROUND, SKILL_UNIT, SKILL_UNIT_GROUND_1, SKILL_UNIT_GROUND_2
 	}
 
 	Context context = Context.NONE;
@@ -133,6 +135,7 @@ public class Controls extends InputProcessorAdapter {
 		skills[2] = new Skills.ExplosionLongCast();
 		skills[3] = new Skills.NovaFlare();
 		skills[4] = new Skills.Implosion();
+		skills[5] = new Skills.ForcePush();
 	}
 
 	private void setSPToMax() {
@@ -180,6 +183,10 @@ public class Controls extends InputProcessorAdapter {
 					handleSkillNone();
 					break;
 				case UNIT:
+					context = Context.SKILL_UNIT;
+					break;
+				case UNIT_GROUND:
+					context = Context.SKILL_UNIT_GROUND_1;
 					break;
 				default:
 					break;
@@ -216,7 +223,7 @@ public class Controls extends InputProcessorAdapter {
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		leftMouseKeyDown = false;
 
-		Vector3 vec = new Vector3(); // obtain world coordinates of the click.
+		Vector3 vec = new Vector3(); // World coordinates of the click.
 		vec = camera.unproject(vec.set(screenX, screenY, 0));
 
 		// Handle Left Click
@@ -232,6 +239,15 @@ public class Controls extends InputProcessorAdapter {
 				break;
 			case SKILL_GROUND:
 				handleSkillGround(vec.x, vec.y);
+				break;
+			case SKILL_UNIT:
+				handleSkillUnit(vec.x, vec.y);
+				break;
+			case SKILL_UNIT_GROUND_1:
+				handleSkillUnitGroundPart1(vec.x, vec.y);
+				break;
+			case SKILL_UNIT_GROUND_2:
+				handleSkillUnitGroundPart2(vec.x, vec.y);
 				break;
 			default:
 				handleLeftClick(vec.x, vec.y, screenX, screenY);
@@ -256,11 +272,45 @@ public class Controls extends InputProcessorAdapter {
 		return false;
 	}
 
-	private void handleSkillGround(float x, float y) {
-		if (selectedUnits.size() != 1) {
-			new Exception("Selected units is not exactly one: " + selectedUnits.size()).printStackTrace();
-			return;
+	private void handleSkillUnit(float x, float y) {
+		assertExactlyOneUnitSelected();
+		Unit clickedUnit = selectUnitAtClickedPoint(x, y);
+
+		if (clickedUnit != null) {
+			UnitSkill skill = (UnitSkill) this.curSkill;
+			Unit caster = selectedUnits.iterator().next();
+			skill.pluginTargeting(caster, clickedUnit);
+			caster.orderUseSkill(skill);
+			clearContext();
 		}
+	}
+
+	private Unit curSkillUnit; // used purely for storing skill parameters in multi-part targetings
+
+	private void handleSkillUnitGroundPart1(float x, float y) {
+		assertExactlyOneUnitSelected();
+		Unit target = selectUnitAtClickedPoint(x, y);
+
+		if (target != null) {
+			curSkillUnit = target;
+			context = Context.SKILL_UNIT_GROUND_2;
+		}
+
+	}
+
+	private void handleSkillUnitGroundPart2(float x, float y) {
+		assertExactlyOneUnitSelected();
+
+		UnitGroundSkill skill = (UnitGroundSkill) this.curSkill;
+		Unit caster = selectedUnits.iterator().next();
+		skill.pluginTargeting(caster, curSkillUnit, x, y);
+		caster.orderUseSkill(skill);
+		clearContext();
+	}
+
+	private void handleSkillGround(float x, float y) {
+		assertExactlyOneUnitSelected();
+
 		GroundSkill skill = (GroundSkill) this.curSkill;
 		Unit caster = selectedUnits.iterator().next();
 		skill.pluginTargeting(caster, x, y);
@@ -269,15 +319,19 @@ public class Controls extends InputProcessorAdapter {
 	}
 
 	private void handleSkillNone() {
+		assertExactlyOneUnitSelected();
+		NoneSkill skill = (NoneSkill) this.curSkill;
+		Unit caster = selectedUnits.iterator().next();
+		skill.pluginTargeting(caster);
+		caster.orderUseSkill(skill);
+		clearContext();
+	}
+
+	private void assertExactlyOneUnitSelected() {
 		if (selectedUnits.size() != 1) {
 			new Exception("Selected units is not exactly one: " + selectedUnits.size()).printStackTrace();
 			return;
 		}
-		NoneSkill c = (NoneSkill) this.curSkill;
-		Unit caster = selectedUnits.iterator().next();
-		c.pluginTargeting(caster);
-		caster.orderUseSkill(c);
-		clearContext();
 	}
 
 	private void handleRightClick(float x, float y) {
@@ -350,6 +404,8 @@ public class Controls extends InputProcessorAdapter {
 	 */
 	private void clearContext() {
 		context = Context.NONE;
+		curSkill = null;
+		curSkillUnit = null;
 	}
 
 	private String getCurrentContextText() {
@@ -439,8 +495,7 @@ public class Controls extends InputProcessorAdapter {
 	/**
 	 * Select a unit if there is one underneath this point. If there are multiple units, select the one that occurs last
 	 * 
-	 * @param x
-	 * @param y
+	 * Like the majority of Control methods, accepts world coordinates
 	 */
 	private Unit selectUnitAtClickedPoint(float x, float y) {
 		Unit selected = null;
