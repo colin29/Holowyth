@@ -487,6 +487,11 @@ public class UnitMotion {
 		setKnockbackVy(knockBackVy);
 	}
 
+	public void setKnockbackVelocity(Vector2 vec) {
+		setKnockbackVx(vec.x);
+		setKnockbackVy(vec.y);
+	}
+
 	public Point getDest() {
 		if (path == null)
 			return null;
@@ -501,16 +506,21 @@ public class UnitMotion {
 		return plannedSpeed;
 	}
 
-	public float getKnockBackVx() {
+	public float getKnockbackVx() {
 		return knockBackVx;
 	}
 
-	public float getKnockBackVy() {
+	public float getKnockbackVy() {
 		return knockBackVy;
 	}
 
-	public Vector2 getKnockBackVelocity() {
+	public Vector2 getKnockbackVelocity() {
 		return new Vector2(knockBackVx, knockBackVy);
+	}
+
+	public void getKnockbackVelocity(Vector2 vec) {
+		setKnockbackVx(vec.x);
+		setKnockbackVy(vec.y);
 	}
 
 	public float getVx() {

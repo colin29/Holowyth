@@ -230,7 +230,7 @@ public class Skills {
 
 	public static class ForcePushEffect extends CasterUnitGroundEffect {
 
-		final float knockbackSpeedBase = 0.75f;
+		final float knockbackSpeedBase = 1.2f;
 
 		protected ForcePushEffect(Unit caster, Unit target, float x, float y) {
 			super(caster, target, x, y);

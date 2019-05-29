@@ -14,11 +14,11 @@ class DebugRenderer extends SubRenderer {
 	void renderUnitKnockbackVelocities() {
 		getWorld().doIfTrueForAllUnits(
 				(UnitInfo u) -> (u.getMotion().isBeingKnockedBack()
-						&& u.getMotion().getKnockBackVelocity().len() > 0.01f),
+						&& u.getMotion().getKnockbackVelocity().len() > 0.01f),
 				(UnitInfo u) -> {
 					float scale = 15;
 					HoloGL.renderArrow(u.getPos(),
-							u.getMotion().getKnockBackVelocity().setLength(scale), Color.ORANGE);
+							u.getMotion().getKnockbackVelocity().setLength(scale), Color.ORANGE);
 				});
 	}
 

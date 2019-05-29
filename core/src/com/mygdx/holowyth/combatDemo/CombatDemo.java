@@ -1,5 +1,8 @@
 package com.mygdx.holowyth.combatDemo;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
@@ -63,6 +66,8 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	DebugStore debugStore = new DebugStore();
 	private FunctionBindings functionBindings = new FunctionBindings();
 
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	public CombatDemo(final Holowyth game) {
 		super(game);
 
@@ -80,8 +85,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		// Load map and test units
 
 		loadMapFromDisk(Holo.mapsDirectory + Holo.editorInitialMap);
-
-		mapStartup();
 
 		Table debugInfo = combatDemoUI.getDebugInfo();
 		functionBindings.bindFunctionToKey(() -> debugInfo.setVisible(!debugInfo.isVisible()), Keys.GRAVE); // tilde key
@@ -170,6 +173,10 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		// GroundSkill implosion = new Skills.Implosion();
 		// implosion.pluginTargeting(playerUnit, 428, 281);
 		// playerUnit.orderUseSkill(implosion);
+
+		// ForcePush forcePush = new Skills.ForcePush();
+		// forcePush.pluginTargeting(playerUnit, Unit.getUnitByID(1), 193, 534); // Give it a good push
+		// playerUnit.orderUseSkill(forcePush);
 
 		// playerUnit.orderMove(CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);
 

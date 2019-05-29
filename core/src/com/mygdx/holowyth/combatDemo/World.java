@@ -47,9 +47,10 @@ public class World implements WorldInfo {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private float knockBackCollisionElasticity = 1;
-	private float knockBackUnitFriction = 0.005f; // 0.01-0.02 is a realistic number
-	private float velocityThresholdToEndKnockback = 0.2f; // 0.03f;
+	private float knockBackCollisionElasticityDefault = 0.06f;
+	private float knockBackCollisionElasticityReboundsOffUnit = 0.33f;
+	private float knockBackUnitFriction = 0.015f; // 0.01-0.02 is a realistic number
+	private float velocityThresholdToEndKnockback = 0.01f; // 0.03f;
 
 	public World(Field map, PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects) {
 		this.map = map;
@@ -194,8 +195,8 @@ public class World implements WorldInfo {
 
 				x = thisUnit.getX();
 				y = thisUnit.getY();
-				vx = thisUnit.motion.getKnockBackVx();
-				vy = thisUnit.motion.getKnockBackVy();
+				vx = thisUnit.motion.getKnockbackVx();
+				vy = thisUnit.motion.getKnockbackVy();
 
 				CircleCBInfo thisColBody = units.unitToColBody().get(thisUnit);
 
@@ -240,23 +241,17 @@ public class World implements WorldInfo {
 
 	private void applyFriction(Unit unit) {
 		if (unit.motion.isBeingKnockedBack()) {
-			float vx = unit.motion.getKnockBackVx();
-			float vy = unit.motion.getKnockBackVy();
 
-			float vxPolarity = vx >= 0 ? 1 : -1;
-			float vyPolarity = vy >= 0 ? 1 : -1;
-
-			float newVx = Math.max(0, (Math.abs(vx) - knockBackUnitFriction)) * vxPolarity;
-			float newVy = Math.max(0, (Math.abs(vy) - knockBackUnitFriction)) * vyPolarity;
-
-			unit.motion.setKnockbackVelocity(newVx, newVy);
+			Vector2 newVelocity = unit.motion.getKnockbackVelocity();
+			newVelocity.setLength(Math.max(0, newVelocity.len() - knockBackUnitFriction));
+			unit.motion.setKnockbackVelocity(newVelocity);
 		}
 	}
 
 	private void endKnockbackForUnitsBelowVelocityThreshold() {
 		for (Unit unit : units.getUnits()) {
 			if (unit.motion.isBeingKnockedBack()) {
-				if (unit.motion.getKnockBackVelocity().len() < velocityThresholdToEndKnockback) {
+				if (unit.motion.getKnockbackVelocity().len() < velocityThresholdToEndKnockback) {
 					unit.motion.endKnockback();
 				}
 			}
@@ -275,6 +270,9 @@ public class World implements WorldInfo {
 		final CircleCBInfo thisBody = collision.cur;
 		final CircleCBInfo otherBody = collision.other;
 
+		Unit thisUnit = units.colBodyToUnit().get(thisBody);
+		Unit otherUnit = units.colBodyToUnit().get(otherBody);
+
 		Vector2 normalNorm = new Vector2((float) Math.cos(collision.collisionAngle),
 				(float) Math.sin(collision.collisionAngle));
 		Vector2 v1 = new Vector2(thisBody.getVx(), thisBody.getVy());
@@ -286,12 +284,27 @@ public class World implements WorldInfo {
 		float v1ColAxis = v1.len() * v1Norm.dot(normalNorm);
 		float v2ColAxis = v2.len() * v2Norm.dot(normalNorm);
 
+		float collisionMagnitudeOfUnit1 = Math.abs(v1ColAxis);
+
+		logger.debug("Magnitude of collision: {}", collisionMagnitudeOfUnit1);
+
+		float elasticity;
+		boolean firstUnitRebounds = false;
+		if (!otherUnit.motion.isBeingKnockedBack() && collisionMagnitudeOfUnit1 < 1) {
+			firstUnitRebounds = true;
+		}
+
+		elasticity = firstUnitRebounds ? knockBackCollisionElasticityReboundsOffUnit
+				: knockBackCollisionElasticityDefault;
+
 		// 2. Transform the problem into the zero momentum frame
 
 		final float MASS_BODY = 3; // system supports mass but game doesn't use it yet
+		final float VERY_HIGH_MASS = 9999;
 
 		final float m1 = MASS_BODY;
-		final float m2 = MASS_BODY;
+		final float m2 = firstUnitRebounds ? VERY_HIGH_MASS
+				: MASS_BODY;
 
 		float M1ColAxis = v1ColAxis * m1;
 		float M2ColAxis = v2ColAxis * m2;
@@ -306,7 +319,7 @@ public class World implements WorldInfo {
 		// 1. Use derived formula to compute v1'
 
 		float v1FinalZeroFrame = (float) Math
-				.sqrt(knockBackCollisionElasticity
+				.sqrt(knockBackCollisionElasticityDefault
 						* (m1 * (v1ZeroFrame * v1ZeroFrame) + m2 * (v2ZeroFrame * v2ZeroFrame))
 						/ (m1 * (1 + m1 / m2)));
 
@@ -325,11 +338,14 @@ public class World implements WorldInfo {
 		Vector2 dv1 = new Vector2(normalNorm).scl(dv1ColAxis);
 		Vector2 dv2 = new Vector2(normalNorm).scl(dv2ColAxis);
 
-		Unit thisUnit = units.colBodyToUnit().get(thisBody);
-		Unit otherUnit = units.colBodyToUnit().get(otherBody);
+		// If the other unit is also in knockback state, we just handle them normally
 
-		thisUnit.motion.applyKnockBackVelocity(dv1.x, dv1.y);
-		otherUnit.motion.applyKnockBackVelocity(dv2.x, dv2.y);
+		if (firstUnitRebounds) {
+			thisUnit.motion.applyKnockBackVelocity(dv1.x, dv1.y);
+		} else {
+			thisUnit.motion.applyKnockBackVelocity(dv1.x, dv1.y);
+			otherUnit.motion.applyKnockBackVelocity(dv2.x, dv2.y);
+		}
 
 		// thisBody.vx += dv1.x;
 		// thisBody.vy += dv1.y;
@@ -357,9 +373,12 @@ public class World implements WorldInfo {
 
 	void spawnSomeEnemyUnits() {
 		ArrayList<Unit> someUnits = new ArrayList<Unit>();
-		someUnits.add(spawnUnit(480, 253, Unit.Side.ENEMY));
+		someUnits.add(spawnUnit(500, 237, Unit.Side.ENEMY));
 		someUnits.add(spawnUnit(450, 300, Unit.Side.ENEMY));
 		someUnits.add(spawnUnit(400, 350, Unit.Side.ENEMY));
+		someUnits.add(spawnUnit(350, 283, Unit.Side.ENEMY));
+		someUnits.add(spawnUnit(402, 259, Unit.Side.ENEMY));
+		someUnits.add(spawnUnit(442, 239, Unit.Side.ENEMY));
 
 		for (Unit unit : someUnits) {
 			PresetUnits.loadUnitStats2(unit.stats);

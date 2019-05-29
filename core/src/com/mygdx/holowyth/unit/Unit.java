@@ -110,6 +110,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	public Unit(float x, float y, WorldInfo world, Side side) {
 		this.id = Unit.getNextId();
 		idToUnit.put(id, this);
+		logger.debug("Placed id [{}]: ", id);
 
 		this.x = x;
 		this.y = y;
