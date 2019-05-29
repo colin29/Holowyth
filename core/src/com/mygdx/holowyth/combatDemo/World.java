@@ -87,6 +87,8 @@ public class World implements WorldInfo {
 
 			// Validate the motion by checking against other colliding bodies.
 
+			Unit debugUnit = Unit.getUnitByID(3);
+
 			if (thisUnit.motion.isBeingKnockedBack()) {
 				// knocked back units do not have voluntary motion, skip
 				HoloAssert.assertEquals(thisUnit.motion.getVx(), 0);
@@ -356,8 +358,8 @@ public class World implements WorldInfo {
 	void spawnSomeEnemyUnits() {
 		ArrayList<Unit> someUnits = new ArrayList<Unit>();
 		someUnits.add(spawnUnit(480, 253, Unit.Side.ENEMY));
-		someUnits.add(spawnUnit(450, 300, Unit.Side.ENEMY));
-		someUnits.add(spawnUnit(400, 350, Unit.Side.ENEMY));
+		// someUnits.add(spawnUnit(450, 300, Unit.Side.ENEMY));
+		// someUnits.add(spawnUnit(400, 350, Unit.Side.ENEMY));
 
 		for (Unit unit : someUnits) {
 			PresetUnits.loadUnitStats2(unit.stats);

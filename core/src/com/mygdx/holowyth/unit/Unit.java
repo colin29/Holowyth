@@ -104,6 +104,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	public Unit(float x, float y, WorldInfo world, Side side) {
 		this.id = Unit.getNextId();
+		idToUnit.put(id, this);
+
 		this.x = x;
 		this.y = y;
 		this.side = side;
@@ -351,6 +353,11 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	private int attackCooldown = 60;
 	private int attackCooldownLeft = 0;
 
+	/**
+	 * Does not even require units be alive or in units. For debugging purposes
+	 */
+	private static Map<Integer, Unit> idToUnit = new HashMap<Integer, Unit>();
+
 	/** Handles the combat logic for a unit for one frame */
 	public void handleCombatLogic() {
 
@@ -560,8 +567,16 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		skillCooldown = value;
 	}
 
+	@Override
 	public int getID() {
 		return id;
+	}
+
+	/**
+	 * For debug purposes. Gets any created unit, regardless of whether is it in the world.
+	 */
+	public static Unit getUnitByID(int id) {
+		return idToUnit.get(id);
 	}
 
 	@Override

@@ -3,6 +3,9 @@ package com.mygdx.holowyth.unit.behaviours;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.Unit.Side;
@@ -11,9 +14,12 @@ import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class AggroIfIsEnemyUnit {
+
+	static Logger logger = LoggerFactory.getLogger(AggroIfIsEnemyUnit.class);
+
 	public static void applyTo(UnitOrderable thisUnit, WorldInfo world) {
 
-		if (thisUnit.getSide() == Side.ENEMY && thisUnit.getCurrentOrder() == Order.IDLE) {
+		if (thisUnit.getSide() == Side.ENEMY && thisUnit.getCurrentOrder() == Order.IDLE && !thisUnit.isAttacking()) {
 
 			Comparator<UnitOrderable> closestUnitComp = (UnitOrderable u1, UnitOrderable u2) -> {
 				if (Point.calcDistanceSqr(thisUnit.getPos(), u1.getPos())
