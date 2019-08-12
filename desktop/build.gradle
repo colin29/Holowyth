@@ -9,5 +9,3 @@ project.ext.assetsDir = new File("../core/assets");
 dependencies {
 compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 }
-
-

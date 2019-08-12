@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.collision;
+package com.mygdx.holowyth.collision.collisiondemo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,7 +77,7 @@ public class Renderer {
 	private void renderObjectIds() {
 		batch.begin();
 		for (CircleObject o : simulation.getCircleObjects()) {
-			Holowyth.fonts.borderedDebugFont().draw(batch, String.valueOf(o.id), o.getX(), o.getY());
+			Holowyth.fonts.borderedMediumFont().draw(batch, String.valueOf(o.id), o.getX(), o.getY());
 		}
 		batch.end();
 	}

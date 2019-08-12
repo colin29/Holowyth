@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.collision;
+package com.mygdx.holowyth.collision.collisiondemo;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;

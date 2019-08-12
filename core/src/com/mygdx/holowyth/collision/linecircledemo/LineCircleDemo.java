@@ -8,7 +8,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.collision.DebugStoreUI;
+import com.mygdx.holowyth.collision.collisiondemo.DebugStoreUI;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;

@@ -3,7 +3,7 @@ package com.mygdx.holowyth.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.collision.CollisionDemo;
+import com.mygdx.holowyth.collision.collisiondemo.CollisionDemo;
 
 public class DemoScreenLauncher {
 	public static void main(String[] arg) {

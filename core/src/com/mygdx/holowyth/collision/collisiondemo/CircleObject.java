@@ -1,8 +1,14 @@
-package com.mygdx.holowyth.collision;
+package com.mygdx.holowyth.collision.collisiondemo;
 
+import com.mygdx.holowyth.collision.CircleCB;
+import com.mygdx.holowyth.collision.CircleCBImpl;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
-public class CircleObject implements ObjectInfo {
+/**
+ * @author Colin Ta
+ *
+ */
+public class CircleObject {
 	public final int id;
 	private CircleCB colBody;
 	private float radius;

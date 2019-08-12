@@ -1,7 +1,7 @@
 package com.mygdx.holowyth.collision;
 
 /**
- * Carries info about a collision, including both colBody's involved
+ * Carries info about a collision sufficient to calculate the result. This includes both colBody's involved
  * 
  * @author Colin Ta
  *

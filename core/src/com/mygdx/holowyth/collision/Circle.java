@@ -4,7 +4,11 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
 
-public class Circle {
+/**
+ * A simple data structure
+ * 
+ */
+class Circle {
 	private float radius;
 	public float x, y;
 

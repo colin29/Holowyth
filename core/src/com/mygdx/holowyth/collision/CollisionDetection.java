@@ -6,11 +6,22 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.exceptions.HoloOperationException;
 
+/**
+ * Can find the first collision of a circle, given its motion segment and a list of other circle bodies.
+ * 
+ * @author Colin Ta
+ *
+ */
 public class CollisionDetection {
+
+	static Logger logger = LoggerFactory.getLogger(CollisionDetection.class);
 
 	public static ArrayList<CircleCBInfo> getObjectCollisionsAlongLineSegment(float ix, float iy, float dx, float dy,
 			float thisRadius,
@@ -31,8 +42,8 @@ public class CollisionDetection {
 	 *            The motion for curBody this tick
 	 * @param curBody
 	 * @param collisions
-	 *            The colBodies being collided into, each of these must actually be intersecting with curBody. Should
-	 *            contain at least one colliding body
+	 *            The colBodies being collided into, each of these must actually be intersecting with curBody. Should contain at least one colliding
+	 *            body
 	 * @param intersectDebugInfo
 	 *            optional
 	 * 
@@ -53,9 +64,9 @@ public class CollisionDetection {
 					colInfos.add(info);
 				}
 			} catch (HoloOperationException e) {
-				CollisionSimulation.logger.warn(e.getMessage());
-				CollisionSimulation.logger.trace(e.getFromMessage());
-				CollisionSimulation.logger.warn("Skipping adding this collision's info");
+				logger.warn(e.getMessage());
+				logger.trace(e.getFromMessage());
+				logger.warn("Skipping adding this collision's info");
 			}
 
 		}
@@ -117,8 +128,7 @@ public class CollisionDetection {
 		final float RADS_TO_DEGREES = (float) (180 / Math.PI);
 
 		/**
-		 * Describes how far intersectPoint is along the motion line segment. Within [0,1] means it lies on the motion
-		 * segment
+		 * Describes how far intersectPoint is along the motion line segment. Within [0,1] means it lies on the motion segment
 		 */
 		float pOfIntersectPoint;
 
@@ -147,7 +157,7 @@ public class CollisionDetection {
 
 		// if distance is greater than center, there is no collision
 		if (closestDistToCenter > keyCircle.getRadius()) {
-			CollisionSimulation.logger.warn("No collision -- line does not intersect circle");
+			logger.warn("No collision -- line does not intersect circle");
 			return null;
 		}
 
@@ -164,8 +174,7 @@ public class CollisionDetection {
 		}
 
 		if (pOfIntersectPoint < 0 || pOfIntersectPoint > 1) {
-			CollisionSimulation.logger
-					.warn("No collision -- p is not within [0,1], collision is not within line segment");
+			logger.warn("No collision -- p is not within [0,1], collision is not within line segment");
 			return null;
 		}
 

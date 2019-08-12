@@ -8,7 +8,8 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFont
 
 public class MyFonts {
 	BitmapFont debugFont;
-	BitmapFont borderedDebugFont;
+	BitmapFont borderedSmallFont;
+	BitmapFont borderedMediumFont;
 	BitmapFont damageEffectFont;
 	BitmapFont missEffectFont;
 
@@ -22,7 +23,8 @@ public class MyFonts {
 	public void init() {
 
 		debugFont = generateFont("fonts/OpenSans.ttf", Color.WHITE, 16);
-		borderedDebugFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 16, Color.BLACK, 1.5f);
+		borderedSmallFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 10, Color.BLACK, 0.8f);
+		borderedMediumFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 16, Color.BLACK, 1.5f);
 
 		damageEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 16, Color.BLACK, 1.5f);
 		missEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 15, Color.GRAY, 0.5f);
@@ -63,8 +65,12 @@ public class MyFonts {
 		return debugFont;
 	}
 
-	public BitmapFont borderedDebugFont() {
-		return borderedDebugFont;
+	public BitmapFont borderedMediumFont() {
+		return borderedMediumFont;
+	}
+
+	public BitmapFont borderedSmallFont() {
+		return borderedMediumFont;
 	}
 
 	public BitmapFont damageEffectFont() {

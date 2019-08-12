@@ -26,9 +26,9 @@ class DebugRenderer extends SubRenderer {
 
 	void renderUnitIdsOnUnits() {
 		batch.begin();
-		Holowyth.fonts.borderedDebugFont().setColor(LIGHT_MINT);
+		Holowyth.fonts.borderedMediumFont().setColor(LIGHT_MINT);
 		getWorld().doForAllUnits((UnitInfo u) -> {
-			Holowyth.fonts.borderedDebugFont().draw(batch, String.valueOf(u.getID()), u.getX(), u.getY());
+			Holowyth.fonts.borderedMediumFont().draw(batch, String.valueOf(u.getID()), u.getX(), u.getY());
 		});
 		batch.end();
 	}
