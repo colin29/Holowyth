@@ -1,5 +1,5 @@
 
-package com.mygdx.holowyth.collision.collisiondemo;
+package com.mygdx.holowyth.util.tools.debugstore;
 
 import static com.mygdx.holowyth.util.DataUtil.getAsPercentage;
 import static com.mygdx.holowyth.util.DataUtil.getRoundedString;
@@ -8,20 +8,21 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
-import com.mygdx.holowyth.util.tools.debugstore.DebugValue;
-import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
-import com.mygdx.holowyth.util.tools.debugstore.ValueLabelMapping;
 
+/**
+ * Is used as a common UI submodule. When created, it exposes a table which can added where desired
+ * 
+ * May add minor customization like font color and type
+ * 
+ * @author Colin Ta
+ *
+ */
 public class DebugStoreUI {
-
-	Stage stage;
 
 	Table debugInfo = new Table();
 
@@ -29,16 +30,15 @@ public class DebugStoreUI {
 
 	DebugStore debugStore;
 
-	public DebugStoreUI(Stage stage, DebugStore debugStore) {
-		this.stage = stage;
+	public DebugStoreUI(DebugStore debugStore) {
 		this.debugStore = debugStore;
 
-		createUI();
+		createDebugInfoDisplay();
 	}
 
 	/**
-	 * This may not work for loading a second map, atm. Nonetheless, this still needs to be called after debug values
-	 * are added from all components -- at the end of component creation
+	 * This may not work for loading a second map, atm. Nonetheless, this still needs to be called after debug values are added from all components --
+	 * at the end of component creation
 	 */
 	public void populateDebugValueDisplay() {
 		valueLabelMapping = new ValueLabelMapping();
@@ -104,10 +104,6 @@ public class DebugStoreUI {
 
 	public Table getDebugInfo() {
 		return debugInfo;
-	}
-
-	private void createUI() {
-		createDebugInfoDisplay();
 	}
 
 	public void createDebugInfoDisplay() {

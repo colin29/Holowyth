@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
@@ -185,7 +184,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	@Override
 	protected void mapShutdown() {
 		System.out.println("test");
-		combatDemoUI.getDebugInfo().clear();
 	}
 
 	/* Input methods */
@@ -204,15 +202,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-
-		if (button == Input.Buttons.LEFT && pointer == 0) {
-
-			// Vector3 vec = new Vector3();
-			// vec = camera.unproject(vec.set(screenX, screenY, 0));
-			// orderMoveTo(playerUnit, vec.x, vec.y);
-
-			return false;
-		}
 		return false;
 	}
 

@@ -15,6 +15,7 @@ import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.template.adapters.InputProcessorAdapter;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
+import com.mygdx.holowyth.util.tools.debugstore.DebugStoreUI;
 
 /**
  * Responsible for creation and update of UI
@@ -52,7 +53,7 @@ public class CollisionDemoUI {
 		this.skin = skin;
 		this.stage = stage;
 		this.knockbackSim = knockbackSim;
-		debugStoreUI = new DebugStoreUI(stage, debugStore);
+		debugStoreUI = new DebugStoreUI(debugStore);
 		createUI();
 
 		this.worldCamera = worldCamera;

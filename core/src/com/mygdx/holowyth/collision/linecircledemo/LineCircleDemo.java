@@ -8,7 +8,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.collision.collisiondemo.DebugStoreUI;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -16,6 +15,7 @@ import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.template.BaseScreen;
 import com.mygdx.holowyth.util.template.adapters.InputProcessorAdapter;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
+import com.mygdx.holowyth.util.tools.debugstore.DebugStoreUI;
 
 public class LineCircleDemo extends BaseScreen {
 
@@ -30,7 +30,7 @@ public class LineCircleDemo extends BaseScreen {
 	private InputMultiplexer multiplexer = new InputMultiplexer();
 
 	DebugStore debugStore = new DebugStore();
-	DebugStoreUI debugStoreUI = new DebugStoreUI(stage, debugStore);
+	DebugStoreUI debugStoreUI = new DebugStoreUI(debugStore);
 
 	World world = new World(debugStore);
 

@@ -12,6 +12,7 @@ import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
+import com.mygdx.holowyth.util.tools.debugstore.DebugStoreUI;
 
 public class CombatDemoUI {
 
@@ -30,15 +31,15 @@ public class CombatDemoUI {
 	public CombatDemoUI(Stage stage, DebugStore debugStore, Skin skin) {
 		this.skin = skin;
 		this.stage = stage;
-		debugStoreUI = new DebugStoreUI(stage, debugStore);
+		debugStoreUI = new DebugStoreUI(debugStore);
 		createUI();
 	}
 
 	private void createUI() {
 		setupStage();
-
 		createCoordinateText();
-		debugStoreUI.createDebugInfoDisplay();
+
+		root.add(debugStoreUI.getDebugInfo());
 	}
 
 	private void setupStage() {
@@ -47,7 +48,7 @@ public class CombatDemoUI {
 		root.top().left();
 		stage.addActor(root);
 
-		root.debug();
+		// root.debug();
 	}
 
 	@SuppressWarnings("unused")
@@ -59,7 +60,6 @@ public class CombatDemoUI {
 		parameterWindow = new Window("Parameters", skin);
 		parameterWindow.setPosition(0, 100);
 
-		// root.add(new TextButton("test", skin));
 		stage.addActor(parameterWindow);
 		// HoloUI.parameterSlider(0, Holo.defaultUnitMoveSpeed,
 		// "initialMoveSpeed", testing, skin,
@@ -85,6 +85,9 @@ public class CombatDemoUI {
 		return coordInfo;
 	}
 
+	/**
+	 * Purely exposed for testing purposes, do not use otherwise
+	 */
 	public Table getDebugInfo() {
 		return debugStoreUI.getDebugInfo();
 	}
