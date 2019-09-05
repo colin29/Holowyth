@@ -137,8 +137,8 @@ public class CollisionSimulation {
 		CircleCB thisBody = (CircleCB) collision.cur;
 		CircleCB other = (CircleCB) collision.other;
 
-		Vector2 normalNorm = new Vector2((float) Math.cos(collision.collisionAngle),
-				(float) Math.sin(collision.collisionAngle));
+		Vector2 normalNorm = new Vector2((float) Math.cos(collision.collisionSurfaceNormalAngle),
+				(float) Math.sin(collision.collisionSurfaceNormalAngle));
 		Vector2 v1 = new Vector2(thisBody.getVx(), thisBody.getVy());
 		Vector2 v1Norm = new Vector2(v1).nor();
 

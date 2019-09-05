@@ -93,9 +93,9 @@ public class CollisionDetection {
 		};
 		PriorityQueue<CollisionInfo> q = new PriorityQueue<CollisionInfo>(ascendingPOrder);
 
-		for (CollisionInfo info : colInfos) {
-			q.add(info);
-		}
+		q.addAll(colInfos);
+
+		// TODO: Here we want to detect and add collisions with an obstacle line-segment
 
 		CollisionInfo firstCollision = q.peek();
 		return firstCollision;
@@ -235,14 +235,14 @@ public class CollisionDetection {
 
 		// public final Vector2 collisionPoint;
 		public final float pOfCollisionPoint;
-		public final float collisionAngle;
+		public final float collisionSurfaceNormalAngle; // this is the normal angle of the other object, at the collision point
 
-		public CollisionInfo(CircleCBInfo curBody, CircleCBInfo other, float pOfCollisionPoint, float collisionAngle) {
+		public CollisionInfo(CircleCBInfo curBody, CircleCBInfo other, float pOfCollisionPoint, float collisionSurfaceNormalAngle) {
 			this.cur = curBody;
 			this.other = other;
 			// this.collisionPoint = new Vector2(x, y);
 			this.pOfCollisionPoint = pOfCollisionPoint;
-			this.collisionAngle = collisionAngle;
+			this.collisionSurfaceNormalAngle = collisionSurfaceNormalAngle;
 
 		}
 

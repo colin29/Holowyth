@@ -75,14 +75,12 @@ public class World implements WorldInfo {
 	}
 
 	/**
-	 * Moves units according to their velocity. Rejects any illegal or conflicting movements based on collision
-	 * detection.
+	 * Moves units according to their velocity. Rejects any illegal or conflicting movements based on collision detection.
 	 */
 	private void moveNormallyMovingUnits() {
 
 		/**
-		 * For this processing, each unit on its iteration should only modify its x,y and no others. vx,vy should not be
-		 * modified.
+		 * For this processing, each unit on its iteration should only modify its x,y and no others. vx,vy should not be modified.
 		 */
 		for (Unit thisUnit : units.getUnits()) {
 
@@ -164,8 +162,7 @@ public class World implements WorldInfo {
 				// effectively blocked.
 
 				/**
-				 * Determines how "impatient" the algorithm will be for signalling blocked for a slow-resolving or
-				 * non-resolving push situation
+				 * Determines how "impatient" the algorithm will be for signalling blocked for a slow-resolving or non-resolving push situation
 				 */
 				final float minProgress = 0.20f * thisUnit.motion.getVelocityMagnitude();
 
@@ -187,6 +184,10 @@ public class World implements WorldInfo {
 
 	}
 
+	/**
+	 * Note: If a knockedback unit collides, only its velocity is changed: it's position doesn't change. Thus, no movement validation needs to be
+	 * done.
+	 */
 	private void moveKnockedBackedUnitsAndResolveCollisions() {
 		for (Unit thisUnit : units.getUnits()) {
 			if (thisUnit.motion.isBeingKnockedBack()) {
@@ -273,8 +274,8 @@ public class World implements WorldInfo {
 		Unit thisUnit = units.colBodyToUnit().get(thisBody);
 		Unit otherUnit = units.colBodyToUnit().get(otherBody);
 
-		Vector2 normalNorm = new Vector2((float) Math.cos(collision.collisionAngle),
-				(float) Math.sin(collision.collisionAngle));
+		Vector2 normalNorm = new Vector2((float) Math.cos(collision.collisionSurfaceNormalAngle),
+				(float) Math.sin(collision.collisionSurfaceNormalAngle));
 		Vector2 v1 = new Vector2(thisBody.getVx(), thisBody.getVy());
 		Vector2 v1Norm = new Vector2(v1).nor();
 
