@@ -61,7 +61,7 @@ public class HoloGL {
 		shapeRenderer.end();
 	}
 
-	public static void renderPolygon(Polygon poly, ShapeRenderer shapeRenderer, Color color) {
+	public static void renderPolygon(Polygon poly, Color color) {
 		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setColor(color);
 		shapeRenderer.polygon(poly.floats, 0, poly.count);
@@ -143,6 +143,10 @@ public class HoloGL {
 	public static void renderArrow(Point start, Vector2 vector, Color arrowColor) {
 		Point end = new Point(start.x + vector.x, start.y + vector.y);
 		renderArrow(start, end, arrowColor);
+	}
+
+	public static void renderArrow(Segment seg, Color arrowColor) {
+		renderArrow(seg.startPoint(), seg.endPoint(), arrowColor);
 	}
 
 	public static void renderArrow(Point start, Point end, Color arrowColor) {

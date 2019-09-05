@@ -20,6 +20,11 @@ public class Polygon implements java.io.Serializable {
 		this.floats = floats.clone();
 	}
 
+	public Polygon(float[] floats) {
+		this.count = floats.length;
+		this.floats = floats.clone();
+	}
+
 	public int vertexCount() {
 		return count / 2;
 	}

@@ -46,14 +46,30 @@ public class Renderer {
 
 		if (this.simulation != null) {
 			renderObstaclePolygons();
+			renderMotionSegment();
 		}
 
 	}
 
 	private void renderObstaclePolygons() {
-		shapeRenderer.setProjectionMatrix(worldCamera.combined);
-		shapeRenderer.setColor(Color.BLACK);
-		HoloGL.renderPolygons(simulation.getObstaclePolygons());
+
+		for (var poly : simulation.getObstaclePolygonsOriented()) {
+
+			if (poly.isClockwise()) {
+				HoloGL.renderPolygon(poly.toRawPolygon(), Color.PURPLE);
+			} else {
+				HoloGL.renderPolygon(poly.toRawPolygon(), wallOutlineColor);
+			}
+
+			for (var seg : poly.segments) {
+				HoloGL.renderSegment(seg.getOutwardlyDisplacedSegment(simulation.getBodyRadius()), Color.CORAL);
+			}
+
+		}
+	}
+
+	private void renderMotionSegment() {
+		HoloGL.renderArrow(simulation.getMotionSegment(), Color.CYAN);
 	}
 
 	public void setClearColor(Color color) {
