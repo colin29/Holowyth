@@ -1,5 +1,7 @@
 package com.mygdx.holowyth.graphics;
 
+import java.util.List;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -12,8 +14,7 @@ import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 
 /**
- * Utility class with various basic rendering/visualization functions. One should set shapeRenderer's projection matrix
- * before calling functions.
+ * Utility class with various basic rendering/visualization functions. One should set shapeRenderer's projection matrix before calling functions.
  *
  */
 public class HoloGL {
@@ -52,7 +53,7 @@ public class HoloGL {
 	/**
 	 * Make sure to set the renderer's matrixes before calling these and similar methods.
 	 */
-	public static void renderPolygons(Polygons polys) {
+	public static void renderPolygons(List<Polygon> polys) {
 		shapeRenderer.begin(ShapeType.Line);
 		for (Polygon p : polys) {
 			shapeRenderer.polygon(p.floats, 0, p.count);
