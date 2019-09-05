@@ -1,5 +1,7 @@
 package com.mygdx.holowyth.util.dataobjects;
 
+import com.badlogic.gdx.math.Vector2;
+
 /**
  * Data struct holding x and y.
  * 
@@ -53,5 +55,9 @@ public class Point {
 	 */
 	public Point add(float x, float y) {
 		return new Point(this.x + x, this.y + y);
+	}
+
+	public Vector2 toVector() {
+		return new Vector2(x, y);
 	}
 }

@@ -47,6 +47,7 @@ public class Renderer {
 		if (this.simulation != null) {
 			renderObstaclePolygons();
 			renderMotionSegment();
+			renderPostCollisionMotion();
 		}
 
 	}
@@ -70,6 +71,12 @@ public class Renderer {
 
 	private void renderMotionSegment() {
 		HoloGL.renderArrow(simulation.getMotionSegment(), Color.CYAN);
+	}
+
+	private void renderPostCollisionMotion() {
+		if (simulation.getPostCollisionMotion() != null) {
+			HoloGL.renderArrow(simulation.getPostCollisionMotion(), Color.RED);
+		}
 	}
 
 	public void setClearColor(Color color) {

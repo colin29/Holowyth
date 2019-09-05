@@ -293,7 +293,7 @@ public class World implements WorldInfo {
 
 		float collisionMagnitudeOfUnit1 = Math.abs(v1ColAxis);
 
-		logger.debug("Magnitude of collision: {}", collisionMagnitudeOfUnit1);
+		logger.debug("Magnitude of collision: {}", v1ColAxis);
 
 		float elasticity;
 		boolean firstUnitRebounds = false;
@@ -326,7 +326,7 @@ public class World implements WorldInfo {
 		// 1. Use derived formula to compute v1'
 
 		float v1FinalZeroFrame = (float) Math
-				.sqrt(knockBackCollisionElasticityDefault
+				.sqrt(elasticity
 						* (m1 * (v1ZeroFrame * v1ZeroFrame) + m2 * (v2ZeroFrame * v2ZeroFrame))
 						/ (m1 * (1 + m1 / m2)));
 

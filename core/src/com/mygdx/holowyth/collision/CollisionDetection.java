@@ -85,11 +85,7 @@ public class CollisionDetection {
 
 		// Compare the p value of all collisions, return the one with smallest p
 		Comparator<CollisionInfo> ascendingPOrder = (CollisionInfo c1, CollisionInfo c2) -> {
-			if (c1.pOfCollisionPoint <= c2.pOfCollisionPoint) {
-				return -1;
-			} else {
-				return 1;
-			}
+			return (c1.pOfCollisionPoint <= c2.pOfCollisionPoint) ? -1 : 1;
 		};
 		PriorityQueue<CollisionInfo> q = new PriorityQueue<CollisionInfo>(ascendingPOrder);
 

@@ -105,4 +105,16 @@ public class Segment {
 		return new Vector2(x2 - x1, y2 - y1);
 	}
 
+	/**
+	 * Moves the whole segment by a vector
+	 * 
+	 * @param vec
+	 */
+	public void displace(Vector2 vec) {
+		x1 += vec.x;
+		x2 += vec.x;
+		y1 += vec.y;
+		y2 += vec.y;
+	}
+
 }

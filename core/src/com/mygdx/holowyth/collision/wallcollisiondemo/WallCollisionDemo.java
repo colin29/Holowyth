@@ -59,7 +59,7 @@ public class WallCollisionDemo extends DemoScreen {
 	InputProcessor myInputProcessor = new InputProcessorAdapter() {
 		@Override
 		public boolean mouseMoved(int screenX, int screenY) {
-			setMotionSegmentEndToMousePos();
+			// setMotionSegmentEndToMousePos();
 			return false;
 		}
 
@@ -67,6 +67,9 @@ public class WallCollisionDemo extends DemoScreen {
 		public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 			if (button == Input.Buttons.RIGHT && pointer == 0) {
 				setMotionSegmentStartToMousePos();
+			}
+			if (button == Input.Buttons.LEFT && pointer == 0) {
+				setMotionSegmentEndToMousePos();
 			}
 			return false;
 		}

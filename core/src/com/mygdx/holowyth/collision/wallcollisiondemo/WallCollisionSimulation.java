@@ -1,12 +1,15 @@
 package com.mygdx.holowyth.collision.wallcollisiondemo;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.holowyth.collision.CircleCBInfo;
 import com.mygdx.holowyth.collision.Collidable;
 import com.mygdx.holowyth.collision.CollisionInfo;
 import com.mygdx.holowyth.collision.ObstacleSeg;
@@ -87,8 +90,24 @@ public class WallCollisionSimulation {
 		return segs;
 	}
 
+	private Segment postCollisionMotion = null;
+
 	void recalculateObjectCollision() {
-		getLineSegCollisionInfos();
+		var infos = getLineSegCollisionInfos();
+		CollisionInfo info;
+		if (infos.isEmpty()) {
+			postCollisionMotion = null;
+		} else {
+			info = getFirstCollision(infos);
+			Vector2 vFinal = calculateVelocityAfterCollision(info);
+			postCollisionMotion = new Segment(objectMotion.startPoint(), objectMotion.startPoint());
+			postCollisionMotion.x2 += vFinal.x;
+			postCollisionMotion.y2 += vFinal.y;
+
+			postCollisionMotion.displace(objectMotion.toVector().scl(info.pOfCollisionPoint));
+			logger.debug("Post-collision [{},{}]", postCollisionMotion.dx(), postCollisionMotion.dy());
+		}
+
 	}
 
 	private List<CollisionInfo> getLineSegCollisionInfos() {
@@ -107,9 +126,11 @@ public class WallCollisionSimulation {
 
 				Vector2 segVec = seg.toVector();
 				segVec.rotate(seg.isClockwise ? 90 : -90);
-				surfaceNormalAngle = segVec.angle();
+				surfaceNormalAngle = segVec.angleRad() < 0 ? (float) (segVec.angleRad() + 2 * Math.PI) : segVec.angleRad();
 
-				CircleCB objectBody = new CircleCBImpl(objectMotion.x1, objectMotion.y2, bodyRadius);
+				final float RADS_TO_DEGREES = (float) (180 / Math.PI);
+				logger.debug("surface normal angle in degrees: {}", surfaceNormalAngle * RADS_TO_DEGREES);
+				CircleCB objectBody = new CircleCBImpl(objectMotion.x1, objectMotion.y1, bodyRadius);
 				objectBody.setVelocity(objectMotion.dx(), objectMotion.dy());
 
 				Collidable obstacleSeg = new ObstacleSeg(seg);
@@ -121,6 +142,93 @@ public class WallCollisionSimulation {
 
 		logger.debug("Line segs found: {} collisions", infos.size());
 		return infos;
+	}
+
+	private CollisionInfo getFirstCollision(List<CollisionInfo> infos) {
+		// Compare the p value of all collisions, return the one with smallest p
+		Comparator<CollisionInfo> ascendingPOrder = (CollisionInfo c1, CollisionInfo c2) -> {
+			return (c1.pOfCollisionPoint <= c2.pOfCollisionPoint) ? -1 : 1;
+		};
+		PriorityQueue<CollisionInfo> q = new PriorityQueue<CollisionInfo>(ascendingPOrder);
+
+		q.addAll(infos);
+
+		CollisionInfo firstCollision = q.peek();
+		return firstCollision;
+	}
+
+	/**
+	 * Note: body 2 is always a wall, which has infinite mass
+	 */
+	private Vector2 calculateVelocityAfterCollision(CollisionInfo collision) {
+		// The collision info takes
+		// the opposite's vx/vy is either their normal movement speed, or their knockback
+		// at the end, if the target wasn't in knockback state, automatically turn it into knockback state (stub
+		// functionality)
+
+		// 1. Determine unit's velocities in terms of the normalized collision normal vector. Set aside the
+		// perpendicular components. We now have 2 1-d velocity vectors
+
+		final CircleCBInfo thisBody = collision.cur;
+
+		if (!(collision.other instanceof ObstacleSeg)) {
+			throw new RuntimeException("Unsupported Collidable type: " + collision.other.getClass().getSimpleName());
+		}
+
+		Vector2 normalNorm = new Vector2((float) Math.cos(collision.collisionSurfaceNormalAngle),
+				(float) Math.sin(collision.collisionSurfaceNormalAngle));
+		Vector2 v1 = new Vector2(thisBody.getVx(), thisBody.getVy());
+		Vector2 v1Norm = new Vector2(v1).nor();
+
+		Vector2 v2 = new Vector2(0, 0);
+		Vector2 v2Norm = new Vector2(v2).nor();
+
+		float v1ColAxis = v1.len() * v1Norm.dot(normalNorm);
+		float v2ColAxis = v2.len() * v2Norm.dot(normalNorm);
+
+		float elasticity = 0.25f;
+
+		// 2. Transform the problem into the zero momentum frame
+
+		final float MASS_BODY = 3; // system supports mass but game doesn't use it yet
+		final float VERY_HIGH_MASS = 9999;
+
+		final float m1 = MASS_BODY;
+		final float m2 = VERY_HIGH_MASS;
+
+		float M1ColAxis = v1ColAxis * m1;
+		float M2ColAxis = v2ColAxis * m2;
+
+		float MSystemColAxis = M1ColAxis + M2ColAxis;
+		float VSystemColAxis = MSystemColAxis / (m1 + m2);
+
+		float v1ZeroFrame = v1ColAxis - VSystemColAxis;
+		float v2ZeroFrame = v2ColAxis - VSystemColAxis;
+
+		// 3. Solve the problem with the zero momentum frame
+		// 1. Use derived formula to compute v1'
+
+		float v1FinalZeroFrame = (float) Math
+				.sqrt(elasticity
+						* (m1 * (v1ZeroFrame * v1ZeroFrame) + m2 * (v2ZeroFrame * v2ZeroFrame))
+						/ (m1 * (1 + m1 / m2)));
+
+		// 2. Plugin to momentum equation to get v2'
+
+		float v2FinalZeroFrame = -1 * v1FinalZeroFrame * m1 / m2;
+
+		// 3. Subtract from initial velocities to get the change in velocity along the collision normal vector
+
+		float dv1ColAxis = v1FinalZeroFrame - v1ZeroFrame;
+		float dv2ColAxis = v2FinalZeroFrame - v2ZeroFrame;
+
+		// 4. Convert change in velocity into standard coordinates and modify both body's velocities by that much,
+		// respectively.
+
+		Vector2 dv1 = new Vector2(normalNorm).scl(dv1ColAxis);
+
+		return dv1.add(v1); // return the final velocity of body 1
+
 	}
 
 	private static Point lineSegsIntersect(Segment s1, Segment s2) {
@@ -162,6 +270,12 @@ public class WallCollisionSimulation {
 
 	public Segment getMotionSegment() {
 		return new Segment(objectMotion);
+	}
+
+	public Segment getPostCollisionMotion() {
+		if (postCollisionMotion == null)
+			return null;
+		return new Segment(postCollisionMotion);
 	}
 
 	public void setMotionStart(float x, float y) {
