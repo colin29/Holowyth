@@ -10,6 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.holowyth.collision.wallcollisiondemo.OrientedPoly;
+import com.mygdx.holowyth.collision.wallcollisiondemo.OrientedSeg;
+import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.exceptions.HoloOperationException;
 
@@ -44,20 +47,108 @@ public class CollisionDetection {
 	}
 
 	/**
+	 * Finds and calculates collision info of obstacle collision while moving along a given line segment
+	 */
+	public static List<CollisionInfo> getObstacleCollisionsAlongLineSegment(CircleCBInfo objectBody,
+			float thisRadius,
+			List<OrientedPoly> polys) {
+
+		Segment objectMotion = new Segment(objectBody.getX(), objectBody.getY(), objectBody.getX() + objectBody.getVx(),
+				objectBody.getY() + objectBody.getVy());
+
+		var infos = new ArrayList<CollisionInfo>();
+
+		var segs = getObstacleExpandedSegs(polys, thisRadius);
+
+		for (var seg : segs) {
+			Point intersection = lineSegsIntersect(objectMotion, seg);
+			if (intersection != null) {
+
+				// Calculate additional details and record collision info
+				float pValue, surfaceNormalAngle;
+				Segment startToIntersect = new Segment(objectMotion.startPoint(), intersection);
+				pValue = startToIntersect.getLength() / objectMotion.getLength();
+
+				Vector2 segVec = seg.toVector();
+				segVec.rotate(seg.isClockwise ? 90 : -90);
+				surfaceNormalAngle = segVec.angleRad() < 0 ? (float) (segVec.angleRad() + 2 * Math.PI) : segVec.angleRad();
+
+				final float RADS_TO_DEGREES = (float) (180 / Math.PI);
+				logger.debug("surface normal angle in degrees: {}", surfaceNormalAngle * RADS_TO_DEGREES);
+
+				Collidable obstacleSeg = new ObstacleSeg(seg);
+
+				var info = new CollisionInfo(objectBody, obstacleSeg, pValue, surfaceNormalAngle);
+				infos.add(info);
+			}
+		}
+		return infos;
+	}
+
+	private static List<OrientedSeg> getObstacleExpandedSegs(List<OrientedPoly> polys, float bodyRadius) {
+		var segs = new ArrayList<OrientedSeg>();
+		for (var poly : polys) {
+			for (var seg : poly.segments) {
+				segs.add(seg.getOutwardlyDisplacedSegment(bodyRadius));
+			}
+		}
+		return segs;
+	}
+
+	private static Point lineSegsIntersect(Segment s1, Segment s2) {
+
+		float a1, a2, b1, b2, c1, c2;
+
+		a1 = s1.y2 - s1.y1;
+		b1 = s1.x1 - s1.x2;
+		c1 = a1 * s1.x1 + b1 * s1.y1;
+
+		a2 = s2.y2 - s2.y1;
+		b2 = s2.x1 - s2.x2;
+		c2 = a2 * s2.x1 + b2 * s2.y1;
+
+		float det = a1 * b2 - a2 * b1;
+		float x, y;
+		if (det == 0) {
+		} else {
+			x = (b2 * c1 - b1 * c2) / det;
+			y = (a1 * c2 - a2 * c1) / det;
+
+			// Check if the point is on both line segments
+			float EPS = 0.001f; // tolerance (From brief testing I saw roundings errors of 0.000031 for x = 400, 30
+								// times less than this. However rounding errors are proportional to size of x, thus
+								// the large safety factor)
+
+			// System.out.printf("%f, %f, %f %n", Math.min(s2.y1, s2.y2) - EPS, y, Math.max(s2.y1, s2.y2) + EPS);
+
+			if (Math.min(s1.x1, s1.x2) - EPS <= x && x <= Math.max(s1.x1, s1.x2) + EPS
+					&& Math.min(s1.y1, s1.y2) - EPS <= y && y <= Math.max(s1.y1, s1.y2 + EPS)
+					&& Math.min(s2.x1, s2.x2) - EPS <= x && x <= Math.max(s2.x1, s2.x2) + EPS
+					&& Math.min(s2.y1, s2.y2) - EPS <= y && y <= Math.max(s2.y1, s2.y2) + EPS) {
+				return new Point(x, y);
+			}
+			return null;
+		}
+		return null;
+	}
+
+	/**
 	 * Given a list of colliding bodies, narrows down and calculates the result of the first collision along the line segment motion.
 	 * 
 	 * @param segment
 	 *            The motion for curBody this tick
 	 * @param curBody
-	 * @param collisions
+	 * @param bodyCollisions
 	 *            The colBodies being collided into, each of these must actually be intersecting with curBody. Should contain at least one colliding
 	 *            body
+	 * @param obstacleCollisions
+	 *            optional, pass null if you don't need to consider obstacle collisions
 	 * @param intersectDebugInfo
 	 *            optional, pass in an object to receive debug values
 	 * 
 	 * @return Information about the first collision along curBody's motion
 	 */
-	public static CollisionInfo getFirstCollisionInfo(CircleCBInfo curBody, List<CircleCBInfo> collisions,
+	public static CollisionInfo getFirstCollisionInfo(CircleCBInfo curBody, List<CircleCBInfo> bodyCollisions, List<CollisionInfo> obstacleCollisions,
 			IntersectDebugInfo intersectDebugInfo) {
 
 		Segment segment = new Segment(curBody.getX(), curBody.getY(),
@@ -65,7 +156,7 @@ public class CollisionDetection {
 				curBody.getY() + curBody.getVy());
 
 		List<CollisionInfo> colInfos = new ArrayList<CollisionInfo>();
-		for (CircleCBInfo other : collisions) {
+		for (CircleCBInfo other : bodyCollisions) {
 			try {
 				CollisionInfo info = getCollisionInfo(segment, curBody, other, intersectDebugInfo);
 				if (info != null) {
@@ -79,10 +170,6 @@ public class CollisionDetection {
 
 		}
 
-		if (colInfos.isEmpty()) {
-			throw (new HoloOperationException("All collisions provided were invalid, so no info could be returned"));
-		}
-
 		// Compare the p value of all collisions, return the one with smallest p
 		Comparator<CollisionInfo> ascendingPOrder = (CollisionInfo c1, CollisionInfo c2) -> {
 			return (c1.pOfCollisionPoint <= c2.pOfCollisionPoint) ? -1 : 1;
@@ -90,8 +177,13 @@ public class CollisionDetection {
 		PriorityQueue<CollisionInfo> q = new PriorityQueue<CollisionInfo>(ascendingPOrder);
 
 		q.addAll(colInfos);
+		if (obstacleCollisions != null) {
+			q.addAll(obstacleCollisions);
+		}
 
-		// TODO: Here we want to detect and add collisions with an obstacle line-segment
+		if (q.isEmpty()) {
+			throw (new HoloOperationException("Error, no collisions actually provided(?)."));
+		}
 
 		CollisionInfo firstCollision = q.peek();
 		return firstCollision;

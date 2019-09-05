@@ -10,11 +10,15 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.collision.CircleCBInfo;
 import com.mygdx.holowyth.collision.CollisionDetection;
 import com.mygdx.holowyth.collision.CollisionInfo;
+import com.mygdx.holowyth.collision.ObstacleSeg;
+import com.mygdx.holowyth.collision.wallcollisiondemo.OrientedPoly;
+import com.mygdx.holowyth.collision.wallcollisiondemo.OrientedSeg;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
@@ -207,28 +211,34 @@ public class World implements WorldInfo {
 
 				Segment motion = new Segment(x, y, x + vx, y + vy);
 
-				List<CircleCBInfo> collisions = CollisionDetection.getObjectCollisionsAlongLineSegment(motion.x1,
+				List<CircleCBInfo> objectCollisions = CollisionDetection.getObjectCollisionsAlongLineSegment(motion.x1,
 						motion.y1, motion.x2, motion.y2,
 						thisColBody.getRadius(), allOtherBodies);
 
-				for (CircleCBInfo colidee : collisions) {
+				List<OrientedPoly> polys = Polygons.calculateOrientedPolygons(map.polys);
+
+				List<CollisionInfo> obstacleCollisions = CollisionDetection.getObstacleCollisionsAlongLineSegment(thisColBody,
+						thisColBody.getRadius(),
+						polys);
+
+				for (CircleCBInfo colidee : objectCollisions) {
 					logger.debug("Collision between units id [{} {}]", thisUnit.getID(),
 							units.colBodyToUnit().get(colidee).getID());
 				}
 
-				if (collisions.isEmpty()) {
+				if (objectCollisions.isEmpty() && obstacleCollisions.isEmpty()) {
 					// Move object normally
 					thisUnit.x += vx;
 					thisUnit.y += vy;
 				} else {
 
 					try {
-						CollisionInfo collision = CollisionDetection.getFirstCollisionInfo(thisColBody, collisions,
+						CollisionInfo collision = CollisionDetection.getFirstCollisionInfo(thisColBody, objectCollisions, obstacleCollisions,
 								null);
-						resolveUnitUnitKnockbackCollision(collision);
+						resolveUnitKnockbackCollision(collision);
 					} catch (HoloOperationException e) {
 						logger.warn(e.getMessage());
-						logger.trace(e.getFromMessage());
+						logger.warn("from: " + e.getFormattedStackTrace());
 						logger.warn("Skipping resolving this object's collision");
 						// Skip resolving this collision
 					}
@@ -238,6 +248,14 @@ public class World implements WorldInfo {
 
 			}
 		}
+	}
+
+	private List<OrientedSeg> getObstacleSegs(List<OrientedPoly> polys) {
+		var segs = new ArrayList<OrientedSeg>();
+		for (var poly : polys) {
+			segs.addAll(poly.segments);
+		}
+		return segs;
 	}
 
 	private void applyFriction(Unit unit) {
@@ -259,7 +277,11 @@ public class World implements WorldInfo {
 		}
 	}
 
-	private void resolveUnitUnitKnockbackCollision(CollisionInfo collision) {
+	private enum CollisionType {
+		UNIT, OBSTACLE_SEG, OBSTACLE_POINT
+	}
+
+	private void resolveUnitKnockbackCollision(CollisionInfo collision) {
 		// The collision info takes
 		// the opposite's vx/vy is either their normal movement speed, or their knockback
 		// at the end, if the target wasn't in knockback state, automatically turn it into knockback state (stub
@@ -269,23 +291,32 @@ public class World implements WorldInfo {
 		// perpendicular components. We now have 2 1-d velocity vectors
 
 		final CircleCBInfo thisBody = collision.cur;
+		CircleCBInfo otherBody = null;
 
-		final CircleCBInfo otherBody;
+		CollisionType collisionType;
+
+		Vector2 v1 = new Vector2(thisBody.getVx(), thisBody.getVy());
+		Vector2 v2;
+
+		// Based on type of collision, set the velocity of the second body
 		if (collision.other instanceof CircleCBInfo) {
 			otherBody = (CircleCBInfo) collision.other;
+			collisionType = CollisionType.UNIT;
+			v2 = new Vector2(otherBody.getVx(), otherBody.getVy());
+		} else if (collision.other instanceof ObstacleSeg) {
+			collisionType = CollisionType.OBSTACLE_SEG; // only thing that needs to be set is mass to VERY_HIGH and velocity to 0
+			v2 = new Vector2(0, 0);
 		} else {
 			throw new RuntimeException("Unsupported Collidable type: " + collision.other.getClass().getName());
 		}
 
 		Unit thisUnit = units.colBodyToUnit().get(thisBody);
-		Unit otherUnit = units.colBodyToUnit().get(otherBody);
+		Unit otherUnit = collisionType == CollisionType.UNIT ? units.colBodyToUnit().get(otherBody) : null;
 
 		Vector2 normalNorm = new Vector2((float) Math.cos(collision.collisionSurfaceNormalAngle),
 				(float) Math.sin(collision.collisionSurfaceNormalAngle));
-		Vector2 v1 = new Vector2(thisBody.getVx(), thisBody.getVy());
 		Vector2 v1Norm = new Vector2(v1).nor();
 
-		Vector2 v2 = new Vector2(otherBody.getVx(), otherBody.getVy());
 		Vector2 v2Norm = new Vector2(v2).nor();
 
 		float v1ColAxis = v1.len() * v1Norm.dot(normalNorm);
@@ -293,25 +324,39 @@ public class World implements WorldInfo {
 
 		float collisionMagnitudeOfUnit1 = Math.abs(v1ColAxis);
 
-		logger.debug("Magnitude of collision: {}", v1ColAxis);
-
 		float elasticity;
-		boolean firstUnitRebounds = false;
-		if (!otherUnit.motion.isBeingKnockedBack() && collisionMagnitudeOfUnit1 < 1) {
-			firstUnitRebounds = true;
-		}
-
-		elasticity = firstUnitRebounds ? knockBackCollisionElasticityReboundsOffUnit
-				: knockBackCollisionElasticityDefault;
-
-		// 2. Transform the problem into the zero momentum frame
 
 		final float MASS_BODY = 3; // system supports mass but game doesn't use it yet
 		final float VERY_HIGH_MASS = 9999;
 
 		final float m1 = MASS_BODY;
-		final float m2 = firstUnitRebounds ? VERY_HIGH_MASS
-				: MASS_BODY;
+		final float m2;
+
+		boolean unitReboundsOffSecondUnit = false;
+
+		// Based on type of collision, set the elasticity and mass of the bodies (angle is already provided)
+
+		switch (collisionType) {
+		case UNIT:
+			if (!otherUnit.motion.isBeingKnockedBack() && collisionMagnitudeOfUnit1 < 1) {
+				unitReboundsOffSecondUnit = true;
+			}
+			elasticity = unitReboundsOffSecondUnit ? knockBackCollisionElasticityReboundsOffUnit
+					: knockBackCollisionElasticityDefault;
+
+			m2 = unitReboundsOffSecondUnit ? VERY_HIGH_MASS
+					: MASS_BODY;
+			break;
+		case OBSTACLE_SEG:
+			elasticity = 0.25f;
+			m2 = VERY_HIGH_MASS;
+			break;
+		default:
+			throw new RuntimeException("Unsupported Collision type: " + collisionType.name());
+
+		}
+
+		// 2. Transform the problem into the zero momentum frame
 
 		float M1ColAxis = v1ColAxis * m1;
 		float M2ColAxis = v2ColAxis * m2;
@@ -345,21 +390,23 @@ public class World implements WorldInfo {
 		Vector2 dv1 = new Vector2(normalNorm).scl(dv1ColAxis);
 		Vector2 dv2 = new Vector2(normalNorm).scl(dv2ColAxis);
 
-		// If the other unit is also in knockback state, we just handle them normally
+		// If collision was a unit
+		switch (collisionType) {
+		case UNIT:
+			if (unitReboundsOffSecondUnit) {
+				thisUnit.motion.applyKnockBackVelocity(dv1.x, dv1.y);
+			} else {
+				thisUnit.motion.applyKnockBackVelocity(dv1.x, dv1.y);
+				otherUnit.motion.applyKnockBackVelocity(dv2.x, dv2.y);
+			}
+			break;
+		case OBSTACLE_SEG:
+			thisUnit.motion.applyKnockBackVelocity(dv1.x, dv1.y);
+			break;
+		default:
+			throw new RuntimeException("Unsupported Collision type: " + collisionType.name());
 
-		if (firstUnitRebounds) {
-			thisUnit.motion.applyKnockBackVelocity(dv1.x, dv1.y);
-		} else {
-			thisUnit.motion.applyKnockBackVelocity(dv1.x, dv1.y);
-			otherUnit.motion.applyKnockBackVelocity(dv2.x, dv2.y);
 		}
-
-		// thisBody.vx += dv1.x;
-		// thisBody.vy += dv1.y;
-		//
-		// other.vx += dv2.x;
-		// other.vy += dv2.y;
-
 	}
 
 	private void tickLogicForUnits() {

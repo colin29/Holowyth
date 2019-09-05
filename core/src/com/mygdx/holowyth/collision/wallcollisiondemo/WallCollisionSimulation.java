@@ -47,21 +47,8 @@ public class WallCollisionSimulation {
 		polygons.clear();
 		polygons.addAll(src);
 		orientedPolys.clear();
-		orientedPolys.addAll(calculateOrientedPolygons(polygons));
+		orientedPolys.addAll(Polygons.calculateOrientedPolygons(polygons));
 		recalculateObjectCollision();
-	}
-
-	/**
-	 * Calculates oriented polygons based on the current polygons
-	 * 
-	 * @param polygons
-	 */
-	private List<OrientedPoly> calculateOrientedPolygons(Polygons polys) {
-		var orientedPolys = new ArrayList<OrientedPoly>();
-		for (Polygon poly : polys) {
-			orientedPolys.add(new OrientedPoly(poly));
-		}
-		return orientedPolys;
 	}
 
 	public Polygons getObstaclePolygons() {

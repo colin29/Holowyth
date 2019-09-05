@@ -110,7 +110,7 @@ public class CollisionSimulation {
 			} else {
 
 				try {
-					CollisionInfo collision = CollisionDetection.getFirstCollisionInfo(thisObject.getColBody(), collisions,
+					CollisionInfo collision = CollisionDetection.getFirstCollisionInfo(thisObject.getColBody(), collisions, null,
 							this.intersectDebugInfo);
 					resolveCollision(collision);
 				} catch (HoloOperationException e) {
