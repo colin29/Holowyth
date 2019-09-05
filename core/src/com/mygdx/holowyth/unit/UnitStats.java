@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.unit;
 
-import static com.mygdx.holowyth.util.DataUtil.*;
+import static com.mygdx.holowyth.util.DataUtil.getAsPercentage;
+import static com.mygdx.holowyth.util.DataUtil.getRoundedString;
 
 import java.util.ArrayList;
 import java.util.HashMap;

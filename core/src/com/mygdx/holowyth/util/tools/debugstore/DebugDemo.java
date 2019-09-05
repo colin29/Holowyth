@@ -1,9 +1,11 @@
 package com.mygdx.holowyth.util.tools.debugstore;
 
-import static com.mygdx.holowyth.util.DataUtil.*;
+import static com.mygdx.holowyth.util.DataUtil.getAsPercentage;
+import static com.mygdx.holowyth.util.DataUtil.getRoundedString;
 
 import java.util.ArrayList;
 import java.util.Map;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;

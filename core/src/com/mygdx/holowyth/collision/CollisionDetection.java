@@ -16,6 +16,9 @@ import com.mygdx.holowyth.util.exceptions.HoloOperationException;
 /**
  * Can find the first collision of a circle, given its motion segment and a list of other circle bodies.
  * 
+ * A class with static methods in order to simulate circle vs circle collisions
+ * 
+ * 
  * @author Colin Ta
  *
  */
@@ -23,6 +26,10 @@ public class CollisionDetection {
 
 	static Logger logger = LoggerFactory.getLogger(CollisionDetection.class);
 
+	/**
+	 * Finds the circle bodies which this circle body collides with while moving along a given line segment. Note: For collision detection purposes,
+	 * all other objects are considered stationary. The physics collisions however, considers the speed of both objects.
+	 */
 	public static ArrayList<CircleCBInfo> getObjectCollisionsAlongLineSegment(float ix, float iy, float dx, float dy,
 			float thisRadius,
 			List<CircleCBInfo> cbs) {
@@ -37,6 +44,7 @@ public class CollisionDetection {
 	}
 
 	/**
+	 * Given a list of colliding bodies, narrows down and calculates the result of the first collision along the line segment motion.
 	 * 
 	 * @param segment
 	 *            The motion for curBody this tick
@@ -45,7 +53,7 @@ public class CollisionDetection {
 	 *            The colBodies being collided into, each of these must actually be intersecting with curBody. Should contain at least one colliding
 	 *            body
 	 * @param intersectDebugInfo
-	 *            optional
+	 *            optional, pass in an object to receive debug values
 	 * 
 	 * @return Information about the first collision along curBody's motion
 	 */
@@ -99,6 +107,8 @@ public class CollisionDetection {
 	 * 
 	 * @param other
 	 *            A colBody which is colliding with curBody. other must actually be intersecting with curBody
+	 * @param intersectDebugInfo
+	 *            optional
 	 * 
 	 * @return Information about the collision. Can return null, but only due to improper input.
 	 */
@@ -207,6 +217,59 @@ public class CollisionDetection {
 		}
 
 		return new CollisionInfo(curBody, other, pOfIntersectPoint, angleOfCircleAtIntersect);
+	}
+
+	/**
+	 * Carries info about a collision sufficient to calculate the result. This includes both colBody's involved
+	 * 
+	 * @author Colin Ta
+	 *
+	 */
+	public static class CollisionInfo {
+		/**
+		 * The current colBody that is being processed. <br>
+		 * Original reference, user may modify
+		 */
+		public final CircleCBInfo cur;
+		public final CircleCBInfo other;
+
+		// public final Vector2 collisionPoint;
+		public final float pOfCollisionPoint;
+		public final float collisionAngle;
+
+		public CollisionInfo(CircleCBInfo curBody, CircleCBInfo other, float pOfCollisionPoint, float collisionAngle) {
+			this.cur = curBody;
+			this.other = other;
+			// this.collisionPoint = new Vector2(x, y);
+			this.pOfCollisionPoint = pOfCollisionPoint;
+			this.collisionAngle = collisionAngle;
+
+		}
+
+	}
+
+	public static class IntersectDebugInfo {
+		public final Vector2 initial = new Vector2();
+		public final Vector2 delta = new Vector2();
+		public final Vector2 deltaNormalized = new Vector2();
+
+		public final Vector2 initialToCircleCenter = new Vector2();
+		public Vector2 initialToClosestPoint = new Vector2();
+
+		public final Vector2 closestPoint = new Vector2();
+		public float closestDistToCenter;
+
+		public final Vector2 intersectPoint = new Vector2();
+
+		/**
+		 * Describes how far intersectPoint is along the motion line segment. Within [0,1] means it lies on the motion segment
+		 */
+		public float pOfIntersectPoint;
+
+		/**
+		 * Is the angle in rads, from circle center to intersect point, 0 degrees is at (0,radius), spinning CCW
+		 */
+		public float angleOfCircleAtIntersectDegrees;
 	}
 
 }

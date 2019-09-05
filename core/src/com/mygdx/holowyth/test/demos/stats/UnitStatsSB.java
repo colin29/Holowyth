@@ -1,9 +1,8 @@
 package com.mygdx.holowyth.test.demos.stats;
 
-import static com.mygdx.holowyth.util.DataUtil.*;
+import static com.mygdx.holowyth.util.DataUtil.getAsPercentage;
+import static com.mygdx.holowyth.util.DataUtil.getRoundedString;
 
-import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
