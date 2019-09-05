@@ -11,11 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.collision.CircleCB;
 import com.mygdx.holowyth.collision.CircleCBInfo;
 import com.mygdx.holowyth.collision.CollisionDetection;
-import com.mygdx.holowyth.collision.CollisionDetection.CollisionInfo;
 import com.mygdx.holowyth.collision.CollisionDetection.IntersectDebugInfo;
+import com.mygdx.holowyth.collision.CollisionInfo;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;

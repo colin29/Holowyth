@@ -219,35 +219,6 @@ public class CollisionDetection {
 		return new CollisionInfo(curBody, other, pOfIntersectPoint, angleOfCircleAtIntersect);
 	}
 
-	/**
-	 * Carries info about a collision sufficient to calculate the result. This includes both colBody's involved
-	 * 
-	 * @author Colin Ta
-	 *
-	 */
-	public static class CollisionInfo {
-		/**
-		 * The current colBody that is being processed. <br>
-		 * Original reference, user may modify
-		 */
-		public final CircleCBInfo cur;
-		public final CircleCBInfo other;
-
-		// public final Vector2 collisionPoint;
-		public final float pOfCollisionPoint;
-		public final float collisionSurfaceNormalAngle; // this is the normal angle of the other object, at the collision point
-
-		public CollisionInfo(CircleCBInfo curBody, CircleCBInfo other, float pOfCollisionPoint, float collisionSurfaceNormalAngle) {
-			this.cur = curBody;
-			this.other = other;
-			// this.collisionPoint = new Vector2(x, y);
-			this.pOfCollisionPoint = pOfCollisionPoint;
-			this.collisionSurfaceNormalAngle = collisionSurfaceNormalAngle;
-
-		}
-
-	}
-
 	public static class IntersectDebugInfo {
 		public final Vector2 initial = new Vector2();
 		public final Vector2 delta = new Vector2();

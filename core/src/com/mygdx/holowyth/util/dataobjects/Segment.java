@@ -1,5 +1,6 @@
 package com.mygdx.holowyth.util.dataobjects;
 
+import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 
 public class Segment {
@@ -33,6 +34,14 @@ public class Segment {
 		this.y2 = y2;
 	}
 
+	public float dx() {
+		return x2 - x1;
+	}
+
+	public float dy() {
+		return y2 - y1;
+	}
+
 	public float getLength() {
 		return (float) Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
 	}
@@ -48,6 +57,10 @@ public class Segment {
 			angle = (float) (2 * Math.PI - angle);
 		}
 		return angle;
+	}
+
+	public float getAngleDegrees() {
+		return (float) (getAngle() * 180 / Math.PI);
 	}
 
 	/**
@@ -87,4 +100,9 @@ public class Segment {
 			throw new HoloAssertException("segments are not (exactly) equal in value");
 		}
 	}
+
+	public Vector2 toVector() {
+		return new Vector2(x2 - x1, y2 - y1);
+	}
+
 }

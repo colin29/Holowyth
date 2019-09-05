@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.collision;
 
-public interface CircleCBInfo {
+public interface CircleCBInfo extends Collidable {
 
 	float getX();
 

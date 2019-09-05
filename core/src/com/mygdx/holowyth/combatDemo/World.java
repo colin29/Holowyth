@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.collision.CircleCBInfo;
 import com.mygdx.holowyth.collision.CollisionDetection;
-import com.mygdx.holowyth.collision.CollisionDetection.CollisionInfo;
+import com.mygdx.holowyth.collision.CollisionInfo;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
@@ -269,7 +269,13 @@ public class World implements WorldInfo {
 		// perpendicular components. We now have 2 1-d velocity vectors
 
 		final CircleCBInfo thisBody = collision.cur;
-		final CircleCBInfo otherBody = collision.other;
+
+		final CircleCBInfo otherBody;
+		if (collision.other instanceof CircleCBInfo) {
+			otherBody = (CircleCBInfo) collision.other;
+		} else {
+			throw new RuntimeException("Unsupported Collidable type: " + collision.other.getClass().getName());
+		}
 
 		Unit thisUnit = units.colBodyToUnit().get(thisBody);
 		Unit otherUnit = units.colBodyToUnit().get(otherBody);

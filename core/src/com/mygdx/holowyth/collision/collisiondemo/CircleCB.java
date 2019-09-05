@@ -1,4 +1,6 @@
-package com.mygdx.holowyth.collision;
+package com.mygdx.holowyth.collision.collisiondemo;
+
+import com.mygdx.holowyth.collision.CircleCBInfo;
 
 /**
  * Circle Collision body <br>

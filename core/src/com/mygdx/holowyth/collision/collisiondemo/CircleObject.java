@@ -1,7 +1,5 @@
 package com.mygdx.holowyth.collision.collisiondemo;
 
-import com.mygdx.holowyth.collision.CircleCB;
-import com.mygdx.holowyth.collision.CircleCBImpl;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
