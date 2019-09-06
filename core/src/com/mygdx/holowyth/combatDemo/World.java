@@ -10,9 +10,10 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.collision.CircleCBInfo;
 import com.mygdx.holowyth.collision.CollisionDetection;
 import com.mygdx.holowyth.collision.CollisionInfo;
+import com.mygdx.holowyth.collision.ObstaclePoint;
 import com.mygdx.holowyth.collision.ObstacleSeg;
+import com.mygdx.holowyth.collision.UnitAdapterCircleCB;
 import com.mygdx.holowyth.collision.wallcollisiondemo.OrientedPoly;
-import com.mygdx.holowyth.collision.wallcollisiondemo.OrientedSeg;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
@@ -202,22 +203,30 @@ public class World implements WorldInfo {
 				vx = thisUnit.motion.getKnockbackVx();
 				vy = thisUnit.motion.getKnockbackVy();
 
-				CircleCBInfo thisColBody = units.unitToColBody().get(thisUnit);
+				CircleCBInfo curBody = units.unitToColBody().get(thisUnit);
 
 				List<CircleCBInfo> allOtherBodies = new ArrayList<CircleCBInfo>();
 				allOtherBodies.addAll(units.getColBodies());
-				allOtherBodies.remove(thisColBody);
+				allOtherBodies.remove(curBody);
 
 				Segment motion = new Segment(x, y, x + vx, y + vy);
 
 				List<CircleCBInfo> objectCollisions = CollisionDetection.getCircleBodyCollisionsAlongLineSegment(motion,
-						thisColBody.getRadius(), allOtherBodies);
+						curBody.getRadius(), allOtherBodies);
 
 				List<OrientedPoly> polys = Polygons.calculateOrientedPolygons(map.polys);
+				List<CircleCBInfo> obstaclePoints = new ArrayList<CircleCBInfo>();
+				for (var poly : polys) {
+					for (var seg : poly.segments) {
+						obstaclePoints.add(new ObstaclePoint(seg.x1, seg.y1));
+					}
+				}
 
-				List<CollisionInfo> obstacleCollisions = CollisionDetection.getObstacleCollisionsAlongLineSegment(thisColBody,
-						thisColBody.getRadius(),
-						polys);
+				List<CollisionInfo> obstacleCollisions = new ArrayList<CollisionInfo>();
+				obstacleCollisions.addAll(CollisionDetection.getCircleSegCollisionInfos(curBody,
+						curBody.getRadius(),
+						polys));
+				obstacleCollisions.addAll(getCirclePointCollisionInfos(curBody, obstaclePoints));
 
 				for (CircleCBInfo colidee : objectCollisions) {
 					logger.debug("Collision between units id [{} {}]", thisUnit.getID(),
@@ -231,7 +240,7 @@ public class World implements WorldInfo {
 				} else {
 
 					try {
-						CollisionInfo collision = CollisionDetection.getFirstCollisionInfo(thisColBody, objectCollisions, obstacleCollisions,
+						CollisionInfo collision = CollisionDetection.getFirstCollisionInfo(curBody, objectCollisions, obstacleCollisions,
 								null);
 						resolveUnitKnockbackCollision(collision);
 					} catch (HoloOperationException e) {
@@ -248,12 +257,23 @@ public class World implements WorldInfo {
 		}
 	}
 
-	private List<OrientedSeg> getObstacleSegs(List<OrientedPoly> polys) {
-		var segs = new ArrayList<OrientedSeg>();
-		for (var poly : polys) {
-			segs.addAll(poly.segments);
+	/**
+	 * Finds and calculates collision infos of a circle body vs wall point, while moving along the body's motion
+	 */
+	private List<CollisionInfo> getCirclePointCollisionInfos(CircleCBInfo curBody, List<CircleCBInfo> obstaclePoints) {
+
+		var collidingPoints = CollisionDetection.getCircleBodyCollisionsAlongLineSegment(curBody, obstaclePoints);
+
+		var infos = new ArrayList<CollisionInfo>();
+
+		Segment motion = new Segment(curBody.getX(), curBody.getY(), curBody.getX() + curBody.getVx(), curBody.getY() + curBody.getVy());
+		for (var point : collidingPoints) {
+			var info = CollisionDetection.getCircleCircleCollisionInfo(motion, curBody, point, null);
+			if (info != null) {
+				infos.add(info);
+			}
 		}
-		return segs;
+		return infos;
 	}
 
 	private void applyFriction(Unit unit) {
@@ -297,12 +317,15 @@ public class World implements WorldInfo {
 		Vector2 v2;
 
 		// Based on type of collision, set the velocity of the second body
-		if (collision.other instanceof CircleCBInfo) {
+		if (collision.other instanceof UnitAdapterCircleCB) {
 			otherBody = (CircleCBInfo) collision.other;
 			collisionType = CollisionType.UNIT;
 			v2 = new Vector2(otherBody.getVx(), otherBody.getVy());
 		} else if (collision.other instanceof ObstacleSeg) {
 			collisionType = CollisionType.OBSTACLE_SEG; // only thing that needs to be set is mass to VERY_HIGH and velocity to 0
+			v2 = new Vector2(0, 0);
+		} else if (collision.other instanceof ObstaclePoint) {
+			collisionType = CollisionType.OBSTACLE_POINT;
 			v2 = new Vector2(0, 0);
 		} else {
 			throw new RuntimeException("Unsupported Collidable type: " + collision.other.getClass().getName());
@@ -345,7 +368,8 @@ public class World implements WorldInfo {
 			m2 = unitReboundsOffSecondUnit ? VERY_HIGH_MASS
 					: MASS_BODY;
 			break;
-		case OBSTACLE_SEG:
+		case OBSTACLE_SEG: // intentional grouping
+		case OBSTACLE_POINT:
 			elasticity = 0.25f;
 			m2 = VERY_HIGH_MASS;
 			break;
@@ -399,6 +423,7 @@ public class World implements WorldInfo {
 			}
 			break;
 		case OBSTACLE_SEG:
+		case OBSTACLE_POINT:
 			thisUnit.motion.applyKnockBackVelocity(dv1.x, dv1.y);
 			break;
 		default:

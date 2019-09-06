@@ -29,6 +29,12 @@ public class CollisionDetection {
 
 	static Logger logger = LoggerFactory.getLogger(CollisionDetection.class);
 
+	public static ArrayList<CircleCBInfo> getCircleBodyCollisionsAlongLineSegment(CircleCBInfo body,
+			List<CircleCBInfo> cbs) {
+		Segment segment = new Segment(body.getX(), body.getY(), body.getX() + body.getVx(), body.getY() + body.getVy());
+		return getCircleBodyCollisionsAlongLineSegment(segment, body.getRadius(), cbs);
+	}
+
 	/**
 	 * Finds the circle bodies which this circle body collides with while moving along a given line segment. Note: For collision detection purposes,
 	 * all other objects are considered stationary. The physics collisions however, considers the speed of both objects.
@@ -47,9 +53,9 @@ public class CollisionDetection {
 	}
 
 	/**
-	 * Finds and calculates collision info of obstacle collision while moving along a given line segment
+	 * Finds and calculates collision infos of a circle body vs wall segment, while moving along the body's motion
 	 */
-	public static List<CollisionInfo> getObstacleCollisionsAlongLineSegment(CircleCBInfo objectBody,
+	public static List<CollisionInfo> getCircleSegCollisionInfos(CircleCBInfo objectBody,
 			float thisRadius,
 			List<OrientedPoly> polys) {
 
