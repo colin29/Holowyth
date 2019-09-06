@@ -96,9 +96,8 @@ public class CollisionSimulation {
 
 			Segment motion = new Segment(x, y, x + vx, y + vy);
 
-			List<CircleCBInfo> collisions = CollisionDetection.getObjectCollisionsAlongLineSegment(motion.x1, motion.y1, motion.x2,
-					motion.y2,
-					thisObject.getColBody().getRadius(), allOtherBodies);
+			List<CircleCBInfo> collisions = CollisionDetection.getCircleBodyCollisionsAlongLineSegment(motion, thisObject.getColBody().getRadius(),
+					allOtherBodies);
 
 			for (CircleCBInfo colidee : collisions) {
 				logger.debug("Collision between units id [{} {}]", thisObject.id, bodyToObject.get(colidee).id);

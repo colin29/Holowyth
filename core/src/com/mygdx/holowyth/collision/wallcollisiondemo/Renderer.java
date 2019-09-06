@@ -46,6 +46,9 @@ public class Renderer {
 
 		if (this.simulation != null) {
 			renderObstaclePolygons();
+			renderObstacleExpandedSegments();
+			renderObstacleExpandedPoints();
+
 			renderMotionSegment();
 			renderPostCollisionMotion();
 		}
@@ -62,10 +65,26 @@ public class Renderer {
 				HoloGL.renderPolygon(poly.toRawPolygon(), wallOutlineColor);
 			}
 
+		}
+	}
+
+	private void renderObstacleExpandedSegments() {
+		for (var poly : simulation.getObstaclePolygonsOriented()) {
 			for (var seg : poly.segments) {
 				HoloGL.renderSegment(seg.getOutwardlyDisplacedSegment(simulation.getBodyRadius()), Color.CORAL);
 			}
+		}
+	}
 
+	/**
+	 * Renders the expanded points (ie. they will expand to circles)
+	 * 
+	 * @param src
+	 */
+	private void renderObstacleExpandedPoints() {
+		var points = simulation.getObstaclePoints();
+		for (var point : points) {
+			HoloGL.renderCircleOutline(point.getX(), point.getY(), simulation.getBodyRadius(), Color.PINK);
 		}
 	}
 

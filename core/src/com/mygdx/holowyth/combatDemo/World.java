@@ -75,7 +75,6 @@ public class World implements WorldInfo {
 		moveNormallyMovingUnits();
 		moveKnockedBackedUnitsAndResolveCollisions();
 		handleCombatLogic();
-
 	}
 
 	/**
@@ -211,8 +210,7 @@ public class World implements WorldInfo {
 
 				Segment motion = new Segment(x, y, x + vx, y + vy);
 
-				List<CircleCBInfo> objectCollisions = CollisionDetection.getObjectCollisionsAlongLineSegment(motion.x1,
-						motion.y1, motion.x2, motion.y2,
+				List<CircleCBInfo> objectCollisions = CollisionDetection.getCircleBodyCollisionsAlongLineSegment(motion,
 						thisColBody.getRadius(), allOtherBodies);
 
 				List<OrientedPoly> polys = Polygons.calculateOrientedPolygons(map.polys);

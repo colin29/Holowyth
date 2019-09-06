@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.collision.wallcollisiondemo;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -11,7 +12,9 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.collision.CircleCBInfo;
 import com.mygdx.holowyth.collision.Collidable;
+import com.mygdx.holowyth.collision.CollisionDetection;
 import com.mygdx.holowyth.collision.CollisionInfo;
+import com.mygdx.holowyth.collision.ObstaclePoint;
 import com.mygdx.holowyth.collision.ObstacleSeg;
 import com.mygdx.holowyth.collision.collisiondemo.CircleCB;
 import com.mygdx.holowyth.collision.collisiondemo.CircleCBImpl;
@@ -32,6 +35,7 @@ public class WallCollisionSimulation {
 
 	private final Polygons polygons = new Polygons();
 	private final List<OrientedPoly> orientedPolys = new ArrayList<OrientedPoly>();
+	private final List<CircleCBInfo> obstaclePoints = new ArrayList<CircleCBInfo>();
 
 	private final Segment objectMotion = new Segment(200, 200, 300, 200);
 	private float bodyRadius = 20;
@@ -48,6 +52,7 @@ public class WallCollisionSimulation {
 		polygons.addAll(src);
 		orientedPolys.clear();
 		orientedPolys.addAll(Polygons.calculateOrientedPolygons(polygons));
+		updateObstaclePoints();
 		recalculateObjectCollision();
 	}
 
@@ -80,7 +85,15 @@ public class WallCollisionSimulation {
 	private Segment postCollisionMotion = null;
 
 	void recalculateObjectCollision() {
-		var infos = getLineSegCollisionInfos();
+
+		CircleCB objectBody = new CircleCBImpl(objectMotion.x1, objectMotion.y1, bodyRadius);
+		objectBody.setVelocity(objectMotion.dx(), objectMotion.dy());
+
+		var infos = new ArrayList<CollisionInfo>();
+
+		infos.addAll(getLineSegCollisionInfos(objectBody));
+		infos.addAll(getLinePointCollisionInfos(objectBody));
+
 		CollisionInfo info;
 		if (infos.isEmpty()) {
 			postCollisionMotion = null;
@@ -92,12 +105,42 @@ public class WallCollisionSimulation {
 			postCollisionMotion.y2 += vFinal.y;
 
 			postCollisionMotion.displace(objectMotion.toVector().scl(info.pOfCollisionPoint));
-			logger.debug("Post-collision [{},{}]", postCollisionMotion.dx(), postCollisionMotion.dy());
 		}
 
 	}
 
-	private List<CollisionInfo> getLineSegCollisionInfos() {
+	private List<CollisionInfo> getLinePointCollisionInfos(CircleCBInfo objectBody) {
+
+		var collidingPoints = CollisionDetection.getCircleBodyCollisionsAlongLineSegment(objectMotion, bodyRadius, obstaclePoints);
+
+		var infos = new ArrayList<CollisionInfo>();
+
+		for (var point : collidingPoints) {
+			var info = CollisionDetection.getCircleCircleCollisionInfo(objectMotion, objectBody, point, null);
+			if (info != null) {
+				infos.add(info);
+			}
+		}
+		return infos;
+	}
+
+	/**
+	 * Updates obstacle points based on oriented polygons
+	 */
+	private void updateObstaclePoints() {
+		obstaclePoints.clear();
+		for (var poly : orientedPolys) {
+			for (var seg : poly.segments) {
+				obstaclePoints.add(new ObstaclePoint(seg.x1, seg.y1));
+			}
+		}
+	}
+
+	public List<CircleCBInfo> getObstaclePoints() {
+		return Collections.unmodifiableList(obstaclePoints);
+	}
+
+	private List<CollisionInfo> getLineSegCollisionInfos(CircleCBInfo objectBody) {
 		var infos = new ArrayList<CollisionInfo>();
 
 		var segs = getObstacleExpandedSegs();
@@ -117,8 +160,6 @@ public class WallCollisionSimulation {
 
 				final float RADS_TO_DEGREES = (float) (180 / Math.PI);
 				logger.debug("surface normal angle in degrees: {}", surfaceNormalAngle * RADS_TO_DEGREES);
-				CircleCB objectBody = new CircleCBImpl(objectMotion.x1, objectMotion.y1, bodyRadius);
-				objectBody.setVelocity(objectMotion.dx(), objectMotion.dy());
 
 				Collidable obstacleSeg = new ObstacleSeg(seg);
 
@@ -127,7 +168,6 @@ public class WallCollisionSimulation {
 			}
 		}
 
-		logger.debug("Line segs found: {} collisions", infos.size());
 		return infos;
 	}
 
@@ -158,7 +198,7 @@ public class WallCollisionSimulation {
 
 		final CircleCBInfo thisBody = collision.cur;
 
-		if (!(collision.other instanceof ObstacleSeg)) {
+		if (!(collision.other instanceof ObstacleSeg || collision.other instanceof ObstaclePoint)) {
 			throw new RuntimeException("Unsupported Collidable type: " + collision.other.getClass().getSimpleName());
 		}
 

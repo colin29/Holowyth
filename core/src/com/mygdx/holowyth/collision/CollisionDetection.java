@@ -33,12 +33,12 @@ public class CollisionDetection {
 	 * Finds the circle bodies which this circle body collides with while moving along a given line segment. Note: For collision detection purposes,
 	 * all other objects are considered stationary. The physics collisions however, considers the speed of both objects.
 	 */
-	public static ArrayList<CircleCBInfo> getObjectCollisionsAlongLineSegment(float ix, float iy, float dx, float dy,
+	public static ArrayList<CircleCBInfo> getCircleBodyCollisionsAlongLineSegment(Segment motion,
 			float thisRadius,
 			List<CircleCBInfo> cbs) {
 		ArrayList<CircleCBInfo> collisions = new ArrayList<CircleCBInfo>();
 		for (CircleCBInfo cb : cbs) {
-			if (Line2D.ptSegDistSq(ix, iy, dx, dy, cb.getX(), cb.getY()) < (cb.getRadius() + thisRadius)
+			if (Line2D.ptSegDistSq(motion.x1, motion.y1, motion.x2, motion.y2, cb.getX(), cb.getY()) < (cb.getRadius() + thisRadius)
 					* (cb.getRadius() + thisRadius)) {
 				collisions.add(cb);
 			}
@@ -133,14 +133,14 @@ public class CollisionDetection {
 	}
 
 	/**
-	 * Given a list of colliding bodies, narrows down and calculates the result of the first collision along the line segment motion.
+	 * Given multiple types of detected collisions, narrows down and calculates the result of the first collision along the line segment motion. There
+	 * should be at least one collision of some type.
 	 * 
 	 * @param segment
 	 *            The motion for curBody this tick
 	 * @param curBody
 	 * @param bodyCollisions
-	 *            The colBodies being collided into, each of these must actually be intersecting with curBody. Should contain at least one colliding
-	 *            body
+	 *            The colBodies being collided into, each of these must actually be intersecting with curBody.
 	 * @param obstacleCollisions
 	 *            optional, pass null if you don't need to consider obstacle collisions
 	 * @param intersectDebugInfo
@@ -158,7 +158,7 @@ public class CollisionDetection {
 		List<CollisionInfo> colInfos = new ArrayList<CollisionInfo>();
 		for (CircleCBInfo other : bodyCollisions) {
 			try {
-				CollisionInfo info = getCollisionInfo(segment, curBody, other, intersectDebugInfo);
+				CollisionInfo info = getCircleCircleCollisionInfo(segment, curBody, other, intersectDebugInfo);
 				if (info != null) {
 					colInfos.add(info);
 				}
@@ -200,7 +200,7 @@ public class CollisionDetection {
 	 * 
 	 * @return Information about the collision. Can return null, but only due to improper input.
 	 */
-	private static CollisionInfo getCollisionInfo(Segment segment, CircleCBInfo curBody, CircleCBInfo other,
+	public static CollisionInfo getCircleCircleCollisionInfo(Segment segment, CircleCBInfo curBody, CircleCBInfo other,
 			IntersectDebugInfo intersectDebugInfo) {
 
 		if (curBody.getVx() == 0 && curBody.getVy() == 0) {
