@@ -1,19 +1,26 @@
 package com.mygdx.holowyth.unit.interfaces;
 
-import com.mygdx.holowyth.unit.UnitStats.Stance;
-import com.mygdx.holowyth.unit.UnitStats.StunState;
-
 public interface UnitStatsInfo {
 	public float getHp();
+
 	public float getSp();
 
 	public int getMaxHp();
+
 	public int getMaxSp();
 
 	public int getBaseMaxHp();
+
 	public int getBaseMaxSp();
-	
+
+	/**
+	 * Gets ratio of current hp to maxHp
+	 */
 	public float getHpRatio();
+
+	/**
+	 * Gets ratio of current sp to maxSp
+	 */
 	public float getSpRatio();
 
 	public float getBaseMoveSpeed();
@@ -41,16 +48,6 @@ public interface UnitStatsInfo {
 	public int getFort();
 
 	public int getPercep();
-
-	public Stance getStance();
-
-	public StunState getStunState();
-
-	public int getStunDurationRemainng();
-
-	public UnitStatsInfo getLookingAt();
-
-	public UnitStatsInfo getOccupiedBy();
 
 	public String getName();
 }

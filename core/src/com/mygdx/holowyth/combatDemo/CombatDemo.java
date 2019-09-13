@@ -89,9 +89,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		Table debugInfo = combatDemoUI.getDebugInfo();
 		functionBindings.bindFunctionToKey(() -> debugInfo.setVisible(!debugInfo.isVisible()), Keys.GRAVE); // tilde key
-		functionBindings.bindFunctionToKey(() -> playerUnit.stats.setHp(playerUnit.stats.getMaxHp()), Keys.Q); // heal player to max
+		functionBindings.bindFunctionToKey(() -> playerUnit.stats.setHpDebug(playerUnit.stats.getMaxHp()), Keys.Q); // heal player to max
 		functionBindings.bindFunctionToKey(() -> {
-			playerUnit.stats.setHp(playerUnit.stats.getMaxHp());
+			playerUnit.stats.setHpDebug(playerUnit.stats.getMaxHp());
 		}, Keys.B); // break point
 	}
 

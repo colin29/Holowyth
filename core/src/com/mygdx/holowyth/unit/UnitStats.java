@@ -35,13 +35,13 @@ public class UnitStats implements UnitStatsInfo {
 	private String name;
 
 	// Base stats
-	public int baseMaxHp, baseMaxSp;
+	public int maxHpBase, maxSpBase;
 	/**
 	 * Unused atm, UnitMotion just uses the default movespeed
 	 */
 	public float baseMoveSpeed;
 
-	public int baseStr, baseAgi, baseFort, basePercep;
+	public int strBase, agiBase, fortBase, perceptBase;
 
 	// test stats
 	public static boolean useTestDamage = true;
@@ -65,37 +65,11 @@ public class UnitStats implements UnitStatsInfo {
 	private int armor, armorPiercing;
 	private float dmgReduction, armorNegation;
 
-	// Helper Stats (summed up item bonuses)
+	// Helper Stats (for summing up stat contributions). 'i' stands for interim
 	private int iStr, iAgi, iFort, iPercep; // core stats
 	private int iAtk, iDef, iForce, iStab, iAcc, iDodge;
 	private int iArmor, iArmorPiercing;
 	private float iDmgReduction, iArmorNegation;
-
-	public enum Stance {
-		DEFENSIVE, NORMAL, ALL_OUT_AGGRESSIVE
-	};
-
-	private Stance stance;
-
-	public enum StunState {
-		NORMAL, STUNNED, REELING
-	};
-
-	private StunState stunState;
-
-	private int stunDurationRemainng;
-
-	public enum Status {
-		PRONE, FATIGUED, MANA_EXHAUSTION, WOUNDED, FEARFUL
-	}
-
-	Array<Status> statuses = new Array<Status>();
-
-	/**
-	 * A unit that is distracted by a target is easier to surpise
-	 */
-	private UnitStats lookingAt;
-	private UnitStats occupiedBy;
 
 	private EquippedItems equip = new EquippedItems();
 
@@ -143,14 +117,14 @@ public class UnitStats implements UnitStatsInfo {
 			addCoreStatBonuses(equip.offHand);
 		}
 
-		str = baseStr + iStr;
-		agi = baseAgi + iAgi;
-		fort = baseFort + iFort;
-		percep = basePercep + iPercep;
+		str = strBase + iStr;
+		agi = agiBase + iAgi;
+		fort = fortBase + iFort;
+		percep = perceptBase + iPercep;
 
 		// 2: calculate hp stats
-		maxHp = baseMaxHp; // Math.round(baseMaxHp * (1 + 0.1f * (fort - 5)));
-		maxSp = baseMaxSp;
+		maxHp = maxHpBase; // Math.round(baseMaxHp * (1 + 0.1f * (fort - 5)));
+		maxSp = maxSpBase;
 
 		// 3: calculate derived stats from core stats;
 
@@ -177,9 +151,6 @@ public class UnitStats implements UnitStatsInfo {
 		atk = testAtk;
 		def = testDef;
 
-		// atk = levelBonus + iAtk + 1 * (percep - mid);
-		// def = levelBonus + iDef + 1 * (agi - mid);
-
 		force = levelBonus + iForce + 2 * (str - mid);
 		stab = levelBonus + iStab + 2 * (fort - mid) + 1 * (str - mid);
 		acc = levelBonus + iAcc + 2 * (percep - mid);
@@ -193,7 +164,7 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	/**
-	 * Preps the unit for use in the game world by setting the transient fields to an appropriate starting value Idempotent (can call >=1 times)
+	 * Preps the unit for use in the game world by setting the transient fields to an appropriate starting value. Idempotent (can call >=1 times)
 	 */
 	public void prepareUnit() {
 		recalculateStats();
@@ -201,92 +172,6 @@ public class UnitStats implements UnitStatsInfo {
 		hp = maxHp;
 		sp = maxSp;
 
-		statuses.clear();
-		stance = Stance.NORMAL;
-		stunState = StunState.NORMAL;
-		stunDurationRemainng = 0;
-
-		lookingAt = null;
-		occupiedBy = null;
-	}
-
-	public String getInfo() {
-		return getInfo(false);
-	}
-
-	public String getInfo(boolean includeEquipment) {
-		recalculateStats();
-
-		String s = "";
-		s += String.format("Unit [%s]  hp: %s/%d  sp: %s/%d  <level %d>%n", name, getRoundedHp(), maxHp, getRoundedSp(), maxSp,
-				level);
-		// s += String.format("Core stats: STR %d, AGI %d, FORT %d, PERCEP %d%n", str, agi, fort, percep);
-		s += String.format("Derived stats: Atk %d, Def %d%n", atk, def);
-		// s += String.format("Derived stats: Atk %d, Def %d, Force %d, Stab %d, Acc %d, Dodge %d%n", atk, def, force,
-		// stab, acc, dodge);
-		/*
-		 * s += "Other stats: \n"; s += String.format(" -Damage %s, AP %d, Armor Negation %s %n", getRoundedString(getUnitAttackDamage()),
-		 * armorPiercing, getAsPercentage(armorNegation)); s += String.format(" -Armor %d, DR %s %n", armor, getAsPercentage(dmgReduction));
-		 */
-
-		if (includeEquipment) {
-			s += "Equipped Items:\n";
-			s += getEquipped();
-
-			s += "Item details:\n";
-
-			s += getInfoForAllEquippedItems();
-		}
-		return s;
-	}
-
-	public String getEquipped() {
-		String s = "";
-
-		Map<String, Item> map = equip.getIteratableMap();
-
-		for (String slotLabel : EquippedItems.slotLabels) {
-			Item item = map.get(slotLabel);
-			if (item != null) {
-				s += " -" + slotLabel + ": " + item.name + "\n";
-			} else {
-				s += " -" + slotLabel + ": [None]\n";
-			}
-		}
-
-		return s;
-	}
-
-	public String getInfoForAllEquippedItems() {
-		// Get a list of all distinct items (different names)
-
-		List<Item> distinctItems = new ArrayList<Item>();
-
-		for (Item item : equip.getArrayOfEquipSlots()) {
-			if (item == null)
-				continue;
-			if (distinctItems.stream().noneMatch(i -> i.name == item.name)) {
-				distinctItems.add(item);
-			}
-		}
-
-		String s = "";
-		for (Item item : distinctItems) {
-			s += item.getInfo();
-		}
-		return s;
-	}
-
-	public void printInfo() {
-		System.out.println(getInfo());
-	}
-
-	public String getRoundedHp() {
-		return getRoundedString(hp);
-	}
-
-	public String getRoundedSp() {
-		return getRoundedString(sp);
 	}
 
 	private void addCoreStatBonuses(Item... items) {
@@ -388,12 +273,15 @@ public class UnitStats implements UnitStatsInfo {
 			return;
 		}
 
-		// 3. Calculate damage and reduction from armor
-
 		float origDamage;
 
-		origDamage = getUnitAttackDamage();
+		if (useTestDamage && testDamage != 0) {
+			origDamage = testDamage;
+		} else {
+			origDamage = getUnitDamage();
+		}
 
+		// 3. Calculate damage and reduction from armor
 		float damageReduced = Math.max(enemy.armor - armorPiercing, origDamage * enemy.dmgReduction);
 		damageReduced *= (1 - armorNegation);
 
@@ -401,10 +289,6 @@ public class UnitStats implements UnitStatsInfo {
 
 		if (damage < 0) {
 			damage = 0;
-		}
-
-		if (useTestDamage && testDamage != 0) {
-			damage = testDamage;
 		}
 
 		// 5. Apply damage
@@ -477,7 +361,7 @@ public class UnitStats implements UnitStatsInfo {
 	// return false;
 	// }
 
-	public float getUnitAttackDamage() {
+	public float getUnitDamage() {
 		float weaponDamage = isWieldingAWeapon() ? equip.mainHand.damage : 1;
 		float strengthBonus = (this.str - 5) * 0.1f;
 
@@ -501,6 +385,77 @@ public class UnitStats implements UnitStatsInfo {
 		}
 
 		return damage;
+	}
+
+	public void printInfo() {
+		System.out.println(getInfo());
+	}
+
+	public String getInfo() {
+		return getInfo(false);
+	}
+
+	public String getInfo(boolean includeEquipmentInfo) {
+		recalculateStats();
+
+		String s = "";
+		s += String.format("Unit [%s]  hp: %s/%d  sp: %s/%d  <level %d>%n", name, getRoundedString(hp), maxHp, getRoundedString(sp), maxSp,
+				level);
+		// s += String.format("Core stats: STR %d, AGI %d, FORT %d, PERCEP %d%n", str, agi, fort, percep);
+		s += String.format("Derived stats: Atk %d, Def %d%n", atk, def);
+		// s += String.format("Derived stats: Atk %d, Def %d, Force %d, Stab %d, Acc %d, Dodge %d%n", atk, def, force,
+		// stab, acc, dodge);
+		/*
+		 * s += "Other stats: \n"; s += String.format(" -Damage %s, AP %d, Armor Negation %s %n", getRoundedString(getUnitAttackDamage()),
+		 * armorPiercing, getAsPercentage(armorNegation)); s += String.format(" -Armor %d, DR %s %n", armor, getAsPercentage(dmgReduction));
+		 */
+
+		if (includeEquipmentInfo) {
+			s += "Equipped Items:\n";
+			s += getEquippedItemsAsString();
+
+			s += "Item details:\n";
+
+			s += getInfoForAllEquippedItems();
+		}
+		return s;
+	}
+
+	private String getEquippedItemsAsString() {
+		String s = "";
+
+		Map<String, Item> map = equip.getIteratableMap();
+
+		for (String slotLabel : EquippedItems.slotLabels) {
+			Item item = map.get(slotLabel);
+			if (item != null) {
+				s += " -" + slotLabel + ": " + item.name + "\n";
+			} else {
+				s += " -" + slotLabel + ": [None]\n";
+			}
+		}
+
+		return s;
+	}
+
+	private String getInfoForAllEquippedItems() {
+		// Get a list of all distinct items (different names)
+
+		List<Item> distinctItems = new ArrayList<Item>();
+
+		for (Item item : equip.getArrayOfEquipSlots()) {
+			if (item == null)
+				continue;
+			if (distinctItems.stream().noneMatch(i -> i.name == item.name)) {
+				distinctItems.add(item);
+			}
+		}
+
+		String s = "";
+		for (Item item : distinctItems) {
+			s += item.getInfo();
+		}
+		return s;
 	}
 
 	public boolean isDead() {
@@ -614,12 +569,12 @@ public class UnitStats implements UnitStatsInfo {
 
 	@Override
 	public int getBaseMaxHp() {
-		return baseMaxHp;
+		return maxHpBase;
 	}
 
 	@Override
 	public int getBaseMaxSp() {
-		return baseMaxSp;
+		return maxSpBase;
 	}
 
 	@Override
@@ -669,47 +624,22 @@ public class UnitStats implements UnitStatsInfo {
 
 	@Override
 	public int getStr() {
-		return baseStr;
+		return strBase;
 	}
 
 	@Override
 	public int getAgi() {
-		return baseAgi;
+		return agiBase;
 	}
 
 	@Override
 	public int getFort() {
-		return baseFort;
+		return fortBase;
 	}
 
 	@Override
 	public int getPercep() {
-		return basePercep;
-	}
-
-	@Override
-	public Stance getStance() {
-		return stance;
-	}
-
-	@Override
-	public StunState getStunState() {
-		return stunState;
-	}
-
-	@Override
-	public int getStunDurationRemainng() {
-		return stunDurationRemainng;
-	}
-
-	@Override
-	public UnitStats getLookingAt() {
-		return lookingAt;
-	}
-
-	@Override
-	public UnitStats getOccupiedBy() {
-		return occupiedBy;
+		return perceptBase;
 	}
 
 	@Override
@@ -726,7 +656,7 @@ public class UnitStats implements UnitStatsInfo {
 	 * 
 	 * @param value
 	 */
-	public void setHp(float value) {
+	public void setHpDebug(float value) {
 		hp = value;
 	}
 }

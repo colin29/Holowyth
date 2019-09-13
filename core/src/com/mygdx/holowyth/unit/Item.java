@@ -27,9 +27,7 @@ public class Item {
 	public int damage;
 
 	public int strBonus, agiBonus, fortBonus, percepBonus;
-	public int atkBonus, defBonus, forceBonus, stabBonus, accBonus, dodgeBonus; // conditional bonuses are handled
-																				// manually in
-	// the combat simulator, for now.
+	public int atkBonus, defBonus, forceBonus, stabBonus, accBonus, dodgeBonus;
 
 	public int armorBonus;
 	public float dmgReductionBonus; // is a percentage reduction

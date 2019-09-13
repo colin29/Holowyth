@@ -10,13 +10,13 @@ import com.mygdx.holowyth.unit.UnitStats.UnitType;
  */
 public class PresetUnits {
 	public static void loadPlayerUnitStats(UnitStats unit) {
-		unit.baseStr = 7;
-		unit.baseAgi = 5;
-		unit.baseFort = 6;
-		unit.basePercep = 6;
+		unit.strBase = 7;
+		unit.agiBase = 5;
+		unit.fortBase = 6;
+		unit.perceptBase = 6;
 	
-		unit.baseMaxHp = 100;
-		unit.baseMaxSp = 50;
+		unit.maxHpBase = 100;
+		unit.maxSpBase = 50;
 	
 		unit.baseMoveSpeed = 2.3f;
 	
@@ -27,13 +27,13 @@ public class PresetUnits {
 
 	public static void loadUnitStats2(UnitStats unit) {
 	
-		unit.baseStr = 5;
-		unit.baseAgi = 5;
-		unit.baseFort = 5;
-		unit.basePercep = 5;
+		unit.strBase = 5;
+		unit.agiBase = 5;
+		unit.fortBase = 5;
+		unit.perceptBase = 5;
 	
-		unit.baseMaxHp = 100;
-		unit.baseMaxSp = 50;
+		unit.maxHpBase = 100;
+		unit.maxSpBase = 50;
 	
 		unit.baseMoveSpeed = 2.3f;
 	

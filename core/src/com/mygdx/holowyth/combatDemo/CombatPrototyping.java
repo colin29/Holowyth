@@ -58,8 +58,8 @@ public class CombatPrototyping {
 		unit.testAtk = 0;
 		unit.testDef = 5;
 
-		unit.baseMaxHp = 100;
-		unit.baseMaxSp = 50;
+		unit.maxHpBase = 100;
+		unit.maxSpBase = 50;
 
 		unit.level = 0;
 
@@ -71,8 +71,8 @@ public class CombatPrototyping {
 		unit.testAtk = 5;
 		unit.testDef = 5;
 
-		unit.baseMaxHp = 100;
-		unit.baseMaxSp = 50;
+		unit.maxHpBase = 100;
+		unit.maxSpBase = 50;
 
 		unit.level = 0;
 
