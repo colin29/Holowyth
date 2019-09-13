@@ -17,7 +17,6 @@ import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitInterPF;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skill.Status;
-import com.mygdx.holowyth.unit.behaviours.AggroIfIsEnemyUnit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
@@ -100,8 +99,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * The skill the character is actively casting or channelling, else null. The Skill class will reset this when the
-	 * active portion has finished.
+	 * The skill the character is actively casting or channelling, else null. The Skill class will reset this when the active portion has finished.
 	 */
 	private Skill activeSkill;
 
@@ -237,8 +235,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * Stops a unit's motion and halts any current orders. It does not disengage a unit that is attacking, though..
-	 * Unlike orderStop, is not affected by order restrictions. As such, it should be for backend and not player use.
+	 * Stops a unit's motion and halts any current orders. It does not disengage a unit that is attacking, though.. Unlike orderStop, is not affected
+	 * by order restrictions. As such, it should be for backend and not player use.
 	 */
 	public void stopUnit() {
 		clearOrder();
@@ -334,9 +332,9 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	/**
 	 * Main function, also is where the unit determines its movement
 	 */
-	public void handleLogic() {
+	public void tickLogic() {
 		motion.tick();
-		AggroIfIsEnemyUnit.applyTo(this, world);
+		// AggroIfIsEnemyUnit.applyTo(this, world);
 		if (currentOrder == Order.RETREAT)
 			retreatDurationRemaining -= 1;
 
@@ -365,7 +363,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	private static Map<Integer, Unit> idToUnit = new HashMap<Integer, Unit>();
 
 	/** Handles the combat logic for a unit for one frame */
-	public void handleCombatLogic() {
+	public void tickCombatLogic() {
 
 		if (isAttacking() && attacking.stats.isDead()) {
 			stopAttacking();
@@ -547,8 +545,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * Some classes only get a reference to WorldInfo because they are not intended to modify the world. This method can
-	 * be used to explicitly get a mutable World instance.
+	 * Some classes only get a reference to WorldInfo because they are not intended to modify the world. This method can be used to explicitly get a
+	 * mutable World instance.
 	 * 
 	 * @return
 	 */

@@ -1,6 +1,5 @@
 package com.mygdx.holowyth.unit;
 
-import static com.mygdx.holowyth.util.DataUtil.getAsPercentage;
 import static com.mygdx.holowyth.util.DataUtil.getRoundedString;
 
 import java.util.ArrayList;
@@ -8,22 +7,23 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
-import com.mygdx.holowyth.util.dataobjects.Pair;
-import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.util.DataUtil;
 
 /**
- * Simple stat fields are exposed public, while those which may trigger extra handling will be exposed through getters
- * and setters
+ * Simple stat fields are exposed public, while those which may trigger extra handling will be exposed through getters and setters
  * 
  * @author Colin Ta
  *
  */
 public class UnitStats implements UnitStatsInfo {
 
-	public static boolean printDetailedCombatInfo = false;
+	public static boolean printDetailedCombatInfo = true;
 
 	Unit self;
 
@@ -36,9 +36,18 @@ public class UnitStats implements UnitStatsInfo {
 
 	// Base stats
 	public int baseMaxHp, baseMaxSp;
+	/**
+	 * Unused atm, UnitMotion just uses the default movespeed
+	 */
 	public float baseMoveSpeed;
 
 	public int baseStr, baseAgi, baseFort, basePercep;
+
+	// test stats
+	public static boolean useTestDamage = true;
+	public int testDamage; // If set, the unit will simply do this much base damage instead of using stat and armor calculations
+	public int testAtk;
+	public int testDef;
 
 	int expGives;
 
@@ -92,6 +101,8 @@ public class UnitStats implements UnitStatsInfo {
 
 	public int level;
 
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	public enum UnitType { // Player-like characters have their derived stats calculated like players. Monsters do not.
 		PLAYER, MONSTER
 	}
@@ -110,8 +121,8 @@ public class UnitStats implements UnitStatsInfo {
 
 	/**
 	 * 
-	 * Calculates correct calculated stats as well as movement speed, movementSpeed. The base stats should be modified
-	 * and status effects set before calling this
+	 * Calculates correct calculated stats as well as movement speed, movementSpeed. The base stats should be modified and status effects set before
+	 * calling this
 	 * 
 	 * Call before anytime you have to read stats from Unit e.g combat calculations or a debug print or displaying on UI
 	 */
@@ -138,7 +149,7 @@ public class UnitStats implements UnitStatsInfo {
 		percep = basePercep + iPercep;
 
 		// 2: calculate hp stats
-		maxHp = Math.round(baseMaxHp * (1 + 0.1f * (fort - 5)));
+		maxHp = baseMaxHp; // Math.round(baseMaxHp * (1 + 0.1f * (fort - 5)));
 		maxSp = baseMaxSp;
 
 		// 3: calculate derived stats from core stats;
@@ -160,11 +171,15 @@ public class UnitStats implements UnitStatsInfo {
 			addDerivedStatBonuses(equip.offHand);
 		}
 
-		int levelBonus = (level - 1) * 2;
-		int mid = 5;
+		int levelBonus = (level) * 2;
+		int mid = 0;
 
-		atk = levelBonus + iAtk + 1 * (percep - mid);
-		def = levelBonus + iDef + 1 * (agi - mid);
+		atk = testAtk;
+		def = testDef;
+
+		// atk = levelBonus + iAtk + 1 * (percep - mid);
+		// def = levelBonus + iDef + 1 * (agi - mid);
+
 		force = levelBonus + iForce + 2 * (str - mid);
 		stab = levelBonus + iStab + 2 * (fort - mid) + 1 * (str - mid);
 		acc = levelBonus + iAcc + 2 * (percep - mid);
@@ -178,8 +193,7 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	/**
-	 * Preps the unit for use in the game world by setting the transient fields to an appropriate starting value
-	 * Idempotent (can call >=1 times)
+	 * Preps the unit for use in the game world by setting the transient fields to an appropriate starting value Idempotent (can call >=1 times)
 	 */
 	public void prepareUnit() {
 		recalculateStats();
@@ -197,26 +211,32 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	public String getInfo() {
+		return getInfo(false);
+	}
+
+	public String getInfo(boolean includeEquipment) {
 		recalculateStats();
 
 		String s = "";
 		s += String.format("Unit [%s]  hp: %s/%d  sp: %s/%d  <level %d>%n", name, getRoundedHp(), maxHp, getRoundedSp(), maxSp,
 				level);
-		s += String.format("Core stats: STR %d, AGI %d, FORT %d, PERCEP %d%n", str, agi, fort, percep);
-		s += String.format("Derived stats: Atk %d, Def %d, Force %d, Stab %d, Acc %d, Dodge %d%n", atk, def, force,
-				stab, acc, dodge);
-		s += "Other stats: \n";
-		s += String.format(" -Damage %s, AP %d, Armor Negation %s %n", getRoundedString(getUnitAttackDamage()),
-				armorPiercing, getAsPercentage(armorNegation));
-		s += String.format(" -Armor %d, DR %s %n", armor, getAsPercentage(dmgReduction));
+		// s += String.format("Core stats: STR %d, AGI %d, FORT %d, PERCEP %d%n", str, agi, fort, percep);
+		s += String.format("Derived stats: Atk %d, Def %d%n", atk, def);
+		// s += String.format("Derived stats: Atk %d, Def %d, Force %d, Stab %d, Acc %d, Dodge %d%n", atk, def, force,
+		// stab, acc, dodge);
+		/*
+		 * s += "Other stats: \n"; s += String.format(" -Damage %s, AP %d, Armor Negation %s %n", getRoundedString(getUnitAttackDamage()),
+		 * armorPiercing, getAsPercentage(armorNegation)); s += String.format(" -Armor %d, DR %s %n", armor, getAsPercentage(dmgReduction));
+		 */
 
-		s += "Equipped Items:\n";
-		s += getEquipped();
+		if (includeEquipment) {
+			s += "Equipped Items:\n";
+			s += getEquipped();
 
-		s += "Item details:\n";
+			s += "Item details:\n";
 
-		s += getInfoForAllEquippedItems();
-
+			s += getInfoForAllEquippedItems();
+		}
 		return s;
 	}
 
@@ -264,6 +284,7 @@ public class UnitStats implements UnitStatsInfo {
 	public String getRoundedHp() {
 		return getRoundedString(hp);
 	}
+
 	public String getRoundedSp() {
 		return getRoundedString(sp);
 	}
@@ -313,56 +334,56 @@ public class UnitStats implements UnitStatsInfo {
 	 */
 	public void attack(UnitStats enemy) {
 		if (this == enemy) {
-			System.out.println("Error, cannot attack self");
+			logger.warn("Error, cannot attack self");
 			return;
 		}
 		if (this.isDead()) {
-			System.out.println("Error, self is dead");
+			logger.warn("Error, self is dead");
 			return;
 		}
 		if (enemy.isDead()) {
-			System.out.println("Cannot attack a dead target");
+			logger.warn("Cannot attack a dead target");
 			return;
 		}
-		
+
 		// System.out.printf("%s attacks %s%n", this.name, enemy.name);
 
 		float chanceToHit = 0;
-		
-		// 1. Simulate dodge chance
 
-		int acc = this.acc;
-		int dodge = enemy.dodge;
-
-		chanceToHit = (float) (Math.pow(2, (acc - dodge) / 10f) * 0.5);
-		chanceToHit = Math.min(accChanceCeiling, chanceToHit);
-		chanceToHit = Math.max(accChanceFloor, chanceToHit);
-		if(printDetailedCombatInfo)
-			System.out.printf(" -Chance to be accurate: %f %d relative acc %n", chanceToHit, acc - dodge);
-
-		if (Math.random() > chanceToHit) {
-//			System.out.printf("%s's attack missed %s %n", this.name, enemy.name);
-			effects.makeMissEffect(this.self);
-			return;
-		}
+		// // 1. Simulate dodge chance
+		//
+		// int acc = this.acc;
+		// int dodge = enemy.dodge;
+		//
+		// chanceToHit = (float) (Math.pow(2, (acc - dodge) / 10f) * 0.5);
+		// chanceToHit = Math.min(accChanceCeiling, chanceToHit);
+		// chanceToHit = Math.max(accChanceFloor, chanceToHit);
+		// if (printDetailedCombatInfo)
+		// System.out.printf(" -Chance to be accurate: %f %d relative acc %n", chanceToHit, acc - dodge);
+		//
+		// if (Math.random() > chanceToHit) {
+		// // System.out.printf("%s's attack missed %s %n", this.name, enemy.name);
+		// effects.makeMissEffect(this.self);
+		// return;
+		// }
 
 		// 2. Simulate block chance
 
-		int atk = this.atk;
-		int def = enemy.def - getBeingAttackedByMultipleEnemiesDefPenalty(enemy)
-				- getBeingFlankedDefPenalty(enemy);
-		
-//		System.out.printf("Defence: %d - %d - %d = %d %n",
-//				enemy.def, getBeingAttackedByMultipleEnemiesDefPenalty(enemy), getBeingFlankedDefPenalty(enemy), def);
+		int atk = this.atk + getMultiTeamingAtkBonus(enemy);
+		int def = enemy.def;
 
-		chanceToHit = (float) (Math.pow(2, (atk - def) / 10f) * 0.25);
+		chanceToHit = (float) (0.4 * (1 + (atk - def) * 0.05));
+
 		chanceToHit = Math.min(atkChanceCeiling, chanceToHit);
 		chanceToHit = Math.max(atkChanceFloor, chanceToHit);
-		if(printDetailedCombatInfo)
-			System.out.printf(" -Chance to land hit: %f %d relative acc %n", chanceToHit, atk - def);
+		if (printDetailedCombatInfo) {
+			logger.debug("{} attacks {}: relative attack is {} (+{} from multi-teaming)%n", this.name, enemy.name, atk - def,
+					getMultiTeamingAtkBonus(enemy));
+			System.out.printf(" -Chance to land hit: %s %d relative acc %n", getRoundedString(chanceToHit), atk - def);
+		}
 
 		if (Math.random() > chanceToHit) {
-//			System.out.printf("%s's attack was blocked by %s %n", this.name, enemy.name);
+			// System.out.printf("%s's attack was blocked by %s %n", this.name, enemy.name);
 			effects.makeBlockEffect(this.self, enemy.self);
 			return;
 		}
@@ -372,7 +393,7 @@ public class UnitStats implements UnitStatsInfo {
 		float origDamage;
 
 		origDamage = getUnitAttackDamage();
-		
+
 		float damageReduced = Math.max(enemy.armor - armorPiercing, origDamage * enemy.dmgReduction);
 		damageReduced *= (1 - armorNegation);
 
@@ -382,60 +403,79 @@ public class UnitStats implements UnitStatsInfo {
 			damage = 0;
 		}
 
-		// 5. Apply damage
-//		System.out.printf("%s's attack hit and did %s damage to %s%n", this.name, DataUtil.getRoundedString(damage), enemy.name);
+		if (useTestDamage && testDamage != 0) {
+			damage = testDamage;
+		}
 
-		if(enemy.applyDamage(damage) > 0) {
+		// 5. Apply damage
+		System.out.printf("%s's attack hit and did %s damage to %s%n", this.name, DataUtil.getRoundedString(damage), enemy.name);
+
+		if (enemy.applyDamage(damage) > 0) {
 			enemy.self.interrupt();
 		}
 	}
-	
-	private int getBeingAttackedByMultipleEnemiesDefPenalty(UnitStats unit) {
-		int numEnemiesBeyondFirst = Math.max(0, unit.self.getAttackers().size()-1);
-		
-		return 2*numEnemiesBeyondFirst;
-	}
-	
-	private int getBeingFlankedDefPenalty(UnitStats unit) {
-		if(unit.isBeingFlanked()) {
-			return 4;
-		}else {
+
+	private int getMultiTeamingAtkBonus(UnitStats target) {
+		int numAttackers = target.self.getAttackers().size();
+
+		switch (numAttackers) {
+		case 1:
 			return 0;
-		}
-	}
-	
-	private static final float flankingRequiredAngle = 130;
-	
-	
-	private boolean isBeingFlanked() {
-		
-		if (self.getAttackers().size() < 2) {
-			return false;
-		}
-		
-		ArrayList<Pair<Unit, Float>> angles = new ArrayList<Pair<Unit, Float>>();
-		for(Unit u: self.getAttackers()) {
-			angles.add(new Pair<Unit, Float>(u, Point.getAngleInDegrees(self.getPos(), u.getPos())));
-		}
-		
-		//Brute force through values looking for two angles that differ by flanking 
-		
-		// Size of array is at least 2 because of condition above
-		for(int i=0; i<angles.size()-1;i++) {
-			for(int j=i+1; j<angles.size();j++) {
-				float angleUnit1 = angles.get(i).second();
-				float angleUnit2 = angles.get(j).second();
-				if(Math.abs(angleUnit1-angleUnit2) >= flankingRequiredAngle) {
-//					String name1 = angles.get(i).first().stats.name;
-//					String name2 = angles.get(j).first().stats.name;
-//					System.out.printf("Unit %s is being flanked by %s and %s%n", this.name, name1, name2);
-					return true;
-				}
+		case 2:
+			return 5;
+		case 3:
+			return 8;
+		case 4:
+			return 10;
+		default:
+			if (numAttackers >= 5) {
+				return 12;
+			} else {
+				return 0;
 			}
 		}
-		
-		return false;
+
 	}
+
+	// private int getFlankingAtkBonus(UnitStats target) {
+	// if (target.isBeingFlanked()) {
+	// return 4;
+	// } else {
+	// return 0;
+	// }
+	// }
+	//
+	// private static final float flankingRequiredAngle = 130;
+	//
+	// private boolean isBeingFlanked() {
+	//
+	// if (self.getAttackers().size() < 2) {
+	// return false;
+	// }
+	//
+	// ArrayList<Pair<Unit, Float>> angles = new ArrayList<Pair<Unit, Float>>();
+	// for (Unit u : self.getAttackers()) {
+	// angles.add(new Pair<Unit, Float>(u, Point.getAngleInDegrees(self.getPos(), u.getPos())));
+	// }
+	//
+	// // Brute force through values looking for two angles that differ by flanking
+	//
+	// // Size of array is at least 2 because of condition above
+	// for (int i = 0; i < angles.size() - 1; i++) {
+	// for (int j = i + 1; j < angles.size(); j++) {
+	// float angleUnit1 = angles.get(i).second();
+	// float angleUnit2 = angles.get(j).second();
+	// if (Math.abs(angleUnit1 - angleUnit2) >= flankingRequiredAngle) {
+	// // String name1 = angles.get(i).first().stats.name;
+	// // String name2 = angles.get(j).first().stats.name;
+	// // System.out.printf("Unit %s is being flanked by %s and %s%n", this.name, name1, name2);
+	// return true;
+	// }
+	// }
+	// }
+	//
+	// return false;
+	// }
 
 	public float getUnitAttackDamage() {
 		float weaponDamage = isWieldingAWeapon() ? equip.mainHand.damage : 1;
@@ -446,12 +486,13 @@ public class UnitStats implements UnitStatsInfo {
 
 	/**
 	 * Will always apply a damage effect, refactor if you want it different.
+	 * 
 	 * @param damage
 	 * @return The amount of damage actually done
 	 */
 	public float applyDamage(float damage) {
 		effects.makeDamageEffect(damage, this.self);
-		
+
 		hp -= damage;
 
 		if (hp <= 0) {
@@ -497,8 +538,7 @@ public class UnitStats implements UnitStatsInfo {
 		 * 
 		 * Like the fields, null means no item equipped
 		 * 
-		 * @return A list of the items in each field, in order. Each index corresponds to an equip slot, so null is a
-		 *         valid value
+		 * @return A list of the items in each field, in order. Each index corresponds to an equip slot, so null is a valid value
 		 */
 		private Array<Item> getArrayOfEquipSlots() {
 			Array<Item> a = new Array<Item>();
@@ -510,8 +550,7 @@ public class UnitStats implements UnitStatsInfo {
 		/**
 		 * Allows other classes to consistently get all the equip slots and their content in order <br>
 		 * Note that the returned map will become outdated if any items are equipped/un-equipped. <br>
-		 * Like the fields, null means no item equipped. Some items, namely 2h weapons will appear in both hand slots
-		 * <br>
+		 * Like the fields, null means no item equipped. Some items, namely 2h weapons will appear in both hand slots <br>
 		 * 
 		 * @return A map of the equip slots, slotName -> Item
 		 */
@@ -528,128 +567,166 @@ public class UnitStats implements UnitStatsInfo {
 
 	}
 
+	@Override
 	public float getHp() {
 		return hp;
 	}
 
+	@Override
 	public float getSp() {
 		return sp;
 	}
 
+	@Override
 	public int getMaxHp() {
 		return maxHp;
 	}
 
+	@Override
 	public int getMaxSp() {
 		return maxSp;
 	}
 
+	@Override
 	public float getHpRatio() {
-		return (float) hp / maxHp;
+		return hp / maxHp;
 	}
 
+	@Override
 	public float getSpRatio() {
-		if(maxSp == 0) {
-			return 0;	
+		if (maxSp == 0) {
+			return 0;
 		}
-		return (float) sp / maxSp;
+		return sp / maxSp;
 	}
-	
+
 	public void addSp(float amount) {
-		sp = Math.min(sp+amount, maxSp);
+		sp = Math.min(sp + amount, maxSp);
 	}
+
 	public void subtractSp(float amount) {
-		sp = Math.max(sp-amount, 0);
+		sp = Math.max(sp - amount, 0);
 	}
+
 	public void setSp(float value) {
 		sp = Math.min(Math.max(value, 0), maxSp);
 	}
 
+	@Override
 	public int getBaseMaxHp() {
 		return baseMaxHp;
 	}
 
+	@Override
 	public int getBaseMaxSp() {
 		return baseMaxSp;
 	}
 
+	@Override
 	public float getBaseMoveSpeed() {
 		return baseMoveSpeed;
 	}
 
+	@Override
 	public int getExp() {
 		return exp;
 	}
 
+	@Override
 	public int getExpGives() {
 		return expGives;
 	}
 
+	@Override
 	public int getAtk() {
 		return atk;
 	}
 
+	@Override
 	public int getDef() {
 		return def;
 	}
 
+	@Override
 	public int getForce() {
 		return force;
 	}
 
+	@Override
 	public int getStab() {
 		return stab;
 	}
 
+	@Override
 	public int getAcc() {
 		return acc;
 	}
 
+	@Override
 	public int getDodge() {
 		return dodge;
 	}
 
+	@Override
 	public int getStr() {
 		return baseStr;
 	}
 
+	@Override
 	public int getAgi() {
 		return baseAgi;
 	}
 
+	@Override
 	public int getFort() {
 		return baseFort;
 	}
 
+	@Override
 	public int getPercep() {
 		return basePercep;
 	}
 
+	@Override
 	public Stance getStance() {
 		return stance;
 	}
 
+	@Override
 	public StunState getStunState() {
 		return stunState;
 	}
 
+	@Override
 	public int getStunDurationRemainng() {
 		return stunDurationRemainng;
 	}
 
+	@Override
 	public UnitStats getLookingAt() {
 		return lookingAt;
 	}
 
+	@Override
 	public UnitStats getOccupiedBy() {
 		return occupiedBy;
 	}
 
+	@Override
 	public String getName() {
 		return name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	/**
+	 * Should only use this for debugging purposes. In-game wise you should use deal applyDamage
+	 * 
+	 * @param value
+	 */
+	public void setHp(float value) {
+		hp = value;
 	}
 }

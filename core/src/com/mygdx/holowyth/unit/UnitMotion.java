@@ -47,11 +47,11 @@ public class UnitMotion {
 	private float maxAccelFactor = 5;
 
 	/**
-	 * The variables below all depend on speed and are modified by {@link UnitMotion#setSpeedAndRelatedVars(float)}
+	 * The variables below all depend on speed and are modified by {@link UnitMotion#setSpeedAndScaleAccel(float)}
 	 */
 	private float speed;
 	{
-		setSpeedAndRelatedVars(defaultUnitMoveSpeed);
+		setSpeedAndScaleAccel(defaultUnitMoveSpeed);
 	}
 
 	private float startingSpeed;
@@ -383,7 +383,7 @@ public class UnitMotion {
 	 * 
 	 * @param speed
 	 */
-	public void setSpeedAndRelatedVars(float speed) {
+	public void setSpeedAndScaleAccel(float speed) {
 		this.speed = speed;
 		this.accelRate = defaultAccelRate * (speed / defaultUnitMoveSpeed);
 		this.decelRate = defaultDecelRate * (speed / defaultUnitMoveSpeed);

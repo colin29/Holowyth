@@ -22,6 +22,7 @@ import com.mygdx.holowyth.util.exceptions.HoloOperationException;
  * A class with static methods in order to simulate circle vs circle collisions
  * 
  * 
+ * 
  * @author Colin Ta
  *
  */
@@ -53,7 +54,7 @@ public class CollisionDetection {
 	}
 
 	/**
-	 * Finds and calculates collision infos of a circle body vs wall segment, while moving along the body's motion
+	 * Finds and calculates collision infos of circle body vs wall segments, while moving along the body's motion
 	 */
 	public static List<CollisionInfo> getCircleSegCollisionInfos(CircleCBInfo objectBody,
 			float thisRadius,
@@ -89,6 +90,63 @@ public class CollisionDetection {
 			}
 		}
 		return infos;
+	}
+
+	/**
+	 * Given multiple types of detected collisions, narrows down and calculates the result of the first collision along the line segment motion. There
+	 * should be at least one collision of some type.
+	 * 
+	 * @param segment
+	 *            The motion for curBody this tick
+	 * @param curBody
+	 * @param bodyCollisions
+	 *            The colBodies being collided into, each of these must actually be intersecting with curBody.
+	 * @param obstacleCollisions
+	 *            optional, pass null if you don't need to consider obstacle collisions
+	 * @param intersectDebugInfo
+	 *            optional, pass in an object to receive debug values
+	 * 
+	 * @return Information about the first collision along curBody's motion
+	 */
+	public static CollisionInfo getFirstCollisionInfo(CircleCBInfo curBody, List<CircleCBInfo> bodyCollisions, List<CollisionInfo> obstacleCollisions,
+			IntersectDebugInfo intersectDebugInfo) {
+
+		Segment segment = new Segment(curBody.getX(), curBody.getY(),
+				curBody.getX() + curBody.getVx(),
+				curBody.getY() + curBody.getVy());
+
+		List<CollisionInfo> colInfos = new ArrayList<CollisionInfo>();
+		for (CircleCBInfo other : bodyCollisions) {
+			try {
+				CollisionInfo info = getCircleCircleCollisionInfo(segment, curBody, other, intersectDebugInfo);
+				if (info != null) {
+					colInfos.add(info);
+				}
+			} catch (HoloOperationException e) {
+				logger.warn(e.getMessage());
+				logger.warn(e.getFromMessage());
+				logger.warn("Skipping adding this collision's info");
+			}
+
+		}
+
+		// Compare the p value of all collisions, return the one with smallest p
+		Comparator<CollisionInfo> ascendingPOrder = (CollisionInfo c1, CollisionInfo c2) -> {
+			return (c1.pOfCollisionPoint <= c2.pOfCollisionPoint) ? -1 : 1;
+		};
+		PriorityQueue<CollisionInfo> q = new PriorityQueue<CollisionInfo>(ascendingPOrder);
+
+		q.addAll(colInfos);
+		if (obstacleCollisions != null) {
+			q.addAll(obstacleCollisions);
+		}
+
+		if (q.isEmpty()) {
+			throw (new HoloOperationException("Error, no collisions actually provided(?)."));
+		}
+
+		CollisionInfo firstCollision = q.peek();
+		return firstCollision;
 	}
 
 	private static List<OrientedSeg> getObstacleExpandedSegs(List<OrientedPoly> polys, float bodyRadius) {
@@ -136,63 +194,6 @@ public class CollisionDetection {
 			return null;
 		}
 		return null;
-	}
-
-	/**
-	 * Given multiple types of detected collisions, narrows down and calculates the result of the first collision along the line segment motion. There
-	 * should be at least one collision of some type.
-	 * 
-	 * @param segment
-	 *            The motion for curBody this tick
-	 * @param curBody
-	 * @param bodyCollisions
-	 *            The colBodies being collided into, each of these must actually be intersecting with curBody.
-	 * @param obstacleCollisions
-	 *            optional, pass null if you don't need to consider obstacle collisions
-	 * @param intersectDebugInfo
-	 *            optional, pass in an object to receive debug values
-	 * 
-	 * @return Information about the first collision along curBody's motion
-	 */
-	public static CollisionInfo getFirstCollisionInfo(CircleCBInfo curBody, List<CircleCBInfo> bodyCollisions, List<CollisionInfo> obstacleCollisions,
-			IntersectDebugInfo intersectDebugInfo) {
-
-		Segment segment = new Segment(curBody.getX(), curBody.getY(),
-				curBody.getX() + curBody.getVx(),
-				curBody.getY() + curBody.getVy());
-
-		List<CollisionInfo> colInfos = new ArrayList<CollisionInfo>();
-		for (CircleCBInfo other : bodyCollisions) {
-			try {
-				CollisionInfo info = getCircleCircleCollisionInfo(segment, curBody, other, intersectDebugInfo);
-				if (info != null) {
-					colInfos.add(info);
-				}
-			} catch (HoloOperationException e) {
-				logger.warn(e.getMessage());
-				logger.trace(e.getFromMessage());
-				logger.warn("Skipping adding this collision's info");
-			}
-
-		}
-
-		// Compare the p value of all collisions, return the one with smallest p
-		Comparator<CollisionInfo> ascendingPOrder = (CollisionInfo c1, CollisionInfo c2) -> {
-			return (c1.pOfCollisionPoint <= c2.pOfCollisionPoint) ? -1 : 1;
-		};
-		PriorityQueue<CollisionInfo> q = new PriorityQueue<CollisionInfo>(ascendingPOrder);
-
-		q.addAll(colInfos);
-		if (obstacleCollisions != null) {
-			q.addAll(obstacleCollisions);
-		}
-
-		if (q.isEmpty()) {
-			throw (new HoloOperationException("Error, no collisions actually provided(?)."));
-		}
-
-		CollisionInfo firstCollision = q.peek();
-		return firstCollision;
 	}
 
 	/**

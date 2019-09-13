@@ -434,13 +434,13 @@ public class World implements WorldInfo {
 
 	private void tickLogicForUnits() {
 		for (Unit u : units.getUnits()) {
-			u.handleLogic();
+			u.tickLogic();
 		}
 	}
 
 	private void handleCombatLogic() {
 		for (Unit u : units.getUnits()) {
-			u.handleCombatLogic();
+			u.tickCombatLogic();
 		}
 	}
 
@@ -448,7 +448,7 @@ public class World implements WorldInfo {
 		return Holo.collisionClearanceDistance * (u.motion.getVelocityMagnitude() / Holo.defaultUnitMoveSpeed);
 	}
 
-	void spawnSomeEnemyUnits() {
+	public void spawnSomeEnemyUnits() {
 		ArrayList<Unit> someUnits = new ArrayList<Unit>();
 		someUnits.add(spawnUnit(500, 237, Unit.Side.ENEMY));
 		someUnits.add(spawnUnit(450, 300, Unit.Side.ENEMY));
@@ -463,6 +463,7 @@ public class World implements WorldInfo {
 			unit.setName("Goblin");
 			unit.stats.prepareUnit();
 		}
+		return;
 	}
 
 	/**
@@ -470,16 +471,16 @@ public class World implements WorldInfo {
 	 * 
 	 * @return
 	 */
-	public Unit createPlayerUnit() {
+	public Unit spawnPlayerUnit() {
 		if (playerUnit == null) {
 			playerUnit = spawnUnit(320, 220, Unit.Side.PLAYER, "Elvin");
-			PresetUnits.loadUnitStats(playerUnit.stats);
+			PresetUnits.loadPlayerUnitStats(playerUnit.stats);
 			PresetUnits.loadSomeEquipment(playerUnit.stats);
 			PresetUnits.loadArmor(playerUnit.stats);
 			playerUnit.stats.prepareUnit();
 			// playerUnit.stats.printInfo();
 
-			playerUnit.motion.setSpeedAndRelatedVars(Holo.defaultUnitMoveSpeed * 5);
+			playerUnit.motion.setSpeedAndScaleAccel(Holo.defaultUnitMoveSpeed * 5);
 
 			return playerUnit;
 		} else {

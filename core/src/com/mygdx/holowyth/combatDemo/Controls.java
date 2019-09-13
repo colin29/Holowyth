@@ -399,8 +399,7 @@ public class Controls extends InputProcessorAdapter {
 	}
 
 	/**
-	 * Makes it so when you are part-way through an order, and then the start of a separate order, the game will stop
-	 * waiting for the first one
+	 * Makes it so when you are part-way through an order, and then the start of a separate order, the game will stop waiting for the first one
 	 */
 	private void clearContext() {
 		context = Context.NONE;
@@ -578,6 +577,9 @@ public class Controls extends InputProcessorAdapter {
 		if (!newlySelected.isEmpty()) {
 			selectedUnits.clear();
 			selectedUnits.addAll(newlySelected);
+			for (Unit u : newlySelected) {
+				u.stats.printInfo();
+			}
 		}
 	}
 
@@ -613,8 +615,8 @@ public class Controls extends InputProcessorAdapter {
 	}
 
 	/**
-	 * Is guaranteed to be called when selectedUnits is modified Is called immediately after a modifiying action, if
-	 * that action actually changed the set.
+	 * Is guaranteed to be called when selectedUnits is modified Is called immediately after a modifiying action, if that action actually changed the
+	 * set.
 	 */
 	private void onSelectedUnitsModified() {
 		// System.out.println("selectedUnits modified");

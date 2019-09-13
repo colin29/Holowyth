@@ -9,7 +9,7 @@ import com.mygdx.holowyth.unit.UnitStats.UnitType;
  *
  */
 public class PresetUnits {
-	public static void loadUnitStats(UnitStats unit) {
+	public static void loadPlayerUnitStats(UnitStats unit) {
 		unit.baseStr = 7;
 		unit.baseAgi = 5;
 		unit.baseFort = 6;
