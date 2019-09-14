@@ -4,6 +4,7 @@ import static com.mygdx.holowyth.util.DataUtil.getRoundedString;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
+import com.mygdx.holowyth.unit.statuseffect.SlowEffect;
 import com.mygdx.holowyth.util.DataUtil;
 
 /**
@@ -23,9 +25,11 @@ import com.mygdx.holowyth.util.DataUtil;
  */
 public class UnitStats implements UnitStatsInfo {
 
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	public static boolean printDetailedCombatInfo = true;
 
-	Unit self;
+	public final Unit self;
 
 	// App fields
 	EffectsHandler effects;
@@ -75,7 +79,9 @@ public class UnitStats implements UnitStatsInfo {
 
 	public int level;
 
-	Logger logger = LoggerFactory.getLogger(this.getClass());
+	// Status Effects
+
+	private final List<SlowEffect> slowEffects = new LinkedList<SlowEffect>();
 
 	public enum UnitType { // Player-like characters have their derived stats calculated like players. Monsters do not.
 		PLAYER, MONSTER
@@ -91,6 +97,17 @@ public class UnitStats implements UnitStatsInfo {
 	public UnitStats(String name, Unit unit) {
 		this(unit);
 		this.name = name;
+	}
+
+	public void tick() {
+		tickEffects();
+	}
+
+	public void tickEffects() {
+
+		slowEffects.forEach((effect) -> effect.tickDuration());
+		slowEffects.removeIf((effect) -> effect.isExpired());
+
 	}
 
 	/**
@@ -172,6 +189,7 @@ public class UnitStats implements UnitStatsInfo {
 		hp = maxHp;
 		sp = maxSp;
 
+		slowEffects.clear();
 	}
 
 	private void addCoreStatBonuses(Item... items) {
@@ -252,6 +270,10 @@ public class UnitStats implements UnitStatsInfo {
 		// return;
 		// }
 
+		// Add a slow effect, regardless of block or hit. This is for balancing fleeing enemies without engaging.
+		enemy.applySlow(0.4f, 90);
+		enemy.applySlow(0.2f, 150);
+
 		// 2. Simulate block chance
 
 		int atk = this.atk + getMultiTeamingAtkBonus(enemy);
@@ -297,6 +319,7 @@ public class UnitStats implements UnitStatsInfo {
 		if (enemy.applyDamage(damage) > 0) {
 			enemy.self.interrupt();
 		}
+
 	}
 
 	private int getMultiTeamingAtkBonus(UnitStats target) {
@@ -386,6 +409,43 @@ public class UnitStats implements UnitStatsInfo {
 
 		return damage;
 	}
+
+	public void addSp(float amount) {
+		sp = Math.min(sp + amount, maxSp);
+	}
+
+	public void subtractSp(float amount) {
+		sp = Math.max(sp - amount, 0);
+	}
+
+	public void setSp(float value) {
+		sp = Math.min(Math.max(value, 0), maxSp);
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	/**
+	 * Should only use this for debugging purposes. In-game wise you should use deal applyDamage
+	 * 
+	 * @param value
+	 */
+	public void setHpDebug(float value) {
+		hp = value;
+	}
+
+	/**
+	 * @param slowAmount
+	 *            from 0 to 1, 1 being a total slow
+	 * @param duration
+	 *            in frames
+	 */
+	public void applySlow(float slowAmount, int duration) {
+		slowEffects.add(new SlowEffect(duration, slowAmount));
+	}
+
+	// Printing Info Methods
 
 	public void printInfo() {
 		System.out.println(getInfo());
@@ -555,18 +615,6 @@ public class UnitStats implements UnitStatsInfo {
 		return sp / maxSp;
 	}
 
-	public void addSp(float amount) {
-		sp = Math.min(sp + amount, maxSp);
-	}
-
-	public void subtractSp(float amount) {
-		sp = Math.max(sp - amount, 0);
-	}
-
-	public void setSp(float value) {
-		sp = Math.min(Math.max(value, 0), maxSp);
-	}
-
 	@Override
 	public int getBaseMaxHp() {
 		return maxHpBase;
@@ -580,6 +628,28 @@ public class UnitStats implements UnitStatsInfo {
 	@Override
 	public float getBaseMoveSpeed() {
 		return baseMoveSpeed;
+	}
+
+	@Override
+	public float getMoveSpeed() {
+
+		float largestSlow = 0;
+		for (var effect : slowEffects) {
+			largestSlow = Math.max(largestSlow, effect.getSlowAmount());
+		}
+
+		return baseMoveSpeed * (1 - largestSlow);
+	}
+
+	/**
+	 * @returns movespeed / baseMoveSpeed. For example if a unit was slowed by 30%, it would return 0.7
+	 */
+	public float getMoveSpeedRatio() {
+		if (baseMoveSpeed == 0) {
+			return 0;
+		}
+
+		return getMoveSpeed() / baseMoveSpeed;
 	}
 
 	@Override
@@ -645,18 +715,5 @@ public class UnitStats implements UnitStatsInfo {
 	@Override
 	public String getName() {
 		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * Should only use this for debugging purposes. In-game wise you should use deal applyDamage
-	 * 
-	 * @param value
-	 */
-	public void setHpDebug(float value) {
-		hp = value;
 	}
 }

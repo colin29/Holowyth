@@ -31,6 +31,7 @@ import com.mygdx.holowyth.skill.UnitGroundSkill;
 import com.mygdx.holowyth.skill.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
+import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.template.adapters.InputProcessorAdapter;
@@ -99,6 +100,15 @@ public class Controls extends InputProcessorAdapter {
 				return Unit.getDist(u1, u2) - (u1.getRadius() + u2.getRadius());
 			} else {
 				return 0;
+			}
+		});
+
+		debugValues.add("Movement speed of one unit", () -> {
+			if (selectedUnits.size() == 1) {
+				Unit u = selectedUnits.iterator().next();
+				return DataUtil.getAsPercentage(u.stats.getMoveSpeedRatio());
+			} else {
+				return "0";
 			}
 		});
 

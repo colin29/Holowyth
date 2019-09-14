@@ -37,7 +37,6 @@ public class UnitMotion {
 
 	// Accel/Decel shared variables
 	private final static float defaultStartingSpeedRatio = 0.4f;
-	private final static float defaultStartingSpeed = Holo.defaultUnitMoveSpeed * defaultStartingSpeedRatio;
 	private final static float defaultAccelRate = 0.01f;
 
 	/**
@@ -100,6 +99,12 @@ public class UnitMotion {
 	}
 
 	public void tick() {
+
+		// unit motion can't handle 0 move speed for some reason (probably needs some extra special casing)
+		if (self.stats.getMoveSpeed() != 0) {
+			setSpeedAndScaleAccel(self.stats.getMoveSpeed());
+		}
+
 		handleRepathing();
 		determineMovement();
 	}
@@ -107,8 +112,7 @@ public class UnitMotion {
 	/**
 	 * Looks for a path in a manner suitable for a move order. If it finds one, the unit's motion adopts that path
 	 * 
-	 * Since a unitMotion will periodically repath for a unit on attack order, even if the initial path fails, this
-	 * method does not report a failure.
+	 * Since a unitMotion will periodically repath for a unit on attack order, even if the initial path fails, this method does not report a failure.
 	 */
 	public void pathFindForAttackOrder() {
 		// find path as normal, except for pathing ignore the target's collision
@@ -123,8 +127,7 @@ public class UnitMotion {
 	}
 
 	/**
-	 * Looks for a path in a manner suitable for a move order. If it finds one, the unit's motion adopts that path. If
-	 * it doesn't, nothing happens
+	 * Looks for a path in a manner suitable for a move order. If it finds one, the unit's motion adopts that path. If it doesn't, nothing happens
 	 * 
 	 * @param dx
 	 * @param dy
@@ -140,9 +143,8 @@ public class UnitMotion {
 	}
 
 	/**
-	 * Stop the current normal movement. This applies to normal voluntary movement, and does not affect knockback
-	 * motion. It is valid to give when a unit is being knocked back, though the unit's normal movement should already
-	 * be cleared
+	 * Stop the current normal movement. This applies to normal voluntary movement, and does not affect knockback motion. It is valid to give when a
+	 * unit is being knocked back, though the unit's normal movement should already be cleared
 	 */
 	public void stopCurrentMovement() {
 		clearPath();
@@ -171,8 +173,8 @@ public class UnitMotion {
 	}
 
 	/**
-	 * Sets the velocity for the unit based on the unit's path. Also accounts for accel+decel at the begin and end of
-	 * movement. When movement is complete, a unit's path is set to null.
+	 * Sets the velocity for the unit based on the unit's path. Also accounts for accel+decel at the begin and end of movement. When movement is
+	 * complete, a unit's path is set to null.
 	 */
 	private void determineMovement() {
 		if (path == null) {
@@ -284,8 +286,7 @@ public class UnitMotion {
 	// Unit Movement
 
 	/**
-	 * When a unit is given a move command that is in a similar direction then it is already travelling, it doesn't need
-	 * to slow down
+	 * When a unit is given a move command that is in a similar direction then it is already travelling, it doesn't need to slow down
 	 * 
 	 * Looks at the unit's current speed and next waypoint.
 	 */
@@ -403,8 +404,8 @@ public class UnitMotion {
 	}
 
 	/**
-	 * Called by world when the pathing unit fails to make progress (even with the push out algorithm). Generally this
-	 * will make the unit repath/ reattack
+	 * Called by world when the pathing unit fails to make progress (even with the push out algorithm). Generally this will make the unit repath/
+	 * reattack
 	 * 
 	 * @return
 	 */
@@ -452,8 +453,8 @@ public class UnitMotion {
 	}
 
 	/**
-	 * If the unit is not in knockback state, sets it to knockback state with this velocity. If it is already being
-	 * knocked back, adds this to its velocity.
+	 * If the unit is not in knockback state, sets it to knockback state with this velocity. If it is already being knocked back, adds this to its
+	 * velocity.
 	 */
 	public void applyKnockBackVelocity(float dx, float dy) {
 		if (isBeingKnockedBack) {

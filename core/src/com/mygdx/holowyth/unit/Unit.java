@@ -304,20 +304,6 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		target = null;
 	}
 
-	public boolean isCasting() {
-		return this.activeSkill != null && activeSkill.getStatus() == Status.CASTING;
-	}
-
-	public boolean isChannelling() {
-		return this.activeSkill != null && activeSkill.getStatus() == Status.CHANNELING;
-	}
-
-	@Override
-	public boolean isBusyRetreating() {
-		return currentOrder == Order.RETREAT && retreatDurationRemaining > 0;
-	}
-	// @formatter:on
-
 	/**
 	 * Caused by normal attacking or stun effects. Interrupts any casting or channeling spell
 	 */
@@ -327,13 +313,15 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		}
 	}
 
-	// Combat
+	// Tick Logic
 
 	/**
 	 * Main function, also is where the unit determines its movement
 	 */
 	public void tickLogic() {
 		motion.tick();
+		stats.tick();
+
 		// AggroIfIsEnemyUnit.applyTo(this, world);
 		if (currentOrder == Order.RETREAT)
 			retreatDurationRemaining -= 1;
@@ -432,7 +420,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		attacking = target;
 		unitsAttacking.get(attacking).add(this);
 
-		attackCooldownLeft = attackCooldown / 2;
+		attackCooldownLeft = attackCooldown / 4;
 	}
 
 	/**
@@ -538,6 +526,19 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	@Override
 	public UnitInfo getAttacking() {
 		return attacking;
+	}
+
+	public boolean isCasting() {
+		return this.activeSkill != null && activeSkill.getStatus() == Status.CASTING;
+	}
+
+	public boolean isChannelling() {
+		return this.activeSkill != null && activeSkill.getStatus() == Status.CHANNELING;
+	}
+
+	@Override
+	public boolean isBusyRetreating() {
+		return currentOrder == Order.RETREAT && retreatDurationRemaining > 0;
 	}
 
 	public WorldInfo getWorld() {

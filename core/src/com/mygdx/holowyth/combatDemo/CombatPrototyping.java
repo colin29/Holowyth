@@ -6,6 +6,7 @@ import java.util.List;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.UnitStats;
 import com.mygdx.holowyth.unit.UnitStats.UnitType;
+import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class CombatPrototyping {
@@ -30,7 +31,7 @@ public class CombatPrototyping {
 		return someUnits;
 	}
 
-	private static Unit playerUnit;
+	private static UnitStats playerUnit;
 
 	/**
 	 * Create a custom player unit. Calling multiple times will just return the existing player unit.
@@ -39,17 +40,17 @@ public class CombatPrototyping {
 	 */
 	public static Unit spawnPlayerUnit(World world) {
 		if (playerUnit == null) {
-			playerUnit = world.spawnUnit(playerPos.x, playerPos.y, Unit.Side.PLAYER, "Elvin");
-			loadPlayerUnitStats(playerUnit.stats);
+			playerUnit = world.spawnUnit(playerPos.x, playerPos.y, Unit.Side.PLAYER, "Elvin").stats;
+			loadPlayerUnitStats(playerUnit);
 
-			playerUnit.stats.prepareUnit();
-			playerUnit.stats.printInfo();
+			playerUnit.prepareUnit();
+			playerUnit.printInfo();
 
-			// playerUnit.motion.setSpeedAndScaleAccel(Holo.defaultUnitMoveSpeed);
+			playerUnit.baseMoveSpeed = Holo.defaultUnitMoveSpeed;
 
-			return playerUnit;
+			return playerUnit.self;
 		} else {
-			return playerUnit;
+			return playerUnit.self;
 		}
 	}
 
@@ -60,6 +61,8 @@ public class CombatPrototyping {
 
 		unit.maxHpBase = 100;
 		unit.maxSpBase = 50;
+
+		unit.baseMoveSpeed = Holo.defaultUnitMoveSpeed;
 
 		unit.level = 0;
 

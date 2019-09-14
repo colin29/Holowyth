@@ -1,53 +1,59 @@
 package com.mygdx.holowyth.unit.interfaces;
 
 public interface UnitStatsInfo {
-	public float getHp();
+	float getHp();
 
-	public float getSp();
+	float getSp();
 
-	public int getMaxHp();
+	int getMaxHp();
 
-	public int getMaxSp();
+	int getMaxSp();
 
-	public int getBaseMaxHp();
+	int getBaseMaxHp();
 
-	public int getBaseMaxSp();
+	int getBaseMaxSp();
 
 	/**
 	 * Gets ratio of current hp to maxHp
 	 */
-	public float getHpRatio();
+	float getHpRatio();
 
 	/**
 	 * Gets ratio of current sp to maxSp
 	 */
-	public float getSpRatio();
+	float getSpRatio();
 
-	public float getBaseMoveSpeed();
+	float getBaseMoveSpeed();
 
-	public int getExp();
+	int getExp();
 
-	public int getExpGives();
+	int getExpGives();
 
-	public int getAtk();
+	int getAtk();
 
-	public int getDef();
+	int getDef();
 
-	public int getForce();
+	int getForce();
 
-	public int getStab();
+	int getStab();
 
-	public int getAcc();
+	int getAcc();
 
-	public int getDodge();
+	int getDodge();
 
-	public int getStr();
+	int getStr();
 
-	public int getAgi();
+	int getAgi();
 
-	public int getFort();
+	int getFort();
 
-	public int getPercep();
+	int getPercep();
 
-	public String getName();
+	String getName();
+
+	/**
+	 * Gets the statistical movespeed of the object, modified by slows. Note this is the speed of the unit for "normal" motion (as opposed to
+	 * knockback motion).
+	 */
+	float getMoveSpeed();
 }

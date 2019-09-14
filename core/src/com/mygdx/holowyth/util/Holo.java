@@ -42,9 +42,9 @@ public class Holo {
 
 	// Combat movement
 	public static float defaultUnitEngageRange = 5;
-	public static float defaultUnitDisengageRange = defaultUnitEngageRange + 5; // the distance the enemy must travel
-																				// before it stops receiving attacks
-																				// from the unit.
+	public static float defaultUnitDisengageRange = defaultUnitEngageRange + 10; // the distance the enemy must travel
+																					// before it stops receiving attacks
+																					// from the unit.
 
 	public static float idleAggroRange = 150f;
 
