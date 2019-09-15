@@ -22,6 +22,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.combatDemo.ui.GameLog;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.GroundSkill;
 import com.mygdx.holowyth.skill.NoneSkill;
@@ -73,10 +74,12 @@ public class Controls extends InputProcessorAdapter {
 	Skin skin;
 	LabelStyle labelStyle;
 
+	private GameLog gameLog;
+
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public Controls(Holowyth game, Camera camera, Camera fixedCam, List<Unit> units, DebugStore debugStore,
-			World world) {
+			World world, GameLog gameLog) {
 		this.shapeRenderer = game.shapeRenderer;
 		this.camera = camera;
 		this.fixedCam = fixedCam;
@@ -85,6 +88,8 @@ public class Controls extends InputProcessorAdapter {
 
 		this.font = Holowyth.fonts.debugFont();
 		this.skin = game.skin;
+
+		this.gameLog = gameLog;
 
 		labelStyle = new LabelStyle(Holowyth.fonts.debugFont(), Holo.debugFontColor);
 
@@ -380,7 +385,14 @@ public class Controls extends InputProcessorAdapter {
 	private void handleRetreatCommand(float x, float y) {
 		clearContext();
 		for (UnitOrderable u : selectedUnits) {
-			u.orderRetreat(x, y);
+			if (u.getRetreatCooldown() > 0) { // specifically catch this condition and notify the user
+				logger.info("Unit {} can't retreat for another {} seconds", u.getStats().getName(),
+						DataUtil.getRoundedString(u.getRetreatCooldown() / 60, 1));
+				gameLog.addErrorMessage(String.format("Unit \"%s\" can't retreat for another %s seconds", u.getStats().getName(),
+						DataUtil.getRoundedString(u.getRetreatCooldown() / 60, 1)));
+			} else {
+				u.orderRetreat(x, y);
+			}
 		}
 	}
 

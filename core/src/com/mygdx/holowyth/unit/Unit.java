@@ -82,7 +82,14 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	// Skills
 
-	int skillCooldown;
+	/**
+	 * Time in frames before the unit can use skills again
+	 */
+	private float skillCooldown;
+	/**
+	 * Time in frames. When a unit engages it cannot retreat for a certain amount of time.
+	 */
+	private float retreatCooldown = 0;
 
 	private WorldInfo world;
 
@@ -263,6 +270,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 			return isAnyOrderAllowed()
 					&& isAttacking()
 					&& this.currentOrder != Order.RETREAT
+					&& retreatCooldown <= 0
 					&& !(isCasting() || isChannelling());
 		}
 		private boolean isStopOrderAllowed() {
@@ -330,12 +338,24 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 			activeSkill.tick();
 
 		tickSkillCooldown();
+		tickRetreatCooldown();
 	}
 
 	private void tickSkillCooldown() {
 		if (skillCooldown > 0) {
 			skillCooldown -= 1;
 		}
+	}
+
+	private void tickRetreatCooldown() {
+		if (retreatCooldown > 0) {
+			retreatCooldown -= 1;
+		}
+	}
+
+	@Override
+	public float getRetreatCooldown() {
+		return retreatCooldown;
 	}
 
 	public boolean areSkillsOnCooldown() {
@@ -421,6 +441,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		unitsAttacking.get(attacking).add(this);
 
 		attackCooldownLeft = attackCooldown / 4;
+		retreatCooldown = 480; // 8 seconds until can retreat
 	}
 
 	/**
@@ -568,7 +589,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		this.activeSkill = activeSkill;
 	}
 
-	public void setSkillCooldown(int value) {
+	public void setSkillCooldown(float value) {
 		skillCooldown = value;
 	}
 

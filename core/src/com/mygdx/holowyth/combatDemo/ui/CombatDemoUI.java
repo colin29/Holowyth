@@ -28,10 +28,15 @@ public class CombatDemoUI {
 
 	Skin skin;
 
+	private GameLog gameLog;
+
 	public CombatDemoUI(Stage stage, DebugStore debugStore, Skin skin) {
 		this.skin = skin;
 		this.stage = stage;
 		debugStoreUI = new DebugStoreUI(debugStore);
+
+		gameLog = new GameLog(stage);
+
 		createUI();
 	}
 
@@ -106,6 +111,10 @@ public class CombatDemoUI {
 				"(" + (int) (p.x) + ", " + (int) (p.y) + ")\n" + "(" + (int) (p.x) / Holo.CELL_SIZE + ", "
 						+ (int) (p.y) / Holo.CELL_SIZE + ")");
 
+	}
+
+	public GameLog getGameLog() {
+		return gameLog;
 	}
 
 }

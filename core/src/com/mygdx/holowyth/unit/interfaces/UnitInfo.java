@@ -42,4 +42,6 @@ public interface UnitInfo {
 	public boolean isAPlayerCharacter();
 
 	public int getID();
+
+	float getRetreatCooldown();
 }

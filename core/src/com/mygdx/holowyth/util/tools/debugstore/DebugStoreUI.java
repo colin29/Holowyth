@@ -15,7 +15,7 @@ import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.Holo;
 
 /**
- * Is used as a common UI submodule. When created, it exposes a table which can added where desired
+ * Is used as a common UI submodule. When created, it exposes a table which the caller can place where desired
  * 
  * May add minor customization like font color and type
  * 

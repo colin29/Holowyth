@@ -284,7 +284,7 @@ public class UnitStats implements UnitStatsInfo {
 		chanceToHit = Math.min(atkChanceCeiling, chanceToHit);
 		chanceToHit = Math.max(atkChanceFloor, chanceToHit);
 		if (printDetailedCombatInfo) {
-			logger.debug("{} attacks {}: relative attack is {} (+{} from multi-teaming)%n", this.name, enemy.name, atk - def,
+			logger.debug("{} attacks {}: relative attack is {} (+{} from multi-teaming)", this.name, enemy.name, atk - def,
 					getMultiTeamingAtkBonus(enemy));
 			System.out.printf(" -Chance to land hit: %s %d relative acc %n", getRoundedString(chanceToHit), atk - def);
 		}

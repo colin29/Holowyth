@@ -104,6 +104,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	@Override
 	public void render(float delta) {
+		stage.act();
 		renderer.render(delta);
 
 		updateTitleBarInformation();
@@ -157,7 +158,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		if (unitControls != null) {
 			multiplexer.removeProcessor(unitControls);
 		}
-		unitControls = new Controls(game, camera, fixedCam, world.getUnits(), debugStore, world);
+		unitControls = new Controls(game, camera, fixedCam, world.getUnits(), debugStore, world, combatDemoUI.getGameLog());
 		multiplexer.addProcessor(unitControls);
 
 		// Set Renderer to render world and other map-lifetime components

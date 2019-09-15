@@ -19,10 +19,25 @@ public class DataUtil {
 		return String.format("%s %s", DataUtil.getRoundedString(point.x), DataUtil.getRoundedString(point.y));
 	}
 
+	/**
+	 * Rounds to 2 places
+	 */
 	public static String getRoundedString(float value) {
 		if (isNotFinite(value))
 			return getNonFiniteString(value);
 		DecimalFormat df = new DecimalFormat("#.##");
+		df.setRoundingMode(RoundingMode.HALF_UP);
+		return df.format(value);
+	}
+
+	public static String getRoundedString(float value, int decimalPlaces) {
+		if (isNotFinite(value))
+			return getNonFiniteString(value);
+		String marker = "";
+		for (int i = 0; i < decimalPlaces; i++) {
+			marker += "#";
+		}
+		DecimalFormat df = new DecimalFormat("#." + marker);
 		df.setRoundingMode(RoundingMode.HALF_UP);
 		return df.format(value);
 	}
