@@ -91,9 +91,11 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		functionBindings.bindFunctionToKey(() -> debugInfo.setVisible(!debugInfo.isVisible()), Keys.GRAVE); // tilde key
 		functionBindings.bindFunctionToKey(() -> playerUnit.stats.setHpDebug(playerUnit.stats.getMaxHp()), Keys.Q); // heal player to max
 		functionBindings.bindFunctionToKey(() -> {
-			playerUnit.stats.setHpDebug(playerUnit.stats.getMaxHp());
+			goBreak = true;
 		}, Keys.B); // break point
 	}
+
+	public static boolean goBreak = false; // debug variable
 
 	private void initializeAppLifetimeComponents() {
 		pathingModule = new PathingModule(camera, shapeRenderer);

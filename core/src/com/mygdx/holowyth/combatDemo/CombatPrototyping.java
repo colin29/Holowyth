@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.UnitStats;
-import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class CombatPrototyping {
@@ -17,7 +16,7 @@ public class CombatPrototyping {
 
 		someUnits.add(world.spawnUnit(playerPos.x + 40, playerPos.y, Unit.Side.ENEMY));
 		someUnits.add(world.spawnUnit(playerPos.x + 40, playerPos.y + 40, Unit.Side.ENEMY));
-		someUnits.add(world.spawnUnit(playerPos.x + 40, playerPos.y + 80, Unit.Side.ENEMY));
+		// someUnits.add(world.spawnUnit(playerPos.x + 40, playerPos.y + 80, Unit.Side.ENEMY));
 
 		for (Unit unit : someUnits) {
 			unit.setName("Goblin");
@@ -37,7 +36,7 @@ public class CombatPrototyping {
 		var someUnits = new ArrayList<Unit>();
 		someUnits.add(world.spawnUnit(playerPos.x, playerPos.y, Unit.Side.PLAYER));
 		someUnits.add(world.spawnUnit(playerPos.x - 40, playerPos.y + 40, Unit.Side.PLAYER));
-		someUnits.add(world.spawnUnit(playerPos.x - 40, playerPos.y + 10, Unit.Side.PLAYER));
+		// someUnits.add(world.spawnUnit(playerPos.x - 40, playerPos.y + 10, Unit.Side.PLAYER));
 
 		for (Unit unit : someUnits) {
 			unit.setName("Player-char");
@@ -72,7 +71,5 @@ public class CombatPrototyping {
 		unit.level = 0;
 
 		unit.testDamage = 7;
-
-		unit.baseMoveSpeed = Holo.defaultUnitMoveSpeed * 3f;
 	}
 }

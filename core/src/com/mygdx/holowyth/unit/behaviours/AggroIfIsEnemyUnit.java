@@ -23,7 +23,7 @@ public class AggroIfIsEnemyUnit {
 
 			Comparator<UnitOrderable> closestUnitComp = (UnitOrderable u1, UnitOrderable u2) -> {
 				if (Point.calcDistanceSqr(thisUnit.getPos(), u1.getPos())
-						- Point.calcDistanceSqr(thisUnit.getPos(), u2.getPos()) >= 0) {
+						- Point.calcDistanceSqr(thisUnit.getPos(), u2.getPos()) < 0) {
 					return -1;
 				} else {
 					return 1;
