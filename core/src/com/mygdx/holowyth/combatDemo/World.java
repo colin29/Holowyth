@@ -48,8 +48,6 @@ public class World implements WorldInfo {
 
 	private UnitCollection units = new UnitCollection();
 
-	Unit playerUnit;
-
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private float knockBackCollisionElasticityDefault = 0.06f;
@@ -464,28 +462,6 @@ public class World implements WorldInfo {
 			unit.stats.prepareUnit();
 		}
 		return;
-	}
-
-	/**
-	 * Create a custom player unit. Calling multiple times will just return the existing player unit.
-	 * 
-	 * @return
-	 */
-	public Unit spawnPlayerUnit() {
-		if (playerUnit == null) {
-			playerUnit = spawnUnit(320, 220, Unit.Side.PLAYER, "Elvin");
-			PresetUnits.loadPlayerUnitStats(playerUnit.stats);
-			PresetUnits.loadSomeEquipment(playerUnit.stats);
-			PresetUnits.loadArmor(playerUnit.stats);
-			playerUnit.stats.prepareUnit();
-			// playerUnit.stats.printInfo();
-
-			playerUnit.motion.setSpeedAndScaleAccel(Holo.defaultUnitMoveSpeed * 5);
-
-			return playerUnit;
-		} else {
-			return playerUnit;
-		}
 	}
 
 	public Unit spawnUnit(float x, float y, Side side) {

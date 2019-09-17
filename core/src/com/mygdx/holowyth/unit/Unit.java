@@ -85,11 +85,18 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	/**
 	 * Time in frames before the unit can use skills again
 	 */
-	private float skillCooldown;
+	private float skillCooldownRemaining;
 	/**
 	 * Time in frames. When a unit engages it cannot retreat for a certain amount of time.
 	 */
-	private float retreatCooldown = 0;
+	private float retreatCooldown = 0; // 480; // 8 seconds until can retreat
+	private float retreatCooldownRemaining = 0;
+
+	private float attackCooldown = 60;
+	private float attackCooldownRemaining = 0;
+
+	private float attackOfOpportunityCooldown = 120;
+	private float attackOfOpportunityCooldownRemaining = 0;
 
 	private WorldInfo world;
 
@@ -134,7 +141,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		if (this.side == Side.PLAYER) {
 			DebugValues debugValues = this.getWorldMutable().getDebugStore().registerComponent("Player unit");
 			debugValues.add(new DebugValue("sp", () -> stats.getSp() + "/" + stats.getMaxSp()));
-			debugValues.add(new DebugValue("skillCooldown", () -> skillCooldown));
+			debugValues.add(new DebugValue("skillCooldown", () -> skillCooldownRemaining));
 
 			debugValues.add("speed", () -> motion.getCurPlannedSpeed());
 		}
@@ -197,17 +204,25 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public void orderRetreat(float x, float y) {
-		if (!isRetreatOrderAllowed()) {
-			return;
+		if (isRetreatOrderAllowed()) {
+			retreat(x, y);
 		}
+	}
 
+	private void retreat(float x, float y) {
 		retreatDurationRemaining = retreatDuration;
 		if (motion.pathFindForMoveOrder(x, y)) {
 			stopAttacking();
 			clearOrder();
 			this.currentOrder = Order.RETREAT;
-		}
+			stats.removeAllBasicAttackSlows();
 
+			var attackers = getAttackers();
+			for (Unit attacker : attackers) {
+				attacker.stats.attackOfOpportunity(this.stats);
+				attacker.attackOfOpportunityCooldownRemaining = attacker.attackOfOpportunityCooldown;
+			}
+		}
 	}
 
 	static final int retreatDuration = 50;
@@ -270,7 +285,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 			return isAnyOrderAllowed()
 					&& isAttacking()
 					&& this.currentOrder != Order.RETREAT
-					&& retreatCooldown <= 0
+					&& retreatCooldownRemaining <= 0
 					&& !(isCasting() || isChannelling());
 		}
 		private boolean isStopOrderAllowed() {
@@ -339,31 +354,35 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 		tickSkillCooldown();
 		tickRetreatCooldown();
+		tickAttackOfOpportunityCooldown();
 	}
 
 	private void tickSkillCooldown() {
-		if (skillCooldown > 0) {
-			skillCooldown -= 1;
+		if (skillCooldownRemaining > 0) {
+			skillCooldownRemaining -= 1;
 		}
 	}
 
 	private void tickRetreatCooldown() {
-		if (retreatCooldown > 0) {
-			retreatCooldown -= 1;
+		if (retreatCooldownRemaining > 0) {
+			retreatCooldownRemaining -= 1;
+		}
+	}
+
+	private void tickAttackOfOpportunityCooldown() {
+		if (attackOfOpportunityCooldownRemaining > 0) {
+			attackOfOpportunityCooldownRemaining -= 1;
 		}
 	}
 
 	@Override
 	public float getRetreatCooldown() {
-		return retreatCooldown;
+		return retreatCooldownRemaining;
 	}
 
 	public boolean areSkillsOnCooldown() {
-		return (skillCooldown > 0);
+		return (skillCooldownRemaining > 0);
 	}
-
-	private int attackCooldown = 60;
-	private int attackCooldownLeft = 0;
 
 	/**
 	 * Does not even require units be alive or in units. For debugging purposes
@@ -397,13 +416,13 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 			}
 
 			if (isAttacking()) {
-				if (attackCooldownLeft <= 0) {
+				if (attackCooldownRemaining <= 0) {
 					this.attack(attacking);
-					attackCooldownLeft = Math.round(attackCooldown / getAttackingSameTargetAtkspdPenalty(attacking));
+					attackCooldownRemaining = attackCooldown / getAttackingSameTargetAtkspdPenalty(attacking);
 					// System.out.println("attack cooldown reset: " + attackCooldownLeft + " Penalty: " +
 					// getAttackingSameTargetAtkspdPenalty(attacking));
 				} else {
-					attackCooldownLeft -= 1;
+					attackCooldownRemaining -= 1;
 				}
 			}
 		}
@@ -440,8 +459,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		attacking = target;
 		unitsAttacking.get(attacking).add(this);
 
-		attackCooldownLeft = attackCooldown / 4;
-		retreatCooldown = 480; // 8 seconds until can retreat
+		attackCooldownRemaining = attackCooldown / 4;
+		retreatCooldownRemaining = retreatCooldown;
 	}
 
 	/**
@@ -590,7 +609,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	}
 
 	public void setSkillCooldown(float value) {
-		skillCooldown = value;
+		skillCooldownRemaining = value;
 	}
 
 	@Override

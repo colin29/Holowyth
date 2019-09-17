@@ -5,53 +5,48 @@ import java.util.List;
 
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.UnitStats;
-import com.mygdx.holowyth.unit.UnitStats.UnitType;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class CombatPrototyping {
 
-	private static Point playerPos = new Point(320, 220);
+	private static Point playerPos = new Point(397, 266);
 
 	public static List<Unit> spawnSomeEnemyUnits(World world) {
 		ArrayList<Unit> someUnits = new ArrayList<Unit>();
 
 		someUnits.add(world.spawnUnit(playerPos.x + 40, playerPos.y, Unit.Side.ENEMY));
 		someUnits.add(world.spawnUnit(playerPos.x + 40, playerPos.y + 40, Unit.Side.ENEMY));
-		someUnits.add(world.spawnUnit(playerPos.x - 40, playerPos.y + 40, Unit.Side.ENEMY));
+		someUnits.add(world.spawnUnit(playerPos.x + 40, playerPos.y + 80, Unit.Side.ENEMY));
 
 		for (Unit unit : someUnits) {
 			unit.setName("Goblin");
-
 			loadEnemyUnitStats(unit.stats);
-
 			unit.stats.prepareUnit();
-			unit.stats.testDamage = 5;
 		}
 		return someUnits;
 	}
 
-	private static UnitStats playerUnit;
-
 	/**
-	 * Create a custom player unit. Calling multiple times will just return the existing player unit.
+	 * Create some units on the player's team
 	 * 
 	 * @return
 	 */
-	public static Unit spawnPlayerUnit(World world) {
-		if (playerUnit == null) {
-			playerUnit = world.spawnUnit(playerPos.x, playerPos.y, Unit.Side.PLAYER, "Elvin").stats;
-			loadPlayerUnitStats(playerUnit);
+	public static List<Unit> spawnSomePlayerUnits(World world) {
 
-			playerUnit.prepareUnit();
-			playerUnit.printInfo();
+		var someUnits = new ArrayList<Unit>();
+		someUnits.add(world.spawnUnit(playerPos.x, playerPos.y, Unit.Side.PLAYER));
+		someUnits.add(world.spawnUnit(playerPos.x - 40, playerPos.y + 40, Unit.Side.PLAYER));
+		someUnits.add(world.spawnUnit(playerPos.x - 40, playerPos.y + 10, Unit.Side.PLAYER));
 
-			playerUnit.baseMoveSpeed = Holo.defaultUnitMoveSpeed;
-
-			return playerUnit.self;
-		} else {
-			return playerUnit.self;
+		for (Unit unit : someUnits) {
+			unit.setName("Player-char");
+			loadPlayerUnitStats(unit.stats);
+			unit.stats.prepareUnit();
+			// unit.stats.baseMoveSpeed = Holo.defaultUnitMoveSpeed;
 		}
+
+		return someUnits;
 	}
 
 	public static void loadEnemyUnitStats(UnitStats unit) {
@@ -66,7 +61,7 @@ public class CombatPrototyping {
 
 		unit.level = 0;
 
-		unit.unitType = UnitType.PLAYER;
+		unit.testDamage = 5;
 	}
 
 	public static void loadPlayerUnitStats(UnitStats unit) {
@@ -80,7 +75,5 @@ public class CombatPrototyping {
 		unit.level = 0;
 
 		unit.testDamage = 7;
-
-		unit.unitType = UnitType.PLAYER;
 	}
 }

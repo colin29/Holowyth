@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
+import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
+import com.mygdx.holowyth.unit.statuseffect.BasicAttackSlowEffect;
 import com.mygdx.holowyth.unit.statuseffect.SlowEffect;
 import com.mygdx.holowyth.util.DataUtil;
 
@@ -236,6 +238,10 @@ public class UnitStats implements UnitStatsInfo {
 	 * @param enemy
 	 */
 	public void attack(UnitStats enemy) {
+		attack(enemy, 0);
+	}
+
+	private void attack(UnitStats enemy, int atkBonus) {
 		if (this == enemy) {
 			logger.warn("Error, cannot attack self");
 			return;
@@ -271,12 +277,12 @@ public class UnitStats implements UnitStatsInfo {
 		// }
 
 		// Add a slow effect, regardless of block or hit. This is for balancing fleeing enemies without engaging.
-		enemy.applySlow(0.4f, 90);
-		enemy.applySlow(0.2f, 150);
+		enemy.applyBasicAttackSlow(0.4f, 90);
+		enemy.applyBasicAttackSlow(0.2f, 150);
 
 		// 2. Simulate block chance
 
-		int atk = this.atk + getMultiTeamingAtkBonus(enemy);
+		int atk = this.atk + getMultiTeamingAtkBonus(enemy) + atkBonus;
 		int def = enemy.def;
 
 		chanceToHit = (float) (0.4 * (1 + (atk - def) * 0.05));
@@ -284,9 +290,10 @@ public class UnitStats implements UnitStatsInfo {
 		chanceToHit = Math.min(atkChanceCeiling, chanceToHit);
 		chanceToHit = Math.max(atkChanceFloor, chanceToHit);
 		if (printDetailedCombatInfo) {
-			logger.debug("{} attacks {}: relative attack is {} (+{} from multi-teaming)", this.name, enemy.name, atk - def,
+			logger.debug("{} attacks {}", this.name, enemy.name);
+			logger.debug("Hit chance: {} - {} relative attack (+{} from multi-teaming)", getRoundedString(chanceToHit), atk - def,
 					getMultiTeamingAtkBonus(enemy));
-			System.out.printf(" -Chance to land hit: %s %d relative acc %n", getRoundedString(chanceToHit), atk - def);
+			// System.out.printf(" -Chance to land hit: %s %n", getRoundedString(chanceToHit), atk - def);
 		}
 
 		if (Math.random() > chanceToHit) {
@@ -320,6 +327,11 @@ public class UnitStats implements UnitStatsInfo {
 			enemy.self.interrupt();
 		}
 
+	}
+
+	void attackOfOpportunity(UnitStats target) {
+		logger.debug("{} did an attack of opportunity on {}", this.getName(), target.getName());
+		attack(target, 10);
 	}
 
 	private int getMultiTeamingAtkBonus(UnitStats target) {
@@ -443,6 +455,19 @@ public class UnitStats implements UnitStatsInfo {
 	 */
 	public void applySlow(float slowAmount, int duration) {
 		slowEffects.add(new SlowEffect(duration, slowAmount));
+	}
+
+	/**
+	 * Same as applySlow but uses a marker sub-class so that certain maneuvers can nullify this slow.
+	 */
+	public void applyBasicAttackSlow(float slowAmount, int duration) {
+		if (self.currentOrder != Order.RETREAT) { // units are unaffected by basic attack slow while retreating
+			slowEffects.add(new BasicAttackSlowEffect(duration, slowAmount));
+		}
+	}
+
+	public void removeAllBasicAttackSlows() {
+		slowEffects.removeIf((effect) -> effect instanceof BasicAttackSlowEffect);
 	}
 
 	// Printing Info Methods

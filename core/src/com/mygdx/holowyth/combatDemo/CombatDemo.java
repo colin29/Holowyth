@@ -176,7 +176,8 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		// unitControls.selectedUnits.add(playerUnit);
 		// world.spawnSomeEnemyUnits();
 
-		playerUnit = CombatPrototyping.spawnPlayerUnit(world);
+		playerUnit = CombatPrototyping.spawnSomePlayerUnits(world).get(0);
+
 		List<Unit> enemies = CombatPrototyping.spawnSomeEnemyUnits(world);
 		// player.orderAttackUnit(enemy);
 		for (Unit enemy : enemies) {
