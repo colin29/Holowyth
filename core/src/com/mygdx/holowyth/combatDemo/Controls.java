@@ -117,7 +117,7 @@ public class Controls extends InputProcessorAdapter {
 				return "0";
 			}
 		});
-		debugValues.add("Movement speed of one unit", () -> {
+		debugValues.add("Current order of one unit", () -> {
 			if (selectedUnits.size() == 1) {
 				Unit u = selectedUnits.iterator().next();
 				return u.getCurrentOrder().toString();
@@ -483,7 +483,7 @@ public class Controls extends InputProcessorAdapter {
 		}
 		if (target != null) {
 			for (UnitOrderable u : selectedUnits) {
-				u.orderAttackUnit(target);
+				u.orderAttackUnit(target, false);
 			}
 		} else { // if no unit is under the cursor, then treat as an attackMove
 			for (UnitOrderable u : selectedUnits) {

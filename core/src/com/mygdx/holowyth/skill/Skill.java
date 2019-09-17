@@ -147,8 +147,7 @@ public class Skill implements Cloneable, SkillInfo {
 		caster.setActiveSkill(null);
 		if (status == Status.CASTING) {
 			casting.onInterrupt();
-		}
-		if (status == Status.CHANNELING) {
+		} else if (status == Status.CHANNELING) {
 			this.onChannellingInterrupt();
 		}
 	}

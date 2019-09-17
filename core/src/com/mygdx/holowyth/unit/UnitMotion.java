@@ -12,7 +12,6 @@ import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -147,14 +146,14 @@ public class UnitMotion {
 	 * unit is being knocked back, though the unit's normal movement should already be cleared
 	 */
 	public void stopCurrentMovement() {
-		clearPath();
+		clearPathandVelocity();
 	}
 
 	/**
 	 * Repath regularly if unit is ordered to attack but is not attacking yet
 	 */
 	private void handleRepathing() {
-		if (self.currentOrder == Order.ATTACKUNIT && !self.isAttacking()) {
+		if (self.currentOrder.isAttackUnit() && !self.isAttacking()) {
 			framesUntilAttackRepath -= 1;
 			if (framesUntilAttackRepath <= 0) {
 				pathFindForAttackOrder();
@@ -183,13 +182,17 @@ public class UnitMotion {
 			return;
 		}
 		switch (self.currentOrder) {
+		case NONE:
+			stopCurrentMovement();
+			break;
 		case MOVE:
 			determineMovementForMoveOrder();
 			break;
 		case RETREAT:
 			determineMovementForMoveOrder();
 			break;
-		case ATTACKUNIT:
+		case ATTACKUNIT_HARD:
+		case ATTACKUNIT_SOFT:
 			determineMovementForAttackOrder();
 			break;
 		default:
@@ -235,7 +238,7 @@ public class UnitMotion {
 			// check if completed path
 			if (waypointIndex == path.size()) {
 				self.clearOrder();
-				clearPath();
+				clearPathandVelocity();
 			}
 		}
 
@@ -361,7 +364,7 @@ public class UnitMotion {
 		isDecelerating = false;
 	}
 
-	private void clearPath() {
+	private void clearPathandVelocity() {
 		this.path = null;
 		waypointIndex = -1;
 		vx = 0;
@@ -416,7 +419,8 @@ public class UnitMotion {
 			pathFindForMoveOrder(getDest().x, getDest().y);
 		case RETREAT:
 			pathFindForMoveOrder(getDest().x, getDest().y);
-		case ATTACKUNIT:
+		case ATTACKUNIT_HARD:
+		case ATTACKUNIT_SOFT:
 			determineMovementForAttackOrder();
 		default:
 			break;

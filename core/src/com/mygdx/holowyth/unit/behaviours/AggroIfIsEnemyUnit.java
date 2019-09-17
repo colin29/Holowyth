@@ -41,7 +41,7 @@ public class AggroIfIsEnemyUnit {
 			if (!closestTargets.isEmpty()) {
 				UnitOrderable closestEnemy = closestTargets.remove();
 				if (Point.calcDistance(thisUnit.getPos(), closestEnemy.getPos()) <= Holo.idleAggroRange) {
-					thisUnit.orderAttackUnit(closestEnemy);
+					thisUnit.orderAttackUnit(closestEnemy, false);
 				}
 			}
 		}

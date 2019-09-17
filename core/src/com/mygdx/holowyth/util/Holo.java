@@ -46,6 +46,8 @@ public class Holo {
 																					// before it stops receiving attacks
 																					// from the unit.
 
+	public static float defaultUnitAttackChaseRange = 225;
+
 	public static float idleAggroRange = 150f;
 
 	// Editor

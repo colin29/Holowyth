@@ -119,9 +119,15 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	/**
 	 * A unit's order represents whether it has any persistent order on it that would determine its behaviour. Note that a unit without a command
 	 * could still be casting or attacking.
+	 * 
+	 * AttackUnit can be hard or soft. Hard will chase indefinitely, a soft attack order will stop chasing if the target goes out of range
 	 */
 	public enum Order {
-		MOVE, ATTACKUNIT, NONE, ATTACKMOVE, RETREAT
+		MOVE, ATTACKUNIT_HARD, ATTACKUNIT_SOFT, NONE, ATTACKMOVE, RETREAT;
+
+		public boolean isAttackUnit() {
+			return this == ATTACKUNIT_HARD || this == ATTACKUNIT_SOFT;
+		}
 	}
 
 	/**
@@ -188,6 +194,18 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	 */
 	@Override
 	public boolean orderAttackUnit(UnitOrderable unitOrd) {
+		return orderAttackUnit(unitOrd, true);
+	}
+
+	/**
+	 * 
+	 * @param unitOrd
+	 * @param isHardOrder
+	 *            A hard attack order makes the unit chase forever, whereas with a soft order the unit will stop chasing if out of range
+	 * @return
+	 */
+	@Override
+	public boolean orderAttackUnit(UnitOrderable unitOrd, boolean isHardOrder) {
 		Unit unit = (Unit) unitOrd; // underlying objects must hold the same type
 
 		if (!isAttackOrderAllowed(unit)) {
@@ -198,7 +216,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 			return false;
 		}
 		clearOrder();
-		this.currentOrder = Order.ATTACKUNIT;
+		this.currentOrder = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
 		this.target = unit;
 
 		this.motion.pathFindForAttackOrder();
@@ -408,9 +426,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 			stopAttacking();
 		}
 
-		if (currentOrder == Order.ATTACKUNIT) {
+		if (currentOrder.isAttackUnit()) {
 			// If the unit is on an attackUnit command and its in engage range, make it start attacking the target
-			// If the unit falls out of engage range, stop it from attacking
 
 			if (target.stats.isDead()) {
 				clearOrder();
@@ -420,11 +437,16 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 			Point a, b;
 			a = this.getPos();
 			b = target.getPos();
-			float dist = Point.calcDistance(a, b);
-			if ((attacking != target) && dist <= this.radius + target.radius + Holo.defaultUnitEngageRange) {
+			float distToTarget = Point.calcDistance(a, b);
+
+			if ((attacking != target) && distToTarget <= this.radius + target.radius + Holo.defaultUnitEngageRange) {
 				startAttacking(target);
-			} else if ((attacking == target) && dist >= this.radius + target.radius + Holo.defaultUnitDisengageRange) {
+			} else if ((attacking == target) && distToTarget >= this.radius + target.radius + Holo.defaultUnitDisengageRange) {
 				stopAttacking();
+			}
+
+			if (currentOrder == Order.ATTACKUNIT_SOFT && distToTarget > Holo.defaultUnitAttackChaseRange) {
+				clearOrder();
 			}
 
 			if (isAttacking()) {
