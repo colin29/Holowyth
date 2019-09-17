@@ -17,6 +17,7 @@ import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitInterPF;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skill.Status;
+import com.mygdx.holowyth.unit.behaviours.AggroIfIsEnemyUnit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
@@ -38,6 +39,17 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
  * 
  */
 
+/**
+ * There are four aspects that largely determine a unit's state. They can be independent, but often check each other for legality. <br>
+ * For example, some skills might castable while attacking, and a unit could retain certain orders while attacking.
+ * 
+ * currentOrder -- a unit with an order will continue trying to do something <br>
+ * attacking -- a unit attacking is locked in combat and will regularly attack their target <br>
+ * activeSkill -- a unit with an active ability is either casting or channelling that ability
+ * 
+ * motion.isBeingKnockedBack() -- a unit being knocked back cannot be given new orders or perform any action (it may retain its old order, depending
+ * on the type)
+ */
 public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	public float x, y;
@@ -63,7 +75,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	public int debugNumOfUnitsCollidingWith = 0;
 
 	// Orders
-	Order currentOrder = Order.IDLE;
+
+	Order currentOrder = Order.NONE;
 	Unit target; // target for the current command.
 
 	// Combat
@@ -73,7 +86,6 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	 * Maps from a unit to a list of units attacking that one unit. Other classes should use {@link #getAttackers()}
 	 */
 	private static Map<Unit, Set<Unit>> unitsAttacking = new HashMap<Unit, Set<Unit>>();
-	Mode mode = Mode.PASSIVE;
 
 	/**
 	 * A unit's friendly/foe status.
@@ -104,12 +116,12 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		PLAYER, ENEMY
 	}
 
+	/**
+	 * A unit's order represents whether it has any persistent order on it that would determine its behaviour. Note that a unit without a command
+	 * could still be casting or attacking.
+	 */
 	public enum Order {
-		MOVE, ATTACKUNIT, IDLE, ATTACKMOVE, RETREAT
-	}
-
-	public enum Mode {
-		ENGAGE, PASSIVE
+		MOVE, ATTACKUNIT, NONE, ATTACKMOVE, RETREAT
 	}
 
 	/**
@@ -323,7 +335,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	 * Clears any current order on this unit. For internal use.
 	 */
 	void clearOrder() {
-		currentOrder = Order.IDLE;
+		currentOrder = Order.NONE;
 		target = null;
 	}
 
@@ -345,7 +357,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		motion.tick();
 		stats.tick();
 
-		// AggroIfIsEnemyUnit.applyTo(this, world);
+		AggroIfIsEnemyUnit.applyTo(this, world);
 		if (currentOrder == Order.RETREAT)
 			retreatDurationRemaining -= 1;
 
@@ -426,14 +438,6 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 				}
 			}
 		}
-
-		if (this.mode == Mode.ENGAGE) {
-			Set<Unit> attackingMe = unitsAttacking.get(this);
-			if (!attackingMe.isEmpty() && !isAttacking()) {
-				orderAttackUnit(attackingMe.iterator().next());
-			}
-		}
-
 	}
 
 	private float getAttackingSameTargetAtkspdPenalty(Unit target) {
@@ -442,11 +446,11 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		if (n <= 1) {
 			return 1;
 		} else if (n == 2) {
-			return 0.8f;
+			return 0.9f;
 		} else if (n == 3) {
-			return 0.6f;
+			return 0.85f;
 		} else { // 4 or more
-			return 0.5f;
+			return 0.82f;
 		}
 	}
 

@@ -31,6 +31,7 @@ import com.mygdx.holowyth.skill.Skills;
 import com.mygdx.holowyth.skill.UnitGroundSkill;
 import com.mygdx.holowyth.skill.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.Holo;
@@ -114,6 +115,14 @@ public class Controls extends InputProcessorAdapter {
 				return DataUtil.getAsPercentage(u.stats.getMoveSpeedRatio());
 			} else {
 				return "0";
+			}
+		});
+		debugValues.add("Movement speed of one unit", () -> {
+			if (selectedUnits.size() == 1) {
+				Unit u = selectedUnits.iterator().next();
+				return u.getCurrentOrder().toString();
+			} else {
+				return "N/A";
 			}
 		});
 
@@ -401,7 +410,7 @@ public class Controls extends InputProcessorAdapter {
 
 		if (button == Input.Buttons.LEFT && pointer == 0) {
 			if (leftMouseKeyDown) {
-				selectAllInSelectionBox(screenX, screenY);
+				selectUnitsInSelectionBox(screenX, screenY);
 			}
 			leftMouseKeyDown = false;
 		}
@@ -549,12 +558,13 @@ public class Controls extends InputProcessorAdapter {
 	}
 
 	/**
-	 * Selects all units inside the selection box
+	 * Selects all units inside the selection box, following these rules: <br>
+	 * If the group consists of a mixed group, only select the player units.
 	 * 
 	 * @param finalX
 	 * @param finalY
 	 */
-	public void selectAllInSelectionBox(float mouseX, float mouseY) {
+	public void selectUnitsInSelectionBox(float mouseX, float mouseY) {
 
 		Vector3 vec = new Vector3();
 		// Set selectionX2, Y2
@@ -587,13 +597,18 @@ public class Controls extends InputProcessorAdapter {
 
 		// check if unit circles are inside or touching the selection box.
 
-		ArrayList<Unit> newlySelected = new ArrayList<Unit>();
+		var newlySelected = new ArrayList<Unit>();
 
 		for (Unit u : units) {
 			if (u.x >= x - u.getRadius() && u.x <= x2 + u.getRadius() && u.y >= y - u.getRadius()
 					&& u.y <= y2 + u.getRadius() && !u.stats.isDead()) {
 				newlySelected.add(u);
 			}
+		}
+
+		boolean containsPlayerUnits = newlySelected.stream().anyMatch((unit) -> unit.getSide() == Side.PLAYER);
+		if (containsPlayerUnits) {
+			newlySelected.removeIf((unit) -> unit.getSide() != Side.PLAYER);
 		}
 
 		if (!newlySelected.isEmpty()) {

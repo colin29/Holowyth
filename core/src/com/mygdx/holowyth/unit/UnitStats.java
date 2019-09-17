@@ -18,6 +18,7 @@ import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.unit.statuseffect.BasicAttackSlowEffect;
 import com.mygdx.holowyth.unit.statuseffect.SlowEffect;
 import com.mygdx.holowyth.util.DataUtil;
+import com.mygdx.holowyth.util.Holo;
 
 /**
  * Simple stat fields are exposed public, while those which may trigger extra handling will be exposed through getters and setters
@@ -45,7 +46,7 @@ public class UnitStats implements UnitStatsInfo {
 	/**
 	 * Unused atm, UnitMotion just uses the default movespeed
 	 */
-	public float baseMoveSpeed;
+	public float baseMoveSpeed = Holo.defaultUnitMoveSpeed;
 
 	public int strBase, agiBase, fortBase, perceptBase;
 

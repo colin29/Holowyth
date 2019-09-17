@@ -19,7 +19,7 @@ public class AggroIfIsEnemyUnit {
 
 	public static void applyTo(UnitOrderable thisUnit, WorldInfo world) {
 
-		if (thisUnit.getSide() == Side.ENEMY && thisUnit.getCurrentOrder() == Order.IDLE && !thisUnit.isAttacking()) {
+		if (thisUnit.getSide() == Side.ENEMY && thisUnit.getCurrentOrder() == Order.NONE && !thisUnit.isAttacking()) {
 
 			Comparator<UnitOrderable> closestUnitComp = (UnitOrderable u1, UnitOrderable u2) -> {
 				if (Point.calcDistanceSqr(thisUnit.getPos(), u1.getPos())

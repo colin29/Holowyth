@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.UnitStats;
-import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class CombatPrototyping {
@@ -56,8 +55,6 @@ public class CombatPrototyping {
 
 		unit.maxHpBase = 100;
 		unit.maxSpBase = 50;
-
-		unit.baseMoveSpeed = Holo.defaultUnitMoveSpeed;
 
 		unit.level = 0;
 

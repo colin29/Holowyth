@@ -188,8 +188,7 @@ public class PFDemoUnit implements UnitInterPF {
 	// Unit Movement
 
 	/**
-	 * When a unit is given a move command that is in a similar direction then it is already travelling, it doesn't need
-	 * to slow down
+	 * When a unit is given a move command that is in a similar direction then it is already travelling, it doesn't need to slow down
 	 */
 	private float calculateInitialMoveSpeed() {
 
@@ -218,8 +217,8 @@ public class PFDemoUnit implements UnitInterPF {
 	}
 
 	/**
-	 * Sets the velocity for the unit based on the unit's path. Also accounts for accel+decel at the begin and end of
-	 * movement. When movement is complete, a unit's path is set to null
+	 * Sets the velocity for the unit based on the unit's path. Also accounts for accel+decel at the begin and end of movement. When movement is
+	 * complete, a unit's path is set to null
 	 */
 	private void determineMovement() {
 		switch (currentOrder) {

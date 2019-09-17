@@ -180,9 +180,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		List<Unit> enemies = CombatPrototyping.spawnSomeEnemyUnits(world);
 		// player.orderAttackUnit(enemy);
-		for (Unit enemy : enemies) {
-			enemy.orderAttackUnit(playerUnit);
-		}
+		// for (Unit enemy : enemies) {
+		// enemy.orderAttackUnit(playerUnit);
+		// }
 
 	}
 
