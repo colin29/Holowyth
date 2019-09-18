@@ -19,6 +19,8 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
 public class UnitMotion {
 
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	private static float waypointMinDistance = 0.01f;
 
 	// Attack Movement
@@ -71,9 +73,14 @@ public class UnitMotion {
 	// Knockback variables
 	private float knockBackVx;
 	private float knockBackVy;
-	private boolean isBeingKnockedBack = false;
 
-	Logger logger = LoggerFactory.getLogger(this.getClass());
+	enum Mode {
+		NORMAL, KNOCKBACK; // PUSHING_OUT
+		// pushing out is a technical movement mode where the unit needs to be slightly pushed out of an obstacle back into legal (normal) movement
+		// space
+	}
+
+	private Mode mode = Mode.NORMAL;
 
 	/**
 	 * This class merely sets planned unit velocities, it is up to the World class to accept/resolve movements
@@ -428,15 +435,15 @@ public class UnitMotion {
 	}
 
 	public boolean isBeingKnockedBack() {
-		return isBeingKnockedBack;
+		return mode == Mode.KNOCKBACK;
 	}
 
 	public void beginKnockback(float initialVx, float initialVy) {
-		if (isBeingKnockedBack) {
+		if (isBeingKnockedBack()) {
 			logger.warn("beginKnockback() called but unit is already in knockback state. Skipping.");
 			return;
 		}
-		isBeingKnockedBack = true;
+		mode = Mode.KNOCKBACK;
 		knockBackVx = initialVx;
 		knockBackVy = initialVy;
 
@@ -447,13 +454,13 @@ public class UnitMotion {
 	}
 
 	public void endKnockback() {
-		if (!isBeingKnockedBack) {
+		if (!isBeingKnockedBack()) {
 			logger.warn("endKnockback called, but unit is not being knocked back. No effect.");
 			return;
 		}
 		knockBackVx = 0;
 		knockBackVy = 0;
-		isBeingKnockedBack = false;
+		mode = Mode.NORMAL;
 	}
 
 	/**
@@ -461,7 +468,7 @@ public class UnitMotion {
 	 * velocity.
 	 */
 	public void applyKnockBackVelocity(float dx, float dy) {
-		if (isBeingKnockedBack) {
+		if (isBeingKnockedBack()) {
 			setKnockbackVelocity(knockBackVx + dx, knockBackVy + dy);
 		} else {
 			beginKnockback(dx, dy);
@@ -470,7 +477,7 @@ public class UnitMotion {
 	}
 
 	public void setKnockbackVx(float knockBackVx) {
-		if (this.isBeingKnockedBack) {
+		if (isBeingKnockedBack()) {
 			this.knockBackVx = knockBackVx;
 		} else {
 			logger.warn(
@@ -479,7 +486,7 @@ public class UnitMotion {
 	}
 
 	public void setKnockbackVy(float knockBackVy) {
-		if (this.isBeingKnockedBack) {
+		if (isBeingKnockedBack()) {
 			this.knockBackVy = knockBackVy;
 		} else {
 			logger.warn(
@@ -538,6 +545,13 @@ public class UnitMotion {
 
 	public Vector2 getVelocity() {
 		return new Vector2(vx, vy);
+	}
+
+	/**
+	 * Eventually will replace isBeingKnocked back, but not fully implemented ...
+	 */
+	public Mode getMode() {
+		return mode;
 	}
 
 }
