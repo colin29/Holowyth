@@ -73,7 +73,7 @@ public class World implements WorldInfo {
 		tickLogicForUnits();
 		moveNormallyMovingUnits();
 		moveKnockedBackedUnitsAndResolveCollisions();
-		handleCombatLogic();
+		handleSecondaryLogic();
 	}
 
 	/**
@@ -436,10 +436,14 @@ public class World implements WorldInfo {
 		}
 	}
 
-	private void handleCombatLogic() {
+	private void handleSecondaryLogic() {
 		for (Unit u : units.getUnits()) {
-			u.tickCombatLogic();
+			u.tickOrderLogic();
 		}
+		for (Unit u : units.getUnits()) {
+			u.tickAttackingLogic();
+		}
+
 	}
 
 	private float getCollisionClearanceDistance(Unit u) {

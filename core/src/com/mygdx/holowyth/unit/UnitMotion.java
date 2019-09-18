@@ -12,6 +12,7 @@ import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -116,20 +117,26 @@ public class UnitMotion {
 	}
 
 	/**
-	 * Looks for a path in a manner suitable for a move order. If it finds one, the unit's motion adopts that path
+	 * Tries to find a path to a unit (the unit's target). Target must be defined.
 	 * 
-	 * Since a unitMotion will periodically repath for a unit on attack order, even if the initial path fails, this method does not report a failure.
+	 * In the case that no path is found, the original path is not modified.
+	 * 
+	 * @return true if a path was found, false otherwise
 	 */
-	public void pathFindForAttackOrder() {
-		// find path as normal, except for pathing ignore the target's collision
-		// body
+	public boolean pathFindTowardsTarget() {
+		// find path as normal, except for pathing ignore the target's collision body
 		ArrayList<Unit> someUnits = new ArrayList<Unit>(units);
 		someUnits.remove(self.target);
-
+		if (self.target == null) {
+			@SuppressWarnings("unused")
+			var x = 4;
+		}
 		Path newPath = pathing.findPathForUnit(self, self.target.x, self.target.y, someUnits);
 		if (newPath != null) {
 			this.setPath(newPath);
+			return true;
 		}
+		return false;
 	}
 
 	/**
@@ -139,7 +146,7 @@ public class UnitMotion {
 	 * @param dy
 	 * @return true if pathfind was successful and unitMotion has adopted that path. False if not.
 	 */
-	public boolean pathFindForMoveOrder(float dx, float dy) {
+	public boolean pathFindTowardsPoint(float dx, float dy) {
 		Path path = pathing.findPathForUnit(self, dx, dy, units);
 		if (path != null) {
 			setPath(path);
@@ -157,25 +164,19 @@ public class UnitMotion {
 	}
 
 	/**
-	 * Repath regularly if unit is ordered to attack but is not attacking yet
+	 * Normal movement doesn't repath atm, unless it gets blocked (and that works fine)
+	 * 
+	 * But when the unit is chasing a moving target, it obviously needs to repath.
 	 */
 	private void handleRepathing() {
-		if (self.currentOrder.isAttackUnit() && !self.isAttacking()) {
+		if ((self.currentOrder.isAttackUnit() && !self.isAttacking()) ||
+				(self.currentOrder == Order.ATTACKMOVE && self.target != null && !self.isAttacking())) {
 			framesUntilAttackRepath -= 1;
 			if (framesUntilAttackRepath <= 0) {
-				pathFindForAttackOrder();
+				pathFindTowardsTarget();
 				framesUntilAttackRepath = attackPathfindingInterval;
 			}
 		}
-
-		// TODO:
-		// if(this.currentOrder == Order.MOVE){
-		// framesUntilAttackRepath -= 1;
-		// if (framesUntilAttackRepath <= 0) {
-		// pathForAttackingUnit();
-		// framesUntilAttackRepath = attackPathfindingInterval;
-		// }
-		// }
 	}
 
 	/**
@@ -193,15 +194,17 @@ public class UnitMotion {
 			stopCurrentMovement();
 			break;
 		case MOVE:
-			determineMovementForMoveOrder();
+			determineMovementFollowingPath();
 			break;
 		case RETREAT:
-			determineMovementForMoveOrder();
+			determineMovementFollowingPath();
 			break;
 		case ATTACKUNIT_HARD:
 		case ATTACKUNIT_SOFT:
-			determineMovementForAttackOrder();
+			determineMovementFollowingPath();
 			break;
+		case ATTACKMOVE:
+			determineMovementFollowingPath();
 		default:
 			break;
 		}
@@ -209,8 +212,11 @@ public class UnitMotion {
 
 	/**
 	 * Determines the unit's velocity based on path (and related state variables). Path must not be null
+	 * 
+	 * When the path is destination is reached, will automatically clear the unit's order. Usually for a non-move order, you will check for other
+	 * conditions (ie. enemies present, is in engage range), and take action / clear movement before the unit actually reaches the destination.
 	 */
-	private void determineMovementForMoveOrder() {
+	private void determineMovementFollowingPath() {
 
 		// Apply acceleration if the unit is not already at full speed.
 		// Acceleration is proportional to the current speed of the unit,
@@ -280,17 +286,6 @@ public class UnitMotion {
 		} else {
 			return -1;
 		}
-	}
-
-	/**
-	 * Path must not be null
-	 */
-	private void determineMovementForAttackOrder() {
-		determineMovementForMoveOrder();
-		// TODO:
-		// Can add extra code this so that units don't enter too deeply into the engage range. The math is simple
-		// but the fact that the units can't be aware of the other's movement makes it non-trivial
-
 	}
 
 	// Unit Movement
@@ -414,8 +409,7 @@ public class UnitMotion {
 	}
 
 	/**
-	 * Called by world when the pathing unit fails to make progress (even with the push out algorithm). Generally this will make the unit repath/
-	 * reattack
+	 * Called by world when the pathing unit fails to make progress (even with the push out algorithm). Will make the unit repath.
 	 * 
 	 * @return
 	 */
@@ -423,12 +417,15 @@ public class UnitMotion {
 		System.out.println("onBlocked called");
 		switch (self.currentOrder) {
 		case MOVE:
-			pathFindForMoveOrder(getDest().x, getDest().y);
+			pathFindTowardsPoint(getDest().x, getDest().y);
+			break;
 		case RETREAT:
-			pathFindForMoveOrder(getDest().x, getDest().y);
+			pathFindTowardsPoint(getDest().x, getDest().y);
+			break;
 		case ATTACKUNIT_HARD:
 		case ATTACKUNIT_SOFT:
-			determineMovementForAttackOrder();
+			pathFindTowardsTarget();
+			break;
 		default:
 			break;
 		}

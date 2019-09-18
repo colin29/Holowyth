@@ -17,7 +17,6 @@ import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitInterPF;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skill.Status;
-import com.mygdx.holowyth.unit.behaviours.IfIdleAggroOntoNearbyTargets;
 import com.mygdx.holowyth.unit.behaviours.UnitUtil;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
@@ -118,6 +117,10 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		PLAYER, ENEMY
 	}
 
+	// Order-specific
+	private float attackMoveDestX;
+	private float attackMoveDestY;
+
 	/**
 	 * A unit's order represents whether it has any persistent order on it that would determine its behaviour. Note that a unit without a command
 	 * could still be casting or attacking.
@@ -180,11 +183,11 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	// Orders
 
 	@Override
-	public void orderMove(float dx, float dy) {
+	public void orderMove(float x, float y) {
 		if (!isMoveOrderAllowed()) {
 			return;
 		}
-		if (motion.pathFindForMoveOrder(dx, dy)) {
+		if (motion.pathFindTowardsPoint(x, y)) {
 			clearOrder();
 			currentOrder = Order.MOVE;
 		}
@@ -221,7 +224,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		this.currentOrder = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
 		this.target = unit;
 
-		this.motion.pathFindForAttackOrder();
+		this.motion.pathFindTowardsTarget();
 		return true;
 	}
 
@@ -248,9 +251,14 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public void orderAttackMove(float x, float y) {
-		if (!isAttackMoveOrderAllowed()) {
-			logger.debug("Attack move given but is not implemented yet");
-			return;
+		if (isAttackMoveOrderAllowed()) {
+
+			if (motion.pathFindTowardsPoint(x, y)) {
+				clearOrder();
+				attackMoveDestX = x;
+				attackMoveDestY = y;
+				this.currentOrder = Order.ATTACKMOVE;
+			}
 		}
 
 	}
@@ -264,7 +272,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	private void retreat(float x, float y) {
 		retreatDurationRemaining = retreatDuration;
-		if (motion.pathFindForMoveOrder(x, y)) {
+		if (motion.pathFindTowardsPoint(x, y)) {
 			stopAttacking();
 			clearOrder();
 			this.currentOrder = Order.RETREAT;
@@ -382,6 +390,9 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	void clearOrder() {
 		currentOrder = Order.NONE;
 		target = null;
+
+		attackMoveDestX = 0;
+		attackMoveDestY = 0;
 	}
 
 	/**
@@ -396,13 +407,13 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	// Tick Logic
 
 	/**
-	 * Main function, also is where the unit determines its movement
+	 * Main function: Determine movement, tick status effects, tick basic cooldowns
+	 * 
 	 */
 	public void tickLogic() {
 		motion.tick();
 		stats.tick();
 
-		IfIdleAggroOntoNearbyTargets.applyTo(this, world);
 		if (currentOrder == Order.RETREAT)
 			retreatDurationRemaining -= 1;
 
@@ -446,50 +457,10 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	 */
 	private static Map<Integer, Unit> idToUnit = new HashMap<Integer, Unit>();
 
-	/** Handles the combat logic for a unit, including engaging and disengaging */
-	public void tickCombatLogic() {
-
-		if (currentOrder.isAttackUnit()) {
-			if (target.stats.isDead()) {
-				clearOrder();
-				return;
-			}
-			handleEngageAndDisengageForAttackUnit();
-			handleTargetLossAndSwitchingForAttackUnit();
-		}
-
-		tickAttackingIfAttacking();
-	}
-
-	private void handleEngageAndDisengageForAttackUnit() {
-		float distToTarget = Point.calcDistance(this.getPos(), target.getPos());
-
-		if (!isAttacking() && distToTarget <= this.radius + target.radius + Holo.defaultUnitEngageRange) {
-			startAttacking(target);
-		} else if (isAttacking(target) && distToTarget >= this.radius + target.radius + Holo.defaultUnitDisengageRange) {
-			stopAttacking();
-		}
-	}
-
-	private void handleTargetLossAndSwitchingForAttackUnit() {
-		var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, world);
-		otherTargetsWithinAggroRange.removeIf((target) -> Point.calcDistance(getPos(), target.getPos()) >= Holo.defaultAggroRange);
-
-		float distToTarget = Point.calcDistance(this.getPos(), target.getPos());
-
-		if (currentOrder == Order.ATTACKUNIT_SOFT) {
-			float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
-			float chaseRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange : Holo.defaultUnitAttackChaseRange;
-
-			if (distToTarget > aggroRange && !otherTargetsWithinAggroRange.isEmpty()) {
-				orderAttackUnit(otherTargetsWithinAggroRange.peek(), false);
-			} else if (distToTarget > chaseRange) {
-				clearOrder();
-			}
-		}
-	}
-
-	private void tickAttackingIfAttacking() {
+	/**
+	 * Updates attacking units
+	 */
+	public void tickAttackingLogic() {
 		if (isAttacking()) {
 			if (attacking.stats.isDead()) {
 				stopAttacking();
@@ -501,6 +472,149 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 			} else {
 				attackCooldownRemaining -= 1;
 			}
+		}
+	}
+
+	/** Handles the complex logic revolving around switching orders and targets */
+	public void tickOrderLogic() {
+
+		// if (this.side == Side.ENEMY) {
+		// ifIdleAggroOntoNearbyTargets();
+		// }
+
+		if (target != null && target.stats.isDead()) {
+			if (currentOrder.isAttackUnit()) {
+				clearOrder();
+			}
+			if (isAttackMoveAndHasTarget()) {
+				target = null;
+				repathToDestinationForAttackMove();
+			}
+		}
+
+		if (currentOrder.isAttackUnit()) {
+			handleTargetLossAndSwitchingForAttackUnit();
+		} else if (currentOrder == Order.ATTACKMOVE) {
+			// If an attacking moving unit has no target it's moving towards its destination. If it does have a target it's chasing that unit.
+			if (target == null) {
+				aggroOntoNearbyTargetsForAttackMove();
+			}
+			if (target != null) {
+				handleTargetLossAndSwitchingForAttackMove();
+			}
+		}
+
+		handleEngageAndDisengage();
+	}
+
+	private void ifIdleAggroOntoNearbyTargets() {
+
+		if (isCompletelyIdle()) {
+
+			var closestTargets = UnitUtil.getTargetsSortedByDistance(this, world);
+			if (!closestTargets.isEmpty()) {
+				UnitOrderable closestEnemy = closestTargets.remove();
+
+				float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
+
+				if (Point.calcDistance(getPos(), closestEnemy.getPos()) <= aggroRange) {
+					orderAttackUnit(closestEnemy, false);
+				}
+			}
+		}
+	}
+
+	private void aggroOntoNearbyTargetsForAttackMove() {
+		if (currentOrder == Order.ATTACKMOVE) {
+			var closestTargets = UnitUtil.getTargetsSortedByDistance(this, world);
+			if (!closestTargets.isEmpty()) {
+				UnitOrderable closestEnemy = closestTargets.remove();
+
+				float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
+
+				if (Point.calcDistance(getPos(), closestEnemy.getPos()) <= aggroRange) {
+					target = (Unit) closestEnemy; // manually set target/path, since we want to keep the ATTACKMOVE order
+					if (!motion.pathFindTowardsTarget()) {
+						target = null; // keep walking normally if path to target not found
+					}
+				}
+			}
+		}
+	}
+
+	private void handleEngageAndDisengage() {
+		if (currentOrder.isAttackUnit() || isAttackMoveAndHasTarget()) {
+			float distToTarget = Point.calcDistance(this.getPos(), target.getPos());
+
+			if (!isAttacking() && distToTarget <= this.radius + target.radius + Holo.defaultUnitEngageRange) {
+				startAttacking(target);
+			} else if (isAttacking(target) && distToTarget >= this.radius + target.radius + Holo.defaultUnitDisengageRange) {
+				stopAttacking();
+			}
+		}
+	}
+
+	boolean isAttackMoveAndHasTarget() {
+		return currentOrder == Order.ATTACKMOVE && target != null;
+	}
+
+	/**
+	 * Preconditions: Target must be defined
+	 */
+	private void handleTargetLossAndSwitchingForAttackUnit() {
+		if (currentOrder == Order.ATTACKUNIT_SOFT) {
+			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, world);
+			otherTargetsWithinAggroRange.removeIf((t) -> Point.calcDistance(getPos(), t.getPos()) >= Holo.defaultAggroRange);
+			otherTargetsWithinAggroRange.remove(target);
+			float distToTarget = Point.calcDistance(this.getPos(), target.getPos());
+
+			float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
+			float chaseRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange : Holo.defaultUnitAttackChaseRange;
+
+			if (distToTarget > aggroRange && !otherTargetsWithinAggroRange.isEmpty()) {
+				orderAttackUnit(otherTargetsWithinAggroRange.peek(), false);
+			} else if (distToTarget > chaseRange) {
+				clearOrder();
+			}
+		}
+	}
+
+	/**
+	 * Preconditions: Target must be defined
+	 */
+	private void handleTargetLossAndSwitchingForAttackMove() {
+		if (currentOrder == Order.ATTACKMOVE) {
+			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, world);
+			otherTargetsWithinAggroRange.removeIf((t) -> Point.calcDistance(getPos(), t.getPos()) >= Holo.defaultAggroRange);
+			otherTargetsWithinAggroRange.remove(target);
+			float distToTarget = Point.calcDistance(this.getPos(), target.getPos());
+
+			float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
+			float chaseRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange : Holo.defaultUnitAttackChaseRange;
+
+			if (distToTarget > aggroRange && !otherTargetsWithinAggroRange.isEmpty()) {
+				// Switch targets
+
+				Unit oldTarget = target;
+
+				target = (Unit) otherTargetsWithinAggroRange.peek();
+				if (!motion.pathFindTowardsTarget()) {
+					target = oldTarget;
+					logger.debug("Was attack moving but no path could be found to the nearest unit, ignoring");
+				}
+
+			} else if (distToTarget > chaseRange) {
+				// Instead of clearing order, repath and resume moving towards the original destination
+				repathToDestinationForAttackMove();
+			}
+		}
+	}
+
+	private void repathToDestinationForAttackMove() {
+		target = null;
+		if (!motion.pathFindTowardsPoint(attackMoveDestX, attackMoveDestY)) {
+			logger.debug("Was attack moving but no path could be found to destination.");
+			clearOrder();
 		}
 	}
 

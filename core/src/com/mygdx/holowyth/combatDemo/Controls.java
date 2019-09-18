@@ -125,6 +125,14 @@ public class Controls extends InputProcessorAdapter {
 				return "N/A";
 			}
 		});
+		debugValues.add("Target ID of one unit", () -> {
+			if (selectedUnits.size() == 1) {
+				Unit u = selectedUnits.iterator().next();
+				return u.getTarget() != null ? String.valueOf(u.getTarget().getID()) : "null";
+			} else {
+				return "N/A";
+			}
+		});
 
 		// functionBindings.bindFunctionToKey(() -> useSkillInSlot(1), Keys.NUM_1);
 		// functionBindings.bindFunctionToKey(() -> useSkillInSlot(2), Keys.NUM_2);
@@ -492,6 +500,7 @@ public class Controls extends InputProcessorAdapter {
 			}
 		} else { // if no unit is under the cursor, then treat as an attackMove
 			for (UnitOrderable u : selectedUnits) {
+				logger.debug("Attack move ordered");
 				u.orderAttackMove(x, y);
 			}
 		}
