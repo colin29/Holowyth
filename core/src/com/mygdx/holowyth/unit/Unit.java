@@ -17,7 +17,7 @@ import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitInterPF;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skill.Status;
-import com.mygdx.holowyth.unit.behaviours.AggroIfIsEnemyUnit;
+import com.mygdx.holowyth.unit.behaviours.IfIdleAggroOntoNearbyTargets;
 import com.mygdx.holowyth.unit.behaviours.UnitUtil;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
@@ -113,7 +113,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	private WorldInfo world;
 
-	public enum Side { // for now, simple, two forces
+	public enum Side { // For now, can assume that not being on the same side means that two units are enemies. Neutrals and alliances, are a
+						// non-trivial task
 		PLAYER, ENEMY
 	}
 
@@ -401,7 +402,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		motion.tick();
 		stats.tick();
 
-		AggroIfIsEnemyUnit.applyTo(this, world);
+		IfIdleAggroOntoNearbyTargets.applyTo(this, world);
 		if (currentOrder == Order.RETREAT)
 			retreatDurationRemaining -= 1;
 
@@ -477,9 +478,12 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		float distToTarget = Point.calcDistance(this.getPos(), target.getPos());
 
 		if (currentOrder == Order.ATTACKUNIT_SOFT) {
-			if (distToTarget > Holo.defaultAggroRange && !otherTargetsWithinAggroRange.isEmpty()) {
+			float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
+			float chaseRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange : Holo.defaultUnitAttackChaseRange;
+
+			if (distToTarget > aggroRange && !otherTargetsWithinAggroRange.isEmpty()) {
 				orderAttackUnit(otherTargetsWithinAggroRange.peek(), false);
-			} else if (distToTarget > Holo.defaultUnitAttackChaseRange) {
+			} else if (distToTarget > chaseRange) {
 				clearOrder();
 			}
 		}
@@ -702,8 +706,18 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	}
 
 	@Override
+	public boolean isCompletelyIdle() {
+		return currentOrder == Order.NONE && !isAttacking() && !isCastingOrChanneling();
+	}
+
+	@Override
 	public UnitMotion getMotion() {
 		return motion;
+	}
+
+	@Override
+	public boolean isDead() {
+		return stats.isDead();
 	}
 
 }

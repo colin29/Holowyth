@@ -27,4 +27,6 @@ public interface UnitOrderable extends UnitInfo {
 
 	void orderUseSkill(Skill skill);
 
+	boolean isCompletelyIdle();
+
 }

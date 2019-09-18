@@ -50,7 +50,10 @@ public class Holo {
 																					// before it stops receiving attacks
 																					// from the unit.
 	public static float defaultAggroRange = 150;
+	public static float alliedUnitsAggroRange = 100;
+
 	public static float defaultUnitAttackChaseRange = 225;
+	public static float alliedUnitsAttackChaseRange = 175;
 
 	// Editor
 	public static String editorInitialMap = "/complexMap.map"; // "/blankMap.map";

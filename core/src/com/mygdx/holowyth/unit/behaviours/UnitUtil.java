@@ -12,10 +12,10 @@ public class UnitUtil {
 	/**
 	 * Get targets in in order from closest to farthest, by euclidean distance
 	 */
-	public static PriorityQueue<UnitOrderable> getTargetsSortedByDistance(UnitOrderable thisUnit, WorldInfo world) {
+	public static PriorityQueue<UnitOrderable> getTargetsSortedByDistance(UnitOrderable unit, WorldInfo world) {
 		Comparator<UnitOrderable> closestUnitComp = (UnitOrderable u1, UnitOrderable u2) -> {
-			if (Point.calcDistanceSqr(thisUnit.getPos(), u1.getPos())
-					- Point.calcDistanceSqr(thisUnit.getPos(), u2.getPos()) < 0) {
+			if (Point.calcDistanceSqr(unit.getPos(), u1.getPos())
+					- Point.calcDistanceSqr(unit.getPos(), u2.getPos()) < 0) {
 				return -1;
 			} else {
 				return 1;
@@ -23,11 +23,9 @@ public class UnitUtil {
 		};
 
 		PriorityQueue<UnitOrderable> closestTargets = new PriorityQueue<UnitOrderable>(closestUnitComp);
-		for (UnitOrderable otherUnit : world.getUnits()) {
-			if (otherUnit == thisUnit)
-				continue;
-			if (otherUnit.getSide() != thisUnit.getSide()) {
-				closestTargets.add(otherUnit);
+		for (UnitOrderable target : world.getUnits()) {
+			if (!target.isDead() && target.getSide() != unit.getSide()) {
+				closestTargets.add(target);
 			}
 		}
 		return closestTargets;
