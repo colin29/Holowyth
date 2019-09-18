@@ -481,9 +481,14 @@ public class Controls extends InputProcessorAdapter {
 			}
 			// check distance of the click to the center of the circle
 		}
+
 		if (target != null) {
 			for (UnitOrderable u : selectedUnits) {
-				u.orderAttackUnit(target, false);
+				if (u.isAttacking()) {
+					u.orderSwitchAttackUnit(target, false);
+				} else {
+					u.orderAttackUnit(target, true);
+				}
 			}
 		} else { // if no unit is under the cursor, then treat as an attackMove
 			for (UnitOrderable u : selectedUnits) {

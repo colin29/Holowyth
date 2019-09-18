@@ -1,6 +1,5 @@
 package com.mygdx.holowyth.unit.behaviours;
 
-import java.util.Comparator;
 import java.util.PriorityQueue;
 
 import org.slf4j.Logger;
@@ -21,26 +20,10 @@ public class AggroIfIsEnemyUnit {
 
 		if (thisUnit.getSide() == Side.ENEMY && thisUnit.getCurrentOrder() == Order.NONE && !thisUnit.isAttacking()) {
 
-			Comparator<UnitOrderable> closestUnitComp = (UnitOrderable u1, UnitOrderable u2) -> {
-				if (Point.calcDistanceSqr(thisUnit.getPos(), u1.getPos())
-						- Point.calcDistanceSqr(thisUnit.getPos(), u2.getPos()) < 0) {
-					return -1;
-				} else {
-					return 1;
-				}
-			};
-
-			PriorityQueue<UnitOrderable> closestTargets = new PriorityQueue<UnitOrderable>(closestUnitComp);
-			for (UnitOrderable otherUnit : world.getUnits()) {
-				if (otherUnit == thisUnit)
-					continue;
-				if (otherUnit.getSide() != Side.ENEMY) {
-					closestTargets.add(otherUnit);
-				}
-			}
+			PriorityQueue<UnitOrderable> closestTargets = UnitUtil.getTargetsSortedByDistance(thisUnit, world);
 			if (!closestTargets.isEmpty()) {
 				UnitOrderable closestEnemy = closestTargets.remove();
-				if (Point.calcDistance(thisUnit.getPos(), closestEnemy.getPos()) <= Holo.idleAggroRange) {
+				if (Point.calcDistance(thisUnit.getPos(), closestEnemy.getPos()) <= Holo.defaultAggroRange) {
 					thisUnit.orderAttackUnit(closestEnemy, false);
 				}
 			}

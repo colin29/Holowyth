@@ -5,6 +5,7 @@
  * Implements commands like move, attackMove, attack target unit, and also controls automatic behavior of units. <br>
  * Holds information related to commands, including attackOrders and retreating. <br>
  * Handles skills and provides that lets {@link Controls} cause a unit to start casting. <br>
+ * Keeps track of simple cooldowns like attacking and attack of opportunities <br>
  * 
  * Motion: <br>
  * Holds path and is responsible for the motion of the unit <br>

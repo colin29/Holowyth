@@ -348,11 +348,7 @@ public class UnitStats implements UnitStatsInfo {
 		case 4:
 			return 10;
 		default:
-			if (numAttackers >= 5) {
-				return 12;
-			} else {
-				return 0;
-			}
+			return numAttackers >= 5 ? 12 : 0;
 		}
 
 	}

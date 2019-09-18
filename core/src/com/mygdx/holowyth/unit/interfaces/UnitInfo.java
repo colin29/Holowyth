@@ -26,6 +26,8 @@ public interface UnitInfo {
 
 	public boolean isAttacking();
 
+	boolean isAttacking(UnitInfo target);
+
 	public UnitInfo getAttacking();
 
 	public SkillInfo getActiveSkill();

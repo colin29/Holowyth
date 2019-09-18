@@ -41,14 +41,16 @@ public class Holo {
 	}
 
 	// Combat movement
+	/**
+	 * You should add this.radius and target.radius to this value to get the actual distance
+	 */
 	public static float defaultUnitEngageRange = 5;
+	public static float defaultUnitSwitchEngageRange = defaultUnitEngageRange + 5;
 	public static float defaultUnitDisengageRange = defaultUnitEngageRange + 10; // the distance the enemy must travel
 																					// before it stops receiving attacks
 																					// from the unit.
-
+	public static float defaultAggroRange = 150;
 	public static float defaultUnitAttackChaseRange = 225;
-
-	public static float idleAggroRange = 150f;
 
 	// Editor
 	public static String editorInitialMap = "/complexMap.map"; // "/blankMap.map";

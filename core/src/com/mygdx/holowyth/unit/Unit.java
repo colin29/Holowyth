@@ -18,6 +18,7 @@ import com.mygdx.holowyth.pathfinding.UnitInterPF;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skill.Status;
 import com.mygdx.holowyth.unit.behaviours.AggroIfIsEnemyUnit;
+import com.mygdx.holowyth.unit.behaviours.UnitUtil;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
@@ -224,6 +225,27 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	}
 
 	@Override
+	public boolean orderSwitchAttackUnit(UnitOrderable unitOrd, boolean isHardOrder) {
+		Unit unit = (Unit) unitOrd; // underlying objects must hold the same type
+
+		if (!isSwitchAttackOrderAllowed(unit)) {
+			return false;
+		}
+		if (unit == this) {
+			System.out.println("Warning: invalid switch attack command (unit can't attack itself)");
+			return false;
+		}
+
+		if (Point.calcDistance(getPos(), unit.getPos()) <= radius + target.radius + Holo.defaultUnitSwitchEngageRange) {
+			this.currentOrder = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
+			this.target = unit;
+			this.attacking = unit;
+			return true;
+		}
+		return false;
+	}
+
+	@Override
 	public void orderAttackMove(float x, float y) {
 		if (!isAttackMoveOrderAllowed()) {
 			logger.debug("Attack move given but is not implemented yet");
@@ -299,6 +321,10 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		private boolean isAttackOrderAllowed(Unit target) {
 			return isGeneralOrderAllowed()
 					&& !isAttacking()
+					&& target.side != this.side;
+		}
+		private boolean isSwitchAttackOrderAllowed(Unit target) {
+			return isGeneralOrderAllowed()
 					&& target.side != this.side;
 		}
 
@@ -419,50 +445,62 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	 */
 	private static Map<Integer, Unit> idToUnit = new HashMap<Integer, Unit>();
 
-	/** Handles the combat logic for a unit for one frame */
+	/** Handles the combat logic for a unit, including engaging and disengaging */
 	public void tickCombatLogic() {
 
-		if (isAttacking() && attacking.stats.isDead()) {
-			stopAttacking();
-		}
-
 		if (currentOrder.isAttackUnit()) {
-			// If the unit is on an attackUnit command and its in engage range, make it start attacking the target
-
 			if (target.stats.isDead()) {
 				clearOrder();
 				return;
 			}
+			handleEngageAndDisengageForAttackUnit();
+			handleTargetLossAndSwitchingForAttackUnit();
+		}
 
-			Point a, b;
-			a = this.getPos();
-			b = target.getPos();
-			float distToTarget = Point.calcDistance(a, b);
+		tickAttackingIfAttacking();
+	}
 
-			if ((attacking != target) && distToTarget <= this.radius + target.radius + Holo.defaultUnitEngageRange) {
-				startAttacking(target);
-			} else if ((attacking == target) && distToTarget >= this.radius + target.radius + Holo.defaultUnitDisengageRange) {
-				stopAttacking();
-			}
+	private void handleEngageAndDisengageForAttackUnit() {
+		float distToTarget = Point.calcDistance(this.getPos(), target.getPos());
 
-			if (currentOrder == Order.ATTACKUNIT_SOFT && distToTarget > Holo.defaultUnitAttackChaseRange) {
+		if (!isAttacking() && distToTarget <= this.radius + target.radius + Holo.defaultUnitEngageRange) {
+			startAttacking(target);
+		} else if (isAttacking(target) && distToTarget >= this.radius + target.radius + Holo.defaultUnitDisengageRange) {
+			stopAttacking();
+		}
+	}
+
+	private void handleTargetLossAndSwitchingForAttackUnit() {
+		var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, world);
+		otherTargetsWithinAggroRange.removeIf((target) -> Point.calcDistance(getPos(), target.getPos()) >= Holo.defaultAggroRange);
+
+		float distToTarget = Point.calcDistance(this.getPos(), target.getPos());
+
+		if (currentOrder == Order.ATTACKUNIT_SOFT) {
+			if (distToTarget > Holo.defaultAggroRange && !otherTargetsWithinAggroRange.isEmpty()) {
+				orderAttackUnit(otherTargetsWithinAggroRange.peek(), false);
+			} else if (distToTarget > Holo.defaultUnitAttackChaseRange) {
 				clearOrder();
-			}
-
-			if (isAttacking()) {
-				if (attackCooldownRemaining <= 0) {
-					this.attack(attacking);
-					attackCooldownRemaining = attackCooldown / getAttackingSameTargetAtkspdPenalty(attacking);
-					// System.out.println("attack cooldown reset: " + attackCooldownLeft + " Penalty: " +
-					// getAttackingSameTargetAtkspdPenalty(attacking));
-				} else {
-					attackCooldownRemaining -= 1;
-				}
 			}
 		}
 	}
 
-	private float getAttackingSameTargetAtkspdPenalty(Unit target) {
+	private void tickAttackingIfAttacking() {
+		if (isAttacking()) {
+			if (attacking.stats.isDead()) {
+				stopAttacking();
+				return;
+			}
+			if (attackCooldownRemaining <= 0) {
+				this.attack(attacking);
+				attackCooldownRemaining = attackCooldown / getMultiTeamingAtkspdPenalty(attacking);
+			} else {
+				attackCooldownRemaining -= 1;
+			}
+		}
+	}
+
+	private float getMultiTeamingAtkspdPenalty(Unit target) {
 		int n = unitsAttacking.get(target).size();
 
 		if (n <= 1) {
@@ -587,6 +625,11 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	@Override
 	public boolean isAttacking() {
 		return attacking != null;
+	}
+
+	@Override
+	public boolean isAttacking(UnitInfo target) {
+		return attacking == target;
 	}
 
 	@Override
