@@ -73,7 +73,7 @@ public class World implements WorldInfo {
 		tickLogicForUnits();
 		moveNormallyMovingUnits();
 		moveKnockedBackedUnitsAndResolveCollisions();
-		handleSecondaryLogic();
+		tickAttacking();
 	}
 
 	/**
@@ -436,12 +436,9 @@ public class World implements WorldInfo {
 		}
 	}
 
-	private void handleSecondaryLogic() {
+	private void tickAttacking() {
 		for (Unit u : units.getUnits()) {
-			u.tickOrderLogic();
-		}
-		for (Unit u : units.getUnits()) {
-			u.tickAttackingLogic();
+			u.tickAttacking();
 		}
 
 	}

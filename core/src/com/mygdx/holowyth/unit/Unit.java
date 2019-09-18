@@ -414,6 +414,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		motion.tick();
 		stats.tick();
 
+		tickOrderLogic();
+
 		if (currentOrder == Order.RETREAT)
 			retreatDurationRemaining -= 1;
 
@@ -460,7 +462,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	/**
 	 * Updates attacking units
 	 */
-	public void tickAttackingLogic() {
+	public void tickAttacking() {
 		if (isAttacking()) {
 			if (attacking.stats.isDead()) {
 				stopAttacking();
