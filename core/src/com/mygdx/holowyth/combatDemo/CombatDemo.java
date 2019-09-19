@@ -10,6 +10,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -110,7 +111,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		renderer.render(delta);
 
 		updateTitleBarInformation();
-		renderCursor();
 
 		combatDemoUI.onRender();
 
@@ -186,6 +186,8 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		// enemy.orderAttackUnit(playerUnit);
 		// }
 
+		Music music = Gdx.audio.newMusic(Gdx.files.internal("assets/bgm/hushuu.mp3"));
+		music.play();
 	}
 
 	@Override
@@ -197,13 +199,12 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	@Override
 	public boolean keyDown(int keycode) {
-		// TODO Auto-generated method stub
+		functionBindings.runBoundFunction(keycode);
 		return false;
 	}
 
 	@Override
 	public boolean keyUp(int keycode) {
-		functionBindings.runBoundFunction(keycode);
 		return false;
 	}
 

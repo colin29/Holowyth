@@ -176,7 +176,6 @@ public class World implements WorldInfo {
 					thisUnit.x = curDestx;
 					thisUnit.y = curDesty;
 				} else {
-					System.out.println("Unit is blocked");
 					thisUnit.motion.onBlocked(); // notify the unit that it is blocked
 				}
 

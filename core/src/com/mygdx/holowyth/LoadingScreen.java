@@ -3,6 +3,7 @@ package com.mygdx.holowyth;
 import java.io.File;
 import java.io.FilenameFilter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +63,18 @@ public class LoadingScreen extends BaseScreen {
 		// game.assets.load("img/witchresized.png", Texture.class);
 
 		// Load all png files in this directory
-		File dir = new File(Holowyth.ASSETS_PATH + "img/");
+		loadAllImagesInDirectory("img/");
+		loadAllImagesInDirectory("icons/cursors/");
+
+	}
+
+	private void loadAllImagesInDirectory(String dirPath) {
+		loadAllImagesInDirectory(new File(Holowyth.ASSETS_PATH + dirPath));
+	}
+
+	private void loadAllImagesInDirectory(File dir) {
+
+		logger.debug("Ran on directory: " + StringUtils.removeStart(dir.getPath().replace("\\", "/"), Holowyth.ASSETS_PATH));
 
 		File[] images = dir.listFiles(new FilenameFilter() {
 			@Override
@@ -74,9 +86,21 @@ public class LoadingScreen extends BaseScreen {
 		for (File image : images) {
 			TextureParameter param = new TextureParameter();
 			param.genMipMaps = true;
-			game.assets.load("img/" + image.getName(), Texture.class, param);
+
+			String dirPath = StringUtils.removeStart(dir.getPath().replace("\\", "/"), Holowyth.ASSETS_PATH);
+			System.out.println("loaded: " + dirPath + "/" + image.getName());
+			game.assets.load(dirPath + "/" + image.getName(), Texture.class, param);
 		}
 
+		File[] subDirs = dir.listFiles(new FilenameFilter() {
+			@Override
+			public boolean accept(File current, String name) {
+				return new File(current, name).isDirectory();
+			}
+		});
+		for (File subDir : subDirs) {
+			loadAllImagesInDirectory(subDir);
+		}
 	}
 
 }

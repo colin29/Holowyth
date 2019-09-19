@@ -56,22 +56,6 @@ public class CombatDemoUI {
 		// root.debug();
 	}
 
-	@SuppressWarnings("unused")
-	/**
-	 * A parameter window produces a slider which can be used to adjust variables dynamically
-	 */
-	private void createParameterWindow() {
-
-		parameterWindow = new Window("Parameters", skin);
-		parameterWindow.setPosition(0, 100);
-
-		stage.addActor(parameterWindow);
-		// HoloUI.parameterSlider(0, Holo.defaultUnitMoveSpeed,
-		// "initialMoveSpeed", testing, skin,
-		// (Float f) -> playerUnit.initialMoveSpeed = f);
-		parameterWindow.pack();
-	}
-
 	/**
 	 * Adds a small coordinate text that displays the mouse cursor position in world coordinates
 	 */

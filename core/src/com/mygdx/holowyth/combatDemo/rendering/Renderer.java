@@ -2,21 +2,32 @@ package com.mygdx.holowyth.combatDemo.rendering;
 
 import java.util.function.Predicate;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.combatDemo.Controls;
+import com.mygdx.holowyth.combatDemo.Controls.Context;
 import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.graphics.HoloGL;
+import com.mygdx.holowyth.graphics.HoloSprite;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.skill.GroundSkill;
 import com.mygdx.holowyth.skill.Skill.Status;
 import com.mygdx.holowyth.skill.SkillInfo;
 import com.mygdx.holowyth.unit.Unit;
@@ -36,6 +47,8 @@ import com.mygdx.holowyth.util.Holo;
  *
  */
 public class Renderer {
+
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	Holowyth game;
 
@@ -60,7 +73,7 @@ public class Renderer {
 
 	// Graphic flags:
 
-	private Controls unitControls;
+	private Controls controls;
 
 	// Sub-components
 	DebugRenderer debug;
@@ -96,8 +109,7 @@ public class Renderer {
 	}
 
 	/*
-	 * Methods call should not set projection matrixes (it is assumed to be the world matrix). If they do they should
-	 * restore the old state
+	 * Methods call should not set projection matrixes (it is assumed to be the world matrix). If they do they should restore the old state
 	 */
 	public void render(float delta) {
 		Gdx.gl.glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
@@ -109,8 +121,10 @@ public class Renderer {
 
 		batch.setProjectionMatrix(worldCamera.combined);
 
+		renderCastingCircleIfSkill();
+		// renderCircleIfAimingSkillGround();
+
 		renderUnitHpSpBars();
-		renderCastingBars();
 
 		// 1: Render Map
 
@@ -127,22 +141,22 @@ public class Renderer {
 
 		// 3: Render units and selection indicators
 
-		if (unitControls != null) {
-			unitControls.clearDeadUnitsFromSelection();
-			unitControls.renderCirclesOnSelectedUnits();
+		if (controls != null) {
+			controls.clearDeadUnitsFromSelection();
+			controls.renderCirclesOnSelectedUnits();
 			pathfinding.renderUnitExpandedHitBodies();
 		}
 
 		renderUnits();
 
-		if (unitControls != null) {
-			unitControls.renderSelectionBox(Controls.defaultSelectionBoxColor);
+		if (controls != null) {
+			controls.renderSelectionBox(Controls.defaultSelectionBoxColor);
 			renderOutlineAroundBusyRetreatingUnits();
 			renderOutlineAroundBusyCastingUnits();
 		}
 		renderOutlineAroundKnockbackedUnits();
 
-		debug.renderUnitIdsOnUnits();
+		// debug.renderUnitIdsOnUnits();
 
 		// 3.5: Render arrows
 
@@ -151,6 +165,8 @@ public class Renderer {
 		for (Unit u : world.getUnits()) {
 			u.renderAttackingArrow();
 		}
+
+		renderCastingBars();
 
 		// 1: Render Obstacle Lines
 
@@ -168,6 +184,55 @@ public class Renderer {
 		stage.act(delta);
 		stage.draw();
 
+	}
+
+	@SuppressWarnings("unused")
+	private void renderCircleIfAimingSkillGround() {
+		if (controls.getContext() == Context.SKILL_GROUND) {
+			var curSkill = (GroundSkill) controls.getCurSkill();
+			var cursorPos = getWorldCoordinatesOfMouseCursor();
+			HoloGL.renderCircleOutline(cursorPos.x, cursorPos.y, curSkill.aimingHelperRadius, Color.RED);
+		}
+	}
+
+	private void renderCastingCircleIfSkill() {
+		if (controls.getContext() == Context.SKILL_GROUND) {
+
+			var curSkill = (GroundSkill) controls.getCurSkill();
+			var cursorPos = getWorldCoordinatesOfMouseCursor();
+
+			TextureRegion magicCircle = new TextureRegion(game.assets.get("img/effects/magicCircle_blue.png", Texture.class));
+			magicCircle.getTexture().setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Nearest);
+
+			// Sprite sprite = new Sprite(magicCircle);
+			// sprite.set
+
+			float width = curSkill.aimingHelperRadius * 2 * 1.04f;
+			HoloSprite sprite = new HoloSprite(magicCircle, cursorPos.x, cursorPos.y, width, 0, 0);
+
+			float revsPerSecond = 1f / 40;
+			int msForOneRotation = (int) (1000 / revsPerSecond);
+			float rotationProgress = (System.currentTimeMillis() % msForOneRotation) / (float) msForOneRotation;
+			sprite.rotation = rotationProgress * 360;
+
+			float upperWidthInterval = 500;
+			float lowerWidthInterval = 200;
+			float minAlphaPercentage = 50;
+
+			if (width > lowerWidthInterval) {
+				float alphaScalingPercentage = Math.min(minAlphaPercentage,
+						100 - (width - lowerWidthInterval) / (upperWidthInterval - lowerWidthInterval) * (100 - minAlphaPercentage));
+				sprite.alphaScaling = alphaScalingPercentage / 100;
+			}
+
+			sprite.draw(batch);
+		}
+	}
+
+	private Vector2 getWorldCoordinatesOfMouseCursor() {
+		Vector3 vec = new Vector3(); // World coordinates of the click.
+		vec = worldCamera.unproject(vec.set(Gdx.input.getX(), Gdx.input.getY(), 0));
+		return new Vector2(vec.x, vec.y);
 	}
 
 	private void renderUnits() {
@@ -335,7 +400,7 @@ public class Renderer {
 	private Color castBarColor = HoloGL.rgb(204, 224, 255);
 
 	public void setUnitControls(Controls unitControls) {
-		this.unitControls = unitControls;
+		this.controls = unitControls;
 	}
 
 	/*

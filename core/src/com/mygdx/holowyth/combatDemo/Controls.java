@@ -14,6 +14,9 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Cursor.SystemCursor;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -65,7 +68,19 @@ public class Controls extends InputProcessorAdapter {
 	boolean leftMouseKeyDown = false;
 
 	public enum Context {
-		NONE, ATTACK, RETREAT, SKILL_GROUND, SKILL_UNIT, SKILL_UNIT_GROUND_1, SKILL_UNIT_GROUND_2
+		NONE, ATTACK, RETREAT, SKILL_GROUND, SKILL_UNIT, SKILL_UNIT_GROUND_1, SKILL_UNIT_GROUND_2;
+
+		boolean isUsingSkill() {
+			switch (this) {
+			case SKILL_GROUND:
+			case SKILL_UNIT:
+			case SKILL_UNIT_GROUND_1:
+			case SKILL_UNIT_GROUND_2:
+				return true;
+			default:
+				return false;
+			}
+		}
 	}
 
 	Context context = Context.NONE;
@@ -88,6 +103,7 @@ public class Controls extends InputProcessorAdapter {
 		this.units = units;
 
 		this.font = Holowyth.fonts.debugFont();
+		this.game = game;
 		this.skin = game.skin;
 
 		this.gameLog = gameLog;
@@ -224,6 +240,7 @@ public class Controls extends InputProcessorAdapter {
 					break;
 
 				}
+				setCursor();
 
 			} catch (CloneNotSupportedException e) {
 				e.printStackTrace();
@@ -233,22 +250,61 @@ public class Controls extends InputProcessorAdapter {
 
 	@Override
 	public boolean keyDown(int keycode) {
+		functionBindings.runBoundFunction(keycode);
+
 		if (keycode == Keys.A && selectedUnits.size() > 0) {
-			clearContext();
-			context = Context.ATTACK;
+			beginAttackContext();
 			return true;
 		} else if (keycode == Keys.R && selectedUnits.size() > 0) {
-			clearContext();
-			context = Context.RETREAT;
+			beginRetreatContext();
 			return true;
 		}
 		return false;
 	}
 
-	@Override
-	public boolean keyUp(int keycode) {
-		functionBindings.runBoundFunction(keycode);
-		return false;
+	private void beginAttackContext() {
+		clearContext();
+		context = Context.ATTACK;
+		setCursor();
+	}
+
+	private void beginRetreatContext() {
+		clearContext();
+		context = Context.RETREAT;
+		setCursor();
+	}
+
+	/**
+	 * Set cursor based on the current context
+	 */
+	private void setCursor() {
+		setCursor(context);
+	}
+
+	private void setCursor(Context context) {
+
+		String cursorPath = null;
+		int offsetX = 0, offsetY = 0;
+
+		if (context == Context.ATTACK) {
+			cursorPath = "icons/cursors/AttackCursor.png";
+		} else if (context.isUsingSkill()) {
+			cursorPath = "icons/cursors/MagicCursor.png";
+		} else if (context == Context.RETREAT) {
+			cursorPath = "icons/cursors/RetreatCursor.png";
+			offsetX = 5;
+			offsetY = 5;
+		}
+
+		if (cursorPath == null) {
+			Gdx.graphics.setSystemCursor(SystemCursor.Crosshair);
+		} else {
+			Texture texture = (Texture) game.assets.get(cursorPath);
+			if (!texture.getTextureData().isPrepared())
+				texture.getTextureData().prepare();
+			Pixmap pixmap = texture.getTextureData().consumePixmap();
+			Gdx.graphics.setCursor(Gdx.graphics.newCursor(pixmap, offsetX, offsetY));
+		}
 	}
 
 	@Override
@@ -444,6 +500,7 @@ public class Controls extends InputProcessorAdapter {
 		context = Context.NONE;
 		curSkill = null;
 		curSkillUnit = null;
+		setCursor();
 	}
 
 	private String getCurrentContextText() {
@@ -744,6 +801,14 @@ public class Controls extends InputProcessorAdapter {
 				selected.clear();
 			}
 		}
+	}
+
+	public Context getContext() {
+		return context;
+	}
+
+	public Skill getCurSkill() {
+		return curSkill;
 	}
 
 }

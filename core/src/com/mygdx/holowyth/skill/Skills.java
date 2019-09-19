@@ -93,7 +93,8 @@ public class Skills {
 		}
 
 		int mainDamage = 25;
-		float splashRadius = 70;
+
+		static float aoeRadius = 70;
 		boolean fired;
 
 		@Override
@@ -102,7 +103,7 @@ public class Skills {
 
 		@Override
 		public void tick() {
-			applySplashAroundLocation(x, y, splashRadius, mainDamage);
+			applySplashAroundLocation(x, y, aoeRadius, mainDamage);
 			fired = true;
 		}
 
@@ -132,6 +133,7 @@ public class Skills {
 			casting.castTime = 60;
 			spCost = 10;
 			cooldown = 20;
+			aimingHelperRadius = ExplosionEffect.aoeRadius;
 		}
 
 		@Override
@@ -147,6 +149,7 @@ public class Skills {
 			casting.castTime = 200;
 			spCost = 10;
 			cooldown = 20;
+			aimingHelperRadius = ExplosionEffect.aoeRadius;
 		}
 
 		@Override
@@ -168,6 +171,7 @@ public class Skills {
 			casting.castTime = 0;
 			spCost = 0;
 			cooldown = 20;
+			aimingHelperRadius = ImplosionEffect.aoeRadius;
 		}
 
 		@Override
@@ -182,7 +186,7 @@ public class Skills {
 		}
 
 		int damage = 10;
-		float effectRadius = 200;
+		static float aoeRadius = 200;
 
 		final float knockbackSpeed = 2;
 
@@ -192,7 +196,7 @@ public class Skills {
 
 		@Override
 		public void tick() {
-			knockBackEnemiesInRadiusTowardsCenter(x, y, effectRadius, damage);
+			knockBackEnemiesInRadiusTowardsCenter(x, y, aoeRadius, damage);
 			markAsComplete();
 		}
 
