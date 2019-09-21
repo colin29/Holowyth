@@ -1,6 +1,6 @@
 
 
-sourceCompatibility = 1.8
+sourceCompatibility = 1.12
 sourceSets.main.java.srcDirs = [ "src/" ]
 
 project.ext.mainClassName = "com.mygdx.holowyth.desktop.DesktopLauncher"

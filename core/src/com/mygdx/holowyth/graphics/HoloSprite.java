@@ -49,7 +49,6 @@ public class HoloSprite {
 		batch.setColor(1, 1, 1, alphaScaling);
 
 		batch.begin();
-		batch.enableBlending();
 
 		batch.draw(tex, x - width / 2.0f + offsetX, y - height / 2.0f + offsetY, width / 2.0f, height / 2.0f, width, height, scale, scale, rotation);
 		batch.end();

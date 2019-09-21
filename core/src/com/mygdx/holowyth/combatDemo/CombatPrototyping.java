@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.UnitStats;
-import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class CombatPrototyping {
@@ -60,7 +59,6 @@ public class CombatPrototyping {
 
 		unit.testDamage = 5;
 
-		unit.baseMoveSpeed = Holo.defaultUnitMoveSpeed * 2;
 	}
 
 	public static void loadPlayerUnitStats(UnitStats unit) {

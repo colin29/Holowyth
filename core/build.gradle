@@ -1,4 +1,4 @@
-sourceCompatibility = 1.8
+sourceCompatibility = 1.12
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 sourceSets.main.java.srcDirs = [ "src/" ]
@@ -7,6 +7,9 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 
 
 dependencies {
+
+	// Libgdx
+	implementation 'space.earlygrey:shapedrawer:1.2.0'
 	
 	// UI
 	compile "com.kotcrab.vis:vis-ui:$visuiVersion"

@@ -22,8 +22,8 @@ public class Skills {
 	 * 
 	 * @param unit
 	 */
-	private static class NovaFlareEffect extends CasterEffect {
-		public NovaFlareEffect(Unit caster) {
+	private static class StaticShockEffect extends CasterEffect {
+		public StaticShockEffect(Unit caster) {
 			super(caster);
 		}
 
@@ -73,8 +73,8 @@ public class Skills {
 
 	};
 
-	public static class NovaFlare extends NoneSkill {
-		public NovaFlare() {
+	public static class StaticShock extends NoneSkill {
+		public StaticShock() {
 			super();
 			name = "Nova Flare";
 			spCost = 10;
@@ -83,7 +83,7 @@ public class Skills {
 
 		@Override
 		public void pluginTargeting(Unit caster) {
-			setEffects(new NovaFlareEffect(caster));
+			setEffects(new StaticShockEffect(caster));
 		}
 	}
 
@@ -212,6 +212,79 @@ public class Skills {
 
 						Vector2 unitToEffectCenter = new Vector2(effectX - unit.x, effectY - unit.y);
 						Vector2 knockBackVel = new Vector2(unitToEffectCenter).nor().scl(knockbackSpeed);
+
+						unit.motion.applyKnockBackVelocity(knockBackVel.x, knockBackVel.y);
+					}
+				}
+			}
+		}
+
+	};
+
+	/**
+	 * Skill that knocks back nearby enemies towards the focal point
+	 * 
+	 * @author Colin Ta
+	 *
+	 */
+	public static class NovaFlare extends GroundSkill {
+		public NovaFlare() {
+			super();
+			name = "Implosion";
+			casting.castTime = 200;
+			spCost = 10;
+			cooldown = 20;
+			aimingHelperRadius = NovaFlareEffect.aoeRadius;
+		}
+
+		@Override
+		public void pluginTargeting(Unit caster, float x, float y) {
+			setEffects(new NovaFlareEffect(caster, x, y));
+		}
+	}
+
+	private static class NovaFlareEffect extends CasterGroundEffect {
+		public NovaFlareEffect(Unit caster, float x, float y) {
+			super(caster, x, y);
+		}
+
+		int damage = 35;
+		static float aoeRadius = 200;
+
+		final float knockbackMagnitude = 2.5f;
+
+		@Override
+		public void begin() {
+		}
+
+		@Override
+		public void tick() {
+			knockBackEnemiesWithinRadius(x, y, aoeRadius, damage);
+			var units = source.getWorldMutable().getUnits();
+			Point effectCenter = new Point(x, y);
+			for (Unit unit : units) {
+				if (Point.calcDistance(effectCenter, unit.getPos()) <= aoeRadius) {
+					if (unit != source) {
+						unit.stats.applyDamage(damage);
+					}
+				}
+			}
+
+			markAsComplete();
+		}
+
+		public void knockBackEnemiesWithinRadius(float effectX, float effectY, float effectRadius,
+				int damage) {
+			List<Unit> units = source.getWorldMutable().getUnits();
+
+			Point effectCenter = new Point(effectX, effectY);
+			for (Unit unit : units) {
+				if (Point.calcDistance(effectCenter, unit.getPos()) <= effectRadius) {
+					if (unit != source) {
+						// knockback the units
+
+						Vector2 unitToEffectCenter = new Vector2(unit.x - effectX, unit.y - effectY);
+						Vector2 knockBackVel = new Vector2(unitToEffectCenter).nor().scl(knockbackMagnitude);
 
 						unit.motion.applyKnockBackVelocity(knockBackVel.x, knockBackVel.y);
 					}

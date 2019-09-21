@@ -480,9 +480,9 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	/** Handles the complex logic revolving around switching orders and targets */
 	public void tickOrderLogic() {
 
-		// if (this.side == Side.ENEMY) {
-		// ifIdleAggroOntoNearbyTargets();
-		// }
+		if (this.side == Side.ENEMY) {
+			ifIdleAggroOntoNearbyTargets();
+		}
 
 		if (target != null && target.stats.isDead()) {
 			if (currentOrder.isAttackUnit()) {

@@ -181,8 +181,8 @@ public class Controls extends InputProcessorAdapter {
 	{
 		skills[1] = new Skills.Explosion();
 		skills[2] = new Skills.ExplosionLongCast();
-		skills[3] = new Skills.NovaFlare();
-		skills[4] = new Skills.Implosion();
+		skills[3] = new Skills.StaticShock();
+		skills[4] = new Skills.NovaFlare();
 		skills[5] = new Skills.ForcePush();
 	}
 
@@ -612,6 +612,7 @@ public class Controls extends InputProcessorAdapter {
 		}
 
 		if (selected != null) {
+			selected.stats.printInfo();
 			return selected;
 		} else {
 			return null;
@@ -685,9 +686,6 @@ public class Controls extends InputProcessorAdapter {
 		if (!newlySelected.isEmpty()) {
 			selectedUnits.clear();
 			selectedUnits.addAll(newlySelected);
-			for (Unit u : newlySelected) {
-				u.stats.printInfo();
-			}
 		}
 	}
 

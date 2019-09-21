@@ -9,6 +9,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -35,6 +36,7 @@ import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.ShapeDrawerPlus;
 
 /**
  * Handles all of CombatDemo's rendering <br>
@@ -57,6 +59,8 @@ public class Renderer {
 	Camera worldCamera;
 	ShapeRenderer shapeRenderer;
 	SpriteBatch batch;
+
+	ShapeDrawerPlus shapeDrawer;
 
 	// Screen lifetime components
 	private Stage stage;
@@ -95,6 +99,7 @@ public class Renderer {
 
 		batch = game.batch;
 		shapeRenderer = game.shapeRenderer;
+		shapeDrawer = new ShapeDrawerPlus(batch, get1PixelWhiteTextureRegion());
 
 		this.game = game;
 
@@ -108,6 +113,13 @@ public class Renderer {
 		sandbox = new SandBoxRenderer(this);
 	}
 
+	private static TextureRegion get1PixelWhiteTextureRegion() {
+		var labelColor = new Pixmap(1, 1, Pixmap.Format.RGB888);
+		labelColor.setColor(Color.WHITE);
+		labelColor.fill();
+		return new TextureRegion(new Texture(labelColor));
+	}
+
 	/*
 	 * Methods call should not set projection matrixes (it is assumed to be the world matrix). If they do they should restore the old state
 	 */
@@ -116,6 +128,7 @@ public class Renderer {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT
 				| (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
 		Gdx.gl.glEnable(GL20.GL_BLEND);
+		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 
 		worldCamera.update();
 
@@ -240,31 +253,34 @@ public class Renderer {
 			sandbox.renderUnitsWithTestSprites();
 		} else {
 
+			batch.begin();
+
 			// Render unit circles
 			for (Unit unit : world.getUnits()) {
 
-				shapeRenderer.begin(ShapeType.Filled);
+				shapeDrawer.setColor(Color.PURPLE);
 
 				if (unit.isAPlayerCharacter()) {
-					shapeRenderer.setColor(Color.PURPLE);
+					shapeDrawer.setColor(Color.PURPLE);
 				} else {
-					shapeRenderer.setColor(Color.YELLOW);
+					shapeDrawer.setColor(Color.YELLOW);
 				}
-				shapeRenderer.getColor().a = unit.stats.isDead() ? 0.5f : 1;
 
-				shapeRenderer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
+				shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
 
-				shapeRenderer.end();
+				shapeDrawer.filledCircle(unit.x, unit.y, Holo.UNIT_RADIUS);
+
 			}
 
-			// Render an outline around the unit
 			for (Unit unit : world.getUnits()) {
-				shapeRenderer.begin(ShapeType.Line);
-				shapeRenderer.setColor(Color.BLACK);
-				shapeRenderer.getColor().a = unit.stats.isDead() ? 0.5f : 1;
-				shapeRenderer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
-				shapeRenderer.end();
+				shapeDrawer.setColor(Color.BLACK);
+				shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
+				shapeDrawer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
 			}
+
+			shapeDrawer.setAlpha(1);
+			batch.end();
+
 		}
 	}
 

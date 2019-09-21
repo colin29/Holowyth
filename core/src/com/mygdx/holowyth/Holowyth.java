@@ -61,9 +61,9 @@ public class Holowyth extends Game {
 		initFonts();
 
 		LoadingScreen loadingScreen = new LoadingScreen(this);
-
 		loadingScreen.queueAssets();
 		this.assets.finishLoading();
+
 		setScreenToGivenClass();
 
 	}
