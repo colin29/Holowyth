@@ -3,12 +3,11 @@ package com.mygdx.holowyth.skill;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections4.CollectionUtils;
-
 import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.skill.effect.CasterEffect;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.util.Holo;
 
 /**
  * Represents a skill instance that is cast and then produces effects. A skill manages its effects through it's lifetime.
@@ -98,43 +97,33 @@ public class Skill implements Cloneable, SkillInfo {
 
 				// Check that sp is sufficient, if not, abort.
 
-				// Calculate actual sp cost here
-
-				if (!hasEnoughSp()) {
+				if (hasEnoughSp()) {
+					if (!Holo.debugNoManaCost)
+						caster.stats.subtractSp(spCost);
+				} else {
 					status = Status.DONE;
 					return;
-				} else {
-					caster.stats.subtractSp(spCost);
 				}
 
-				// update cooldown
 				caster.setSkillCooldown(cooldown);
 
 				if (hasChannelingBehaviour) {
 					status = Status.CHANNELING;
 				} else {
-					status = Status.RESOLVING;
+					status = Status.DONE;
+				}
+
+				for (Effect effect : effects) {
+					effect.begin();
+					world.addEffect(effect);
 				}
 				onFinishCasting();
 			}
 		}
 
-		// TODO: skills with Channeling behaviour
-
-		if (status == Status.CHANNELING || status == Status.RESOLVING) {
-			for (Effect effect : effects) {
-				effect.tick();
-			}
-		}
-
-		// Remove all completed effects from the list
-
-		CollectionUtils.filter(effects, (item) -> !item.isComplete());
-
 		// If all effects are completed, skill is complete
 
-		if (effects.isEmpty()) {
-			status = Status.DONE;
+		if (status == Status.DONE) {
 			caster.setActiveSkill(null);
 			System.out.printf("Skill %s finished. %n", this.name);
 		}
@@ -164,11 +153,6 @@ public class Skill implements Cloneable, SkillInfo {
 	}
 
 	private void onFinishCasting() {
-
-		// Start all effects
-		for (Effect effect : effects) {
-			effect.begin();
-		}
 	}
 
 	/**

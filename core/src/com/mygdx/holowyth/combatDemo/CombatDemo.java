@@ -10,7 +10,6 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -185,9 +184,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		// for (Unit enemy : enemies) {
 		// enemy.orderAttackUnit(playerUnit);
 		// }
-
-		Music music = Gdx.audio.newMusic(Gdx.files.internal("assets/bgm/hushuu.mp3"));
-		music.play();
 	}
 
 	@Override

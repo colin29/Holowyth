@@ -40,6 +40,14 @@ public class Holo {
 		}
 	}
 
+	// Unit behaviour
+	public static boolean idleEnemyUnitsAggro = false;
+
+	// Debug Cheats
+	public static boolean debugFastCastEnbabled = true;
+	public static boolean debugHighHpUnits = true;
+	public static boolean debugNoManaCost = true;
+
 	// Combat movement
 	/**
 	 * You should add this.radius and target.radius to this value to get the actual distance

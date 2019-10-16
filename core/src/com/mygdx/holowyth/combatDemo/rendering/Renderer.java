@@ -306,11 +306,11 @@ public class Renderer {
 		for (UnitInfo unit : world.getUnits()) {
 
 			UnitStatsInfo unitStats = unit.getStats();
-			float maxHp = unitStats.getMaxHp();
+			float virtualMaxHp = Holo.debugHighHpUnits ? unitStats.getMaxHp() / 10 : unitStats.getMaxHp();
 			float hpRatio = unitStats.getHpRatio();
 			float spRatio = unitStats.getSpRatio();
 
-			float hpBarWidth = (float) Math.sqrt((maxHp / 100)) * hpBarWidthBase;
+			float hpBarWidth = (float) Math.sqrt((virtualMaxHp / 100)) * hpBarWidthBase;
 			hpBarWidth = Math.max(hpBarWidth, hpBarWidthMin);
 			hpBarWidth = Math.min(hpBarWidth, hpBarWidthMax);
 

@@ -10,9 +10,7 @@ public abstract class Effect {
 	private boolean markedAsComplete = false;
 	private String name = "Untitled Effect";
 
-	private
-
-	World world;
+	protected final World world;
 
 	Effect(World world) {
 		this.world = world;

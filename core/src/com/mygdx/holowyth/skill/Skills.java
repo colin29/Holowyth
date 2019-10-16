@@ -260,7 +260,7 @@ public class Skills {
 		@Override
 		public void tick() {
 			knockBackEnemiesWithinRadius(x, y, aoeRadius, damage);
-			var units = source.getWorldMutable().getUnits();
+			var units = world.getUnits();
 			Point effectCenter = new Point(x, y);
 			for (Unit unit : units) {
 				if (Point.calcDistance(effectCenter, unit.getPos()) <= aoeRadius) {

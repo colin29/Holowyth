@@ -143,7 +143,7 @@ public class UnitStats implements UnitStatsInfo {
 		percep = perceptBase + iPercep;
 
 		// 2: calculate hp stats
-		maxHp = maxHpBase; // Math.round(baseMaxHp * (1 + 0.1f * (fort - 5)));
+		maxHp = Holo.debugHighHpUnits ? maxHpBase * 10 : maxHpBase; // Math.round(baseMaxHp * (1 + 0.1f * (fort - 5)));
 		maxSp = maxSpBase;
 
 		// 3: calculate derived stats from core stats;

@@ -20,6 +20,7 @@ import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.polygon.Polygons;
+import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
@@ -43,7 +44,7 @@ public class World implements WorldInfo {
 	Field map; // Each world instance is tied to a single map (specifically, is
 				// loaded from a single map)
 
-	EffectsHandler effects;
+	EffectsHandler gfx;
 	DebugStore debugStore;
 
 	private UnitCollection units = new UnitCollection();
@@ -55,10 +56,12 @@ public class World implements WorldInfo {
 	private float knockBackUnitFriction = 0.015f; // 0.01-0.02 is a realistic number
 	private float velocityThresholdToEndKnockback = 0.01f; // 0.03f;
 
+	private List<Effect> effects = new ArrayList<Effect>();
+
 	public World(Field map, PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects) {
 		this.map = map;
 		this.pathingModule = pathingModule;
-		this.effects = effects;
+		this.gfx = effects;
 
 		this.debugStore = debugStore;
 
@@ -70,10 +73,24 @@ public class World implements WorldInfo {
 	 * Evaluates one frame of the game world
 	 */
 	public void tick() {
+
 		tickLogicForUnits();
 		moveNormallyMovingUnits();
 		moveKnockedBackedUnitsAndResolveCollisions();
 		tickAttacking();
+
+		tickEffects();
+	}
+
+	public void addEffect(Effect e) {
+		effects.add(e);
+	}
+
+	private void tickEffects() {
+		for (Effect e : effects) {
+			e.tick();
+		}
+		effects.removeIf((Effect e) -> e.isComplete());
 	}
 
 	/**
@@ -489,7 +506,7 @@ public class World implements WorldInfo {
 
 	@Override
 	public EffectsHandler getEffectsHandler() {
-		return effects;
+		return gfx;
 	}
 
 	public Field getMap() {

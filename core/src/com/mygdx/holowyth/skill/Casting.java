@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.skill;
 
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.util.Holo;
 
 /**
  * Component of Skill. Default version simply ticks down.
@@ -23,7 +24,10 @@ public class Casting implements Cloneable, CastingInfo {
 
 	public void begin(Unit caster) {
 
-		this.castTimeRemaining = castTime;
+		if (Holo.debugFastCastEnbabled) {
+			castTime = castTime / 10;
+		}
+		castTimeRemaining = castTime;
 		onBeginCast();
 	}
 
