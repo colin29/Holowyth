@@ -40,8 +40,13 @@ public class Skill implements Cloneable, SkillInfo {
 
 	public boolean hasChannelingBehaviour = false;
 
+	/**
+	 * Channeled *effects* is not implemented yet. Those effects need to be specially marked 'channeling', and when the skill channel is interrupted
+	 * they should be interrupted/removed.
+	 *
+	 */
 	public enum Status {
-		INIT, CASTING, CHANNELING, RESOLVING, DONE
+		INIT, CASTING, CHANNELING, DONE
 	}
 
 	private Status status = Status.INIT;
@@ -58,8 +63,10 @@ public class Skill implements Cloneable, SkillInfo {
 
 	private final Targeting targeting; // determines what types of effects can be entered
 
-	private List<CasterEffect> effects; // if this is set, then all the effects are instantiated and the skill is fully
-										// defined.
+	private List<CasterEffect> effects = new ArrayList<CasterEffect>();
+	private boolean effectsSet = false;
+
+	// if this is set, then all the effects are instantiated and the skill is fully defined.
 
 	public Skill(Targeting targeting) {
 		this.targeting = targeting;
@@ -156,20 +163,24 @@ public class Skill implements Cloneable, SkillInfo {
 	}
 
 	/**
-	 * Sets effects as a single effect
+	 * Sets effects as a single effect.
+	 * 
 	 */
 	public void setEffects(CasterEffect effect) {
-		this.effects = new ArrayList<CasterEffect>();
-		this.effects.add(effect);
+		effects.clear();
+		effects.add(effect);
+		effectsSet = true;
 	}
 
-	public void setEffects(List<CasterEffect> effects) {
-		this.effects = effects;
+	public void setEffects(List<CasterEffect> src) {
+		effects.clear();
+		effects.addAll(src);
+		effectsSet = true;
 	}
 
 	@Override
 	public boolean areEffectsSet() {
-		return effects != null;
+		return effectsSet;
 	}
 
 	@Override
