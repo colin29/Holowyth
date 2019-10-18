@@ -9,13 +9,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
 
-public class BaseRenderer {
+public class BaseHoloRenderer {
 
 	private Camera worldCamera;
-	private Stage stage;
 	private Holowyth game;
 
 	protected ShapeRenderer shapeRenderer;
@@ -24,7 +22,7 @@ public class BaseRenderer {
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 	private Color clearColor = Color.BLACK;
 
-	public BaseRenderer(Holowyth game, Camera worldCamera, Stage stage) {
+	public BaseHoloRenderer(Holowyth game, Camera worldCamera) {
 
 		batch = game.batch;
 		shapeRenderer = game.shapeRenderer;
@@ -32,7 +30,6 @@ public class BaseRenderer {
 		this.game = game;
 
 		this.worldCamera = worldCamera;
-		this.stage = stage;
 	}
 
 	/**

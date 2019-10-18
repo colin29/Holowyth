@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.holowyth.Holowyth;
 
-public abstract class BaseScreen implements Screen {
+public abstract class BaseHoloScreen implements Screen {
 
 	protected final Holowyth game;
 	protected OrthographicCamera camera; // Used for rendering world objects (that use world coordinates)
@@ -22,7 +22,7 @@ public abstract class BaseScreen implements Screen {
 
 	protected ShapeRenderer shapeRenderer;
 
-	public BaseScreen(final Holowyth game) {
+	public BaseHoloScreen(final Holowyth game) {
 		this.game = game;
 		this.batch = game.batch;
 		this.shapeRenderer = game.shapeRenderer;

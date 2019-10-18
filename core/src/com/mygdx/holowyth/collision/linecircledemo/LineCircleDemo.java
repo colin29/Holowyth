@@ -12,12 +12,12 @@ import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
-import com.mygdx.holowyth.util.template.BaseScreen;
+import com.mygdx.holowyth.util.template.BaseHoloScreen;
 import com.mygdx.holowyth.util.template.adapters.InputProcessorAdapter;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStoreUI;
 
-public class LineCircleDemo extends BaseScreen {
+public class LineCircleDemo extends BaseHoloScreen {
 
 	Renderer renderer;
 

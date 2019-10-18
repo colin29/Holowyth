@@ -7,16 +7,16 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
-import com.mygdx.holowyth.util.template.BaseRenderer;
+import com.mygdx.holowyth.util.template.BaseHoloRenderer;
 
-class Renderer extends BaseRenderer {
+class Renderer extends BaseHoloRenderer {
 
 	World world;
 	private final Color CIRCLE_COLOR = Color.BLACK;
 	private Stage stage;
 
 	public Renderer(Holowyth game, Camera worldCamera, Stage stage, World world) {
-		super(game, worldCamera, stage);
+		super(game, worldCamera);
 		this.world = world;
 		this.stage = stage;
 	}

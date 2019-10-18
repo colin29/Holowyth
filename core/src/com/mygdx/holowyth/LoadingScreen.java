@@ -13,9 +13,9 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.mygdx.holowyth.editor.PolyMapEditor;
-import com.mygdx.holowyth.util.template.BaseScreen;
+import com.mygdx.holowyth.util.template.BaseHoloScreen;
 
-public class LoadingScreen extends BaseScreen {
+public class LoadingScreen extends BaseHoloScreen {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 

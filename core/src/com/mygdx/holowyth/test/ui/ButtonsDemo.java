@@ -22,10 +22,10 @@ import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
-import com.mygdx.holowyth.util.template.BaseScreen;
+import com.mygdx.holowyth.util.template.BaseHoloScreen;
 import com.mygdx.holowyth.util.template.adapters.InputProcessorAdapter;
 
-public class ButtonsDemo extends BaseScreen {
+public class ButtonsDemo extends BaseHoloScreen {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	InputMultiplexer multiplexer = new InputMultiplexer();

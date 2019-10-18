@@ -9,6 +9,7 @@ sourceSets.main.java.srcDirs = [ "src/" ]
 dependencies {
 
 	// Libgdx
+	compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 	implementation 'space.earlygrey:shapedrawer:1.2.0'
 	
 	// UI
@@ -27,6 +28,5 @@ dependencies {
 	// Logging
 	compile group: 'ch.qos.logback', name: 'logback-core', version: '1.2.3'
 	compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
-
 	
 }

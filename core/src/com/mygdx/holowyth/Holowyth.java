@@ -37,7 +37,7 @@ public class Holowyth extends Game {
 	// IO
 	public FileChooser fileChooser;
 
-	Class<?> screenToLoad;
+	Class<? extends Screen> screenClassToLoad;
 
 	public Holowyth() {
 		this(PolyMapEditor.class);
@@ -47,7 +47,7 @@ public class Holowyth extends Game {
 
 		assets = new PrefixingAssetManager(ASSETS_PATH);
 
-		screenToLoad = clazz;
+		screenClassToLoad = clazz;
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class Holowyth extends Game {
 		loadingScreen.queueAssets();
 		this.assets.finishLoading();
 
-		setScreenToGivenClass();
+		setScreenToClass(screenClassToLoad);
 
 	}
 
@@ -93,10 +93,10 @@ public class Holowyth extends Game {
 		fonts.init();
 	}
 
-	private void setScreenToGivenClass() {
+	private void setScreenToClass(Class<? extends Screen> clazz) {
 		Constructor<?> cons;
 		try {
-			cons = screenToLoad.getConstructor(Holowyth.class);
+			cons = screenClassToLoad.getConstructor(Holowyth.class);
 		} catch (NoSuchMethodException | SecurityException e1) {
 			e1.printStackTrace();
 			return;
