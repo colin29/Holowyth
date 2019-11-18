@@ -407,7 +407,8 @@ public class UnitStats implements UnitStatsInfo {
 	 * @return The amount of damage actually done
 	 */
 	public float applyDamage(float damage) {
-		effects.makeDamageEffect(damage, this.self);
+
+		effects.makeDamageEffect(damage, self);
 
 		hp -= damage;
 

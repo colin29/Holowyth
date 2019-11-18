@@ -44,7 +44,7 @@ public class MainMenuScreen extends BaseScreen {
 	public void show() {
 		Gdx.input.setInputProcessor(multiplexer);
 		multiplexer.clear();
-		multiplexer.addProcessor(input);
 		multiplexer.addProcessor(stage);
+		multiplexer.addProcessor(input);
 	}
 }

@@ -41,7 +41,7 @@ public class Holo {
 	}
 
 	// Unit behaviour
-	public static boolean idleEnemyUnitsAggro = false;
+	public static boolean idleEnemyUnitsAggro = true;
 
 	// Debug Cheats
 	public static boolean debugFastCastEnbabled = true;

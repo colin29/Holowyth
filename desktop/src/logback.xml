@@ -16,7 +16,7 @@
 
 	<!-- Particular classes which we want extra info from -->
 
-	<logger name="com.mygdx.holowyth.unit.UnitStats" level="DEBUG">
+	<logger name="com.mygdx.holowyth.unit.UnitStats" level="INFO">
 	</logger>
 
 

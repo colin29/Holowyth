@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
+import com.mygdx.holowyth.graphics.HoloGL;
 
 public class MyFonts {
 	BitmapFont debugFont;
@@ -16,9 +17,13 @@ public class MyFonts {
 	BitmapFont font;
 	BitmapFont font_goth12;
 	BitmapFont font_goth24;
+	BitmapFont damageEffectFontRedForeground;
 
 	MyFonts() {
 	}
+
+	private static Color PALE_RED = HoloGL.rgb(255, 155, 155);
+	private static Color DARK_RED = HoloGL.rgb(255, 0, 0);
 
 	public void init() {
 
@@ -27,6 +32,7 @@ public class MyFonts {
 		borderedMediumFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 16, Color.BLACK, 1.5f);
 
 		damageEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 16, Color.BLACK, 1.5f);
+		damageEffectFontRedForeground = generateFontWithBorder("fonts/OpenSans.ttf", DARK_RED, 17, PALE_RED, 1.5f);
 		missEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 15, Color.GRAY, 0.5f);
 
 		font = new BitmapFont(); // Default Arial font.
@@ -73,8 +79,12 @@ public class MyFonts {
 		return borderedMediumFont;
 	}
 
-	public BitmapFont damageEffectFont() {
+	public BitmapFont damageEffectRegular() {
 		return damageEffectFont;
+	}
+
+	public BitmapFont damageEffectPlayer() {
+		return damageEffectFontRedForeground;
 	}
 
 	public BitmapFont missEffectFont() {

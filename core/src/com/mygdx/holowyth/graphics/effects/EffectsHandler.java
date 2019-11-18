@@ -3,11 +3,11 @@ package com.mygdx.holowyth.graphics.effects;
 import java.util.ArrayList;
 import java.util.ListIterator;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.graphics.effects.DamageEffect.PresetType;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
@@ -41,17 +41,26 @@ public class EffectsHandler {
 		game.batch.setProjectionMatrix(worldCamera.combined);
 		game.batch.begin();
 
-		BitmapFont damageFont = Holowyth.fonts.damageEffectFont();
-		BitmapFont missFont = Holowyth.fonts.missEffectFont();
-
-		BitmapFont font;
-
 		for (DamageEffect d : damageEffects) {
-
+			BitmapFont font;
 			if (d instanceof MissEffect) {
-				font = missFont;
+				font = Holowyth.fonts.missEffectFont();
 			} else {
-				font = damageFont;
+				if (d.isUsingPreset()) {
+					switch (d.presetType) {
+					case ENEMY:
+						font = Holowyth.fonts.damageEffectRegular();
+						break;
+					case PLAYER:
+						font = Holowyth.fonts.damageEffectPlayer();
+						break;
+					default:
+						throw new IllegalStateException("Unhandled DamageEffect preset");
+					}
+				} else {
+					font = Holowyth.fonts.damageEffectRegular();
+					font.setColor(d.color);
+				}
 			}
 
 			// we want to draw the fonts centered
@@ -60,16 +69,15 @@ public class EffectsHandler {
 			float width = glyphLayout.width;
 			float height = glyphLayout.height;
 
-			Color color = missFont.getColor();
-			color.set(d.color).a = d.getCurrentOpacity();
+			font.getColor().a = d.getCurrentOpacity();
+
 			font.draw(game.batch, d.text, d.x - width / 2, d.y + height / 2);
 		}
 		game.batch.end();
 	}
 
 	/**
-	 * Ticks effects which operate based on the game logic clock. Vfx particle effects may run independently using delta
-	 * t
+	 * Ticks effects which operate based on the game logic clock. Vfx particle effects may run independently using delta t
 	 */
 	public void tick() {
 		ListIterator<DamageEffect> iter = damageEffects.listIterator();
@@ -86,12 +94,15 @@ public class EffectsHandler {
 	 * 
 	 * @param damage
 	 * @param unit
-	 *            The unit to display the damage over
+	 *            The unit which is taking damage
 	 */
 	public void makeDamageEffect(float damage, UnitInfo unit) {
+
+		PresetType damageEffectType = unit.isAPlayerCharacter() ? PresetType.PLAYER : PresetType.ENEMY;
+
 		float x = unit.getX();
 		float y = unit.getY() + unit.getRadius() / 2;
-		damageEffects.add(new DamageEffect(DataUtil.getFullyRoundedString(damage), x, y));
+		damageEffects.add(new DamageEffect(DataUtil.getFullyRoundedString(damage), unit.getPos(), damageEffectType));
 	}
 
 	/**
