@@ -4,6 +4,7 @@ import com.mygdx.holowyth.skill.SkillInfo;
 import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.UnitMotion;
+import com.mygdx.holowyth.unit.UnitSkills;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 public interface UnitInfo {
@@ -48,4 +49,6 @@ public interface UnitInfo {
 	float getRetreatCooldown();
 
 	boolean isDead();
+
+	UnitSkills getSkills();
 }

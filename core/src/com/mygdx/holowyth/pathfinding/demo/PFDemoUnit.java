@@ -20,6 +20,7 @@ import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.pathfinding.UnitInterPF;
+import com.mygdx.holowyth.unit.UnitSkills;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
@@ -497,6 +498,12 @@ public class PFDemoUnit implements UnitInterPF {
 	@Override
 	public Path getPath() {
 		return this.path;
+	}
+
+	@Override
+	public UnitSkills getSkills() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

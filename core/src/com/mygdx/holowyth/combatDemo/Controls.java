@@ -37,6 +37,7 @@ import com.mygdx.holowyth.skill.UnitGroundSkill;
 import com.mygdx.holowyth.skill.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
+import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.Holo;
@@ -812,6 +813,13 @@ public class Controls extends InputProcessorAdapter {
 
 	public SelectedUnits getSelectedUnits() {
 		return selectedUnits;
+	}
+
+	/**
+	 * @return A seperate copy
+	 */
+	public List<UnitInfo> getSelectedUnitReadOnly() {
+		return new ArrayList<>(selectedUnits);
 	}
 
 }

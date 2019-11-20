@@ -21,13 +21,13 @@ public class UnitSkills {
 	/**
 	 * Slot 0 is unused atm, but can be used.
 	 */
-	Skill[] skills = new Skill[11];
+	Skill[] slot = new Skill[11];
 	{
-		skills[1] = new Skills.Explosion();
-		skills[2] = new Skills.ExplosionLongCast();
-		skills[3] = new Skills.StaticShock();
-		skills[4] = new Skills.NovaFlare();
-		skills[5] = new Skills.ForcePush();
+		slot[1] = new Skills.Explosion();
+		slot[2] = new Skills.ExplosionLongCast();
+		slot[3] = new Skills.StaticShock();
+		slot[4] = new Skills.NovaFlare();
+		slot[5] = new Skills.ForcePush();
 	}
 
 	/**
@@ -41,16 +41,24 @@ public class UnitSkills {
 			throw new HoloIllegalArgumentsException("slot number must be between 0 and 10");
 		}
 
-		if (skills[slotNumber] == null) {
+		if (slot[slotNumber] == null) {
 			logger.debug("Tried to use skill slot [{}] but no skill was assigned", slotNumber);
 			return null;
 		}
 
 		try {
-			return (Skill) skills[slotNumber].clone();
+			return (Skill) slot[slotNumber].clone();
 		} catch (CloneNotSupportedException e) {
 			throw new HoloException(e);
 		}
+	}
+
+	/**
+	 * 
+	 * @return the skill slots, where you can access the original skill instances. Slots go from indexes 1-10, 0 is unused.
+	 */
+	public Skill[] getSkillSlots() {
+		return slot;
 	}
 
 }

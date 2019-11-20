@@ -9,6 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.mygdx.holowyth.combatDemo.Controls;
 import com.mygdx.holowyth.combatDemo.Controls.ControlsListener;
+import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
 /**
@@ -49,8 +51,10 @@ public class SkillBarUI {
 			@Override
 			public void unitSelectionModified() {
 				root.clear();
-				if (controls.getSelectedUnits().size() == 1) {
-					regenerateSkillBar();
+
+				var selectedUnits = controls.getSelectedUnitReadOnly();
+				if (selectedUnits.size() == 1) {
+					regenerateSkillBar(selectedUnits.get(0));
 				}
 			}
 		});
@@ -60,7 +64,7 @@ public class SkillBarUI {
 	/**
 	 * Todo: bar should only appear when exactly one unit is selected
 	 */
-	private void regenerateSkillBar() {
+	private void regenerateSkillBar(UnitInfo unit) {
 		logger.debug("regenerated skill bar");
 		root.clear();
 
@@ -69,9 +73,19 @@ public class SkillBarUI {
 
 		skillBar.row().size(50).space(10);
 
+		Skill[] skills = unit.getSkills().getSkillSlots();
+
 		for (int i = 1; i <= 5; i++) {
 			var button = new TextButton("Skill " + i, skin);
 			skillBar.add(button);
+
+			Skill skill = skills[i];
+			if (skill == null)
+				continue;
+			String skillText = "(" + i + ")\n" + skill.name.substring(0, 5);
+			button.setText(skillText);
+			button.getLabel().setWrap(true);
+
 		}
 
 		skillBar.pad(20);

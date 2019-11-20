@@ -76,7 +76,7 @@ public class Skills {
 	public static class StaticShock extends NoneSkill {
 		public StaticShock() {
 			super();
-			name = "Nova Flare";
+			name = "Static Shock";
 			spCost = 10;
 			cooldown = 60;
 		}
@@ -230,7 +230,7 @@ public class Skills {
 	public static class NovaFlare extends GroundSkill {
 		public NovaFlare() {
 			super();
-			name = "Implosion";
+			name = "Nova Flare";
 			casting.castTime = 200;
 			spCost = 10;
 			cooldown = 20;

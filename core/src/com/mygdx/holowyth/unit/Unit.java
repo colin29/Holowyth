@@ -836,4 +836,9 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		return stats.isDead();
 	}
 
+	@Override
+	public UnitSkills getSkills() {
+		return skills;
+	}
+
 }
