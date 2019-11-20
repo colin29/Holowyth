@@ -1,6 +1,9 @@
 package com.mygdx.holowyth.skill.effect;
 
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.holowyth.combatDemo.World;
+import com.mygdx.holowyth.util.ShapeDrawerPlus;
 
 public abstract class Effect {
 
@@ -33,6 +36,10 @@ public abstract class Effect {
 
 	protected void markAsComplete() {
 		markedAsComplete = true;
+	}
+
+	public void render(SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
+
 	}
 
 }

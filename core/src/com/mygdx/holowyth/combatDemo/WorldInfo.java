@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 
@@ -30,4 +31,6 @@ public interface WorldInfo {
 			task.accept(unit);
 		}
 	}
+
+	List<Effect> getEffects();
 }

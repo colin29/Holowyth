@@ -517,4 +517,9 @@ public class World implements WorldInfo {
 		return debugStore;
 	}
 
+	@Override
+	public List<Effect> getEffects() {
+		return effects;
+	}
+
 }

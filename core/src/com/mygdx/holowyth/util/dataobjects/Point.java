@@ -40,6 +40,9 @@ public class Point {
 		return dx * dx + dy * dy;
 	}
 
+	/**
+	 * @return a value in the range [0, 360)
+	 */
 	public static float getAngleInDegrees(Point p1, Point p2) {
 		float angle = (float) Math.toDegrees(Math.atan2(p2.y - p1.y, p2.x - p1.x));
 

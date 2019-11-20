@@ -31,6 +31,7 @@ import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.GroundSkill;
 import com.mygdx.holowyth.skill.Skill.Status;
 import com.mygdx.holowyth.skill.SkillInfo;
+import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
@@ -69,13 +70,11 @@ public class Renderer {
 	// Map lifetime components
 	private World world;
 	private Field map;
-	private EffectsHandler effects;
+	private EffectsHandler gfx;
 
 	// Graphics options
 
 	private Color clearColor = Color.BLACK;
-
-	// Graphic flags:
 
 	private Controls controls;
 
@@ -190,8 +189,11 @@ public class Renderer {
 		}
 
 		// Render effects
-		effects.renderDamageEffects();
-		effects.renderBlockEffects(delta);
+
+		renderEffects();
+
+		gfx.renderDamageEffects();
+		gfx.renderBlockEffects(delta);
 
 		// UI
 		stage.act(delta);
@@ -213,6 +215,9 @@ public class Renderer {
 
 			var curSkill = (GroundSkill) controls.getCurSkill();
 			var cursorPos = getWorldCoordinatesOfMouseCursor();
+
+			if (curSkill.aimingHelperRadius == 0)
+				return;
 
 			TextureRegion magicCircle = new TextureRegion(game.assets.get("img/effects/magicCircle_blue.png", Texture.class));
 			magicCircle.getTexture().setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Nearest);
@@ -248,6 +253,12 @@ public class Renderer {
 		return new Vector2(vec.x, vec.y);
 	}
 
+	private void renderEffects() {
+		for (Effect effect : world.getEffects()) {
+			effect.render(batch, shapeDrawer, game.assets);
+		}
+	}
+
 	private void renderUnits() {
 		if (Holo.useTestSprites) {
 			sandbox.renderUnitsWithTestSprites();
@@ -278,7 +289,6 @@ public class Renderer {
 				shapeDrawer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
 			}
 
-			shapeDrawer.setAlpha(1);
 			batch.end();
 
 		}
@@ -440,7 +450,7 @@ public class Renderer {
 	}
 
 	public void setEffectsHandler(EffectsHandler effects) {
-		this.effects = effects;
+		this.gfx = effects;
 	}
 
 	void renderThickOutlineIfTrueForAllUnits(Color color, Predicate<UnitInfo> predicate) {

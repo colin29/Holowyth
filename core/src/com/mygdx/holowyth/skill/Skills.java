@@ -1,12 +1,21 @@
 package com.mygdx.holowyth.skill;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.skill.effect.CasterEffect;
 import com.mygdx.holowyth.skill.effect.CasterGroundEffect;
 import com.mygdx.holowyth.skill.effect.CasterUnitGroundEffect;
+import com.mygdx.holowyth.skill.effect.projectiles.MagicMissileBolt;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
@@ -16,6 +25,8 @@ import com.mygdx.holowyth.util.dataobjects.Point;
  *
  */
 public class Skills {
+
+	protected static Logger logger = LoggerFactory.getLogger(Skills.class);
 
 	/**
 	 * Deals damage to all units in a radius around the caster
@@ -103,7 +114,7 @@ public class Skills {
 
 		@Override
 		public void tick() {
-			applySplashAroundLocation(x, y, aoeRadius, mainDamage);
+			applySplashAroundLocation(groundX, groundY, aoeRadius, mainDamage);
 			fired = true;
 		}
 
@@ -131,22 +142,6 @@ public class Skills {
 			super();
 			name = "Explosion";
 			casting.castTime = 60;
-			spCost = 10;
-			cooldown = 20;
-			aimingHelperRadius = ExplosionEffect.aoeRadius;
-		}
-
-		@Override
-		public void pluginTargeting(Unit caster, float x, float y) {
-			setEffects(new ExplosionEffect(caster, x, y));
-		}
-	}
-
-	public static class ExplosionLongCast extends GroundSkill {
-		public ExplosionLongCast() {
-			super();
-			name = "Explosion";
-			casting.castTime = 200;
 			spCost = 10;
 			cooldown = 20;
 			aimingHelperRadius = ExplosionEffect.aoeRadius;
@@ -196,7 +191,7 @@ public class Skills {
 
 		@Override
 		public void tick() {
-			knockBackEnemiesInRadiusTowardsCenter(x, y, aoeRadius, damage);
+			knockBackEnemiesInRadiusTowardsCenter(groundX, groundY, aoeRadius, damage);
 			markAsComplete();
 		}
 
@@ -259,9 +254,9 @@ public class Skills {
 
 		@Override
 		public void tick() {
-			knockBackEnemiesWithinRadius(x, y, aoeRadius, damage);
+			knockBackEnemiesWithinRadius(groundX, groundY, aoeRadius, damage);
 			var units = world.getUnits();
-			Point effectCenter = new Point(x, y);
+			Point effectCenter = new Point(groundX, groundY);
 			for (Unit unit : units) {
 				if (Point.calcDistance(effectCenter, unit.getPos()) <= aoeRadius) {
 					if (unit != source) {
@@ -331,5 +326,67 @@ public class Skills {
 		}
 
 	}
+
+	/**
+	 * 
+	 * @author Colin Ta
+	 *
+	 */
+	public static class MagicMissile extends GroundSkill {
+		public MagicMissile() {
+			super();
+			name = "Magic Missile";
+			casting.castTime = 0;
+			spCost = 10;
+			cooldown = 5;
+		}
+
+		@Override
+		public void pluginTargeting(Unit caster, float x, float y) {
+			setEffects(new MagicMissileEffect(caster, x, y));
+		}
+	}
+
+	private static class MagicMissileEffect extends CasterGroundEffect {
+		public MagicMissileEffect(Unit caster, float x, float y) {
+			super(caster, x, y);
+		}
+
+		int damage = 8;
+		List<MagicMissileBolt> missiles;
+
+		float missileVfxRadius = 5;
+
+		@Override
+		public void begin() {
+			missiles = new ArrayList<MagicMissileBolt>();
+			for (int i = 0; i < 3; i++) {
+				missiles.add(new MagicMissileBolt(source.x, source.y + 18 * i, damage, source, world.getUnits())); // space the missiles out slightly
+			}
+		}
+
+		@Override
+		public void tick() {
+
+			for (var m : missiles) {
+				m.tick();
+			}
+			missiles.removeIf(m -> m.duration <= 0 || m.collided);
+
+			if (missiles.isEmpty())
+				markAsComplete();
+		}
+
+		@Override
+		public void render(SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
+			shapeDrawer.setColor(Color.RED, 0.8f);
+			batch.begin();
+			for (var m : missiles) {
+				shapeDrawer.filledCircle(m.x, m.y, missileVfxRadius);
+			}
+			batch.end();
+		}
+
+	};
 
 }

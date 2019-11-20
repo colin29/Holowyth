@@ -4,12 +4,12 @@ import com.mygdx.holowyth.unit.Unit;
 
 public abstract class CasterGroundEffect extends CasterEffect {
 
-	protected final float x, y;
+	protected final float groundX, groundY;
 
 	protected CasterGroundEffect(Unit caster, float x, float y) {
 		super(caster);
-		this.x = x;
-		this.y = y;
+		this.groundX = x;
+		this.groundY = y;
 	}
 
 }
