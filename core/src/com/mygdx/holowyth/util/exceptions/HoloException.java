@@ -12,6 +12,14 @@ public class HoloException extends RuntimeException {
 		super(msg);
 	}
 
+	public HoloException(Throwable cause) {
+		super(cause);
+	}
+
+	public HoloException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
 	/**
 	 * Gets the string as we wish to display it project-wide
 	 */

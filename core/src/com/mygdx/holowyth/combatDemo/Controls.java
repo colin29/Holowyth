@@ -176,18 +176,6 @@ public class Controls extends InputProcessorAdapter {
 	Skill skillToUse = new Skills.Explosion();
 	Skill curSkill = null;
 
-	/**
-	 * Slot 0 is unused atm, but can be used.
-	 */
-	Skill[] skills = new Skill[11];
-	{
-		skills[1] = new Skills.Explosion();
-		skills[2] = new Skills.ExplosionLongCast();
-		skills[3] = new Skills.StaticShock();
-		skills[4] = new Skills.NovaFlare();
-		skills[5] = new Skills.ForcePush();
-	}
-
 	private void setSPToMax() {
 		for (Unit unit : selectedUnits) {
 			unit.stats.setSp(unit.stats.getMaxSp());
@@ -199,54 +187,41 @@ public class Controls extends InputProcessorAdapter {
 	 */
 	private void useSkillInSlot(int slotNumber) {
 
-		if (slotNumber < 0 || slotNumber > 10) {
-			return;
-		}
-
-		if (skills[slotNumber] == null) {
-			logger.debug("Tried to use skill slot [{}] but no skill was assigned", slotNumber);
-			return;
-		}
-
 		if (selectedUnits.size() == 1) {
+
 			Unit unit = selectedUnits.iterator().next();
-			try {
 
-				curSkill = (Skill) skills[slotNumber].clone();
-				System.out.println("Using " + curSkill.name);
+			curSkill = unit.skills.getSkillInSlot(slotNumber);
+			System.out.println("Using " + curSkill.name);
 
-				if (unit.areSkillsOnCooldown()) {
-					System.out.println(unit.stats.getName() + ": Skills are on cooldown");
-					return;
-				}
-
-				if (!curSkill.hasEnoughSp(unit)) {
-					System.out.println("not enough sp");
-					return;
-				}
-
-				switch (curSkill.getTargeting()) {
-				case GROUND:
-					context = Context.SKILL_GROUND;
-					break;
-				case NONE:
-					handleSkillNone();
-					break;
-				case UNIT:
-					context = Context.SKILL_UNIT;
-					break;
-				case UNIT_GROUND:
-					context = Context.SKILL_UNIT_GROUND_1;
-					break;
-				default:
-					break;
-
-				}
-				setCursor();
-
-			} catch (CloneNotSupportedException e) {
-				e.printStackTrace();
+			if (unit.areSkillsOnCooldown()) {
+				System.out.println(unit.stats.getName() + ": Skills are on cooldown");
+				return;
 			}
+
+			if (!curSkill.hasEnoughSp(unit)) {
+				System.out.println("not enough sp");
+				return;
+			}
+
+			switch (curSkill.getTargeting()) {
+			case GROUND:
+				context = Context.SKILL_GROUND;
+				break;
+			case NONE:
+				handleSkillNone();
+				break;
+			case UNIT:
+				context = Context.SKILL_UNIT;
+				break;
+			case UNIT_GROUND:
+				context = Context.SKILL_UNIT_GROUND_1;
+				break;
+			default:
+				break;
+
+			}
+			updateCursorIcon();
 		}
 	}
 
@@ -267,19 +242,19 @@ public class Controls extends InputProcessorAdapter {
 	private void beginAttackContext() {
 		clearContext();
 		context = Context.ATTACK;
-		setCursor();
+		updateCursorIcon();
 	}
 
 	private void beginRetreatContext() {
 		clearContext();
 		context = Context.RETREAT;
-		setCursor();
+		updateCursorIcon();
 	}
 
 	/**
 	 * Set cursor based on the current context
 	 */
-	private void setCursor() {
+	private void updateCursorIcon() {
 		setCursor(context);
 	}
 
@@ -502,7 +477,7 @@ public class Controls extends InputProcessorAdapter {
 		context = Context.NONE;
 		curSkill = null;
 		curSkillUnit = null;
-		setCursor();
+		updateCursorIcon();
 	}
 
 	private String getCurrentContextText() {

@@ -57,6 +57,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	// Components
 	public final UnitMotion motion;
 	public final UnitStats stats;
+	public final UnitSkills skills;
 
 	// World Fields
 	List<Unit> units;
@@ -150,16 +151,16 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		this.x = x;
 		this.y = y;
 		this.side = side;
+		this.world = world;
 
 		// get neccesary references
-		this.units = world.getUnits();
+		units = world.getUnits();
 
 		Unit.unitsAttacking.put(this, new HashSet<Unit>());
 
-		this.world = world;
-		this.motion = new UnitMotion(this, world);
-
-		this.stats = new UnitStats(this);
+		motion = new UnitMotion(this, world);
+		stats = new UnitStats(this);
+		skills = new UnitSkills(this);
 
 		if (this.side == Side.PLAYER) {
 			DebugValues debugValues = this.getWorldMutable().getDebugStore().registerComponent("Player unit");
@@ -168,7 +169,6 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 			debugValues.add("speed", () -> motion.getCurPlannedSpeed());
 		}
-
 	}
 
 	public Unit(float x, float y, WorldInfo world, Side side, String name) {
