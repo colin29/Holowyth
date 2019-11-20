@@ -1,12 +1,17 @@
 package com.mygdx.holowyth.util;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.EventListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Dialog;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
@@ -14,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton.TextButtonStyle;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener.ChangeEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 
 /**
  * Utility methods for creating GUI's in Scene2D
@@ -210,5 +216,27 @@ public class HoloUI {
 	public static void centerOnStage(Actor actor) {
 		actor.setPosition(Gdx.graphics.getWidth() / 2 - actor.getWidth() / 2,
 				Gdx.graphics.getHeight() / 2 - actor.getHeight() / 2);
+	}
+
+	/**
+	 * Workaround for there being no easy way to draw a background on a label
+	 */
+	public static void setLabelBackgroundColor(Label label, Color color) {
+		LabelStyle style = new LabelStyle(label.getStyle());
+		Pixmap labelColor = new Pixmap(1, 1, Pixmap.Format.RGB888);
+		labelColor.setColor(color);
+		labelColor.fill();
+		style.background = new Image(new Texture(labelColor)).getDrawable();
+		label.setStyle(style);
+	}
+
+	/**
+	 * The returned drawable can be used to set a background for a widget, such as a table
+	 */
+	public static Drawable getSolidBG(Color color) {
+		Pixmap labelColor = new Pixmap(1, 1, Pixmap.Format.RGB888);
+		labelColor.setColor(color);
+		labelColor.fill();
+		return new Image(new Texture(labelColor)).getDrawable();
 	}
 }

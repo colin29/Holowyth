@@ -322,7 +322,7 @@ public class UnitStats implements UnitStatsInfo {
 		}
 
 		// 5. Apply damage
-		System.out.printf("%s's attack hit and did %s damage to %s%n", this.name, DataUtil.getRoundedString(damage), enemy.name);
+		logger.debug("{}'s attack hit and did {} damage to {}%n", this.name, DataUtil.getRoundedString(damage), enemy.name);
 
 		if (enemy.applyDamage(damage) > 0) {
 			enemy.self.interrupt();

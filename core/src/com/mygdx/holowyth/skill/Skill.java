@@ -128,8 +128,6 @@ public class Skill implements Cloneable, SkillInfo {
 			}
 		}
 
-		// If all effects are completed, skill is complete
-
 		if (status == Status.DONE) {
 			caster.setActiveSkill(null);
 			System.out.printf("Skill %s finished. %n", this.name);
@@ -144,10 +142,14 @@ public class Skill implements Cloneable, SkillInfo {
 		if (status == Status.CASTING) {
 			casting.onInterrupt();
 		} else if (status == Status.CHANNELING) {
-			this.onChannellingInterrupt();
+			onChannellingInterrupt();
 		}
 	}
 
+	/**
+	 * Override this if special behaviour is required (like making a particular effect fizzle out 1 second after interrupt) By default all channeling
+	 * effects are removed immediately when channeling is interrupted.
+	 */
 	public void onChannellingInterrupt() {
 	}
 

@@ -1,8 +1,10 @@
 package com.mygdx.holowyth.combatDemo;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -64,7 +66,7 @@ public class Controls extends InputProcessorAdapter {
 
 	private FunctionBindings functionBindings = new FunctionBindings();
 
-	public SelectedUnits selectedUnits = new SelectedUnits();
+	private SelectedUnits selectedUnits = new SelectedUnits();
 	boolean leftMouseKeyDown = false;
 
 	public enum Context {
@@ -576,12 +578,6 @@ public class Controls extends InputProcessorAdapter {
 
 		leftMouseKeyDown = true;
 
-		Unit selected = selectUnitAtClickedPoint(worldX, worldY);
-		if (selected != null) {
-			selectedUnits.clear();
-			selectedUnits.add(selected);
-		}
-
 		// Set up a new selection box, initially zero-sized at the point of click
 		Vector3 vec = new Vector3();
 		vec = fixedCam.unproject(vec.set(screenX, screenY, 0));
@@ -632,6 +628,8 @@ public class Controls extends InputProcessorAdapter {
 	/**
 	 * Selects all units inside the selection box, following these rules: <br>
 	 * If the group consists of a mixed group, only select the player units.
+	 * 
+	 * Actually makes the click-select case obsolete, as a zero-size selection box does the same thing.
 	 * 
 	 * @param finalX
 	 * @param finalY
@@ -724,11 +722,26 @@ public class Controls extends InputProcessorAdapter {
 	 * Is guaranteed to be called when selectedUnits is modified Is called immediately after a modifiying action, if that action actually changed the
 	 * set.
 	 */
-	private void onSelectedUnitsModified() {
-		// System.out.println("selectedUnits modified");
+	private void onUnitSelectionModified() {
 		if (context == Context.SKILL_GROUND || context == Context.SKILL_UNIT) {
 			context = Context.NONE;
 		}
+		listeners.forEach((l) -> l.unitSelectionModified());
+	}
+
+	private Set<ControlsListener> listeners = new LinkedHashSet<ControlsListener>();
+
+	public void addListener(ControlsListener l) {
+		listeners.add(l);
+		logger.debug("Added listener");
+	}
+
+	public void removeListener(ControlsListener l) {
+		listeners.remove(l);
+	}
+
+	public static abstract class ControlsListener {
+		public abstract void unitSelectionModified();
 	}
 
 	/**
@@ -745,7 +758,7 @@ public class Controls extends InputProcessorAdapter {
 		@Override
 		public boolean remove(Object u) {
 			if (selected.remove(u)) {
-				onSelectedUnitsModified();
+				onUnitSelectionModified();
 				return true;
 			} else {
 				return false;
@@ -755,7 +768,20 @@ public class Controls extends InputProcessorAdapter {
 		@Override
 		public boolean add(Unit u) {
 			if (selected.add(u)) {
-				onSelectedUnitsModified();
+				onUnitSelectionModified();
+				return true;
+			} else {
+				return false;
+			}
+		}
+
+		@Override
+		/**
+		 * custom addAll method to reduce duplicate calls of selection being modified
+		 */
+		public boolean addAll(Collection<? extends Unit> units) {
+			if (selected.addAll(units)) {
+				onUnitSelectionModified();
 				return true;
 			} else {
 				return false;
@@ -785,7 +811,7 @@ public class Controls extends InputProcessorAdapter {
 				@Override
 				public void remove() {
 					iter.remove();
-					onSelectedUnitsModified();
+					onUnitSelectionModified();
 				}
 			};
 		}
@@ -794,7 +820,7 @@ public class Controls extends InputProcessorAdapter {
 		public void clear() {
 			if (!selected.isEmpty()) {
 				selected.clear();
-				onSelectedUnitsModified();
+				onUnitSelectionModified();
 			} else {
 				selected.clear();
 			}
@@ -807,6 +833,10 @@ public class Controls extends InputProcessorAdapter {
 
 	public Skill getCurSkill() {
 		return curSkill;
+	}
+
+	public SelectedUnits getSelectedUnits() {
+		return selectedUnits;
 	}
 
 }

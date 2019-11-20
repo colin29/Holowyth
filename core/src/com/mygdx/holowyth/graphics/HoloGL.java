@@ -204,5 +204,4 @@ public class HoloGL {
 	public static void setShapeRenderer(ShapeRenderer shapeRenderer) {
 		HoloGL.shapeRenderer = shapeRenderer;
 	}
-
 }

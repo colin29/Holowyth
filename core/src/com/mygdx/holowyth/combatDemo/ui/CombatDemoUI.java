@@ -1,13 +1,14 @@
 package com.mygdx.holowyth.combatDemo.ui;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.mygdx.holowyth.combatDemo.CombatDemo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -18,10 +19,13 @@ public class CombatDemoUI {
 
 	// Sub-components
 	DebugStoreUI debugStoreUI;
+	SkillBarUI skillBarUI;
 
 	// Widgets
-	Window parameterWindow;
 	Label coordInfo;
+
+	// Debugging
+	DebugStore debugStore;
 
 	private Stage stage;
 	private Table root = new Table();
@@ -30,10 +34,15 @@ public class CombatDemoUI {
 
 	private GameLog gameLog;
 
-	public CombatDemoUI(Stage stage, DebugStore debugStore, Skin skin) {
+	private CombatDemo self;
+
+	public CombatDemoUI(Stage stage, DebugStore debugStore, Skin skin, CombatDemo combatDemo) {
 		this.skin = skin;
 		this.stage = stage;
 		debugStoreUI = new DebugStoreUI(debugStore);
+		this.debugStore = debugStore;
+
+		this.self = combatDemo;
 
 		gameLog = new GameLog(stage);
 
@@ -66,10 +75,6 @@ public class CombatDemoUI {
 		coordInfo.setPosition(Gdx.graphics.getWidth() - coordInfo.getWidth() - 4, 4);
 	}
 
-	public Window getParameterWindow() {
-		return parameterWindow;
-	}
-
 	public Label getCoordInfo() {
 		return coordInfo;
 	}
@@ -83,9 +88,15 @@ public class CombatDemoUI {
 
 	public void onMapStartup() {
 		debugStoreUI.populateDebugValueDisplay();
+		skillBarUI = new SkillBarUI(stage, debugStore, skin, self.getControls());
+	}
+
+	public void onMapShutdown() {
+		skillBarUI.remove();
 	}
 
 	public void onRender() {
+		stage.setDebugAll(Gdx.input.isKeyPressed(Keys.SPACE));
 		debugStoreUI.updateDebugValueDisplay();
 	}
 

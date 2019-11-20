@@ -77,7 +77,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		initializeAppLifetimeComponents();
 
-		combatDemoUI = new CombatDemoUI(stage, debugStore, skin);
+		combatDemoUI = new CombatDemoUI(stage, debugStore, skin, this);
 
 		// Configure Input
 		multiplexer.addProcessor(stage);
@@ -188,7 +188,8 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	@Override
 	protected void mapShutdown() {
-		System.out.println("test");
+		System.out.println("mapShutdown called");
+		combatDemoUI.onMapShutdown();
 	}
 
 	/* Input methods */
@@ -219,6 +220,10 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 		combatDemoUI.updateMouseCoordLabel(screenX, screenY, camera);
 		return false;
+	}
+
+	public Controls getControls() {
+		return unitControls;
 	}
 
 }
