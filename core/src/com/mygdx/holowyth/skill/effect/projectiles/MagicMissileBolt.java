@@ -195,8 +195,6 @@ public class MagicMissileBolt {
 		// We want the sidewinder to follow a sin motion, so the speed should be the derivative, or cos
 		float sideWindTurnSpeed = Math.abs(sideWindBaseTurnSpeed * (float) (Math.cos(sideWindCounter / sideWindPeriod * -Math.PI)));
 
-		logger.debug("{}", Math.sin(sideWindCounter / sideWindPeriod * 2 * Math.PI));
-
 		if (sideWindCounter >= sideWindPeriod / 2) { // sidewinding left (CCW)
 
 			if (relativeAngle > -1 * sideWindMaxAngle) {

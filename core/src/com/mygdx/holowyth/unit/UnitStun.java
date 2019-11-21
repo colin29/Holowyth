@@ -1,10 +1,14 @@
 package com.mygdx.holowyth.unit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Handles logic for whether a unit is stunned or not
  *
  */
 public class UnitStun {
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private Unit self;
 
@@ -44,7 +48,15 @@ public class UnitStun {
 		}
 	}
 
+	/**
+	 * A duration of 0 will create a very brief stun, like an interrupt. <br>
+	 * 
+	 */
 	void applyStun(float duration) {
+		if (duration < 0) {
+			logger.warn("tried to apply stun of negative duration");
+			return;
+		}
 		if (!isStunned) {
 			beginStun(duration);
 		} else {
@@ -52,7 +64,17 @@ public class UnitStun {
 		}
 	}
 
+	/**
+	 * A duration of 0 will create a very brief stun, like an interrupt. <br>
+	 * 
+	 */
 	void applyReel(float duration) {
+		if (duration < 0) {
+			logger.warn("tried to apply reel of negative duration");
+			return;
+		}
+		if (duration <= 0)
+			return;
 		if (!isReeled) {
 			beginReel(duration);
 		} else {

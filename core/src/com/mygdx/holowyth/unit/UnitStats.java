@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -418,6 +419,32 @@ public class UnitStats implements UnitStatsInfo {
 		}
 
 		return damage;
+	}
+
+	/**
+	 * Makes a stun roll against this unit, the result depends on the unit's stability plus a random roll
+	 * 
+	 * @param force
+	 * @param stunDuration
+	 * @return
+	 */
+	public void doStunRollAgainst(int force, float stunDuration) {
+
+		int stab = 10; // Set for 10 for testing purposes
+		int stabilityRoll = stab + RandomUtils.nextInt(1, 7); // 1d6
+
+		int attackerResult = force - stabilityRoll;
+
+		logger.debug("Stun roll made against {}. Attacker Result: {} ({} - {} - {})", this, attackerResult, force, stab, stabilityRoll - stab);
+
+		if (attackerResult > 0) {
+			applyStun(stunDuration); // apply full stun duration
+		} else if (attackerResult > -10) {
+			applyStun(stunDuration * (attackerResult + 10) * 0.1f); // varying duration
+		} else if (attackerResult > -20) {
+			applyReel(stunDuration * (attackerResult + 20) * 0.1f); // lesser effect
+		}
+
 	}
 
 	@Override
