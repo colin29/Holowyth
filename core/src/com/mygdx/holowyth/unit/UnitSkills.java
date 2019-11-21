@@ -23,7 +23,7 @@ public class UnitSkills {
 	 */
 	Skill[] slot = new Skill[11];
 	{
-		slot[1] = new Skills.Explosion();
+		slot[1] = new Skills.StunTestSkill();
 		slot[2] = new Skills.MagicMissile();
 		slot[3] = new Skills.StaticShock();
 		slot[4] = new Skills.NovaFlare();

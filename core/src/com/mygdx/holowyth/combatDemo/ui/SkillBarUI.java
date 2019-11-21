@@ -75,8 +75,8 @@ public class SkillBarUI {
 
 		Skill[] skills = unit.getSkills().getSkillSlots();
 
-		for (int i = 1; i <= 5; i++) {
-			var button = new TextButton("Skill " + i, skin);
+		for (int i = 1; i <= 8; i++) {
+			var button = new TextButton("(" + i + ")", skin);
 			skillBar.add(button);
 
 			Skill skill = skills[i];

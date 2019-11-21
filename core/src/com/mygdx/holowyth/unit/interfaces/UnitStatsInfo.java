@@ -56,4 +56,8 @@ public interface UnitStatsInfo {
 	 * knockback motion).
 	 */
 	float getMoveSpeed();
+
+	float getStunDurationRemaining();
+
+	boolean isStunned();
 }

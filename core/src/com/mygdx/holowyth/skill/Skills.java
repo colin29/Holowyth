@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.skill.effect.CasterEffect;
 import com.mygdx.holowyth.skill.effect.CasterGroundEffect;
+import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
 import com.mygdx.holowyth.skill.effect.CasterUnitGroundEffect;
 import com.mygdx.holowyth.skill.effect.projectiles.MagicMissileBolt;
 import com.mygdx.holowyth.unit.Unit;
@@ -332,7 +333,7 @@ public class Skills {
 	 * @author Colin Ta
 	 *
 	 */
-	public static class MagicMissile extends GroundSkill {
+	public static class MagicMissile extends UnitSkill {
 		public MagicMissile() {
 			super();
 			name = "Magic Missile";
@@ -342,14 +343,14 @@ public class Skills {
 		}
 
 		@Override
-		public void pluginTargeting(Unit caster, float x, float y) {
-			setEffects(new MagicMissileEffect(caster, x, y));
+		public void pluginTargeting(Unit caster, Unit target) {
+			setEffects(new MagicMissileEffect(caster, target));
 		}
 	}
 
-	private static class MagicMissileEffect extends CasterGroundEffect {
-		public MagicMissileEffect(Unit caster, float x, float y) {
-			super(caster, x, y);
+	private static class MagicMissileEffect extends CasterUnitEffect {
+		public MagicMissileEffect(Unit caster, Unit target) {
+			super(caster, target);
 		}
 
 		int damage = 8;
@@ -361,7 +362,7 @@ public class Skills {
 		public void begin() {
 			missiles = new ArrayList<MagicMissileBolt>();
 			for (int i = 0; i < 3; i++) {
-				missiles.add(new MagicMissileBolt(source.x, source.y + 18 * i, damage, source, world.getUnits())); // space the missiles out slightly
+				missiles.add(new MagicMissileBolt(source.x, source.y + 18 * i, damage, target, source, world.getUnits())); // space the missiles out
 			}
 		}
 
@@ -382,11 +383,48 @@ public class Skills {
 			shapeDrawer.setColor(Color.RED, 0.8f);
 			batch.begin();
 			for (var m : missiles) {
+				if (m.isSideWindingLeft()) {
+					shapeDrawer.setColor(Color.CYAN, 0.8f);
+				} else {
+					shapeDrawer.setColor(Color.RED, 0.8f);
+				}
 				shapeDrawer.filledCircle(m.x, m.y, missileVfxRadius);
 			}
 			batch.end();
 		}
 
 	};
+
+	public static class StunTestSkill extends UnitSkill {
+		public StunTestSkill() {
+			super();
+			name = "StunTestSkill";
+			casting.castTime = 0;
+			spCost = 10;
+			cooldown = 5;
+		}
+
+		@Override
+		public void pluginTargeting(Unit caster, Unit target) {
+			setEffects(new StunTestEffect(caster, target));
+		}
+	}
+
+	private static class StunTestEffect extends CasterUnitEffect {
+		public StunTestEffect(Unit caster, Unit target) {
+			super(caster, target);
+		}
+
+		@Override
+		public void begin() {
+		}
+
+		@Override
+		public void tick() {
+			logger.debug("applied stun");
+			target.stats.applyStun(120);
+			markAsComplete();
+		}
+	}
 
 }

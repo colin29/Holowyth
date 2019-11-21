@@ -37,13 +37,19 @@ public class UnitCollection {
 		assertDataStructsAreEqualLength();
 	}
 
-	public void removeUnit(Unit u) {
-		units.remove(u);
+	public boolean removeUnit(Unit u) {
+		boolean wasPresent = false;
+
+		assertDataStructsAreEqualLength();
+
+		wasPresent = units.remove(u);
 		colBodies.remove(unitToColBody.get(u));
 
 		unitToColBody.remove(u);
 
 		assertDataStructsAreEqualLength();
+
+		return wasPresent;
 	}
 
 	private void assertDataStructsAreEqualLength() {

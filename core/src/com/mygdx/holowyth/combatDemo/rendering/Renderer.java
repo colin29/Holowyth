@@ -167,6 +167,7 @@ public class Renderer {
 			renderOutlineAroundBusyCastingUnits();
 		}
 		renderOutlineAroundKnockbackedUnits();
+		renderOutlineAroundStunnedUnits();
 
 		// debug.renderUnitIdsOnUnits();
 
@@ -278,7 +279,6 @@ public class Renderer {
 				}
 
 				shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
-
 				shapeDrawer.filledCircle(unit.x, unit.y, Holo.UNIT_RADIUS);
 
 			}
@@ -412,8 +412,14 @@ public class Renderer {
 	}
 
 	private void renderOutlineAroundKnockbackedUnits() {
-		renderModerateWidthOutlineIfTrueForAllUnits(Color.ORANGE, (UnitInfo u) -> {
+		renderModerateOutlineIfTrueForAllUnits(Color.ORANGE, (UnitInfo u) -> {
 			return u.getMotion().isBeingKnockedBack();
+		});
+	}
+
+	private void renderOutlineAroundStunnedUnits() {
+		renderThickOutlineIfTrueForAllUnits(Color.SCARLET, (UnitInfo u) -> {
+			return u.getStats().isStunned();
 		});
 	}
 
@@ -462,7 +468,7 @@ public class Renderer {
 		});
 	}
 
-	void renderModerateWidthOutlineIfTrueForAllUnits(Color color, Predicate<UnitInfo> predicate) {
+	void renderModerateOutlineIfTrueForAllUnits(Color color, Predicate<UnitInfo> predicate) {
 		world.doIfTrueForAllUnits(predicate, (UnitInfo u) -> {
 			shapeRenderer.setProjectionMatrix(worldCamera.combined);
 			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, color);

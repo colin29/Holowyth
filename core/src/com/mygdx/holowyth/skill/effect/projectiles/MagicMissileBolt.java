@@ -4,36 +4,50 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.dataobjects.Point;
-import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 
 /**
  * 
- * This missile acquires the nearest enemy target. I
+ * This missile acquires the nearest enemy target.
  */
 public class MagicMissileBolt {
+
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	public float x, y;
-	public float velocity = 3.5f;
+
+	private float timeInFlight = 0;
+	private float timeToReachMaxVelocity = 90;
+	public float baseProjectileSpeed = 1.5f;
+	public float maxProjectileSpeed = 2.5f;
+	public float speed = baseProjectileSpeed; // let's make the velocity increase from 2 to 5
 
 	public float rotation; // 0 is in the x axis, rotating counter-clockwise, in degrees
 	public float turnSpeed = 2; // in degrees per frame;
 
-	public float maxDuration = 180;
+	public float maxDuration = 1000; // 180;
 	public float duration = maxDuration;
 
 	public boolean collided = false;
 
 	public float damage;
 
+	private float sideWindMaxAngle = 30; // the max amount sidewind will swerve missile away from target
+	private float sideWindPeriod = 80; // period acccounts for a 180 (swing right, then left)
+	private float sideWindCounter = sideWindPeriod * 0.75f;
+	private float sideWindBaseTurnSpeed = 3f;
+
 	List<Unit> units;
 	Unit caster;
 	Unit target; // target is allowed to be null;
 
-	public MagicMissileBolt(float x, float y, float damage, Unit caster, List<Unit> units) {
+	public MagicMissileBolt(float x, float y, float damage, Unit target, Unit caster, List<Unit> units) {
 		this.x = x;
 		this.y = y;
 
@@ -42,9 +56,9 @@ public class MagicMissileBolt {
 
 		this.damage = damage;
 
-		rotation = 0;
+		this.target = target;
+		rotation = Point.getAngleInDegrees(new Point(x, y), target.getPos());
 
-		acquireTarget();
 	}
 
 	/**
@@ -52,15 +66,15 @@ public class MagicMissileBolt {
 	 */
 	private Vector2 vec = new Vector2();
 
-	private void acquireTarget() {
-		Side side = caster.getSide();
-		if (side != Side.PLAYER && side != Side.ENEMY) {
-			throw new HoloAssertException("Unhandled side type");
-
-		}
-		List<Unit> targets = getValidTargets();
-		target = getClosestTarget(targets);
-	}
+	// private void acquireTarget() {
+	// Side side = caster.getSide();
+	// if (side != Side.PLAYER && side != Side.ENEMY) {
+	// throw new HoloAssertException("Unhandled side type");
+	//
+	// }
+	// List<Unit> targets = getValidTargets();
+	// target = getClosestTarget(targets);
+	// }
 
 	private List<Unit> getValidTargets() {
 		var targets = new ArrayList<Unit>();
@@ -95,8 +109,11 @@ public class MagicMissileBolt {
 
 	public void tick() {
 		turnTowardsTarget();
+		sideWindProjectile();
 
-		vec.set(velocity, 0);
+		updateSpeed();
+
+		vec.set(speed, 0);
 		vec.rotate(rotation);
 		x += vec.x;
 		y += vec.y;
@@ -104,6 +121,17 @@ public class MagicMissileBolt {
 		duration -= 1;
 
 		detectCollisionsWithEnemies();
+
+		handleTargetDead();
+	}
+
+	private void updateSpeed() {
+		timeInFlight += 1;
+
+		float additionalSpeedPortion = Math.max(0, Math.min(timeInFlight / timeToReachMaxVelocity, 1));
+		float additonalSpeedTotal = maxProjectileSpeed - baseProjectileSpeed;
+
+		speed = baseProjectileSpeed + additonalSpeedTotal * additionalSpeedPortion;
 	}
 
 	private void turnTowardsTarget() {
@@ -148,6 +176,59 @@ public class MagicMissileBolt {
 		return (angle %= 360) > 0 ? angle : (angle + 360);
 	}
 
+	/**
+	 * Rotate the projectile to make it veer side to side
+	 */
+	private void sideWindProjectile() {
+
+		Point thisPos = new Point(x, y);
+		float angleToTarget = Point.getAngleInDegrees(thisPos, target.getPos());
+		float relativeAngle = normalizeAngle(angleToTarget - rotation); // represents how many degrees you should turn CCW
+
+		if (relativeAngle >= 180) // recenter relative angle from [-180, 180)
+			relativeAngle -= 360;
+
+		float amountToRotate = 0;
+
+		isSideWindingLeftDebug = false;
+
+		// We want the sidewinder to follow a sin motion, so the speed should be the derivative, or cos
+		float sideWindTurnSpeed = Math.abs(sideWindBaseTurnSpeed * (float) (Math.cos(sideWindCounter / sideWindPeriod * -Math.PI)));
+
+		logger.debug("{}", Math.sin(sideWindCounter / sideWindPeriod * 2 * Math.PI));
+
+		if (sideWindCounter >= sideWindPeriod / 2) { // sidewinding left (CCW)
+
+			if (relativeAngle > -1 * sideWindMaxAngle) {
+				isSideWindingLeftDebug = true;
+				// if turning in the wrong direction, only turn up until sideWindMaxAngle
+				amountToRotate = Math.min(sideWindTurnSpeed, sideWindMaxAngle + relativeAngle);
+				rotation += amountToRotate;
+			}
+		} else {
+			float reverseRelativeAngle = relativeAngle * -1;
+			if (reverseRelativeAngle > -1 * sideWindMaxAngle) {
+				isSideWindingLeftDebug = true;
+				// if turning in the wrong direction, only turn up until sideWindMaxAngle
+				amountToRotate = Math.min(sideWindTurnSpeed, sideWindMaxAngle + reverseRelativeAngle);
+				rotation -= amountToRotate;
+			}
+		}
+
+		// Increment counter
+		sideWindCounter += 1;
+		if (sideWindCounter >= sideWindPeriod) {
+			sideWindCounter = 0;
+		}
+		// logger.debug("{}", sideWindCounter);
+	}
+
+	private boolean isSideWindingLeftDebug = false;
+
+	public boolean isSideWindingLeft() {
+		return isSideWindingLeftDebug;
+	}
+
 	private void detectCollisionsWithEnemies() {
 		var enemies = getValidTargets();
 
@@ -158,6 +239,15 @@ public class MagicMissileBolt {
 				collided = true;
 				return;
 			}
+		}
+	}
+
+	private void handleTargetDead() {
+		if (target == null)
+			return;
+
+		if (target.isDead() && collided == false) {
+			duration = Math.min(15, duration);
 		}
 	}
 }

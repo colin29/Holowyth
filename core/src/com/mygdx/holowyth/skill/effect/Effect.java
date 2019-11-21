@@ -23,6 +23,9 @@ public abstract class Effect {
 		return name;
 	}
 
+	/**
+	 * Use for initialization. For consistency, altering the world should happen in tick
+	 */
 	public abstract void begin();
 
 	public abstract void tick();

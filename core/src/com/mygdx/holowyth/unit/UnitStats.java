@@ -35,7 +35,10 @@ public class UnitStats implements UnitStatsInfo {
 	public final Unit self;
 
 	// App fields
-	EffectsHandler effects;
+	EffectsHandler gfx;
+
+	// Sub-components:
+	private final UnitStun stun;
 
 	// Info stats
 
@@ -94,7 +97,9 @@ public class UnitStats implements UnitStatsInfo {
 
 	public UnitStats(Unit unit) {
 		this.self = unit;
-		this.effects = unit.getWorld().getEffectsHandler();
+		this.gfx = unit.getWorld().getEffectsHandler();
+
+		stun = new UnitStun(unit);
 	}
 
 	public UnitStats(String name, Unit unit) {
@@ -103,11 +108,11 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	public void tick() {
-		tickEffects();
+		tickStatusEffects();
+		stun.tick();
 	}
 
-	public void tickEffects() {
-
+	public void tickStatusEffects() {
 		slowEffects.forEach((effect) -> effect.tickDuration());
 		slowEffects.removeIf((effect) -> effect.isExpired());
 
@@ -284,7 +289,7 @@ public class UnitStats implements UnitStatsInfo {
 		// 2. Simulate block chance
 
 		int atk = this.atk + getMultiTeamingAtkBonus(enemy) + atkBonus;
-		int def = enemy.def;
+		int def = enemy.def - enemy.getStunDefPenalty();
 
 		chanceToHit = (float) (0.4 * (1 + (atk - def) * 0.05));
 
@@ -299,7 +304,7 @@ public class UnitStats implements UnitStatsInfo {
 
 		if (Math.random() > chanceToHit) {
 			// System.out.printf("%s's attack was blocked by %s %n", this.name, enemy.name);
-			effects.makeBlockEffect(this.self, enemy.self);
+			gfx.makeBlockEffect(this.self, enemy.self);
 			return;
 		}
 
@@ -325,7 +330,7 @@ public class UnitStats implements UnitStatsInfo {
 		logger.debug("{}'s attack hit and did {} damage to {}%n", this.name, DataUtil.getRoundedString(damage), enemy.name);
 
 		if (enemy.applyDamage(damage) > 0) {
-			enemy.self.interrupt();
+			enemy.self.interruptCastingAndChannelling();
 		}
 
 	}
@@ -393,6 +398,10 @@ public class UnitStats implements UnitStatsInfo {
 	// return false;
 	// }
 
+	private int getStunDefPenalty() {
+		return stun.isStunned() ? 20 : 0;
+	}
+
 	public float getUnitDamage() {
 		float weaponDamage = isWieldingAWeapon() ? equip.mainHand.damage : 1;
 		float strengthBonus = (this.str - 5) * 0.1f;
@@ -408,7 +417,7 @@ public class UnitStats implements UnitStatsInfo {
 	 */
 	public float applyDamage(float damage) {
 
-		effects.makeDamageEffect(damage, self);
+		gfx.makeDamageEffect(damage, self);
 
 		hp -= damage;
 
@@ -418,6 +427,20 @@ public class UnitStats implements UnitStatsInfo {
 		}
 
 		return damage;
+	}
+
+	@Override
+	public boolean isStunned() {
+		return stun.isStunned();
+	}
+
+	public void applyStun(float duration) {
+		stun.applyStun(duration);
+	}
+
+	@Override
+	public float getStunDurationRemaining() {
+		return stun.getStunDurationRemaining();
 	}
 
 	public void addSp(float amount) {

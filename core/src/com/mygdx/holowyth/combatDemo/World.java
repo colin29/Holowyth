@@ -492,6 +492,16 @@ public class World implements WorldInfo {
 	}
 
 	/**
+	 * Returns true if unit was present
+	 * 
+	 * @param u
+	 * @return
+	 */
+	public boolean removeUnit(Unit u) {
+		return units.removeUnit(u);
+	}
+
+	/**
 	 * The list itself is read-only, though elements can be modified
 	 */
 	@Override

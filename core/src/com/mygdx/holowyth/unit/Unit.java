@@ -378,7 +378,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		 */
 		private boolean isAnyOrderAllowed() {
 			return !stats.isDead()
-			&& !motion.isBeingKnockedBack();
+			&& !motion.isBeingKnockedBack()
+			&& !stats.isStunned();
 		}
 		
 		
@@ -398,7 +399,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	/**
 	 * Caused by normal attacking or stun effects. Interrupts any casting or channeling spell
 	 */
-	public void interrupt() {
+	public void interruptCastingAndChannelling() {
 		if (isCasting() || isChannelling()) {
 			activeSkill.interrupt();
 		}
@@ -472,7 +473,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 				this.attack(attacking);
 				attackCooldownRemaining = attackCooldown / getMultiTeamingAtkspdPenalty(attacking);
 			} else {
-				attackCooldownRemaining -= 1;
+				attackCooldownRemaining = Math.max(0, attackCooldownRemaining - 1); // prevent from going below 0
 			}
 		}
 	}
@@ -677,6 +678,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		if (isAttacking()) {
 			stopAttacking();
 		}
+
+		getWorldMutable().removeUnit(this);
 	}
 
 	// For now we allow multiple player characters
