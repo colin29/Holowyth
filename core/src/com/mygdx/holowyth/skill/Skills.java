@@ -422,7 +422,7 @@ public class Skills {
 		@Override
 		public void tick() {
 			logger.debug("applied stun");
-			target.stats.applyStun(120);
+			target.stats.applyStun(90);
 			markAsComplete();
 		}
 	}

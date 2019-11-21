@@ -260,27 +260,9 @@ public class UnitStats implements UnitStatsInfo {
 			logger.warn("Cannot attack a dead target");
 			return;
 		}
-
 		// System.out.printf("%s attacks %s%n", this.name, enemy.name);
 
 		float chanceToHit = 0;
-
-		// // 1. Simulate dodge chance
-		//
-		// int acc = this.acc;
-		// int dodge = enemy.dodge;
-		//
-		// chanceToHit = (float) (Math.pow(2, (acc - dodge) / 10f) * 0.5);
-		// chanceToHit = Math.min(accChanceCeiling, chanceToHit);
-		// chanceToHit = Math.max(accChanceFloor, chanceToHit);
-		// if (printDetailedCombatInfo)
-		// System.out.printf(" -Chance to be accurate: %f %d relative acc %n", chanceToHit, acc - dodge);
-		//
-		// if (Math.random() > chanceToHit) {
-		// // System.out.printf("%s's attack missed %s %n", this.name, enemy.name);
-		// effects.makeMissEffect(this.self);
-		// return;
-		// }
 
 		// Add a slow effect, regardless of block or hit. This is for balancing fleeing enemies without engaging.
 		enemy.applyBasicAttackSlow(0.4f, 90);
@@ -288,16 +270,17 @@ public class UnitStats implements UnitStatsInfo {
 
 		// 2. Simulate block chance
 
-		int atk = this.atk + getMultiTeamingAtkBonus(enemy) + atkBonus;
-		int def = enemy.def - enemy.getStunDefPenalty();
+		int atk = this.atk + getMultiTeamingAtkBonus(enemy) + atkBonus - getReelAtkPenalty();
+		int defEnemy = enemy.def - enemy.getStunDefPenalty() - enemy.getReelDefPenalty();
 
-		chanceToHit = (float) (0.4 * (1 + (atk - def) * 0.05));
+		chanceToHit = (float) (0.4 * (1 + (atk - defEnemy) * 0.05));
 
 		chanceToHit = Math.min(atkChanceCeiling, chanceToHit);
 		chanceToHit = Math.max(atkChanceFloor, chanceToHit);
+
 		if (printDetailedCombatInfo) {
 			logger.debug("{} attacks {}", this.name, enemy.name);
-			logger.debug("Hit chance: {} - {} relative attack (+{} from multi-teaming)", getRoundedString(chanceToHit), atk - def,
+			logger.debug("Hit chance: {} - {} relative attack (+{} from multi-teaming)", getRoundedString(chanceToHit), atk - defEnemy,
 					getMultiTeamingAtkBonus(enemy));
 			// System.out.printf(" -Chance to land hit: %s %n", getRoundedString(chanceToHit), atk - def);
 		}
@@ -327,7 +310,7 @@ public class UnitStats implements UnitStatsInfo {
 		}
 
 		// 5. Apply damage
-		logger.debug("{}'s attack hit and did {} damage to {}%n", this.name, DataUtil.getRoundedString(damage), enemy.name);
+		logger.debug("{}'s attack hit and did {} damage to {}", this.name, DataUtil.getRoundedString(damage), enemy.name);
 
 		if (enemy.applyDamage(damage) > 0) {
 			enemy.self.interruptCastingAndChannelling();
@@ -402,6 +385,14 @@ public class UnitStats implements UnitStatsInfo {
 		return stun.isStunned() ? 20 : 0;
 	}
 
+	private int getReelAtkPenalty() {
+		return stun.isReeled() ? 10 : 0;
+	}
+
+	private int getReelDefPenalty() {
+		return stun.isReeled() ? 10 : 0;
+	}
+
 	public float getUnitDamage() {
 		float weaponDamage = isWieldingAWeapon() ? equip.mainHand.damage : 1;
 		float strengthBonus = (this.str - 5) * 0.1f;
@@ -441,6 +432,20 @@ public class UnitStats implements UnitStatsInfo {
 	@Override
 	public float getStunDurationRemaining() {
 		return stun.getStunDurationRemaining();
+	}
+
+	public void applyReel(float duration) {
+		stun.applyReel(duration);
+	}
+
+	@Override
+	public boolean isReeled() {
+		return stun.isReeled();
+	}
+
+	@Override
+	public float getReeledDurationRemaining() {
+		return stun.getReelDurationRemaining();
 	}
 
 	public void addSp(float amount) {
@@ -676,6 +681,8 @@ public class UnitStats implements UnitStatsInfo {
 		return baseMoveSpeed;
 	}
 
+	public final float REEL_SLOW_AMOUNT = 0.4f;
+
 	@Override
 	public float getMoveSpeed() {
 
@@ -684,7 +691,9 @@ public class UnitStats implements UnitStatsInfo {
 			largestSlow = Math.max(largestSlow, effect.getSlowAmount());
 		}
 
-		return baseMoveSpeed * (1 - largestSlow);
+		float reelingMoveSlow = isReeled() ? REEL_SLOW_AMOUNT : 0;
+
+		return baseMoveSpeed * (1 - largestSlow) * (1 - reelingMoveSlow);
 	}
 
 	/**
@@ -762,4 +771,5 @@ public class UnitStats implements UnitStatsInfo {
 	public String getName() {
 		return name;
 	}
+
 }

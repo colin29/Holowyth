@@ -168,6 +168,7 @@ public class Renderer {
 		}
 		renderOutlineAroundKnockbackedUnits();
 		renderOutlineAroundStunnedUnits();
+		renderOutlineAroundReeledUnits();
 
 		// debug.renderUnitIdsOnUnits();
 
@@ -420,6 +421,12 @@ public class Renderer {
 	private void renderOutlineAroundStunnedUnits() {
 		renderThickOutlineIfTrueForAllUnits(Color.SCARLET, (UnitInfo u) -> {
 			return u.getStats().isStunned();
+		});
+	}
+
+	private void renderOutlineAroundReeledUnits() {
+		renderThickOutlineIfTrueForAllUnits(Color.ORANGE, (UnitInfo u) -> {
+			return u.getStats().isReeled();
 		});
 	}
 

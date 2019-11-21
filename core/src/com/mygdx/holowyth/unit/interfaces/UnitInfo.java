@@ -51,4 +51,8 @@ public interface UnitInfo {
 	boolean isDead();
 
 	UnitSkills getSkills();
+
+	float getAttackCooldownRemaining();
+
+	float getAttackCooldown();
 }

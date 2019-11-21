@@ -60,4 +60,8 @@ public interface UnitStatsInfo {
 	float getStunDurationRemaining();
 
 	boolean isStunned();
+
+	boolean isReeled();
+
+	float getReeledDurationRemaining();
 }

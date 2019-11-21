@@ -464,6 +464,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	 * Updates attacking units
 	 */
 	public void tickAttacking() {
+		attackCooldownRemaining = Math.max(0, attackCooldownRemaining - 1); // cooldown ticks even when unit not attacking
+
 		if (isAttacking()) {
 			if (attacking.stats.isDead()) {
 				stopAttacking();
@@ -472,8 +474,6 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 			if (attackCooldownRemaining <= 0) {
 				this.attack(attacking);
 				attackCooldownRemaining = attackCooldown / getMultiTeamingAtkspdPenalty(attacking);
-			} else {
-				attackCooldownRemaining = Math.max(0, attackCooldownRemaining - 1); // prevent from going below 0
 			}
 		}
 	}
@@ -644,7 +644,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		attacking = target;
 		unitsAttacking.get(attacking).add(this);
 
-		attackCooldownRemaining = attackCooldown / 4;
+		// Attack cooldown may be artificially higher because of a recent stun/reel
+		attackCooldownRemaining = Math.max(attackCooldownRemaining, attackCooldown / 4);
 		retreatCooldownRemaining = retreatCooldown;
 	}
 
@@ -656,6 +657,10 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 			unitsAttacking.get(attacking).remove(this);
 			attacking = null;
 		}
+	}
+
+	void addAttackCooldownRemaining(float value) {
+		attackCooldownRemaining += value;
 	}
 
 	// Debug
@@ -842,6 +847,16 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	@Override
 	public UnitSkills getSkills() {
 		return skills;
+	}
+
+	@Override
+	public float getAttackCooldown() {
+		return attackCooldown;
+	}
+
+	@Override
+	public float getAttackCooldownRemaining() {
+		return attackCooldownRemaining;
 	}
 
 }
