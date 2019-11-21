@@ -3,6 +3,8 @@ package com.mygdx.holowyth.unit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mygdx.holowyth.util.exceptions.HoloAssertException;
+
 /**
  * Handles logic for whether a unit is stunned or not
  *
@@ -12,10 +14,18 @@ public class UnitStun {
 
 	private Unit self;
 
-	private boolean isStunned;
-	private float stunDurationRemaining; // in frames;
+	enum State {
+		STUNNED, REELED, NORMAL;
+	}
 
-	private boolean isReeled;
+	private State state = State.NORMAL;
+
+	private float stunDurationRemaining; // in frames;
+	/**
+	 * Amount of reel time accumulated, to be executed after stun expires
+	 */
+	private float deferredReelAmount;
+
 	private float reelDurationRemaining;
 
 	public UnitStun(Unit self) {
@@ -57,15 +67,23 @@ public class UnitStun {
 			logger.warn("tried to apply stun of negative duration");
 			return;
 		}
-		if (!isStunned) {
+		switch (state) {
+		case NORMAL:
 			beginStun(duration);
-		} else {
+			break;
+		case REELED:
+			deferredReelAmount = reelDurationRemaining;
+			beginStun(duration);
+			break;
+		case STUNNED:
 			stunDurationRemaining += duration;
+			break;
+		default:
+			throw new HoloAssertException("Unsupported state");
 		}
 	}
 
 	/**
-	 * A duration of 0 will create a very brief stun, like an interrupt. <br>
 	 * 
 	 */
 	void applyReel(float duration) {
@@ -73,24 +91,31 @@ public class UnitStun {
 			logger.warn("tried to apply reel of negative duration");
 			return;
 		}
-		if (duration <= 0)
-			return;
-		if (!isReeled) {
+
+		switch (state) {
+		case NORMAL:
 			beginReel(duration);
-		} else {
+			break;
+		case REELED:
 			reelDurationRemaining += duration;
+			break;
+		case STUNNED:
+			deferredReelAmount += duration;
+			break;
+		default:
+			throw new HoloAssertException("Unsupported state");
 		}
 	}
 
 	boolean isStunned() {
-		return isStunned;
+		return state == State.STUNNED;
 	}
 
 	/**
 	 * Note: a unit that is stun will return false, if you want either use isReelel() || isStunned()
 	 */
 	boolean isReeled() {
-		return isReeled;
+		return state == State.REELED;
 	}
 
 	float getStunDurationRemaining() {
@@ -107,30 +132,31 @@ public class UnitStun {
 		self.stopAttacking();
 		self.interruptCastingAndChannelling();
 
-		isStunned = true;
+		state = State.STUNNED;
 		stunDurationRemaining = duration;
 	}
 
-	private void endStun() {
-		isStunned = false;
-		stunDurationRemaining = 0;
-		beginReel(120);
-	}
-
 	private void beginReel(float duration) {
+
 		self.motion.stopCurrentMovement();
 		self.clearOrder();
-
+		// reeling doesn't interrupt attacking, unlike stun
 		self.interruptCastingAndChannelling();
 
-		isReeled = true;
+		state = State.REELED;
 		reelDurationRemaining = duration;
 
 		self.addAttackCooldownRemaining(self.getAttackCooldown());
 	}
 
+	private void endStun() {
+		stunDurationRemaining = 0;
+		beginReel(Math.max(120, deferredReelAmount));
+		deferredReelAmount = 0;
+	}
+
 	private void endReeled() {
-		isReeled = false;
+		state = State.NORMAL;
 		reelDurationRemaining = 0;
 	}
 
