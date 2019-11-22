@@ -430,15 +430,15 @@ public class World implements WorldInfo {
 		switch (collisionType) {
 		case UNIT:
 			if (unitReboundsOffSecondUnit) {
-				thisUnit.motion.applyKnockBackVelocity(dv1.x, dv1.y);
+				thisUnit.stats.applyKnockbackStun(0, dv1); // don't add any stun duration, but apply dv
 			} else {
-				thisUnit.motion.applyKnockBackVelocity(dv1.x, dv1.y);
-				otherUnit.motion.applyKnockBackVelocity(dv2.x, dv2.y);
+				thisUnit.stats.applyKnockbackStun(0, dv1);
+				otherUnit.stats.applyKnockbackStun(0, dv2);
 			}
 			break;
 		case OBSTACLE_SEG:
 		case OBSTACLE_POINT:
-			thisUnit.motion.applyKnockBackVelocity(dv1.x, dv1.y);
+			thisUnit.stats.applyKnockbackStun(0, dv1);
 			break;
 		default:
 			throw new RuntimeException("Unsupported Collision type: " + collisionType.name());

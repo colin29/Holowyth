@@ -3,6 +3,7 @@ package com.mygdx.holowyth.unit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 
 /**
@@ -46,7 +47,8 @@ public class UnitStun {
 
 	private void tickStun() {
 		stunDurationRemaining -= 1;
-		if (stunDurationRemaining <= 0) {
+		if (stunDurationRemaining <= 0 &&
+				!self.motion.isBeingKnockedBack()) { // if unit is still being knockbacked, wait until knockback ends before ending stun
 			endStun();
 		}
 	}
@@ -81,6 +83,18 @@ public class UnitStun {
 		default:
 			throw new HoloAssertException("Unsupported state");
 		}
+	}
+
+	/**
+	 * Knockback is treated exactly as a stun stun, except that the unit will remain stunned until knockback motion ends
+	 */
+	void applyKnockbackStun(float duration, Vector2 dv) {
+		applyStun(duration);
+		self.motion.applyKnockBackVelocity(dv.x, dv.y);
+	}
+
+	boolean isUnitBeingKnockedBack() {
+		return self.motion.isBeingKnockedBack();
 	}
 
 	/**

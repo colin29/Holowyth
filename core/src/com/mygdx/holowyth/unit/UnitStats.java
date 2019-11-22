@@ -12,6 +12,7 @@ import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.unit.Unit.Order;
@@ -454,6 +455,10 @@ public class UnitStats implements UnitStatsInfo {
 
 	public void applyStun(float duration) {
 		stun.applyStun(duration);
+	}
+
+	public void applyKnockbackStun(float duration, Vector2 dv) {
+		stun.applyKnockbackStun(duration, dv);
 	}
 
 	@Override

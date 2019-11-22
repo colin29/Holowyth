@@ -435,7 +435,7 @@ public class UnitMotion {
 		return mode == Mode.KNOCKBACK;
 	}
 
-	public void beginKnockback(float initialVx, float initialVy) {
+	private void beginKnockback(float initialVx, float initialVy) {
 		if (isBeingKnockedBack()) {
 			logger.warn("beginKnockback() called but unit is already in knockback state. Skipping.");
 			return;
@@ -462,10 +462,12 @@ public class UnitMotion {
 	}
 
 	/**
-	 * If the unit is not in knockback state, sets it to knockback state with this velocity. If it is already being knocked back, adds this to its
-	 * velocity.
+	 * If you want to apply a knockback stun as per game rules, use UnitStats.applyKnockbackStun() instead. Should only be called for internal use
+	 * <br>
+	 * Reason is because knockback counts as a stun in-game, but the stun will only be started if you call that method. If you just want to adjust the
+	 * velocity, and you know the unit is already being knockbacked, you can call setKnockbackVelocity
 	 */
-	public void applyKnockBackVelocity(float dx, float dy) {
+	void applyKnockBackVelocity(float dx, float dy) {
 		if (isBeingKnockedBack()) {
 			setKnockbackVelocity(knockBackVx + dx, knockBackVy + dy);
 		} else {
@@ -474,32 +476,18 @@ public class UnitMotion {
 
 	}
 
-	public void setKnockbackVx(float knockBackVx) {
+	public void setKnockbackVelocity(float knockBackVx, float knockBackVy) {
 		if (isBeingKnockedBack()) {
 			this.knockBackVx = knockBackVx;
-		} else {
-			logger.warn(
-					"setKnockbackVx, but unit is not in knockbackState. This would suggest bad logic. Ignoring set");
-		}
-	}
-
-	public void setKnockbackVy(float knockBackVy) {
-		if (isBeingKnockedBack()) {
 			this.knockBackVy = knockBackVy;
 		} else {
 			logger.warn(
-					"setKnockbackVy, but unit is not in knockbackState. This would suggest bad logic. Ignoring set");
+					"setKnockback, but unit is not in knockbackState. This would suggest bad logic. Ignoring.");
 		}
 	}
 
-	public void setKnockbackVelocity(float knockBackVx, float knockBackVy) {
-		setKnockbackVx(knockBackVx);
-		setKnockbackVy(knockBackVy);
-	}
-
 	public void setKnockbackVelocity(Vector2 vec) {
-		setKnockbackVx(vec.x);
-		setKnockbackVy(vec.y);
+		setKnockbackVelocity(vec.x, vec.y);
 	}
 
 	public Point getDest() {
@@ -526,11 +514,6 @@ public class UnitMotion {
 
 	public Vector2 getKnockbackVelocity() {
 		return new Vector2(knockBackVx, knockBackVy);
-	}
-
-	public void getKnockbackVelocity(Vector2 vec) {
-		setKnockbackVx(vec.x);
-		setKnockbackVy(vec.y);
 	}
 
 	public float getVx() {

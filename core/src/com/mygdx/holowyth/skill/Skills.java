@@ -209,7 +209,7 @@ public class Skills {
 						Vector2 unitToEffectCenter = new Vector2(effectX - unit.x, effectY - unit.y);
 						Vector2 knockBackVel = new Vector2(unitToEffectCenter).nor().scl(knockbackSpeed);
 
-						unit.motion.applyKnockBackVelocity(knockBackVel.x, knockBackVel.y);
+						unit.stats.applyKnockbackStun(0, knockBackVel);
 					}
 				}
 			}
@@ -282,7 +282,7 @@ public class Skills {
 						Vector2 unitToEffectCenter = new Vector2(unit.x - effectX, unit.y - effectY);
 						Vector2 knockBackVel = new Vector2(unitToEffectCenter).nor().scl(knockbackMagnitude);
 
-						unit.motion.applyKnockBackVelocity(knockBackVel.x, knockBackVel.y);
+						unit.stats.applyKnockbackStun(0, knockBackVel);
 					}
 				}
 			}
@@ -315,10 +315,8 @@ public class Skills {
 
 			final float knockBackSpeed = knockbackSpeedBase * targetToPoint.len() / 100;
 			Vector2 knockBackVel = new Vector2(targetToPoint).nor().scl(knockBackSpeed);
-			if (knockBackVel.isZero()) // cover degenerate case
-				targetToPoint.set(knockBackSpeed, 0);
 
-			target.motion.applyKnockBackVelocity(knockBackVel.x, knockBackVel.y);
+			target.stats.applyKnockbackStun(60, knockBackVel);
 			markAsComplete();
 		}
 
