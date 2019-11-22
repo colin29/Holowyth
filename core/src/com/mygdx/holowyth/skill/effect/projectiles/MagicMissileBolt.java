@@ -234,6 +234,12 @@ public class MagicMissileBolt {
 		for (Unit enemy : enemies) {
 			if (Point.calcDistance(thisPos, enemy.getPos()) < enemy.getRadius()) {
 				enemy.stats.applyDamage(damage);
+
+				// Apply knockback stun in direction missile was travelling
+				Vector2 knockBackVec = new Vector2(vec).setLength(0.5f);
+
+				enemy.stats.applyKnockbackStun(20, knockBackVec);
+
 				collided = true;
 				return;
 			}

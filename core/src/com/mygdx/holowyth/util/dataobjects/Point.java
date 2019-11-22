@@ -41,7 +41,9 @@ public class Point {
 	}
 
 	/**
-	 * @return a value in the range [0, 360)
+	 * Returns the angle from point 1 to point 2. If points are identical in value, should return 0.
+	 * 
+	 * @return a value in the range [0, 360).
 	 */
 	public static float getAngleInDegrees(Point p1, Point p2) {
 		float angle = (float) Math.toDegrees(Math.atan2(p2.y - p1.y, p2.x - p1.x));

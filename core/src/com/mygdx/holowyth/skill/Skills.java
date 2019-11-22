@@ -381,11 +381,6 @@ public class Skills {
 			shapeDrawer.setColor(Color.RED, 0.8f);
 			batch.begin();
 			for (var m : missiles) {
-				if (m.isSideWindingLeft()) {
-					shapeDrawer.setColor(Color.CYAN, 0.8f);
-				} else {
-					shapeDrawer.setColor(Color.RED, 0.8f);
-				}
 				shapeDrawer.filledCircle(m.x, m.y, missileVfxRadius);
 			}
 			batch.end();
