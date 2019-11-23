@@ -238,7 +238,7 @@ public class MagicMissileBolt {
 				// Apply knockback stun in direction missile was travelling
 				Vector2 knockBackVec = new Vector2(vec).setLength(0.5f);
 
-				enemy.stats.doKnockBackRollAgainst(15, 20, knockBackVec);
+				enemy.stats.doKnockBackRollAgainst(15, 20, knockBackVec, 1.5f);
 
 				collided = true;
 				return;

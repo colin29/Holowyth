@@ -486,6 +486,10 @@ public class UnitMotion {
 		}
 	}
 
+	public void addKnockbackVelocity(Vector2 vec) {
+		setKnockbackVelocity(knockBackVx + vec.x, knockBackVy + vec.y);
+	}
+
 	public void setKnockbackVelocity(Vector2 vec) {
 		setKnockbackVelocity(vec.x, vec.y);
 	}

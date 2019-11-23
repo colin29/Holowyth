@@ -10,7 +10,7 @@ import com.mygdx.holowyth.util.exceptions.HoloAssertException;
  * Handles logic for whether a unit is stunned or not
  *
  */
-public class UnitStun {
+class UnitStun {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private Unit self;
@@ -29,7 +29,7 @@ public class UnitStun {
 
 	private float reelDurationRemaining;
 
-	public UnitStun(Unit self) {
+	UnitStun(Unit self) {
 		this.self = self;
 	}
 
@@ -62,13 +62,18 @@ public class UnitStun {
 
 	/**
 	 * A duration of 0 will create a very brief stun, like an interrupt. <br>
+	 * However, knockback is also a stun, so even if duration is 0, the unit will remain stunned until knockback ends
 	 * 
+	 * @param maxStunDuration
+	 *            Cumulative stun contributions are prorated around this. If maxStunDuration < duration, it will be treated as maxStunDuration =
+	 *            duration
 	 */
-	void applyStun(float duration) {
+	void applyStun(float duration, float maxStunDuration) {
 		if (duration < 0) {
 			logger.warn("tried to apply stun of negative duration");
 			return;
 		}
+
 		switch (state) {
 		case NORMAL:
 			beginStun(duration);
@@ -78,18 +83,40 @@ public class UnitStun {
 			beginStun(duration);
 			break;
 		case STUNNED:
-			stunDurationRemaining += duration;
+			// in case of consecutive stuns, stun contributions are prorated around a maxDuration
+			if (maxStunDuration < duration) {
+				maxStunDuration = duration;
+			}
+			float prorateFactor = Math.max(0, 1 - stunDurationRemaining / maxStunDuration);
+			stunDurationRemaining += duration * prorateFactor;
 			break;
 		default:
 			throw new HoloAssertException("Unsupported state");
 		}
+		logger.debug("Stun duration remaining: {}", stunDurationRemaining);
 	}
 
-	/**
-	 * Knockback is treated exactly as a stun stun, except that the unit will remain stunned until knockback motion ends
-	 */
-	void applyKnockbackStun(float duration, Vector2 dv) {
-		applyStun(duration);
+	void applyKnockbackStun(float duration, Vector2 dv, float maxKnockBackVel, float maxStunDuration) {
+		applyStun(duration, maxStunDuration);
+
+		if (self.motion.isBeingKnockedBack()) {
+			// Prorate dv based on current velocity: the higher velocity, the smaller dv's effect is
+			Vector2 curVel = self.motion.getKnockbackVelocity();
+			float factor = Math.max(0, 1 - curVel.len() / maxKnockBackVel);
+			Vector2 dVProrated = new Vector2(dv).scl(factor);
+			self.motion.applyKnockBackVelocity(dVProrated.x, dVProrated.y);
+
+			// logger.debug("Knockback info: Orig Vel {} maxKnockBackVel {} dv {} proratedDv {} finalVel {}", curVel.len(), maxKnockBackVel, dv.len(),
+			// dVProrated.len(), self.motion.getKnockbackVelocity().len());
+
+		} else {
+			self.motion.applyKnockBackVelocity(dv.x, dv.y);
+		}
+
+	}
+
+	void applyKnockbackStunWithoutVelProrate(float duration, float maxStunDuration, Vector2 dv) {
+		applyStun(duration, maxStunDuration);
 		self.motion.applyKnockBackVelocity(dv.x, dv.y);
 	}
 

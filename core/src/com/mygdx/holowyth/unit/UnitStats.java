@@ -323,14 +323,24 @@ public class UnitStats implements UnitStatsInfo {
 	 * @return
 	 */
 	public void doStunRollAgainst(int force, float stunDuration) {
-		doStunRollAgainst(force, stunDuration, false, null);
+		doStunRollAgainst(force, stunDuration, stunDuration + 1, false, null, 0);
 	}
 
-	public void doKnockBackRollAgainst(int force, float stunDuration, Vector2 knockbackVel) {
-		doStunRollAgainst(force, stunDuration, true, knockbackVel);
+	/**
+	 * 
+	 * @param force
+	 * @param stunDuration
+	 * @param knockbackVel
+	 * @param maxKnockbackVel
+	 *            The max knockback speed the unit can be pushed, no matter how many consecutive knockbacks there are. <br>
+	 *            Affects velocity proration
+	 */
+	public void doKnockBackRollAgainst(int force, float stunDuration, Vector2 knockbackVel, float maxKnockbackVel) {
+		doStunRollAgainst(force, stunDuration, stunDuration + 1, true, knockbackVel, maxKnockbackVel);
 	}
 
-	private void doStunRollAgainst(int force, float stunDuration, boolean isKnockback, Vector2 knockbackVel) {
+	private void doStunRollAgainst(int force, float stunDuration, float maxStunDuration, boolean isKnockback, Vector2 knockbackVel,
+			float maxKnockbackVel) {
 
 		int attackerRoll = RandomUtils.nextInt(1, 7); // 1d6
 
@@ -341,14 +351,14 @@ public class UnitStats implements UnitStatsInfo {
 
 		if (attackerResult >= 10) { // apply full effect
 			if (isKnockback) {
-				applyKnockbackStun(stunDuration, knockbackVel);
+				applyKnockbackStun(stunDuration, maxStunDuration, knockbackVel, maxKnockbackVel);
 			} else {
 				applyStun(stunDuration);
 			}
 		} else if (attackerResult > 0) { // reduced stun and/or knockback
 			float factor = (attackerResult + 10) * 0.1f;
 			if (isKnockback) {
-				applyKnockbackStun(stunDuration * factor, knockbackVel.scl(factor));
+				applyKnockbackStun(stunDuration * factor, maxStunDuration, knockbackVel.scl(factor), maxKnockbackVel);
 			} else {
 				applyStun(stunDuration * factor);
 			}
@@ -358,17 +368,47 @@ public class UnitStats implements UnitStatsInfo {
 
 	}
 
+	public void applyStun(float duration) {
+		stun.applyStun(duration, duration + 1); // thus a 0.5 sec stun will prorate around a 1.5sec max, 3sec -> 4 sec max
+	}
+
+	public void applyStun(float duration, float maxStunDuration) {
+		stun.applyStun(duration, maxStunDuration);
+	}
+
+	/**
+	 * Unlike doKnockbackRoll, this method has no concept of force/stability
+	 * 
+	 * @param dv
+	 */
+	public void applyKnockbackStun(float duration, float maxStunDuration, Vector2 dv) {
+		applyKnockbackStun(duration, maxStunDuration, dv, dv.len());
+	}
+
+	/**
+	 * 
+	 * @param duration
+	 * @param maxStunDuration
+	 *            stun contribution by this effect is prorated around this value
+	 * @param dv
+	 * @param maxKnockbackVel
+	 *            velocity contribution by this effect is prorated around this value
+	 */
+	public void applyKnockbackStun(float duration, float maxStunDuration, Vector2 dv, float maxKnockbackVel) {
+		stun.applyKnockbackStun(duration, dv, maxKnockbackVel, maxStunDuration);
+	}
+
+	public void applyKnockbackStunWithoutVelProrate(float duration, Vector2 dv) {
+		applyKnockbackStunWithoutVelProrate(duration, duration + 1, dv);
+	}
+
+	public void applyKnockbackStunWithoutVelProrate(float duration, float maxStunDuration, Vector2 dv) {
+		stun.applyKnockbackStunWithoutVelProrate(duration, maxStunDuration, dv);
+	}
+
 	@Override
 	public boolean isStunned() {
 		return stun.isStunned();
-	}
-
-	public void applyStun(float duration) {
-		stun.applyStun(duration);
-	}
-
-	public void applyKnockbackStun(float duration, Vector2 dv) {
-		stun.applyKnockbackStun(duration, dv);
 	}
 
 	@Override
