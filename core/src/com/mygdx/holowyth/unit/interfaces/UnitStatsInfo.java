@@ -25,10 +25,6 @@ public interface UnitStatsInfo {
 
 	float getBaseMoveSpeed();
 
-	int getExp();
-
-	int getExpGives();
-
 	int getAtk();
 
 	int getDef();

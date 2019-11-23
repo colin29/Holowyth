@@ -40,21 +40,22 @@ public class UnitStats implements UnitStatsInfo {
 	EffectsHandler gfx;
 
 	// Sub-components:
-	private final UnitStun stun;
 	private final UnitStatCalculator calc;
 
-	// Info stats
-
+	// Stats
 	private String name;
+	float hp;
+	float sp;
+	public int level;
 
-	// Base stats
+	// Base attributes
 	public int maxHpBase, maxSpBase;
 	public int strBase, agiBase, fortBase, perceptBase;
 
-	/**
-	 * Unused atm, UnitMotion just uses the default movespeed
-	 */
-	public float baseMoveSpeed = Holo.defaultUnitMoveSpeed;
+	// Equips and status
+	private final EquippedItems equip = new EquippedItems();
+	private final List<SlowEffect> slowEffects = new LinkedList<SlowEffect>();
+	private final UnitStun stun;
 
 	// test stats
 	public static boolean useTestDamage = true;
@@ -62,35 +63,18 @@ public class UnitStats implements UnitStatsInfo {
 	public int testDamage; // If set, the unit will simply do this much base damage instead of using stat and armor calculations
 	public int testAtk;
 	public int testDef;
-
-	int expGives;
-
-	int exp;
-
-	float hp;
-	float sp;
-
-	// Calculated stats
-	// private int str, agi, fort, percep; // core stats
-	// private int maxHp, maxSp;
-	// private int atk, def, force, stab, acc, dodge;
-
-	private int armor, armorPiercing;
-	private float dmgReduction, armorNegation;
-
-	private final EquippedItems equip = new EquippedItems();
-
-	public int level;
-
-	// Status Effects
-
-	private final List<SlowEffect> slowEffects = new LinkedList<SlowEffect>();
+	// end test stats
 
 	public enum UnitType { // Player-like characters have their derived stats calculated like players. Monsters do not.
 		PLAYER, MONSTER
 	}
 
 	public UnitType unitType;
+
+	/**
+	 * Unused atm, UnitMotion just uses the default movespeed
+	 */
+	public float baseMoveSpeed = Holo.defaultUnitMoveSpeed;
 
 	public UnitStats(Unit unit) {
 		this.self = unit;
@@ -211,8 +195,8 @@ public class UnitStats implements UnitStatsInfo {
 		}
 
 		// 3. Calculate damage and reduction from armor
-		float damageReduced = Math.max(enemy.armor - armorPiercing, origDamage * enemy.dmgReduction);
-		damageReduced *= (1 - armorNegation);
+		float damageReduced = Math.max(enemy.getArmor() - getArmorPiercing(), origDamage * enemy.getDmgReduction());
+		damageReduced *= (1 - getArmorNegation());
 
 		float damage = origDamage - damageReduced;
 
@@ -662,16 +646,6 @@ public class UnitStats implements UnitStatsInfo {
 		}
 
 		return getMoveSpeed() / baseMoveSpeed;
-	}
-
-	@Override
-	public int getExp() {
-		return exp;
-	}
-
-	@Override
-	public int getExpGives() {
-		return expGives;
 	}
 
 	@Override
