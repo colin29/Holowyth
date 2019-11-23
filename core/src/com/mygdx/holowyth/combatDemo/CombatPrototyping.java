@@ -62,6 +62,8 @@ public class CombatPrototyping {
 
 		unit.testDamage = 5;
 
+		unit.fortBase = 12;
+
 	}
 
 	public static void loadPlayerUnitStats(UnitStats unit) {
@@ -75,6 +77,8 @@ public class CombatPrototyping {
 		unit.level = 0;
 
 		unit.testDamage = 7;
+
+		unit.fortBase = 5;
 		// unit.baseMoveSpeed = Holo.defaultUnitMoveSpeed * 3;
 	}
 }

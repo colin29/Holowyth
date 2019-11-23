@@ -28,11 +28,8 @@ public class UnitStatCalculator {
 	 * Call this when ever stats need to be recalculated (ie. items equipped/un-equipped, base stats changes
 	 */
 	void recalculateStats() {
-		// private int maxHp, maxSp;
-		// private int str, agi, fort, percep;
-		// int atk, def, force, stab, acc, dodge;
 
-		// 1: calculate new stats from equipment bonuses
+		// 1: calculate equipment bonuses
 
 		strBonus = 0;
 		agiBonus = 0;
@@ -51,14 +48,12 @@ public class UnitStatCalculator {
 		fort = self.fortBase + fortBonus;
 		percep = self.perceptBase + perceptBonus;
 
-		// 2: calculate hp stats
-
-		// Base stats
+		// 2: calculate hp/sp
 
 		maxHp = Holo.debugHighHpUnits ? self.maxHpBase * 10 : self.maxHpBase; // Math.round(baseMaxHp * (1 + 0.1f * (fort - 5)));
 		maxSp = self.maxSpBase;
 
-		// 3: calculate derived stats from core stats;
+		// 3: calculate derived stats
 
 		iAtk = 0;
 		iDef = 0;

@@ -109,7 +109,7 @@ public class UnitMotion {
 
 		// unit motion can't handle 0 move speed for some reason (probably needs some extra special casing)
 		if (self.stats.getMoveSpeed() != 0) {
-			setSpeedAndScaleAccel(self.stats.getMoveSpeed());
+			setSpeedAndScaleAccel(self.stats.getBaseMoveSpeed());
 		}
 
 		handleRepathing();
@@ -260,8 +260,8 @@ public class UnitMotion {
 			float sin = dy / dist;
 			float cos = dx / dist;
 
-			this.vx = cos * plannedSpeed;
-			this.vy = sin * plannedSpeed;
+			this.vx = cos * plannedSpeed * self.stats.getMoveSpeedRatio();
+			this.vy = sin * plannedSpeed * self.stats.getMoveSpeedRatio();
 		} else {
 			this.vx = dx;
 			this.vy = dy;

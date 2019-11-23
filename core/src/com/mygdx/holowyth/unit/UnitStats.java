@@ -332,13 +332,12 @@ public class UnitStats implements UnitStatsInfo {
 
 	private void doStunRollAgainst(int force, float stunDuration, boolean isKnockback, Vector2 knockbackVel) {
 
-		int stab = 10; // Set for 10 for testing purposes
 		int attackerRoll = RandomUtils.nextInt(1, 7); // 1d6
 
-		int attackerResult = force + attackerRoll - stab;
+		int attackerResult = force + attackerRoll - getStab();
 
 		logger.debug("{} roll made against {}. Attacker Result: {} ({} + ({}) - {})", isKnockback ? "knockback" : "stun",
-				getName(), attackerResult, force, attackerRoll, stab);
+				getName(), attackerResult, force, attackerRoll, getStab());
 
 		if (attackerResult >= 10) { // apply full effect
 			if (isKnockback) {
@@ -454,7 +453,8 @@ public class UnitStats implements UnitStatsInfo {
 		s += String.format("Unit [%s]  hp: %s/%d  sp: %s/%d  <level %d>%n", name, getRoundedString(hp), getMaxHp(), getRoundedString(sp), getMaxSp(),
 				level);
 		s += String.format("Core stats: STR %d, AGI %d, FORT %d, PERCEP %d%n", getStr(), getAgi(), getFort(), getPercep());
-		s += String.format("Derived stats: Atk %d, Def %d%n", getAtk(), getDef());
+		// s += String.format("Derived stats: Atk %d, Def %d%n", getAtk(), getDef());
+		s += String.format("Derived stats: Force %d, Stab %d%n", getForce(), getStab());
 		// s += String.format("Derived stats: Atk %d, Def %d, Force %d, Stab %d, Acc %d, Dodge %d%n", atk, def, force,
 		// stab, acc, dodge);
 		/*

@@ -193,6 +193,9 @@ public class Controls extends InputProcessorAdapter {
 			Unit unit = selectedUnits.iterator().next();
 
 			curSkill = unit.skills.getSkillInSlot(slotNumber);
+			if (curSkill == null) {
+				return;
+			}
 			System.out.println("Using " + curSkill.name);
 
 			if (unit.areSkillsOnCooldown()) {

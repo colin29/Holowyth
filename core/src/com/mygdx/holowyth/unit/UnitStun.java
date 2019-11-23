@@ -152,9 +152,7 @@ public class UnitStun {
 
 	private void beginReel(float duration) {
 
-		self.motion.stopCurrentMovement();
-		self.clearOrder();
-		// reeling doesn't interrupt attacking, unlike stun
+		// reeling doesn't interrupt attacking or motion, unlike stun
 		self.interruptCastingAndChannelling();
 
 		state = State.REELED;
