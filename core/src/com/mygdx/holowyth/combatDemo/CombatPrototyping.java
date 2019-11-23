@@ -15,8 +15,8 @@ public class CombatPrototyping {
 		ArrayList<Unit> someUnits = new ArrayList<Unit>();
 
 		someUnits.add(world.spawnUnit(playerPos.x + 40, playerPos.y, Unit.Side.ENEMY));
-		someUnits.add(world.spawnUnit(playerPos.x + 40, playerPos.y + 40, Unit.Side.ENEMY));
-		someUnits.add(world.spawnUnit(playerPos.x + 40, playerPos.y + 80, Unit.Side.ENEMY));
+		// someUnits.add(world.spawnUnit(playerPos.x + 40, playerPos.y + 40, Unit.Side.ENEMY));
+		// someUnits.add(world.spawnUnit(playerPos.x + 40, playerPos.y + 80, Unit.Side.ENEMY));
 
 		for (Unit unit : someUnits) {
 			unit.setName("Goblin");
@@ -36,10 +36,10 @@ public class CombatPrototyping {
 		var someUnits = new ArrayList<Unit>();
 		someUnits.add(world.spawnUnit(260, 220, Unit.Side.PLAYER));
 
-		someUnits.add(world.spawnUnit(playerPos.x - 40, playerPos.y, Unit.Side.PLAYER));
-		someUnits.add(world.spawnUnit(playerPos.x - 40, playerPos.y + 30, Unit.Side.PLAYER));
-		someUnits.add(world.spawnUnit(playerPos.x - 40, playerPos.y - 30, Unit.Side.PLAYER));
-		someUnits.add(world.spawnUnit(188, 197, Unit.Side.PLAYER));
+		// someUnits.add(world.spawnUnit(playerPos.x - 40, playerPos.y, Unit.Side.PLAYER));
+		// someUnits.add(world.spawnUnit(playerPos.x - 40, playerPos.y + 30, Unit.Side.PLAYER));
+		// someUnits.add(world.spawnUnit(playerPos.x - 40, playerPos.y - 30, Unit.Side.PLAYER));
+		// someUnits.add(world.spawnUnit(188, 197, Unit.Side.PLAYER));
 
 		for (Unit unit : someUnits) {
 			unit.setName("Player-char");

@@ -41,6 +41,7 @@ public class UnitStats implements UnitStatsInfo {
 
 	// Sub-components:
 	private final UnitStun stun;
+	private final UnitStatCalculator calc;
 
 	// Info stats
 
@@ -48,42 +49,36 @@ public class UnitStats implements UnitStatsInfo {
 
 	// Base stats
 	public int maxHpBase, maxSpBase;
+	public int strBase, agiBase, fortBase, perceptBase;
+
 	/**
 	 * Unused atm, UnitMotion just uses the default movespeed
 	 */
 	public float baseMoveSpeed = Holo.defaultUnitMoveSpeed;
 
-	public int strBase, agiBase, fortBase, perceptBase;
-
 	// test stats
 	public static boolean useTestDamage = true;
+	public static boolean useTestAtkDef = true;
 	public int testDamage; // If set, the unit will simply do this much base damage instead of using stat and armor calculations
 	public int testAtk;
 	public int testDef;
 
 	int expGives;
 
-	// Progress stats
 	int exp;
 
 	float hp;
 	float sp;
 
 	// Calculated stats
-	private int str, agi, fort, percep; // core stats
-	private int maxHp, maxSp;
-	private int atk, def, force, stab, acc, dodge;
+	// private int str, agi, fort, percep; // core stats
+	// private int maxHp, maxSp;
+	// private int atk, def, force, stab, acc, dodge;
 
 	private int armor, armorPiercing;
 	private float dmgReduction, armorNegation;
 
-	// Helper Stats (for summing up stat contributions). 'i' stands for interim
-	private int iStr, iAgi, iFort, iPercep; // core stats
-	private int iAtk, iDef, iForce, iStab, iAcc, iDodge;
-	private int iArmor, iArmorPiercing;
-	private float iDmgReduction, iArmorNegation;
-
-	private EquippedItems equip = new EquippedItems();
+	private final EquippedItems equip = new EquippedItems();
 
 	public int level;
 
@@ -102,6 +97,7 @@ public class UnitStats implements UnitStatsInfo {
 		this.gfx = unit.getWorld().getEffectsHandler();
 
 		stun = new UnitStun(unit);
+		calc = new UnitStatCalculator(this);
 	}
 
 	public UnitStats(String name, Unit unit) {
@@ -128,66 +124,7 @@ public class UnitStats implements UnitStatsInfo {
 	 * Call before anytime you have to read stats from Unit e.g combat calculations or a debug print or displaying on UI
 	 */
 	public void recalculateStats() {
-		// private int maxHp, maxSp;
-		// private int str, agi, fort, percep;
-		// int atk, def, force, stab, acc, dodge;
-
-		// 1: calculate new stats from equipment bonuses
-
-		iStr = 0;
-		iAgi = 0;
-		iFort = 0;
-		iPercep = 0;
-
-		addCoreStatBonuses(equip.head, equip.torso, equip.mainHand, equip.accessory1, equip.accessory2);
-		if (equip.mainHand != equip.offHand) { // avoid adding bonuses from a 2H-wielded weapon twice
-			addCoreStatBonuses(equip.offHand);
-		}
-
-		str = strBase + iStr;
-		agi = agiBase + iAgi;
-		fort = fortBase + iFort;
-		percep = perceptBase + iPercep;
-
-		// 2: calculate hp stats
-		maxHp = Holo.debugHighHpUnits ? maxHpBase * 10 : maxHpBase; // Math.round(baseMaxHp * (1 + 0.1f * (fort - 5)));
-		maxSp = maxSpBase;
-
-		// 3: calculate derived stats from core stats;
-
-		iAtk = 0;
-		iDef = 0;
-		iForce = 0;
-		iStab = 0;
-		iAcc = 0;
-		iDodge = 0;
-
-		iArmor = 0;
-		iDmgReduction = 0;
-		iArmorPiercing = 0;
-		iArmorNegation = 0;
-
-		addDerivedStatBonuses(equip.head, equip.torso, equip.mainHand, equip.accessory1, equip.accessory2);
-		if (equip.mainHand != equip.offHand) {
-			addDerivedStatBonuses(equip.offHand);
-		}
-
-		int levelBonus = (level) * 2;
-		int mid = 0;
-
-		atk = testAtk;
-		def = testDef;
-
-		force = levelBonus + iForce + 2 * (str - mid);
-		stab = levelBonus + iStab + 2 * (fort - mid) + 1 * (str - mid);
-		acc = levelBonus + iAcc + 2 * (percep - mid);
-		dodge = levelBonus + iDodge + 2 * (agi - mid);
-
-		armor = iArmor;
-		dmgReduction = iDmgReduction;
-		armorPiercing = iArmorPiercing;
-		armorNegation = iArmorNegation;
-
+		calc.recalculateStats();
 	}
 
 	/**
@@ -196,40 +133,12 @@ public class UnitStats implements UnitStatsInfo {
 	public void prepareUnit() {
 		recalculateStats();
 
-		hp = maxHp;
-		sp = maxSp;
+		hp = getMaxHp();
+		sp = getMaxSp();
 
 		slowEffects.clear();
-	}
 
-	private void addCoreStatBonuses(Item... items) {
-		for (Item item : items) {
-			if (item != null) {
-				iStr += item.strBonus;
-				iAgi += item.agiBonus;
-				iFort += item.fortBonus;
-				iPercep += item.percepBonus;
-			}
-		}
-	}
-
-	private void addDerivedStatBonuses(Item... items) {
-
-		for (Item item : items) {
-			if (item != null) {
-				iAtk += item.atkBonus;
-				iDef += item.defBonus;
-				iForce += item.forceBonus;
-				iStab += item.stabBonus;
-				iAcc += item.accBonus;
-				iDodge += item.dodgeBonus;
-
-				iArmor += item.armorBonus;
-				iDmgReduction += item.dmgReductionBonus;
-				iArmorPiercing += item.armorPiercingBonus;
-				iArmorNegation += item.armorNegationBonus;
-			}
-		}
+		printInfo();
 	}
 
 	// Combat/Attacking methods
@@ -272,8 +181,8 @@ public class UnitStats implements UnitStatsInfo {
 
 		// 2. Simulate block chance
 
-		int atk = this.atk + getMultiTeamingAtkBonus(enemy) + atkBonus - getReelAtkPenalty();
-		int defEnemy = enemy.def - enemy.getStunDefPenalty() - enemy.getReelDefPenalty();
+		int atk = getAtk() + getMultiTeamingAtkBonus(enemy) + atkBonus - getReelAtkPenalty();
+		int defEnemy = enemy.getDef() - enemy.getStunDefPenalty() - enemy.getReelDefPenalty();
 
 		chanceToHit = (float) (0.4 * (1 + (atk - defEnemy) * 0.05));
 
@@ -397,7 +306,7 @@ public class UnitStats implements UnitStatsInfo {
 
 	public float getUnitDamage() {
 		float weaponDamage = isWieldingAWeapon() ? equip.mainHand.damage : 1;
-		float strengthBonus = (this.str - 5) * 0.1f;
+		float strengthBonus = (getStr() - 5) * 0.1f;
 
 		return weaponDamage * (1 + strengthBonus);
 	}
@@ -430,20 +339,38 @@ public class UnitStats implements UnitStatsInfo {
 	 * @return
 	 */
 	public void doStunRollAgainst(int force, float stunDuration) {
+		doStunRollAgainst(force, stunDuration, false, null);
+	}
+
+	public void doKnockBackRollAgainst(int force, float stunDuration, Vector2 knockbackVel) {
+		doStunRollAgainst(force, stunDuration, true, knockbackVel);
+	}
+
+	private void doStunRollAgainst(int force, float stunDuration, boolean isKnockback, Vector2 knockbackVel) {
 
 		int stab = 10; // Set for 10 for testing purposes
-		int stabilityRoll = stab + RandomUtils.nextInt(1, 7); // 1d6
+		int attackerRoll = RandomUtils.nextInt(1, 7); // 1d6
 
-		int attackerResult = force - stabilityRoll;
+		int attackerResult = force + attackerRoll - stab;
 
-		logger.debug("Stun roll made against {}. Attacker Result: {} ({} - {} - {})", this, attackerResult, force, stab, stabilityRoll - stab);
+		logger.debug("{} roll made against {}. Attacker Result: {} ({} + ({}) - {})", isKnockback ? "knockback" : "stun",
+				getName(), attackerResult, force, attackerRoll, stab);
 
-		if (attackerResult > 0) {
-			applyStun(stunDuration); // apply full stun duration
+		if (attackerResult >= 10) { // apply full effect
+			if (isKnockback) {
+				applyKnockbackStun(stunDuration, knockbackVel);
+			} else {
+				applyStun(stunDuration);
+			}
+		} else if (attackerResult > 0) { // reduced stun and/or knockback
+			float factor = (attackerResult + 10) * 0.1f;
+			if (isKnockback) {
+				applyKnockbackStun(stunDuration * factor, knockbackVel.scl(factor));
+			} else {
+				applyStun(stunDuration * factor);
+			}
 		} else if (attackerResult > -10) {
-			applyStun(stunDuration * (attackerResult + 10) * 0.1f); // varying duration
-		} else if (attackerResult > -20) {
-			applyReel(stunDuration * (attackerResult + 20) * 0.1f); // lesser effect
+			applyReel(stunDuration * (attackerResult + 20) * 0.1f);
 		}
 
 	}
@@ -481,7 +408,7 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	public void addSp(float amount) {
-		sp = Math.min(sp + amount, maxSp);
+		sp = Math.min(sp + amount, getMaxSp());
 	}
 
 	public void subtractSp(float amount) {
@@ -489,7 +416,7 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	public void setSp(float value) {
-		sp = Math.min(Math.max(value, 0), maxSp);
+		sp = Math.min(Math.max(value, 0), getMaxSp());
 	}
 
 	public void setName(String name) {
@@ -497,11 +424,9 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	/**
-	 * Should only use this for debugging purposes. In-game wise you should use deal applyDamage
-	 * 
-	 * @param value
+	 * Should only use this for debugging purposes. In-game wise you should use applyDamage() instead
 	 */
-	public void setHpDebug(float value) {
+	public void setHp(float value) {
 		hp = value;
 	}
 
@@ -542,10 +467,10 @@ public class UnitStats implements UnitStatsInfo {
 		recalculateStats();
 
 		String s = "";
-		s += String.format("Unit [%s]  hp: %s/%d  sp: %s/%d  <level %d>%n", name, getRoundedString(hp), maxHp, getRoundedString(sp), maxSp,
+		s += String.format("Unit [%s]  hp: %s/%d  sp: %s/%d  <level %d>%n", name, getRoundedString(hp), getMaxHp(), getRoundedString(sp), getMaxSp(),
 				level);
-		// s += String.format("Core stats: STR %d, AGI %d, FORT %d, PERCEP %d%n", str, agi, fort, percep);
-		s += String.format("Derived stats: Atk %d, Def %d%n", atk, def);
+		s += String.format("Core stats: STR %d, AGI %d, FORT %d, PERCEP %d%n", getStr(), getAgi(), getFort(), getPercep());
+		s += String.format("Derived stats: Atk %d, Def %d%n", getAtk(), getDef());
 		// s += String.format("Derived stats: Atk %d, Def %d, Force %d, Stab %d, Acc %d, Dodge %d%n", atk, def, force,
 		// stab, acc, dodge);
 		/*
@@ -610,7 +535,7 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	public EquippedItems getEquip() {
-		return this.equip;
+		return equip;
 	}
 
 	public static class EquippedItems {
@@ -677,25 +602,25 @@ public class UnitStats implements UnitStatsInfo {
 
 	@Override
 	public int getMaxHp() {
-		return maxHp;
+		return calc.getMaxHp();
 	}
 
 	@Override
 	public int getMaxSp() {
-		return maxSp;
+		return calc.getMaxSp();
 	}
 
 	@Override
 	public float getHpRatio() {
-		return hp / maxHp;
+		return hp / getMaxHp();
 	}
 
 	@Override
 	public float getSpRatio() {
-		if (maxSp == 0) {
+		if (getMaxSp() == 0) {
 			return 0;
 		}
-		return sp / maxSp;
+		return sp / getMaxSp();
 	}
 
 	@Override
@@ -751,57 +676,77 @@ public class UnitStats implements UnitStatsInfo {
 
 	@Override
 	public int getAtk() {
-		return atk;
+		return calc.getAtk();
 	}
 
 	@Override
 	public int getDef() {
-		return def;
+		return calc.getDef();
 	}
 
 	@Override
 	public int getForce() {
-		return force;
+		return calc.getForce();
 	}
 
 	@Override
 	public int getStab() {
-		return stab;
+		return calc.getStab();
 	}
 
 	@Override
 	public int getAcc() {
-		return acc;
+		return calc.getAcc();
 	}
 
 	@Override
 	public int getDodge() {
-		return dodge;
+		return calc.getDodge();
 	}
 
 	@Override
 	public int getStr() {
-		return strBase;
+		return calc.getStr();
 	}
 
 	@Override
 	public int getAgi() {
-		return agiBase;
+		return calc.getAgi();
 	}
 
 	@Override
 	public int getFort() {
-		return fortBase;
+		return calc.getFort();
 	}
 
 	@Override
 	public int getPercep() {
-		return perceptBase;
+		return calc.getPercep();
 	}
 
 	@Override
 	public String getName() {
 		return name;
+	}
+
+	@Override
+	public int getArmor() {
+		return calc.getArmor();
+	}
+
+	@Override
+	public int getArmorPiercing() {
+		return calc.getArmorPiercing();
+	}
+
+	@Override
+	public float getDmgReduction() {
+		return calc.getDmgReduction();
+	}
+
+	@Override
+	public float getArmorNegation() {
+		return calc.getArmorNegation();
 	}
 
 }

@@ -65,7 +65,6 @@ public class SkillBarUI {
 	 * Todo: bar should only appear when exactly one unit is selected
 	 */
 	private void regenerateSkillBar(UnitInfo unit) {
-		logger.debug("regenerated skill bar");
 		root.clear();
 
 		var skillBar = new Table();

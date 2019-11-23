@@ -64,4 +64,12 @@ public interface UnitStatsInfo {
 	boolean isReeled();
 
 	float getReeledDurationRemaining();
+
+	float getArmorNegation();
+
+	float getDmgReduction();
+
+	int getArmorPiercing();
+
+	int getArmor();
 }

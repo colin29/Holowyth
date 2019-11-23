@@ -74,7 +74,7 @@ public class LoadingScreen extends BaseHoloScreen {
 
 	private void loadAllImagesInDirectory(File dir) {
 
-		logger.debug("Ran on directory: " + StringUtils.removeStart(dir.getPath().replace("\\", "/"), Holowyth.ASSETS_PATH));
+		// logger.debug("Loaded images in directory: " + StringUtils.removeStart(dir.getPath().replace("\\", "/"), Holowyth.ASSETS_PATH));
 
 		File[] images = dir.listFiles(new FilenameFilter() {
 			@Override
@@ -88,7 +88,7 @@ public class LoadingScreen extends BaseHoloScreen {
 			param.genMipMaps = true;
 
 			String dirPath = StringUtils.removeStart(dir.getPath().replace("\\", "/"), Holowyth.ASSETS_PATH);
-			System.out.println("loaded: " + dirPath + "/" + image.getName());
+			// System.out.println("loaded: " + dirPath + "/" + image.getName());
 			game.assets.load(dirPath + "/" + image.getName(), Texture.class, param);
 		}
 

@@ -414,8 +414,6 @@ public class Skills {
 
 		@Override
 		public void tick() {
-			logger.debug("applied stun");
-			// target.stats.applyStun(90);
 			target.stats.doStunRollAgainst(15, 90);
 			markAsComplete();
 		}
