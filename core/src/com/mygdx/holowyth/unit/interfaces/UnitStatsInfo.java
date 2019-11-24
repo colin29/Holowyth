@@ -63,7 +63,10 @@ public interface UnitStatsInfo {
 
 	float getArmorNegation();
 
-	float getDmgReduction();
+	/**
+	 * Takes on values between 0 and 1. For example, 0.2 is 20% damage reduction from armor
+	 */
+	float getPercentageArmor();
 
 	int getArmorPiercing();
 

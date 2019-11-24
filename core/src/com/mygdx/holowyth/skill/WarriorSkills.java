@@ -19,23 +19,24 @@ public class WarriorSkills {
 		public boolean pluginTargeting(Unit caster) {
 			if (!caster.isAttacking())
 				return false;
-			setEffects(new StunTestEffect(caster, caster.getAttacking()));
+			setEffects(new RageBlowEffect(caster, caster.getAttacking()));
 			return true;
 		}
 	}
 
-	private static class StunTestEffect extends CasterUnitEffect {
-		public StunTestEffect(Unit caster, Unit target) {
+	private static class RageBlowEffect extends CasterUnitEffect {
+		public RageBlowEffect(Unit caster, Unit target) {
 			super(caster, target);
 		}
 
 		@Override
-		public void begin() {
-		}
-
-		@Override
 		public void tick() {
-			target.stats.applyDamage(caster.stats.getDamage() * 3);
+			if (caster.stats.isAttackRollSuccessful(target.stats, 10)) {
+				target.stats.applyDamage(caster.stats.getDamage() * 3);
+			} else {
+				world.getGfx().makeBlockEffect(caster, target);
+			}
+
 			target.stats.doStunRollAgainst(15, 90);
 			markAsComplete();
 		}

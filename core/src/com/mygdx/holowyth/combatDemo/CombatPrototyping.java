@@ -65,6 +65,9 @@ public class CombatPrototyping {
 
 		unit.fortBase = 12;
 
+		unit.armorBase = 2;
+		unit.percentageArmorBase = 0.15f;
+
 	}
 
 	public static void loadPlayerUnitStats(UnitStats unit) {

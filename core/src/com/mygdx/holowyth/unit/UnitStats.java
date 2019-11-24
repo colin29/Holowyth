@@ -52,6 +52,10 @@ public class UnitStats implements UnitStatsInfo {
 	public int maxHpBase, maxSpBase;
 	public int strBase, agiBase, fortBase, perceptBase;
 
+	// Base other attributes
+	public int armorBase, armorPiercingBase; // Mainly for npc monsters and testing, most units have 0
+	public float percentageArmorBase, armorNegationBase;
+
 	// Equips and status
 	private final EquippedItems equip = new EquippedItems();
 	private final List<SlowEffect> slowEffects = new LinkedList<SlowEffect>();
@@ -78,7 +82,7 @@ public class UnitStats implements UnitStatsInfo {
 
 	public UnitStats(Unit unit) {
 		this.self = unit;
-		this.gfx = unit.getWorld().getEffectsHandler();
+		this.gfx = unit.getWorld().getGfx();
 
 		stun = new UnitStun(unit);
 		calc = new UnitStatCalculator(this);
@@ -130,9 +134,6 @@ public class UnitStats implements UnitStatsInfo {
 	private float accChanceFloor = 0.05f;
 	private float accChanceCeiling = 1f;
 
-	private float atkChanceFloor = 0.01f;
-	private float atkChanceCeiling = 1f;
-
 	/**
 	 * Called when an the unit makes an actual strike
 	 * 
@@ -155,9 +156,6 @@ public class UnitStats implements UnitStatsInfo {
 			logger.warn("Cannot attack a dead target");
 			return;
 		}
-		// System.out.printf("%s attacks %s%n", this.name, enemy.name);
-
-		float chanceToHit = 0;
 
 		// Add a slow effect, regardless of block or hit. This is for balancing fleeing enemies without engaging.
 		enemy.applyBasicAttackSlow(0.4f, 90);
@@ -165,7 +163,35 @@ public class UnitStats implements UnitStatsInfo {
 
 		// 2. Simulate block chance
 
-		int atk = getAtk() + getMultiTeamingAtkBonus(enemy) + atkBonus - getReelAtkPenalty();
+		if (!isAttackRollSuccessful(enemy, atkBonus)) {
+			// System.out.printf("%s's attack was blocked by %s %n", this.name, enemy.name);
+			gfx.makeBlockEffect(this.self, enemy.self);
+			return;
+		}
+
+		// 3. Calculate damage and reduction from armor
+
+		float damage = enemy.calculateDamageThroughArmor(getDamage(), getArmorPiercing(), getArmorNegation());
+
+		// 5. Apply damage
+		logger.trace("{}'s attack hit and did {} damage to {}", this.name, DataUtil.getRoundedString(damage), enemy.name);
+
+		enemy.applyDamageIgnoringArmor(damage);
+		if (damage > 0) {
+			enemy.self.interruptCastingAndChannelling();
+		}
+
+	}
+
+	private float atkChanceFloor = 0.01f;
+	private float atkChanceCeiling = 1f;
+
+	/**
+	 * Does an attack roll on enemy and returns whether attack was successful or not
+	 */
+	public boolean isAttackRollSuccessful(UnitStats enemy, int atkBonus) {
+		float chanceToHit;
+		int atk = getAtk() + atkBonus + getMultiTeamingAtkBonus(enemy) - getReelAtkPenalty();
 		int defEnemy = enemy.getDef() - enemy.getStunDefPenalty() - enemy.getReelDefPenalty();
 
 		chanceToHit = (float) (0.4 * (1 + (atk - defEnemy) * 0.05));
@@ -174,35 +200,13 @@ public class UnitStats implements UnitStatsInfo {
 		chanceToHit = Math.max(atkChanceFloor, chanceToHit);
 
 		if (printDetailedCombatInfo) {
-			logger.debug("{} attacks {}", this.name, enemy.name);
-			logger.debug("Hit chance: {} - {} relative attack (+{} from multi-teaming)", getRoundedString(chanceToHit), atk - defEnemy,
+			logger.debug("{} -> {} {}  ({} relative attack) (+{} from multi-teaming)", this.name, enemy.name,
+					getRoundedString(chanceToHit), atk - defEnemy,
 					getMultiTeamingAtkBonus(enemy));
 			// System.out.printf(" -Chance to land hit: %s %n", getRoundedString(chanceToHit), atk - def);
 		}
 
-		if (Math.random() > chanceToHit) {
-			// System.out.printf("%s's attack was blocked by %s %n", this.name, enemy.name);
-			gfx.makeBlockEffect(this.self, enemy.self);
-			return;
-		}
-
-		// 3. Calculate damage and reduction from armor
-		float damageReduced = Math.max(enemy.getArmor() - getArmorPiercing(), getDamage() * enemy.getDmgReduction());
-		damageReduced *= (1 - getArmorNegation());
-
-		float damage = getDamage() - damageReduced;
-
-		if (damage < 0) {
-			damage = 0;
-		}
-
-		// 5. Apply damage
-		logger.debug("{}'s attack hit and did {} damage to {}", this.name, DataUtil.getRoundedString(damage), enemy.name);
-
-		if (enemy.applyDamage(damage) > 0) {
-			enemy.self.interruptCastingAndChannelling();
-		}
-
+		return Math.random() <= chanceToHit;
 	}
 
 	void attackOfOpportunity(UnitStats target) {
@@ -280,18 +284,43 @@ public class UnitStats implements UnitStatsInfo {
 		return stun.isReeled() ? 10 : 0;
 	}
 
-	public float getDamage() {
-		return calc.getDamage();
+	/**
+	 * Note: uses the armor values of this unit
+	 * 
+	 * @return
+	 */
+	public float calculateDamageThroughArmor(float damage, int atkerArmorPiercing, float atkerArmorNegation) {
+		float damageMitgated = Math.max(getArmor() - atkerArmorPiercing, damage * getPercentageArmor());
+		damageMitgated *= (1 - atkerArmorNegation);
+
+		float postArmorDamage = damage - damageMitgated;
+
+		if (postArmorDamage < 0) {
+			postArmorDamage = 0;
+		}
+
+		logger.debug("Damage {} --> {}", damage, postArmorDamage);
+		return postArmorDamage;
 	}
 
 	/**
-	 * Will always apply a damage effect, refactor if you want it different.
+	 * Applies damage with armor dmg reduction as normal
+	 */
+	public void applyDamage(float damage) {
+		applyDamageIgnoringArmor(calculateDamageThroughArmor(damage, 0, 0));
+	}
+
+	public void applyDamage(float damage, int atkerArmorPiercing, float atkerArmorNegation) {
+		applyDamageIgnoringArmor(calculateDamageThroughArmor(damage, atkerArmorPiercing, atkerArmorNegation));
+	}
+
+	/**
+	 * Applies the damage, doesn't do any damage reduction
 	 * 
 	 * @param damage
-	 * @return The amount of damage actually done
+	 * @return
 	 */
-	public float applyDamage(float damage) {
-
+	public void applyDamageIgnoringArmor(float damage) {
 		gfx.makeDamageEffect(damage, self);
 
 		hp -= damage;
@@ -300,8 +329,6 @@ public class UnitStats implements UnitStatsInfo {
 			hp = 0;
 			self.unitDies();
 		}
-
-		return damage;
 	}
 
 	/**
@@ -486,10 +513,11 @@ public class UnitStats implements UnitStatsInfo {
 		s += String.format("Derived stats: Force %d, Stab %d%n", getForce(), getStab());
 		// s += String.format("Derived stats: Atk %d, Def %d, Force %d, Stab %d, Acc %d, Dodge %d%n", atk, def, force,
 		// stab, acc, dodge);
-		/*
-		 * s += "Other stats: \n"; s += String.format(" -Damage %s, AP %d, Armor Negation %s %n", getRoundedString(getUnitAttackDamage()),
-		 * armorPiercing, getAsPercentage(armorNegation)); s += String.format(" -Armor %d, DR %s %n", armor, getAsPercentage(dmgReduction));
-		 */
+
+		s += "Other stats: \n";
+		s += String.format(" -Damage %s, AP %d, Armor Negation %s %n", getRoundedString(getDamage()),
+				getArmorPiercing(), DataUtil.getAsPercentage(getArmorNegation()));
+		s += String.format(" -Armor %d + %s %n", getArmor(), DataUtil.getAsPercentage(getPercentageArmor()));
 
 		if (includeEquipmentInfo) {
 			s += "Equipped Items:\n";
@@ -677,6 +705,10 @@ public class UnitStats implements UnitStatsInfo {
 		return getMoveSpeed() / baseMoveSpeed;
 	}
 
+	public float getDamage() {
+		return calc.getDamage();
+	}
+
 	@Override
 	public int getAtk() {
 		return calc.getAtk();
@@ -738,13 +770,13 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	@Override
-	public int getArmorPiercing() {
-		return calc.getArmorPiercing();
+	public float getPercentageArmor() {
+		return calc.getPercentageArmor();
 	}
 
 	@Override
-	public float getDmgReduction() {
-		return calc.getDmgReduction();
+	public int getArmorPiercing() {
+		return calc.getArmorPiercing();
 	}
 
 	@Override

@@ -24,9 +24,10 @@ public abstract class Effect {
 	}
 
 	/**
-	 * Use for initialization. For consistency, altering the world should happen in tick
+	 * Use for initialization. For order consistency, altering the world should always happen in tick()
 	 */
-	public abstract void begin();
+	public void begin() {
+	}
 
 	public abstract void tick();
 

@@ -76,7 +76,7 @@ public class Skills {
 			for (Unit unit : units) {
 				if (Unit.getDist(caster, unit) <= splashRadius) {
 					if (unit != caster) {
-						unit.stats.applyDamage(damage);
+						unit.stats.applyDamageIgnoringArmor(damage);
 					}
 				}
 			}
@@ -115,10 +115,6 @@ public class Skills {
 		boolean fired;
 
 		@Override
-		public void begin() {
-		}
-
-		@Override
 		public void tick() {
 			applySplashAroundLocation(groundX, groundY, aoeRadius, mainDamage);
 			fired = true;
@@ -131,7 +127,7 @@ public class Skills {
 			for (Unit unit : units) {
 				if (Point.calcDistance(p, unit.getPos()) <= splashRadius) {
 					if (unit != caster) {
-						unit.stats.applyDamage(damage);
+						unit.stats.applyDamageIgnoringArmor(damage);
 					}
 				}
 			}
@@ -190,10 +186,6 @@ public class Skills {
 		static float aoeRadius = 200;
 
 		final float knockbackSpeed = 2;
-
-		@Override
-		public void begin() {
-		}
 
 		@Override
 		public void tick() {
@@ -255,10 +247,6 @@ public class Skills {
 		final float knockbackMagnitude = 2.5f;
 
 		@Override
-		public void begin() {
-		}
-
-		@Override
 		public void tick() {
 			knockBackEnemiesWithinRadius(groundX, groundY, aoeRadius, damage);
 			var units = world.getUnits();
@@ -266,7 +254,7 @@ public class Skills {
 			for (Unit unit : units) {
 				if (Point.calcDistance(effectCenter, unit.getPos()) <= aoeRadius) {
 					if (unit != caster) {
-						unit.stats.applyDamage(damage);
+						unit.stats.applyDamageIgnoringArmor(damage);
 					}
 				}
 			}
@@ -315,7 +303,7 @@ public class Skills {
 		}
 
 		@Override
-		public void begin() {
+		public void tick() {
 			Vector2 targetToPoint = new Vector2(x - target.x, y - target.y);
 
 			final float knockBackSpeed = knockbackSpeedBase * targetToPoint.len() / 100;
@@ -323,10 +311,6 @@ public class Skills {
 
 			target.stats.applyKnockbackStun(60, 60, knockBackVel);
 			markAsComplete();
-		}
-
-		@Override
-		public void tick() {
 		}
 
 	}
@@ -411,10 +395,6 @@ public class Skills {
 	private static class StunTestEffect extends CasterUnitEffect {
 		public StunTestEffect(Unit caster, Unit target) {
 			super(caster, target);
-		}
-
-		@Override
-		public void begin() {
 		}
 
 		@Override

@@ -16,7 +16,7 @@ public interface WorldInfo {
 
 	public PathingModule getPathingModule();
 
-	public EffectsHandler getEffectsHandler();
+	public EffectsHandler getGfx();
 
 	default public void doIfTrueForAllUnits(Predicate<UnitInfo> predicate, Consumer<UnitInfo> task) {
 		for (UnitInfo unit : getUnits()) {

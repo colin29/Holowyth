@@ -516,7 +516,7 @@ public class World implements WorldInfo {
 	}
 
 	@Override
-	public EffectsHandler getEffectsHandler() {
+	public EffectsHandler getGfx() {
 		return gfx;
 	}
 

@@ -10,7 +10,7 @@ public class UnitStatCalculator {
 	private int atk, def, force, stab, acc, dodge;
 
 	private int armor, armorPiercing;
-	private float dmgReduction, armorNegation;
+	private float percentageArmor, armorNegation;
 
 	// Helper Stats (for summing up stat contributions). 'i' stands for interim
 	private int strBonus, agiBonus, fortBonus, perceptBonus;
@@ -89,10 +89,10 @@ public class UnitStatCalculator {
 		acc = levelBonus + iAcc + 2 * (percep - mid);
 		dodge = levelBonus + iDodge + 2 * (agi - mid);
 
-		armor = iArmor;
-		dmgReduction = iDmgReduction;
-		armorPiercing = iArmorPiercing;
-		armorNegation = iArmorNegation;
+		armor = self.armorBase + iArmor;
+		percentageArmor = self.percentageArmorBase + iDmgReduction;
+		armorPiercing = self.armorPiercingBase + iArmorPiercing;
+		armorNegation = self.armorNegationBase + iArmorNegation;
 
 		damage = calcDamage();
 
@@ -194,8 +194,8 @@ public class UnitStatCalculator {
 		return armorPiercing;
 	}
 
-	public float getDmgReduction() {
-		return dmgReduction;
+	public float getPercentageArmor() {
+		return percentageArmor;
 	}
 
 	public float getArmorNegation() {

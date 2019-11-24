@@ -359,8 +359,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 		
 		private boolean isUseSkillAllowed() {
-			return isGeneralOrderAllowed()
-					&& !areSkillsOnCooldown();
+			return isGeneralOrderAllowed();
 		}
 		
 		/**
