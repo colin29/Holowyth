@@ -129,7 +129,11 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	 * AttackUnit can be hard or soft. Hard will chase indefinitely, a soft attack order will stop chasing if the target goes out of range
 	 */
 	public enum Order {
-		MOVE, ATTACKUNIT_HARD, ATTACKUNIT_SOFT, NONE, ATTACKMOVE, RETREAT;
+		MOVE, ATTACKUNIT_HARD, ATTACKUNIT_SOFT, NONE,
+		/**
+		 * If an attacking moving unit has no target it's moving towards its destination. If it does have a target it's chasing that unit.
+		 */
+		ATTACKMOVE, RETREAT;
 
 		public boolean isAttackUnit() {
 			return this == ATTACKUNIT_HARD || this == ATTACKUNIT_SOFT;
@@ -174,10 +178,6 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	public Unit(float x, float y, WorldInfo world, Side side, String name) {
 		this(x, y, world, side);
 		setName(name);
-	}
-
-	public void setName(String name) {
-		this.stats.setName(name);
 	}
 
 	// Orders
@@ -228,22 +228,31 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		return true;
 	}
 
+	/**
+	 * Precondition: Unit is currently attacking a unit
+	 * 
+	 * Units are allowed to switch and attack a new target if that unit is in melee range
+	 */
 	@Override
-	public boolean orderSwitchAttackUnit(UnitOrderable unitOrd, boolean isHardOrder) {
-		Unit unit = (Unit) unitOrd; // underlying objects must hold the same type
+	public boolean orderSwitchAttackUnit(UnitOrderable targetUnitOrd, boolean isHardOrder) {
+		Unit target = (Unit) targetUnitOrd;
 
-		if (!isSwitchAttackOrderAllowed(unit)) {
+		if (!isSwitchAttackOrderAllowed(target)) {
 			return false;
 		}
-		if (unit == this) {
-			System.out.println("Warning: invalid switch attack command (unit can't attack itself)");
+		if (attacking == null) {
+			logger.warn("order SwitchAttack called but unit is not attacking");
+			return false;
+		}
+		if (target == this) {
+			logger.warn("Warning: invalid switch attack command (unit can't attack itself)");
 			return false;
 		}
 
-		if (Point.calcDistance(getPos(), unit.getPos()) <= radius + target.radius + Holo.defaultUnitSwitchEngageRange) {
-			this.currentOrder = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
-			this.target = unit;
-			this.attacking = unit;
+		if (Point.calcDistance(getPos(), target.getPos()) <= radius + target.radius + Holo.defaultUnitSwitchEngageRange) {
+			currentOrder = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
+			this.target = target;
+			attacking = target;
 			return true;
 		}
 		return false;
@@ -497,7 +506,6 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		if (currentOrder.isAttackUnit()) {
 			handleTargetLossAndSwitchingForAttackUnit();
 		} else if (currentOrder == Order.ATTACKMOVE) {
-			// If an attacking moving unit has no target it's moving towards its destination. If it does have a target it's chasing that unit.
 			if (target == null) {
 				aggroOntoNearbyTargetsForAttackMove();
 			}
@@ -506,13 +514,12 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 			}
 		}
 
-		handleEngageAndDisengage();
+		startAttackingIfInRangeForAttackOrders();
+		stopAttackingIfEnemyIsOutOfRange();
 	}
 
 	private void ifIdleAggroOntoNearbyTargets() {
-
 		if (isCompletelyIdle()) {
-
 			var closestTargets = UnitUtil.getTargetsSortedByDistance(this, world);
 			if (!closestTargets.isEmpty()) {
 				UnitOrderable closestEnemy = closestTargets.remove();
@@ -544,19 +551,25 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		}
 	}
 
-	private void handleEngageAndDisengage() {
-		if (currentOrder.isAttackUnit() || isAttackMoveAndHasTarget()) {
+	private void startAttackingIfInRangeForAttackOrders() {
+		if (!isAttacking() && (currentOrder.isAttackUnit() || isAttackMoveAndHasTarget())) {
 			float distToTarget = Point.calcDistance(this.getPos(), target.getPos());
-
-			if (!isAttacking() && distToTarget <= this.radius + target.radius + Holo.defaultUnitEngageRange) {
+			if (distToTarget <= this.radius + target.radius + Holo.defaultUnitEngageRange) {
 				startAttacking(target);
-			} else if (isAttacking(target) && distToTarget >= this.radius + target.radius + Holo.defaultUnitDisengageRange) {
+			}
+		}
+	}
+
+	private void stopAttackingIfEnemyIsOutOfRange() {
+		if (isAttacking()) {
+			float distToEnemy = Point.calcDistance(this.getPos(), attacking.getPos());
+			if (distToEnemy >= this.radius + attacking.radius + Holo.defaultUnitDisengageRange) {
 				stopAttacking();
 			}
 		}
 	}
 
-	boolean isAttackMoveAndHasTarget() {
+	private boolean isAttackMoveAndHasTarget() {
 		return currentOrder == Order.ATTACKMOVE && target != null;
 	}
 
@@ -828,6 +841,9 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 				|| getActiveSkill().getStatus() == Status.CHANNELING);
 	}
 
+	/**
+	 * Not doing any action nor has any order assigned
+	 */
 	@Override
 	public boolean isCompletelyIdle() {
 		return currentOrder == Order.NONE && !isAttacking() && !isCastingOrChanneling();
@@ -856,6 +872,14 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	@Override
 	public float getAttackCooldownRemaining() {
 		return attackCooldownRemaining;
+	}
+
+	public void setName(String name) {
+		this.stats.setName(name);
+	}
+
+	public String getName() {
+		return stats.getName();
 	}
 
 }

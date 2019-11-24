@@ -130,7 +130,7 @@ public class Controls extends InputProcessorAdapter {
 
 		debugValues.add("Movement speed of one unit", () -> {
 			if (selectedUnits.size() == 1) {
-				Unit u = selectedUnits.iterator().next();
+				Unit u = selectedUnits.first();
 				return DataUtil.getAsPercentage(u.stats.getMoveSpeedRatio());
 			} else {
 				return "0";
@@ -138,7 +138,7 @@ public class Controls extends InputProcessorAdapter {
 		});
 		debugValues.add("Current order of one unit", () -> {
 			if (selectedUnits.size() == 1) {
-				Unit u = selectedUnits.iterator().next();
+				Unit u = selectedUnits.first();
 				return u.getCurrentOrder().toString();
 			} else {
 				return "N/A";
@@ -146,8 +146,16 @@ public class Controls extends InputProcessorAdapter {
 		});
 		debugValues.add("Target ID of one unit", () -> {
 			if (selectedUnits.size() == 1) {
-				Unit u = selectedUnits.iterator().next();
+				Unit u = selectedUnits.first();
 				return u.getTarget() != null ? String.valueOf(u.getTarget().getID()) : "null";
+			} else {
+				return "N/A";
+			}
+		});
+		debugValues.add("Attacking of one unit", () -> {
+			if (selectedUnits.size() == 1) {
+				Unit u = selectedUnits.first();
+				return u.getAttacking() != null ? u.getAttacking().getName() : null;
 			} else {
 				return "N/A";
 			}
@@ -737,6 +745,10 @@ public class Controls extends InputProcessorAdapter {
 
 		private static final long serialVersionUID = 1L;
 		private final Set<Unit> selected = new HashSet<Unit>();
+
+		public Unit first() {
+			return selected.iterator().next();
+		}
 
 		@Override
 		public boolean remove(Object u) {
