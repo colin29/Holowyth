@@ -761,7 +761,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	}
 
 	@Override
-	public UnitInfo getAttacking() {
+	public Unit getAttacking() {
 		return attacking;
 	}
 

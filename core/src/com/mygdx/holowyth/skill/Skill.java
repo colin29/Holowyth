@@ -24,6 +24,7 @@ import com.mygdx.holowyth.util.Holo;
 public class Skill implements Cloneable, SkillInfo {
 
 	public float cooldown; // in game frames
+	public float curCooldown;
 
 	public int spCost;
 

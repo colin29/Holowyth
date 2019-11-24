@@ -29,12 +29,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.combatDemo.ui.GameLog;
 import com.mygdx.holowyth.graphics.HoloGL;
-import com.mygdx.holowyth.skill.GroundSkill;
-import com.mygdx.holowyth.skill.NoneSkill;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skills;
-import com.mygdx.holowyth.skill.UnitGroundSkill;
-import com.mygdx.holowyth.skill.UnitSkill;
+import com.mygdx.holowyth.skill.skilltypes.GroundSkill;
+import com.mygdx.holowyth.skill.skilltypes.NoneSkill;
+import com.mygdx.holowyth.skill.skilltypes.UnitGroundSkill;
+import com.mygdx.holowyth.skill.skilltypes.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
@@ -196,7 +196,6 @@ public class Controls extends InputProcessorAdapter {
 			if (curSkill == null) {
 				return;
 			}
-			System.out.println("Using " + curSkill.name);
 
 			if (unit.areSkillsOnCooldown()) {
 				System.out.println(unit.stats.getName() + ": Skills are on cooldown");
@@ -391,8 +390,13 @@ public class Controls extends InputProcessorAdapter {
 		assertExactlyOneUnitSelected();
 		NoneSkill skill = (NoneSkill) this.curSkill;
 		Unit caster = selectedUnits.iterator().next();
-		skill.pluginTargeting(caster);
-		caster.orderUseSkill(skill);
+
+		if (skill.pluginTargeting(caster)) {
+			caster.orderUseSkill(skill);
+		} else {
+			logger.info("Skill '{}' could not be used.", skill.name);
+		}
+
 		clearContext();
 	}
 

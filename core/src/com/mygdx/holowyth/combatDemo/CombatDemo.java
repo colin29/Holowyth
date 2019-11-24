@@ -122,7 +122,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	}
 
 	private void ifTimeElapsedTickWorld() {
-		timer.start(1000 / 60);
+		timer.start(1000 / Holo.GAME_FPS);
 		if (timer.taskReady()) {
 			world.tick();
 			effects.tick();

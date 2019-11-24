@@ -15,6 +15,10 @@ import com.mygdx.holowyth.skill.effect.CasterGroundEffect;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
 import com.mygdx.holowyth.skill.effect.CasterUnitGroundEffect;
 import com.mygdx.holowyth.skill.effect.projectiles.MagicMissileBolt;
+import com.mygdx.holowyth.skill.skilltypes.GroundSkill;
+import com.mygdx.holowyth.skill.skilltypes.NoneSkill;
+import com.mygdx.holowyth.skill.skilltypes.UnitGroundSkill;
+import com.mygdx.holowyth.skill.skilltypes.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -50,8 +54,8 @@ public class Skills {
 
 		@Override
 		public void begin() {
-			x = source.x;
-			y = source.y;
+			x = caster.x;
+			y = caster.y;
 			time = 0;
 		}
 
@@ -68,10 +72,10 @@ public class Skills {
 		}
 
 		public void applySplashAroundLocation(float x, float y, float splashRadius, int damage) {
-			List<Unit> units = source.getWorldMutable().getUnits();
+			List<Unit> units = caster.getWorldMutable().getUnits();
 			for (Unit unit : units) {
-				if (Unit.getDist(source, unit) <= splashRadius) {
-					if (unit != source) {
+				if (Unit.getDist(caster, unit) <= splashRadius) {
+					if (unit != caster) {
 						unit.stats.applyDamage(damage);
 					}
 				}
@@ -94,8 +98,9 @@ public class Skills {
 		}
 
 		@Override
-		public void pluginTargeting(Unit caster) {
+		public boolean pluginTargeting(Unit caster) {
 			setEffects(new StaticShockEffect(caster));
+			return true;
 		}
 	}
 
@@ -120,12 +125,12 @@ public class Skills {
 		}
 
 		public void applySplashAroundLocation(float x, float y, float splashRadius, int damage) {
-			List<Unit> units = source.getWorldMutable().getUnits();
+			List<Unit> units = caster.getWorldMutable().getUnits();
 
 			Point p = new Point(x, y);
 			for (Unit unit : units) {
 				if (Point.calcDistance(p, unit.getPos()) <= splashRadius) {
-					if (unit != source) {
+					if (unit != caster) {
 						unit.stats.applyDamage(damage);
 					}
 				}
@@ -198,12 +203,12 @@ public class Skills {
 
 		public void knockBackEnemiesInRadiusTowardsCenter(float effectX, float effectY, float effectRadius,
 				int damage) {
-			List<Unit> units = source.getWorldMutable().getUnits();
+			List<Unit> units = caster.getWorldMutable().getUnits();
 
 			Point effectCenter = new Point(effectX, effectY);
 			for (Unit unit : units) {
 				if (Point.calcDistance(effectCenter, unit.getPos()) <= effectRadius) {
-					if (unit.getSide() != source.getSide()) {
+					if (unit.getSide() != caster.getSide()) {
 						// knockback the units
 
 						Vector2 unitToEffectCenter = new Vector2(effectX - unit.x, effectY - unit.y);
@@ -260,7 +265,7 @@ public class Skills {
 			Point effectCenter = new Point(groundX, groundY);
 			for (Unit unit : units) {
 				if (Point.calcDistance(effectCenter, unit.getPos()) <= aoeRadius) {
-					if (unit != source) {
+					if (unit != caster) {
 						unit.stats.applyDamage(damage);
 					}
 				}
@@ -271,12 +276,12 @@ public class Skills {
 
 		public void knockBackEnemiesWithinRadius(float effectX, float effectY, float effectRadius,
 				int damage) {
-			List<Unit> units = source.getWorldMutable().getUnits();
+			List<Unit> units = caster.getWorldMutable().getUnits();
 
 			Point effectCenter = new Point(effectX, effectY);
 			for (Unit unit : units) {
 				if (Point.calcDistance(effectCenter, unit.getPos()) <= effectRadius) {
-					if (unit != source) {
+					if (unit != caster) {
 						// knockback the units
 
 						Vector2 unitToEffectCenter = new Vector2(unit.x - effectX, unit.y - effectY);
@@ -360,7 +365,7 @@ public class Skills {
 		public void begin() {
 			missiles = new ArrayList<MagicMissileBolt>();
 			for (int i = 0; i < 3; i++) {
-				missiles.add(new MagicMissileBolt(source.x, source.y + 18 * i, damage, target, source, world.getUnits())); // space the missiles out
+				missiles.add(new MagicMissileBolt(caster.x, caster.y + 18 * i, damage, target, caster, world.getUnits())); // space the missiles out
 			}
 		}
 

@@ -34,7 +34,8 @@ public class CombatPrototyping {
 	public static List<Unit> spawnSomePlayerUnits(World world) {
 
 		var someUnits = new ArrayList<Unit>();
-		someUnits.add(world.spawnUnit(260, 220, Unit.Side.PLAYER));
+		// someUnits.add(world.spawnUnit(260, 220, Unit.Side.PLAYER));
+		someUnits.add(world.spawnUnit(playerPos.x, playerPos.y, Unit.Side.PLAYER));
 
 		// someUnits.add(world.spawnUnit(playerPos.x - 40, playerPos.y, Unit.Side.PLAYER));
 		// someUnits.add(world.spawnUnit(playerPos.x - 40, playerPos.y + 30, Unit.Side.PLAYER));

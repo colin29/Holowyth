@@ -21,6 +21,7 @@ public class Holo {
 	public static String defaultMapName = "UntitledMap";
 	public static int defaultMapWidth = 800;
 	public static int defaultMapHeight = 600;
+	public static final int GAME_FPS = 60;
 
 	// Pathfinding and collision detection
 	public static float defaultUnitMoveSpeed = 0.8f; // world units per frame
@@ -28,6 +29,7 @@ public class Holo {
 																				// collision detection upon collision
 
 	public static final int CELL_SIZE = 15; // size in world units
+
 	public static float UNIT_RADIUS = 13;
 
 	public static boolean largeSize = false; // use larger sized units and faster movement speed for easier debugging in

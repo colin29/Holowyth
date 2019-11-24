@@ -58,8 +58,8 @@ public class UnitStats implements UnitStatsInfo {
 	private final UnitStun stun;
 
 	// test stats
-	public static boolean useTestDamage = true;
-	public static boolean useTestAtkDef = true;
+	public boolean useTestDamage = true;
+	public boolean useTestAtkDef = true;
 	public int testDamage; // If set, the unit will simply do this much base damage instead of using stat and armor calculations
 	public int testAtk;
 	public int testDef;
@@ -186,19 +186,11 @@ public class UnitStats implements UnitStatsInfo {
 			return;
 		}
 
-		float origDamage;
-
-		if (useTestDamage && testDamage != 0) {
-			origDamage = testDamage;
-		} else {
-			origDamage = getUnitDamage();
-		}
-
 		// 3. Calculate damage and reduction from armor
-		float damageReduced = Math.max(enemy.getArmor() - getArmorPiercing(), origDamage * enemy.getDmgReduction());
+		float damageReduced = Math.max(enemy.getArmor() - getArmorPiercing(), getDamage() * enemy.getDmgReduction());
 		damageReduced *= (1 - getArmorNegation());
 
-		float damage = origDamage - damageReduced;
+		float damage = getDamage() - damageReduced;
 
 		if (damage < 0) {
 			damage = 0;
@@ -288,11 +280,8 @@ public class UnitStats implements UnitStatsInfo {
 		return stun.isReeled() ? 10 : 0;
 	}
 
-	public float getUnitDamage() {
-		float weaponDamage = isWieldingAWeapon() ? equip.mainHand.damage : 1;
-		float strengthBonus = (getStr() - 5) * 0.1f;
-
-		return weaponDamage * (1 + strengthBonus);
+	public float getDamage() {
+		return calc.getDamage();
 	}
 
 	/**

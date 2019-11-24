@@ -19,6 +19,7 @@ public class UnitStatCalculator {
 	private float iDmgReduction, iArmorNegation;
 
 	private final UnitStats self;
+	private float damage;
 
 	UnitStatCalculator(UnitStats self) {
 		this.self = self;
@@ -75,7 +76,7 @@ public class UnitStatCalculator {
 		int levelBonus = (self.level) * 2;
 		int mid = 0;
 
-		if (UnitStats.useTestAtkDef) {
+		if (self.useTestAtkDef) {
 			atk = self.testAtk;
 			def = self.testDef;
 		} else {
@@ -92,6 +93,19 @@ public class UnitStatCalculator {
 		dmgReduction = iDmgReduction;
 		armorPiercing = iArmorPiercing;
 		armorNegation = iArmorNegation;
+
+		damage = calcDamage();
+
+	}
+
+	private float calcDamage() {
+		if (self.useTestDamage && self.testDamage != 0) {
+			return self.testDamage;
+		} else {
+			float weaponDamage = self.isWieldingAWeapon() ? self.getEquip().mainHand.damage : 1;
+			float strengthBonus = (getStr() - 5) * 0.1f;
+			return weaponDamage * (1 + strengthBonus);
+		}
 	}
 
 	private void addCoreStatBonusesFor(Item... items) {
@@ -194,6 +208,10 @@ public class UnitStatCalculator {
 
 	public void setMaxSp(int maxSp) {
 		this.maxSp = maxSp;
+	}
+
+	public float getDamage() {
+		return damage;
 	}
 
 }
