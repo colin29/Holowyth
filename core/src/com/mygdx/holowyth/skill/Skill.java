@@ -8,6 +8,7 @@ import com.mygdx.holowyth.skill.effect.CasterEffect;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.exceptions.HoloException;
 
 /**
  * Represents a skill instance that is cast and then produces effects. A skill manages its effects through it's lifetime.
@@ -24,6 +25,15 @@ import com.mygdx.holowyth.util.Holo;
 public class Skill implements Cloneable, SkillInfo {
 
 	public float cooldown; // in game frames
+
+	/**
+	 * The slotted skill that this skill was copied from <br>
+	 * If this is a slotted skill, is null;
+	 */
+	private Skill parent;
+	/**
+	 * Is used for skills held in unit's skill slots, represents the current cooldown of that skill
+	 */
 	public float curCooldown;
 
 	public int spCost;
@@ -97,6 +107,9 @@ public class Skill implements Cloneable, SkillInfo {
 		}
 	}
 
+	/**
+	 * Tick happens every frame, and continues as long as the unit remains casting or channeling the skill
+	 */
 	public void tick() {
 
 		if (status == Status.CASTING) {
@@ -113,7 +126,11 @@ public class Skill implements Cloneable, SkillInfo {
 					return;
 				}
 
-				caster.setSkillCooldown(cooldown);
+				if (parent != null) {
+					parent.curCooldown = cooldown;
+				} else {
+					throw new HoloException("Skill used but parent field false");
+				}
 
 				if (hasChannelingBehaviour) {
 					status = Status.CHANNELING;
@@ -145,6 +162,10 @@ public class Skill implements Cloneable, SkillInfo {
 		} else if (status == Status.CHANNELING) {
 			onChannellingInterrupt();
 		}
+	}
+
+	public void tickCooldown() {
+		curCooldown = Math.max(0, curCooldown - 1);
 	}
 
 	/**
@@ -206,6 +227,14 @@ public class Skill implements Cloneable, SkillInfo {
 	@Override
 	public CastingInfo getCasting() {
 		return casting;
+	}
+
+	public Skill getParent() {
+		return parent;
+	}
+
+	public void setParent(Skill parent) {
+		this.parent = parent;
 	}
 
 }

@@ -43,12 +43,12 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
  * There are four aspects that largely determine a unit's state. They can be independent, but often check each other for legality. <br>
  * For example, some skills might castable while attacking, and a unit could retain certain orders while attacking.
  * 
- * currentOrder -- a unit with an order will continue trying to do something <br>
- * attacking -- a unit attacking is locked in combat and will regularly attack their target <br>
- * activeSkill -- a unit with an active ability is either casting or channelling that ability
+ * <b>currentOrder</b> -- a unit with an order will continue trying to do something <br>
+ * <b>attacking</b> -- a unit attacking is locked in combat and will regularly attack their target <br>
+ * <b>activeSkill</b> -- a unit with an active ability is either casting or channelling that ability <br>
  * 
- * motion.isBeingKnockedBack() -- a unit being knocked back cannot be given new orders or perform any action (it may retain its old order, depending
- * on the type)
+ * <b>motion.isBeingKnockedBack()</b> -- a unit being knocked back cannot be given new orders or perform any action (it may retain its old order,
+ * depending on the type)
  */
 public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
@@ -431,15 +431,17 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		if (activeSkill != null)
 			activeSkill.tick();
 
-		tickSkillCooldown();
+		tickSkillCooldowns();
 		tickRetreatCooldown();
 		tickAttackOfOpportunityCooldown();
 	}
 
-	private void tickSkillCooldown() {
+	private void tickSkillCooldowns() {
 		if (skillCooldownRemaining > 0) {
 			skillCooldownRemaining -= 1;
 		}
+		// tick individual skill Cooldowns too
+		skills.tickSkillCooldowns();
 	}
 
 	private void tickRetreatCooldown() {
@@ -467,24 +469,6 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	 * Does not even require units be alive or in units. For debugging purposes
 	 */
 	private static Map<Integer, Unit> idToUnit = new HashMap<Integer, Unit>();
-
-	/**
-	 * Updates attacking units
-	 */
-	public void tickAttacking() {
-		attackCooldownRemaining = Math.max(0, attackCooldownRemaining - 1); // cooldown ticks even when unit not attacking
-
-		if (isAttacking()) {
-			if (attacking.stats.isDead()) {
-				stopAttacking();
-				return;
-			}
-			if (attackCooldownRemaining <= 0) {
-				this.attack(attacking);
-				attackCooldownRemaining = attackCooldown / getMultiTeamingAtkspdPenalty(attacking);
-			}
-		}
-	}
 
 	/** Handles the complex logic revolving around switching orders and targets */
 	public void tickOrderLogic() {
@@ -644,6 +628,24 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 			return 0.85f;
 		} else { // 4 or more
 			return 0.82f;
+		}
+	}
+
+	/**
+	 * Updates attacking units
+	 */
+	public void tickAttacking() {
+		attackCooldownRemaining = Math.max(0, attackCooldownRemaining - 1); // cooldown ticks even when unit not attacking
+
+		if (isAttacking()) {
+			if (attacking.stats.isDead()) {
+				stopAttacking();
+				return;
+			}
+			if (attackCooldownRemaining <= 0) {
+				this.attack(attacking);
+				attackCooldownRemaining = attackCooldown / getMultiTeamingAtkspdPenalty(attacking);
+			}
 		}
 	}
 

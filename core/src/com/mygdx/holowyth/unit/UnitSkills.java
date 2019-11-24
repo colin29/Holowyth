@@ -49,7 +49,9 @@ public class UnitSkills {
 		}
 
 		try {
-			return (Skill) slot[slotNumber].clone();
+			Skill skill = (Skill) slot[slotNumber].clone();
+			skill.setParent(slot[slotNumber]);
+			return skill;
 		} catch (CloneNotSupportedException e) {
 			throw new HoloException(e);
 		}
@@ -61,6 +63,16 @@ public class UnitSkills {
 	 */
 	public Skill[] getSkillSlots() {
 		return slot;
+	}
+
+	public void tickSkillCooldowns() {
+		for (int i = 1; i <= 10; i++) {
+			var skill = slot[i];
+			if (skill != null) {
+				skill.tickCooldown();
+			}
+		}
+
 	}
 
 }

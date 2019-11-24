@@ -206,7 +206,11 @@ public class Controls extends InputProcessorAdapter {
 			}
 
 			if (unit.areSkillsOnCooldown() && !Holo.debugSkillCooldownDisabled) {
-				System.out.println(unit.stats.getName() + ": Skills are on cooldown");
+				logger.info("{}: Skills are on cooldown", unit.getName());
+				return;
+			}
+			if (curSkill.getParent().curCooldown > 0) {
+				logger.info("{} is on cooldown", curSkill.name);
 				return;
 			}
 
