@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.skill.skillsandeffects.RangerSkills;
 import com.mygdx.holowyth.skill.skillsandeffects.Skills;
 import com.mygdx.holowyth.skill.skillsandeffects.WarriorSkills;
 import com.mygdx.holowyth.util.exceptions.HoloException;
@@ -26,10 +27,11 @@ public class UnitSkills {
 	{
 		slot[1] = new Skills.StunTestSkill();
 		slot[2] = new Skills.MagicMissile();
-		slot[3] = new WarriorSkills.RageBlowSkill();
-		slot[4] = new Skills.NovaFlare();
+		slot[3] = new WarriorSkills.RageBlow();
+		slot[4] = new RangerSkills.CrossSlash();
 		slot[5] = new Skills.ForcePush();
 		slot[6] = new Skills.StaticShock();
+		slot[7] = new Skills.NovaFlare();
 	}
 
 	/**

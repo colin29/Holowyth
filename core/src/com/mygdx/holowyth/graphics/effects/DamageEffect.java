@@ -11,10 +11,14 @@ import com.mygdx.holowyth.util.dataobjects.Point;
  */
 public class DamageEffect {
 
-	private static int duration = 110;
-	private static float initialVelocity = 0.4f;
+	private static int standardDuration = 110;
+	private static float standardInitialSpeed = 0.4f;
 
-	private int durationLeft = duration;
+	protected int fullOpacityDuration;
+
+	protected float initialSpeed;
+	protected int duration;
+	protected int durationLeft;
 
 	String text;
 	float origX, origY;
@@ -34,6 +38,9 @@ public class DamageEffect {
 		this.origY = y;
 		this.x = x;
 		this.y = y;
+		setStartingDuration(standardDuration);
+		setInitialSpeed(standardInitialSpeed);
+		fullOpacityDuration = duration / 3;
 	}
 
 	DamageEffect(String text, Point pos) {
@@ -60,18 +67,16 @@ public class DamageEffect {
 		y += getCurrentVelocity();
 	}
 
-	private float getCurrentVelocity() {
-		float ratio = Math.max(0, (durationLeft - 25.0f) / duration);
-		return initialVelocity * ratio;
+	protected float getCurrentVelocity() {
+		float ratio = Math.max(0, (durationLeft - 25.0f) / standardDuration);
+		return initialSpeed * ratio;
 	}
 
-	private static float fullOpacityDuration = duration / 3.0f;
-
 	public float getCurrentOpacity() {
-		if (durationLeft >= duration - fullOpacityDuration) {
+		if (durationLeft >= standardDuration - fullOpacityDuration) {
 			return 1;
 		} else {
-			return durationLeft / (duration - fullOpacityDuration);
+			return durationLeft / (float) (standardDuration - fullOpacityDuration);
 		}
 	}
 
@@ -81,6 +86,15 @@ public class DamageEffect {
 
 	public boolean isUsingPreset() {
 		return presetType != null;
+	}
+
+	protected void setStartingDuration(int value) {
+		duration = value;
+		durationLeft = duration;
+	}
+
+	protected void setInitialSpeed(float value) {
+		initialSpeed = value;
 	}
 
 }

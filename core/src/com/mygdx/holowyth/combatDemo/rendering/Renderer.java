@@ -31,7 +31,7 @@ import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.Skill.Status;
 import com.mygdx.holowyth.skill.SkillInfo;
 import com.mygdx.holowyth.skill.effect.Effect;
-import com.mygdx.holowyth.skill.skilltypes.GroundSkill;
+import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;

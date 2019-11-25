@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.skill.skilltypes;
+package com.mygdx.holowyth.skill.skill;
 
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.unit.Unit;

@@ -90,19 +90,15 @@ public class EffectsHandler {
 		}
 	}
 
-	/**
-	 * 
-	 * @param damage
-	 * @param unit
-	 *            The unit which is taking damage
-	 */
-	public void makeDamageEffect(float damage, UnitInfo unit) {
+	public boolean useScatteringDamageEffect = false;
 
+	public void makeDamageEffect(float damage, UnitInfo unit, boolean useScatteringDamageEffect) {
 		PresetType damageEffectType = unit.isAPlayerCharacter() ? PresetType.PLAYER : PresetType.ENEMY;
-
-		float x = unit.getX();
-		float y = unit.getY() + unit.getRadius() / 2;
-		damageEffects.add(new DamageEffect(DataUtil.getFullyRoundedString(damage), unit.getPos(), damageEffectType));
+		if (useScatteringDamageEffect) {
+			damageEffects.add(new FastDamageEffect(DataUtil.getFullyRoundedString(damage), unit.getPos(), damageEffectType));
+		} else {
+			damageEffects.add(new DamageEffect(DataUtil.getFullyRoundedString(damage), unit.getPos(), damageEffectType));
+		}
 	}
 
 	/**

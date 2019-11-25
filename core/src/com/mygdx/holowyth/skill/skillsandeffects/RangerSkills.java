@@ -3,25 +3,23 @@ package com.mygdx.holowyth.skill.skillsandeffects;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
 import com.mygdx.holowyth.unit.Unit;
 
-public class WarriorSkills {
-
-	public static class RageBlow extends NoneSkill {
-		public RageBlow() {
+public class RangerSkills {
+	public static class CrossSlash extends NoneSkill {
+		public CrossSlash() {
 			super();
-			name = "Rage Blow";
-			casting.castTime = 60 * 0.8f;
+			name = "Cross Slash";
+			casting.castTime = 60 * 0.5f;
 			casting.isInterruptedByDamageOrReel = false;
-			spCost = 8;
-			cooldown = 60 * 15;
+			spCost = 14;
+			cooldown = 60 * 10;
 		}
 
 		@Override
 		public boolean pluginTargeting(Unit caster) {
 			if (!caster.isAttacking())
 				return false;
-			setEffects(new WarriorEffects.RageBlowEffect(caster, caster.getAttacking()));
+			setEffects(new RangerEffects.CrossSlashEffect(caster, caster.getAttacking()));
 			return true;
 		}
 	}
-
 }

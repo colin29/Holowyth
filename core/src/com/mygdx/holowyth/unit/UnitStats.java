@@ -307,11 +307,23 @@ public class UnitStats implements UnitStatsInfo {
 	 * Applies damage with armor dmg reduction as normal
 	 */
 	public void applyDamage(float damage) {
-		applyDamageIgnoringArmor(calculateDamageThroughArmor(damage, 0, 0));
+		applyDamage(damage, false);
+	}
+
+	public void applyDamage(float damage, boolean useScatteringDamageEffect) {
+		applyDamage(damage, 0, 0, useScatteringDamageEffect);
 	}
 
 	public void applyDamage(float damage, int atkerArmorPiercing, float atkerArmorNegation) {
-		applyDamageIgnoringArmor(calculateDamageThroughArmor(damage, atkerArmorPiercing, atkerArmorNegation));
+		applyDamage(damage, atkerArmorPiercing, atkerArmorNegation, false);
+	}
+
+	public void applyDamage(float damage, int atkerArmorPiercing, float atkerArmorNegation, boolean useScatteringDamageEffect) {
+		applyDamageIgnoringArmor(calculateDamageThroughArmor(damage, atkerArmorPiercing, atkerArmorNegation), useScatteringDamageEffect);
+	}
+
+	public void applyDamageIgnoringArmor(float damage) {
+		applyDamageIgnoringArmor(damage, false);
 	}
 
 	/**
@@ -320,8 +332,8 @@ public class UnitStats implements UnitStatsInfo {
 	 * @param damage
 	 * @return
 	 */
-	public void applyDamageIgnoringArmor(float damage) {
-		gfx.makeDamageEffect(damage, self);
+	public void applyDamageIgnoringArmor(float damage, boolean useScatteringDamageEffect) {
+		gfx.makeDamageEffect(damage, self, useScatteringDamageEffect);
 
 		hp -= damage;
 

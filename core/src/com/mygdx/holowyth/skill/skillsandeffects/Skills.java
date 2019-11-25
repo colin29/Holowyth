@@ -3,6 +3,10 @@ package com.mygdx.holowyth.skill.skillsandeffects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mygdx.holowyth.skill.skill.GroundSkill;
+import com.mygdx.holowyth.skill.skill.NoneSkill;
+import com.mygdx.holowyth.skill.skill.UnitGroundSkill;
+import com.mygdx.holowyth.skill.skill.UnitSkill;
 import com.mygdx.holowyth.skill.skillsandeffects.Effects.ExplosionEffect;
 import com.mygdx.holowyth.skill.skillsandeffects.Effects.ForcePushEffect;
 import com.mygdx.holowyth.skill.skillsandeffects.Effects.ImplosionEffect;
@@ -10,10 +14,6 @@ import com.mygdx.holowyth.skill.skillsandeffects.Effects.MagicMissileEffect;
 import com.mygdx.holowyth.skill.skillsandeffects.Effects.NovaFlareEffect;
 import com.mygdx.holowyth.skill.skillsandeffects.Effects.StaticShockEffect;
 import com.mygdx.holowyth.skill.skillsandeffects.Effects.StunTestEffect;
-import com.mygdx.holowyth.skill.skilltypes.GroundSkill;
-import com.mygdx.holowyth.skill.skilltypes.NoneSkill;
-import com.mygdx.holowyth.skill.skilltypes.UnitGroundSkill;
-import com.mygdx.holowyth.skill.skilltypes.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
 
 /**
