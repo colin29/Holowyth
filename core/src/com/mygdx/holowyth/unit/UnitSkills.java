@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.skill.Skill;
-import com.mygdx.holowyth.skill.Skills;
-import com.mygdx.holowyth.skill.WarriorSkills;
+import com.mygdx.holowyth.skill.skillsandeffects.Skills;
+import com.mygdx.holowyth.skill.skillsandeffects.WarriorSkills;
 import com.mygdx.holowyth.util.exceptions.HoloException;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 

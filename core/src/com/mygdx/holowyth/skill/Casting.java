@@ -11,10 +11,16 @@ import com.mygdx.holowyth.util.Holo;
  */
 public class Casting implements Cloneable, CastingInfo {
 
-	float castTime = 0; // by default, cast time of 0
-	float castTimeRemaining;
+	/**
+	 * By default, cast time of 0. Cast-time zero spells will finish casting on the same frame as started so interruptibility are irrelevant
+	 * 
+	 */
+	public float castTime = 0;
+	public float castTimeRemaining;
 
 	private boolean completed = false;
+
+	public boolean isInterruptedByDamageOrReel = true;
 
 	Skill parent;
 

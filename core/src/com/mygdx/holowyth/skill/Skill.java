@@ -153,13 +153,22 @@ public class Skill implements Cloneable, SkillInfo {
 
 	}
 
-	public void interrupt() {
-		System.out.println("Interrupted: " + this.name);
-		status = Status.DONE;
-		caster.setActiveSkill(null);
+	/**
+	 * If the interrupt goes through, will clear the current skill of unit
+	 * 
+	 * @param isHardInterrupt
+	 */
+	public void interrupt(boolean isHardInterrupt) {
+
 		if (status == Status.CASTING) {
-			casting.onInterrupt();
+			if (isHardInterrupt || casting.isInterruptedByDamageOrReel) {
+				System.out.println("Interrupted: " + this.name);
+				status = Status.DONE;
+				caster.setActiveSkill(null);
+				casting.onInterrupt();
+			}
 		} else if (status == Status.CHANNELING) {
+			caster.setActiveSkill(null);
 			onChannellingInterrupt();
 		}
 	}

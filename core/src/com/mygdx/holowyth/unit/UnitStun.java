@@ -171,7 +171,7 @@ class UnitStun {
 		self.motion.stopCurrentMovement();
 		self.clearOrder();
 		self.stopAttacking();
-		self.interruptCastingAndChannelling();
+		self.interruptHard();
 
 		state = State.STUNNED;
 		stunDurationRemaining = duration;
@@ -180,7 +180,7 @@ class UnitStun {
 	private void beginReel(float duration) {
 
 		// reeling doesn't interrupt attacking or motion, unlike stun
-		self.interruptCastingAndChannelling();
+		self.interruptNormal();
 
 		state = State.REELED;
 		reelDurationRemaining = duration;

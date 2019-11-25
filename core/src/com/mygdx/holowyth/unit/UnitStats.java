@@ -178,7 +178,7 @@ public class UnitStats implements UnitStatsInfo {
 
 		enemy.applyDamageIgnoringArmor(damage);
 		if (damage > 0) {
-			enemy.self.interruptCastingAndChannelling();
+			enemy.self.interruptNormal();
 		}
 
 	}

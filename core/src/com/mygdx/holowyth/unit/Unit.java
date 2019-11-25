@@ -405,11 +405,20 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * Caused by normal attacking or stun effects. Interrupts any casting or channeling spell
+	 * Normal interrupts are caused by damage and reel. Some skills, particularly melee skills, are not interrupt by this.
 	 */
-	public void interruptCastingAndChannelling() {
+	public void interruptNormal() {
 		if (isCasting() || isChannelling()) {
-			activeSkill.interrupt();
+			activeSkill.interrupt(false);
+		}
+	}
+
+	/**
+	 * Hard interrupts are caused by stun / knockback
+	 */
+	public void interruptHard() {
+		if (isCasting() || isChannelling()) {
+			activeSkill.interrupt(true);
 		}
 	}
 

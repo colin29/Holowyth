@@ -1,10 +1,7 @@
-package com.mygdx.holowyth.skill;
+package com.mygdx.holowyth.skill.skillsandeffects;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
@@ -15,30 +12,18 @@ import com.mygdx.holowyth.skill.effect.CasterGroundEffect;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
 import com.mygdx.holowyth.skill.effect.CasterUnitGroundEffect;
 import com.mygdx.holowyth.skill.effect.projectiles.MagicMissileBolt;
-import com.mygdx.holowyth.skill.skilltypes.GroundSkill;
-import com.mygdx.holowyth.skill.skilltypes.NoneSkill;
-import com.mygdx.holowyth.skill.skilltypes.UnitGroundSkill;
-import com.mygdx.holowyth.skill.skilltypes.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
-/**
- * Static class that holds a collection of skills as well as their associated effects
- * 
- * @author Colin Ta
- *
- */
-public class Skills {
-
-	protected static Logger logger = LoggerFactory.getLogger(Skills.class);
+public class Effects {
 
 	/**
 	 * Deals damage to all units in a radius around the caster
 	 * 
 	 * @param unit
 	 */
-	private static class StaticShockEffect extends CasterEffect {
+	static class StaticShockEffect extends CasterEffect {
 		public StaticShockEffect(Unit caster) {
 			super(caster);
 		}
@@ -87,24 +72,9 @@ public class Skills {
 			return secondaryExplosionFired;
 		}
 
-	};
-
-	public static class StaticShock extends NoneSkill {
-		public StaticShock() {
-			super();
-			name = "Static Shock";
-			spCost = 10;
-			cooldown = 60;
-		}
-
-		@Override
-		public boolean pluginTargeting(Unit caster) {
-			setEffects(new StaticShockEffect(caster));
-			return true;
-		}
 	}
 
-	private static class ExplosionEffect extends CasterGroundEffect {
+	static class ExplosionEffect extends CasterGroundEffect {
 		public ExplosionEffect(Unit caster, float x, float y) {
 			super(caster, x, y);
 		}
@@ -137,47 +107,9 @@ public class Skills {
 		public boolean isComplete() {
 			return fired;
 		}
-	};
-
-	public static class Explosion extends GroundSkill {
-		public Explosion() {
-			super();
-			name = "Explosion";
-			casting.castTime = 60;
-			spCost = 10;
-			cooldown = 20;
-			aimingHelperRadius = ExplosionEffect.aoeRadius;
-		}
-
-		@Override
-		public void pluginTargeting(Unit caster, float x, float y) {
-			setEffects(new ExplosionEffect(caster, x, y));
-		}
 	}
 
-	/**
-	 * Skill that knocks back nearby enemies towards the focal point
-	 * 
-	 * @author Colin Ta
-	 *
-	 */
-	public static class Implosion extends GroundSkill {
-		public Implosion() {
-			super();
-			name = "Implosion";
-			casting.castTime = 0;
-			spCost = 0;
-			cooldown = 20;
-			aimingHelperRadius = ImplosionEffect.aoeRadius;
-		}
-
-		@Override
-		public void pluginTargeting(Unit caster, float x, float y) {
-			setEffects(new ImplosionEffect(caster, x, y));
-		}
-	}
-
-	private static class ImplosionEffect extends CasterGroundEffect {
+	static class ImplosionEffect extends CasterGroundEffect {
 		public ImplosionEffect(Unit caster, float x, float y) {
 			super(caster, x, y);
 		}
@@ -214,29 +146,7 @@ public class Skills {
 
 	};
 
-	/**
-	 * Skill that knocks back nearby enemies towards the focal point
-	 * 
-	 * @author Colin Ta
-	 *
-	 */
-	public static class NovaFlare extends GroundSkill {
-		public NovaFlare() {
-			super();
-			name = "Nova Flare";
-			casting.castTime = 200;
-			spCost = 10;
-			cooldown = 20;
-			aimingHelperRadius = NovaFlareEffect.aoeRadius;
-		}
-
-		@Override
-		public void pluginTargeting(Unit caster, float x, float y) {
-			setEffects(new NovaFlareEffect(caster, x, y));
-		}
-	}
-
-	private static class NovaFlareEffect extends CasterGroundEffect {
+	static class NovaFlareEffect extends CasterGroundEffect {
 		public NovaFlareEffect(Unit caster, float x, float y) {
 			super(caster, x, y);
 		}
@@ -283,18 +193,7 @@ public class Skills {
 
 	};
 
-	public static class ForcePush extends UnitGroundSkill {
-		{
-			name = "Force Push";
-		}
-
-		@Override
-		public void pluginTargeting(Unit caster, Unit target, float x, float y) {
-			setEffects(new ForcePushEffect(caster, target, x, y));
-		}
-	}
-
-	public static class ForcePushEffect extends CasterUnitGroundEffect {
+	static class ForcePushEffect extends CasterUnitGroundEffect {
 
 		final float knockbackSpeedBase = 1.2f;
 
@@ -315,27 +214,7 @@ public class Skills {
 
 	}
 
-	/**
-	 * 
-	 * @author Colin Ta
-	 *
-	 */
-	public static class MagicMissile extends UnitSkill {
-		public MagicMissile() {
-			super();
-			name = "Magic Missile";
-			casting.castTime = 0;
-			spCost = 10;
-			cooldown = 5;
-		}
-
-		@Override
-		public void pluginTargeting(Unit caster, Unit target) {
-			setEffects(new MagicMissileEffect(caster, target));
-		}
-	}
-
-	private static class MagicMissileEffect extends CasterUnitEffect {
+	static class MagicMissileEffect extends CasterUnitEffect {
 		public MagicMissileEffect(Unit caster, Unit target) {
 			super(caster, target);
 		}
@@ -377,22 +256,7 @@ public class Skills {
 
 	};
 
-	public static class StunTestSkill extends UnitSkill {
-		public StunTestSkill() {
-			super();
-			name = "StunTestSkill";
-			casting.castTime = 0;
-			spCost = 10;
-			cooldown = 5;
-		}
-
-		@Override
-		public void pluginTargeting(Unit caster, Unit target) {
-			setEffects(new StunTestEffect(caster, target));
-		}
-	}
-
-	private static class StunTestEffect extends CasterUnitEffect {
+	static class StunTestEffect extends CasterUnitEffect {
 		public StunTestEffect(Unit caster, Unit target) {
 			super(caster, target);
 		}

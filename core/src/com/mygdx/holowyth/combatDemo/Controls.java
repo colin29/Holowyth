@@ -30,7 +30,7 @@ import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.combatDemo.ui.GameLog;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.Skill;
-import com.mygdx.holowyth.skill.Skills;
+import com.mygdx.holowyth.skill.skillsandeffects.Skills;
 import com.mygdx.holowyth.skill.skilltypes.GroundSkill;
 import com.mygdx.holowyth.skill.skilltypes.NoneSkill;
 import com.mygdx.holowyth.skill.skilltypes.UnitGroundSkill;
@@ -209,7 +209,7 @@ public class Controls extends InputProcessorAdapter {
 				logger.info("{}: Skills are on cooldown", unit.getName());
 				return;
 			}
-			if (curSkill.getParent().curCooldown > 0) {
+			if (curSkill.getParent().curCooldown > 0 && !Holo.debugSkillCooldownDisabled) {
 				logger.info("{} is on cooldown", curSkill.name);
 				return;
 			}

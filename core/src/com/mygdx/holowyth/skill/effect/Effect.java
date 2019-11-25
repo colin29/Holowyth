@@ -25,6 +25,9 @@ public abstract class Effect {
 
 	/**
 	 * Use for initialization. For order consistency, altering the world should always happen in tick()
+	 * 
+	 * This seperate method is needed because Effect is initialized when targeting is plugged in: when skill is used. <br>
+	 * But begin() is called when the effect is about to be added to world: after any casting is done.
 	 */
 	public void begin() {
 	}
