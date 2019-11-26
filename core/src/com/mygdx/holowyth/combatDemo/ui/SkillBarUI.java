@@ -3,14 +3,21 @@ package com.mygdx.holowyth.combatDemo.ui;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mygdx.holowyth.combatDemo.Controls;
 import com.mygdx.holowyth.combatDemo.Controls.ControlsListener;
+import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
+import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
 /**
@@ -71,23 +78,74 @@ public class SkillBarUI {
 		root.add(skillBar);
 
 		skillBar.row().size(50).space(10);
+		skillBar.pad(20);
 
 		Skill[] skills = unit.getSkills().getSkillSlots();
 
 		for (int i = 1; i <= 8; i++) {
-			var button = new TextButton("(" + i + ")", skin);
-			skillBar.add(button);
 
+			// Make button
+			var button = new TextButton("(" + i + ")", skin);
 			Skill skill = skills[i];
 			if (skill == null)
 				continue;
+
+			skillBar.add(button);
 			String skillText = "(" + i + ")\n" + skill.name.substring(0, 5);
 			button.setText(skillText);
 			button.getLabel().setWrap(true);
 
+			// Make Hover Panel
+			final Table hoverPanel = new Table();
+			hoverPanel.defaults().width(200);
+
+			var headerRow = new Label(skill.name + "    " + skill.spCost + " sp", skin);
+			headerRow.setWrap(true);
+			hoverPanel.add(headerRow);
+
+			hoverPanel.row();
+			var description = new Label(skill.getDescription(), skin);
+			description.setWrap(true);
+			hoverPanel.add(description);
+
+			hoverPanel.pad(4);
+			hoverPanel.pack();
+
+			hoverPanel.setBackground(HoloUI.getSolidBG(HoloGL.rgb(0, 0, 0, 0.5f)));
+
+			// stage.setDebugAll(true);
+			stage.addActor(hoverPanel);
+			hoverPanel.setVisible(false);
+
+			button.addListener(new ClickListener() {
+				@Override
+				public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+					super.enter(event, x, y, pointer, fromActor);
+
+					Vector2 buttonPos = button.localToStageCoordinates(new Vector2(0, 0));
+					logger.debug("button pos: {} {}", buttonPos.x, buttonPos.y);
+					hoverPanel.setPosition(buttonPos.x, buttonPos.y + 50);
+					hoverPanel.setVisible(true);
+				}
+
+				@Override
+				public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+					super.exit(event, x, y, pointer, toActor);
+					hoverPanel.setVisible(false);
+				}
+
+			});
+
 		}
 
-		skillBar.pad(20);
+	}
+
+	static class SkillButton extends TextButton {
+
+		public SkillButton(String text, Skin skin, Skill skill) {
+			super(text, skin);
+
+		}
 
 	}
 

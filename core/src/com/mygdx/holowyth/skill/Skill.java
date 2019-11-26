@@ -246,4 +246,8 @@ public class Skill implements Cloneable, SkillInfo {
 		this.parent = parent;
 	}
 
+	public String getDescription() {
+		return "no description";
+	}
+
 }

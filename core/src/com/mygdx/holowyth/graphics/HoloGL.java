@@ -197,6 +197,10 @@ public class HoloGL {
 		return new Color((float) r / 256, (float) g / 256, (float) b / 256, 1);
 	}
 
+	public static Color rgb(int r, int g, int b, float a) {
+		return new Color((float) r / 256, (float) g / 256, (float) b / 256, a);
+	}
+
 	public static ShapeRenderer getShapeRenderer() {
 		return shapeRenderer;
 	}

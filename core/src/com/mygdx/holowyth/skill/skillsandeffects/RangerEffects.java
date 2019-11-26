@@ -10,9 +10,9 @@ public class RangerEffects {
 		}
 
 		int framesElapsed = 0;
-		int secondStrikeDelay = 60 / 2;
-		int delayBetweenStrikesInX = 6;
-
+		static int secondStrikeDelay = 60 / 2;
+		static int delayBetweenStrikesInX = 6;
+		static float strikeDamage = 8;
 		boolean attackHits;
 
 		@Override
@@ -28,7 +28,7 @@ public class RangerEffects {
 						framesElapsed == delayBetweenStrikesInX ||
 						framesElapsed == secondStrikeDelay ||
 						framesElapsed == secondStrikeDelay + delayBetweenStrikesInX) {
-					target.stats.applyDamage(8, true);
+					target.stats.applyDamage(strikeDamage, true);
 				}
 			} else {
 				if (framesElapsed == delayBetweenStrikesInX) {
