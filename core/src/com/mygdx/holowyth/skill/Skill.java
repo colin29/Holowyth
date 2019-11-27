@@ -148,7 +148,6 @@ public class Skill implements Cloneable, SkillInfo {
 
 		if (status == Status.DONE) {
 			caster.setActiveSkill(null);
-			System.out.printf("Skill %s finished. %n", this.name);
 		}
 
 	}

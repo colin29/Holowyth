@@ -123,7 +123,6 @@ public class SkillBarUI {
 					super.enter(event, x, y, pointer, fromActor);
 
 					Vector2 buttonPos = button.localToStageCoordinates(new Vector2(0, 0));
-					logger.debug("button pos: {} {}", buttonPos.x, buttonPos.y);
 					hoverPanel.setPosition(buttonPos.x, buttonPos.y + 50);
 					hoverPanel.setVisible(true);
 				}

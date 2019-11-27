@@ -43,7 +43,7 @@ public class CombatPrototyping {
 		// someUnits.add(world.spawnUnit(188, 197, Unit.Side.PLAYER));
 
 		for (Unit unit : someUnits) {
-			unit.setName("Player-char");
+			unit.setName("Player");
 			loadPlayerUnitStats(unit.stats);
 			unit.stats.prepareUnit();
 		}

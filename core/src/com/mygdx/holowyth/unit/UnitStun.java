@@ -127,7 +127,7 @@ class UnitStun {
 	/**
 	 * 
 	 */
-	void applyReel(float duration) {
+	void applyReel(float duration, float maxDuration) {
 		if (duration < 0) {
 			logger.warn("tried to apply reel of negative duration");
 			return;

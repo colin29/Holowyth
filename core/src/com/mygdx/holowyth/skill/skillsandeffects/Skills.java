@@ -7,13 +7,6 @@ import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
 import com.mygdx.holowyth.skill.skill.UnitGroundSkill;
 import com.mygdx.holowyth.skill.skill.UnitSkill;
-import com.mygdx.holowyth.skill.skillsandeffects.Effects.ExplosionEffect;
-import com.mygdx.holowyth.skill.skillsandeffects.Effects.ForcePushEffect;
-import com.mygdx.holowyth.skill.skillsandeffects.Effects.ImplosionEffect;
-import com.mygdx.holowyth.skill.skillsandeffects.Effects.MagicMissileEffect;
-import com.mygdx.holowyth.skill.skillsandeffects.Effects.NovaFlareEffect;
-import com.mygdx.holowyth.skill.skillsandeffects.Effects.StaticShockEffect;
-import com.mygdx.holowyth.skill.skillsandeffects.Effects.StunTestEffect;
 import com.mygdx.holowyth.unit.Unit;
 
 /**
@@ -111,26 +104,6 @@ public class Skills {
 		@Override
 		public void pluginTargeting(Unit caster, Unit target, float x, float y) {
 			setEffects(new Effects.ForcePushEffect(caster, target, x, y));
-		}
-	}
-
-	/**
-	 * 
-	 * @author Colin Ta
-	 *
-	 */
-	public static class MagicMissile extends UnitSkill {
-		public MagicMissile() {
-			super();
-			name = "Magic Missile";
-			casting.castTime = 0;
-			spCost = 10;
-			cooldown = 5;
-		}
-
-		@Override
-		public void pluginTargeting(Unit caster, Unit target) {
-			setEffects(new Effects.MagicMissileEffect(caster, target));
 		}
 	}
 

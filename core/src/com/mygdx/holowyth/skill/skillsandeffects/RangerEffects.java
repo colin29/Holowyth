@@ -32,7 +32,7 @@ public class RangerEffects {
 				}
 			} else {
 				if (framesElapsed == delayBetweenStrikesInX) {
-					target.stats.applyReel(60 * 3);
+					target.stats.doReelRollAgainst(15, 60 * 3);
 				}
 			}
 

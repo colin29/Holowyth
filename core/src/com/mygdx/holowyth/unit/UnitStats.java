@@ -32,7 +32,7 @@ public class UnitStats implements UnitStatsInfo {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	public static boolean printDetailedCombatInfo = true;
+	public static boolean logBasicAttackInfo = false;
 
 	public final Unit self;
 
@@ -163,7 +163,7 @@ public class UnitStats implements UnitStatsInfo {
 
 		// 2. Simulate block chance
 
-		if (!isAttackRollSuccessful(enemy, atkBonus)) {
+		if (!isAttackRollSuccessful(enemy, atkBonus, false)) {
 			// System.out.printf("%s's attack was blocked by %s %n", this.name, enemy.name);
 			gfx.makeBlockEffect(this.self, enemy.self);
 			return;
@@ -186,10 +186,14 @@ public class UnitStats implements UnitStatsInfo {
 	private float atkChanceFloor = 0.01f;
 	private float atkChanceCeiling = 1f;
 
+	public boolean isAttackRollSuccessful(UnitStats enemy, int atkBonus) {
+		return isAttackRollSuccessful(enemy, atkBonus, true);
+	}
+
 	/**
 	 * Does an attack roll on enemy and returns whether attack was successful or not
 	 */
-	public boolean isAttackRollSuccessful(UnitStats enemy, int atkBonus) {
+	public boolean isAttackRollSuccessful(UnitStats enemy, int atkBonus, boolean isSkill) {
 		float chanceToHit;
 		int atk = getAtk() + atkBonus + getMultiTeamingAtkBonus(enemy) - getReelAtkPenalty();
 		int defEnemy = enemy.getDef() - enemy.getStunDefPenalty() - enemy.getReelDefPenalty();
@@ -199,11 +203,16 @@ public class UnitStats implements UnitStatsInfo {
 		chanceToHit = Math.min(atkChanceCeiling, chanceToHit);
 		chanceToHit = Math.max(atkChanceFloor, chanceToHit);
 
-		if (printDetailedCombatInfo) {
-			logger.debug("{} -> {} {}  ({} relative attack) (+{} from multi-teaming)", this.name, enemy.name,
-					getRoundedString(chanceToHit), atk - defEnemy,
-					getMultiTeamingAtkBonus(enemy));
-			// System.out.printf(" -Chance to land hit: %s %n", getRoundedString(chanceToHit), atk - def);
+		if (isSkill) {
+			logger.debug("Skill atk roll: {}->{} {} {} ({} relative attack)", this.name, enemy.name,
+					Math.random() <= chanceToHit ? "SUCCESS" : "FAILURE",
+					getRoundedString(chanceToHit), atk - defEnemy);
+		} else {
+			if (logBasicAttackInfo) {
+				logger.debug("{} -> {} {}  ({} relative attack) (+{} from multi-teaming)", this.name, enemy.name,
+						getRoundedString(chanceToHit), atk - defEnemy,
+						getMultiTeamingAtkBonus(enemy));
+			}
 		}
 
 		return Math.random() <= chanceToHit;
@@ -299,7 +308,7 @@ public class UnitStats implements UnitStatsInfo {
 			postArmorDamage = 0;
 		}
 
-		logger.debug("Damage {} --> {}", damage, postArmorDamage);
+		// logger.debug("Damage {} --> {}", damage, postArmorDamage);
 		return postArmorDamage;
 	}
 
@@ -320,6 +329,10 @@ public class UnitStats implements UnitStatsInfo {
 
 	public void applyDamage(float damage, int atkerArmorPiercing, float atkerArmorNegation, boolean useScatteringDamageEffect) {
 		applyDamageIgnoringArmor(calculateDamageThroughArmor(damage, atkerArmorPiercing, atkerArmorNegation), useScatteringDamageEffect);
+	}
+
+	public void applyMagicDamage(float damage) {
+		applyDamageIgnoringArmor(damage);
 	}
 
 	public void applyDamageIgnoringArmor(float damage) {
@@ -396,6 +409,30 @@ public class UnitStats implements UnitStatsInfo {
 
 	}
 
+	public void doReelRollAgainst(int force, float reelDuration) {
+		doReelRollAgainst(force, reelDuration, reelDuration + 2);
+	}
+
+	public void doReelRollAgainst(int force, float reelDuration, float maxReelDuration) {
+
+		int attackerRoll = RandomUtils.nextInt(1, 7); // 1d6
+
+		int attackerResult = force + attackerRoll - getStab();
+
+		logger.debug("Reel roll made against {}. Attacker Result: {} ({} + ({}) - {})",
+				getName(), attackerResult, force, attackerRoll, getStab());
+
+		if (attackerResult >= 10) { // apply full effect
+			applyReel(reelDuration, maxReelDuration);
+		} else if (attackerResult > 0) { // reduced stun and/or knockback
+			float factor = (attackerResult + 10) * 0.1f;
+			applyReel(reelDuration * factor, maxReelDuration);
+		} else {
+			// resisted
+		}
+
+	}
+
 	public void applyStun(float duration) {
 		stun.applyStun(duration, duration + 1); // thus a 0.5 sec stun will prorate around a 1.5sec max, 3sec -> 4 sec max
 	}
@@ -445,7 +482,11 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	public void applyReel(float duration) {
-		stun.applyReel(duration);
+		applyReel(duration, duration + 2);
+	}
+
+	public void applyReel(float duration, float maxReelDuration) {
+		stun.applyReel(duration, maxReelDuration);
 	}
 
 	@Override

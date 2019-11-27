@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.skill.skillsandeffects.MageSkills;
 import com.mygdx.holowyth.skill.skillsandeffects.RangerSkills;
 import com.mygdx.holowyth.skill.skillsandeffects.Skills;
 import com.mygdx.holowyth.skill.skillsandeffects.WarriorSkills;
@@ -26,7 +27,7 @@ public class UnitSkills {
 	Skill[] slot = new Skill[11];
 	{
 		slot[1] = new Skills.StunTestSkill();
-		slot[2] = new Skills.MagicMissile();
+		slot[2] = new MageSkills.MagicMissile();
 		slot[3] = new WarriorSkills.RageBlow();
 		slot[4] = new RangerSkills.CrossSlash();
 		slot[5] = new Skills.ForcePush();
