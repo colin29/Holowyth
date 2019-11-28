@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.skill.effect.projectiles;
+package com.mygdx.holowyth.skill.skillsandeffects.projectiles;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,16 +66,6 @@ public class MagicMissileBolt {
 	 */
 	private Vector2 vec = new Vector2();
 
-	// private void acquireTarget() {
-	// Side side = caster.getSide();
-	// if (side != Side.PLAYER && side != Side.ENEMY) {
-	// throw new HoloAssertException("Unhandled side type");
-	//
-	// }
-	// List<Unit> targets = getValidTargets();
-	// target = getClosestTarget(targets);
-	// }
-
 	private List<Unit> getValidTargets() {
 		var targets = new ArrayList<Unit>();
 
@@ -85,26 +75,6 @@ public class MagicMissileBolt {
 			CollectionUtils.select(units, (u) -> u.getSide() == Side.PLAYER, targets);
 		}
 		return targets;
-	}
-
-	private Unit getClosestTarget(List<Unit> targets) {
-		if (targets.isEmpty()) {
-			return null;
-		}
-
-		Unit closest = targets.get(0);
-		Point thisPos = new Point(x, y);
-		float minDist = Float.MAX_VALUE;
-
-		float dist;
-		for (var target : targets) {
-			dist = Point.calcDistance(thisPos, target.getPos());
-			if (dist < minDist) {
-				closest = target;
-				minDist = dist;
-			}
-		}
-		return closest;
 	}
 
 	public void tick() {

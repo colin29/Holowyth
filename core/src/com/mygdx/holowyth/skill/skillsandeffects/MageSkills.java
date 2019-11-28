@@ -10,12 +10,27 @@ public class MageSkills {
 			name = "Magic Missile";
 			casting.castTime = 60 * 1;
 			spCost = 10;
-			cooldown = 5;
+			cooldown = 60 * 12;
 		}
 
 		@Override
 		public void pluginTargeting(Unit caster, Unit target) {
 			setEffects(new MageEffects.MagicMissileEffect(caster, target));
+		}
+	}
+
+	public static class WindBlades extends UnitSkill {
+		public WindBlades() {
+			super();
+			name = "Wind Blades";
+			casting.castTime = 30 * 1;
+			spCost = 8;
+			cooldown = 60 * 8;
+		}
+
+		@Override
+		public void pluginTargeting(Unit caster, Unit target) {
+			setEffects(new MageEffects.WindBladesEffect(caster, target));
 		}
 	}
 

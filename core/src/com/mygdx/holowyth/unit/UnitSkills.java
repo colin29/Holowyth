@@ -7,7 +7,6 @@ import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.skillsandeffects.MageSkills;
 import com.mygdx.holowyth.skill.skillsandeffects.RangerSkills;
 import com.mygdx.holowyth.skill.skillsandeffects.Skills;
-import com.mygdx.holowyth.skill.skillsandeffects.WarriorSkills;
 import com.mygdx.holowyth.util.exceptions.HoloException;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
@@ -28,7 +27,7 @@ public class UnitSkills {
 	{
 		slot[1] = new Skills.StunTestSkill();
 		slot[2] = new MageSkills.MagicMissile();
-		slot[3] = new WarriorSkills.RageBlow();
+		slot[3] = new MageSkills.WindBlades();
 		slot[4] = new RangerSkills.CrossSlash();
 		slot[5] = new Skills.ForcePush();
 		slot[6] = new Skills.StaticShock();

@@ -319,20 +319,24 @@ public class UnitStats implements UnitStatsInfo {
 		applyDamage(damage, false);
 	}
 
-	public void applyDamage(float damage, boolean useScatteringDamageEffect) {
-		applyDamage(damage, 0, 0, useScatteringDamageEffect);
+	public void applyDamage(float damage, boolean useFastDamageEffect) {
+		applyDamage(damage, 0, 0, useFastDamageEffect);
 	}
 
 	public void applyDamage(float damage, int atkerArmorPiercing, float atkerArmorNegation) {
 		applyDamage(damage, atkerArmorPiercing, atkerArmorNegation, false);
 	}
 
-	public void applyDamage(float damage, int atkerArmorPiercing, float atkerArmorNegation, boolean useScatteringDamageEffect) {
-		applyDamageIgnoringArmor(calculateDamageThroughArmor(damage, atkerArmorPiercing, atkerArmorNegation), useScatteringDamageEffect);
+	public void applyDamage(float damage, int atkerArmorPiercing, float atkerArmorNegation, boolean useFastDamageEffect) {
+		applyDamageIgnoringArmor(calculateDamageThroughArmor(damage, atkerArmorPiercing, atkerArmorNegation), useFastDamageEffect);
 	}
 
 	public void applyMagicDamage(float damage) {
 		applyDamageIgnoringArmor(damage);
+	}
+
+	public void applyMagicDamage(float damage, boolean useFastDamageEffect) {
+		applyDamageIgnoringArmor(damage, useFastDamageEffect);
 	}
 
 	public void applyDamageIgnoringArmor(float damage) {
@@ -345,8 +349,8 @@ public class UnitStats implements UnitStatsInfo {
 	 * @param damage
 	 * @return
 	 */
-	public void applyDamageIgnoringArmor(float damage, boolean useScatteringDamageEffect) {
-		gfx.makeDamageEffect(damage, self, useScatteringDamageEffect);
+	public void applyDamageIgnoringArmor(float damage, boolean useFastDamageEffect) {
+		gfx.makeDamageEffect(damage, self, useFastDamageEffect);
 
 		hp -= damage;
 
