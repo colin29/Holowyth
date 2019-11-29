@@ -13,7 +13,6 @@ import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
 import com.mygdx.holowyth.skill.skillsandeffects.projectiles.FireballBolt;
 import com.mygdx.holowyth.skill.skillsandeffects.projectiles.MagicMissileBolt;
-import com.mygdx.holowyth.skill.skillsandeffects.projectiles.Projectile;
 import com.mygdx.holowyth.skill.skillsandeffects.projectiles.ProjectileBase;
 import com.mygdx.holowyth.skill.skillsandeffects.projectiles.WindBladeBolt;
 import com.mygdx.holowyth.unit.Unit;
@@ -43,11 +42,10 @@ public class MageEffects {
 
 		@Override
 		public void tick() {
-
 			for (var m : missiles) {
 				m.tick();
 			}
-			missiles.removeIf(m -> m.duration <= 0 || m.collided);
+			missiles.removeIf(m -> m.isExpired() || m.isCollided());
 
 			if (missiles.isEmpty())
 				markAsComplete();
@@ -58,7 +56,7 @@ public class MageEffects {
 			shapeDrawer.setColor(Color.RED, 0.8f);
 			batch.begin();
 			for (var m : missiles) {
-				shapeDrawer.filledCircle(m.x, m.y, missileVfxRadius);
+				shapeDrawer.filledCircle(m.getX(), m.getY(), missileVfxRadius);
 			}
 			batch.end();
 		}
@@ -75,7 +73,7 @@ public class MageEffects {
 		int missilesLeftToFire = numMissiles;
 		int missileFiringInterval = 10;
 
-		List<Projectile> missiles = new ArrayList<Projectile>();
+		List<ProjectileBase> missiles = new ArrayList<ProjectileBase>();
 
 		float missileVfxRadius = 4;
 
@@ -86,7 +84,7 @@ public class MageEffects {
 
 			if (framesElapsed % missileFiringInterval == 0 && missilesLeftToFire > 0) {
 				missilesLeftToFire = Math.max(0, missilesLeftToFire - 1);
-				missiles.add(new WindBladeBolt(caster.x, caster.y, damage, target, caster, world.getUnits())); // space the missiles out
+				missiles.add(new WindBladeBolt(caster.x, caster.y, damage, caster, target)); // space the missiles out
 			}
 
 			for (var m : missiles) {
@@ -125,7 +123,7 @@ public class MageEffects {
 
 		@Override
 		public void begin() {
-			projectile = new FireballBolt(caster, target, damage, world);
+			projectile = new FireballBolt(damage, caster, target);
 		}
 
 		@Override

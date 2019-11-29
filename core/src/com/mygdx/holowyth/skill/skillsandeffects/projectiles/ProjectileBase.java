@@ -25,11 +25,11 @@ public abstract class ProjectileBase {
 	protected final Point pos;
 
 	// Speed and Velocity
-	private float speed = 4.5f; // let's make the velocity increase from 2 to 5
+	private float speed;
 	private float rotation;
 
 	// Duration
-	private float duration;
+	protected float duration;
 
 	// Sides and Colliding
 	protected final Unit.Side side;
@@ -38,7 +38,7 @@ public abstract class ProjectileBase {
 	// Extra info for sub-classes
 	protected Unit caster;
 
-	public ProjectileBase(float x, float y, float speed, float rotation, float maxDuration, Unit caster, World world) {
+	public ProjectileBase(float x, float y, float speed, float rotation, float maxDuration, Unit caster) {
 		pos = new Point(x, y);
 		this.speed = speed;
 		this.rotation = rotation;
@@ -49,9 +49,15 @@ public abstract class ProjectileBase {
 
 		this.caster = caster;
 
-		this.world = world;
+		this.world = caster.getWorldMutable();
 	}
 
+	/**
+	 * For consistency, default implementation should be <br>
+	 * move(); <br>
+	 * detectCollisionsWithEnemies(); <br>
+	 * tickDuration();
+	 */
 	public abstract void tick();
 
 	public final float getX() {
@@ -80,10 +86,23 @@ public abstract class ProjectileBase {
 		this.speed = speed;
 	}
 
+	/**
+	 * Normalizes and sets angle
+	 */
 	protected void setRotation(float rotation) {
-		this.rotation = rotation;
+		this.rotation = normalizeAngle(rotation);
 	}
 
+	/**
+	 * @return value in the range [0, 360)
+	 */
+	protected static float normalizeAngle(float angle) {
+		return (angle %= 360) > 0 ? angle : (angle + 360);
+	}
+
+	/**
+	 * @return angle in the range [0, 360)
+	 */
 	public float getRotation() {
 		return rotation;
 	}
@@ -99,6 +118,9 @@ public abstract class ProjectileBase {
 
 	private boolean collided;
 
+	/**
+	 * Returns a new vector
+	 */
 	public Vector2 getVelocity() {
 		calculateVelocity();
 		return new Vector2(velocity);
