@@ -11,8 +11,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
+import com.mygdx.holowyth.skill.skillsandeffects.projectiles.FireballBolt;
 import com.mygdx.holowyth.skill.skillsandeffects.projectiles.MagicMissileBolt;
 import com.mygdx.holowyth.skill.skillsandeffects.projectiles.Projectile;
+import com.mygdx.holowyth.skill.skillsandeffects.projectiles.ProjectileBase;
 import com.mygdx.holowyth.skill.skillsandeffects.projectiles.WindBladeBolt;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
@@ -26,7 +28,7 @@ public class MageEffects {
 			super(caster, target);
 		}
 
-		int damage = 6;
+		int damage = 5;
 		List<MagicMissileBolt> missiles;
 
 		float missileVfxRadius = 5;
@@ -80,10 +82,6 @@ public class MageEffects {
 		int framesElapsed = 0;
 
 		@Override
-		public void begin() {
-		}
-
-		@Override
 		public void tick() {
 
 			if (framesElapsed % missileFiringInterval == 0 && missilesLeftToFire > 0) {
@@ -111,5 +109,39 @@ public class MageEffects {
 			}
 			batch.end();
 		}
+	}
+
+	static class FireBallEffect extends CasterUnitEffect {
+
+		int damage = 18;
+
+		protected FireBallEffect(Unit caster, Unit target) {
+			super(caster, target);
+		}
+
+		ProjectileBase projectile;
+
+		private static float missileVfxRadius = 6;
+
+		@Override
+		public void begin() {
+			projectile = new FireballBolt(caster, target, damage, world);
+		}
+
+		@Override
+		public void tick() {
+			projectile.tick();
+			if (projectile.isExpired() || projectile.isCollided())
+				markAsComplete();
+		}
+
+		@Override
+		public void render(SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
+			shapeDrawer.setColor(Color.ORANGE, 1f);
+			batch.begin();
+			shapeDrawer.filledCircle(projectile.getX(), projectile.getY(), missileVfxRadius);
+			batch.end();
+		}
+
 	}
 }

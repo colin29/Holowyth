@@ -34,4 +34,19 @@ public class MageSkills {
 		}
 	}
 
+	public static class Fireball extends UnitSkill {
+		public Fireball() {
+			super();
+			name = "Fireball";
+			casting.castTime = 60 * 1;
+			spCost = 16;
+			cooldown = 60 * 16;
+		}
+
+		@Override
+		public void pluginTargeting(Unit caster, Unit target) {
+			setEffects(new MageEffects.FireBallEffect(caster, target));
+		}
+	}
+
 }

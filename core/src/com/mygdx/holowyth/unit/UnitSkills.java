@@ -25,7 +25,7 @@ public class UnitSkills {
 	 */
 	Skill[] slot = new Skill[11];
 	{
-		slot[1] = new Skills.StunTestSkill();
+		slot[1] = new MageSkills.Fireball();
 		slot[2] = new MageSkills.MagicMissile();
 		slot[3] = new MageSkills.WindBlades();
 		slot[4] = new RangerSkills.CrossSlash();
