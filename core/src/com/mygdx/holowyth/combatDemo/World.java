@@ -426,7 +426,7 @@ public class World implements WorldInfo {
 			} else {
 				thisUnit.getMotion().addKnockbackVelocity(dv1);
 				// We need to apply a stun to otherUnit, thus the different call
-				otherUnit.stats.applyKnockbackStunWithoutVelProrate(0, 0, dv2);
+				otherUnit.stats.applyKnockbackStunWithoutVelProrate(dv2);
 			}
 			break;
 		case OBSTACLE_SEG:

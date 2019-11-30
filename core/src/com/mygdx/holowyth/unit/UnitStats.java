@@ -373,6 +373,8 @@ public class UnitStats implements UnitStatsInfo {
 
 	/**
 	 * 
+	 * Use default stun proration
+	 * 
 	 * @param force
 	 * @param stunDuration
 	 * @param knockbackVel
@@ -381,7 +383,11 @@ public class UnitStats implements UnitStatsInfo {
 	 *            Affects velocity proration
 	 */
 	public void doKnockBackRollAgainst(int force, float stunDuration, Vector2 knockbackVel, float maxKnockbackVel) {
-		doStunRollAgainst(force, stunDuration, stunDuration + 1, true, knockbackVel, maxKnockbackVel);
+		doStunRollAgainst(force, stunDuration, stunDuration + 60, true, knockbackVel, maxKnockbackVel);
+	}
+
+	public void doKnockBackRollAgainst(int force, float stunDuration, Vector2 knockbackVel) {
+		doStunRollAgainst(force, stunDuration, stunDuration + 60, true, knockbackVel, knockbackVel.len() + 1);
 	}
 
 	private void doStunRollAgainst(int force, float stunDuration, float maxStunDuration, boolean isKnockback, Vector2 knockbackVel,
@@ -401,7 +407,7 @@ public class UnitStats implements UnitStatsInfo {
 				applyStun(stunDuration);
 			}
 		} else if (attackerResult > 0) { // reduced stun and/or knockback
-			float factor = (attackerResult + 10) * 0.1f;
+			float factor = attackerResult * 0.1f;
 			if (isKnockback) {
 				applyKnockbackStun(stunDuration * factor, maxStunDuration, knockbackVel.scl(factor), maxKnockbackVel);
 			} else {
@@ -467,8 +473,20 @@ public class UnitStats implements UnitStatsInfo {
 		stun.applyKnockbackStun(duration, dv, maxKnockbackVel, maxStunDuration);
 	}
 
+	/**
+	 * Apply a knockback stun without adding any minimum stun time
+	 * 
+	 * @param dv
+	 */
+	public void applyKnockbackStunWithoutVelProrate(Vector2 dv) {
+		applyKnockbackStunWithoutVelProrate(0, dv);
+	}
+
+	/**
+	 * Use default stun proration
+	 */
 	public void applyKnockbackStunWithoutVelProrate(float duration, Vector2 dv) {
-		applyKnockbackStunWithoutVelProrate(duration, duration + 1, dv);
+		applyKnockbackStunWithoutVelProrate(duration, duration + 60, dv);
 	}
 
 	public void applyKnockbackStunWithoutVelProrate(float duration, float maxStunDuration, Vector2 dv) {

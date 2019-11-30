@@ -65,11 +65,6 @@ public abstract class ProjectileBase {
 	}
 
 	/**
-	 * For consistency, default implementation should be <br>
-	 * move(); <br>
-	 * detectCollisionsWithEnemies(); <br>
-	 * detectCollisionWithObstacles() <br>
-	 * tickDuration();
 	 */
 	public abstract void tick();
 
@@ -205,12 +200,12 @@ public abstract class ProjectileBase {
 				// CollisionInfo collision = CollisionDetection.getFirstCollisionInfo(cb, null, obstacleCollisions,
 				// null);
 				onCollisionWithObstacle(getX(), getY());
+				collided = true;
 			} catch (HoloOperationException e) {
 				logger.warn(e.getMessage());
 				logger.warn("from: " + e.getFormattedStackTrace());
-				logger.warn("Skipping resolving this object's collision");
+				logger.warn("Skipping resolving this projectile's collision");
 				// Skip resolving this collision
-
 			}
 		}
 
@@ -222,10 +217,9 @@ public abstract class ProjectileBase {
 	protected abstract void onCollision(Unit enemy);
 
 	/**
-	 * Action that should happen when projectile collides with terrain. Default is to simply set collided without any other effect.
+	 * Action that should happen when projectile collides with terrain.
 	 */
 	protected void onCollisionWithObstacle(float x, float y) {
-		collided = true;
 	}
 
 	protected List<Unit> getCollisionTargets() {

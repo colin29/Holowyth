@@ -19,5 +19,9 @@
 	<logger name="com.mygdx.holowyth.unit.UnitStats" level="DEBUG">
 	</logger>
 
+	<logger name="com.mygdx.holowyth.collision" level="INFO">
+	</logger>	
+	
+
 
 </configuration>

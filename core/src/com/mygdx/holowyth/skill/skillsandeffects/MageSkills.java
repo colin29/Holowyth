@@ -8,7 +8,7 @@ public class MageSkills {
 		public MagicMissile() {
 			super();
 			name = "Magic Missile";
-			casting.castTime = 60 * 1;
+			casting.castTime = 60 * 0.8f;
 			spCost = 10;
 			cooldown = 60 * 12;
 		}
@@ -19,11 +19,26 @@ public class MageSkills {
 		}
 	}
 
+	public static class ArcaneBolt extends UnitSkill {
+		public ArcaneBolt() {
+			super();
+			name = "Arcane Bolt";
+			casting.castTime = 60 * 1.2f;
+			spCost = 22;
+			cooldown = 60 * 18;
+		}
+
+		@Override
+		public void pluginTargeting(Unit caster, Unit target) {
+			setEffects(new MageEffects.ArcaneBoltEffect(caster, target));
+		}
+	}
+
 	public static class WindBlades extends UnitSkill {
 		public WindBlades() {
 			super();
 			name = "Wind Blades";
-			casting.castTime = 30 * 1;
+			casting.castTime = 60 * 0.5f;
 			spCost = 8;
 			cooldown = 60 * 8;
 		}

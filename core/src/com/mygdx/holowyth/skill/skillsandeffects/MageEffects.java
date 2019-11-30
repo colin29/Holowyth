@@ -13,6 +13,7 @@ import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
 import com.mygdx.holowyth.skill.effect.Effect;
+import com.mygdx.holowyth.skill.skillsandeffects.projectiles.ArcaneBoltBolt;
 import com.mygdx.holowyth.skill.skillsandeffects.projectiles.FireballBolt;
 import com.mygdx.holowyth.skill.skillsandeffects.projectiles.MagicMissileBolt;
 import com.mygdx.holowyth.skill.skillsandeffects.projectiles.ProjectileBase;
@@ -38,10 +39,7 @@ public class MageEffects {
 		public void begin() {
 			missiles = new ArrayList<MagicMissileBolt>();
 			for (int i = 0; i < 3; i++) {
-				missiles.add(new MagicMissileBolt(caster.x, caster.y + 18 * i, damage, target, caster, world.getUnits())); // space
-																																				// the
-																																				// missiles
-																																				// out
+				missiles.add(new MagicMissileBolt(caster.x, caster.y + 18 * i, damage, target, caster, world.getUnits()));
 			}
 		}
 
@@ -67,6 +65,42 @@ public class MageEffects {
 		}
 
 	};
+
+	static class ArcaneBoltEffect extends CasterUnitEffect {
+
+		protected ArcaneBoltEffect(Unit caster, Unit target) {
+			super(caster, target);
+		}
+
+		ProjectileBase projectile;
+
+		int damage = 24;
+		private static float missileVfxRadius = 6;
+		private static float explosionRadius = 30;
+
+		@Override
+		public void begin() {
+			projectile = new ArcaneBoltBolt(damage, caster, target);
+		}
+
+		@Override
+		public void tick() {
+			projectile.tick();
+			if (projectile.isExpired() || projectile.isCollided()) {
+				markAsComplete();
+			}
+
+		}
+
+		@Override
+		public void render(SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
+			shapeDrawer.setColor(Color.VIOLET, 1f);
+			batch.begin();
+			shapeDrawer.filledCircle(projectile.getX(), projectile.getY(), missileVfxRadius);
+			batch.end();
+		}
+
+	}
 
 	static class WindBladesEffect extends CasterUnitEffect {
 		public WindBladesEffect(Unit caster, Unit target) {
@@ -189,4 +223,5 @@ public class MageEffects {
 		}
 
 	}
+
 }

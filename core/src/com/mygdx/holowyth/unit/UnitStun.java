@@ -73,14 +73,20 @@ class UnitStun {
 			logger.warn("tried to apply stun of negative duration");
 			return;
 		}
+		if (maxStunDuration == 0) {
+			return;
+		}
+		float stunTimeAddedDebug;
 
 		switch (state) {
 		case NORMAL:
 			beginStun(duration);
+			stunTimeAddedDebug = duration;
 			break;
 		case REELED:
 			deferredReelAmount = reelDurationRemaining;
 			beginStun(duration);
+			stunTimeAddedDebug = duration;
 			break;
 		case STUNNED:
 			// in case of consecutive stuns, stun contributions are prorated around a maxDuration
@@ -89,11 +95,12 @@ class UnitStun {
 			}
 			float prorateFactor = Math.max(0, 1 - stunDurationRemaining / maxStunDuration);
 			stunDurationRemaining += duration * prorateFactor;
+			stunTimeAddedDebug = duration * prorateFactor;
 			break;
 		default:
 			throw new HoloAssertException("Unsupported state");
 		}
-		logger.debug("Stun duration remaining: {}", stunDurationRemaining);
+		logger.debug("Stun time: {} (+{})", stunDurationRemaining, stunTimeAddedDebug);
 	}
 
 	void applyKnockbackStun(float duration, Vector2 dv, float maxKnockBackVel, float maxStunDuration) {

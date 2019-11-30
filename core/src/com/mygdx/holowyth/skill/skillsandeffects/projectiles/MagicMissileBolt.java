@@ -147,7 +147,7 @@ public class MagicMissileBolt extends ProjectileBase {
 
 		// Apply knockback stun in direction missile was travelling
 		Vector2 knockBackVec = getVelocity().setLength(0.5f);
-		enemy.stats.doKnockBackRollAgainst(15, 20, knockBackVec, 1.5f);
+		enemy.stats.doKnockBackRollAgainst(15, 60 * 0.5f, knockBackVec, 1.5f);
 
 	}
 }
