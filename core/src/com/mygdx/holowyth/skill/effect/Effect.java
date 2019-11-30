@@ -15,7 +15,7 @@ public abstract class Effect {
 
 	protected final World world;
 
-	Effect(World world) {
+	public Effect(World world) {
 		this.world = world;
 	}
 

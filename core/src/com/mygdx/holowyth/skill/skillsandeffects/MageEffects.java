@@ -9,8 +9,10 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
+import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.skill.skillsandeffects.projectiles.FireballBolt;
 import com.mygdx.holowyth.skill.skillsandeffects.projectiles.MagicMissileBolt;
 import com.mygdx.holowyth.skill.skillsandeffects.projectiles.ProjectileBase;
@@ -120,17 +122,21 @@ public class MageEffects {
 		ProjectileBase projectile;
 
 		private static float missileVfxRadius = 6;
+		private static float explosionRadius = 30;
 
 		@Override
 		public void begin() {
-			projectile = new FireballBolt(damage, caster, target);
+			projectile = new FireballBolt(damage, explosionRadius, caster, target);
 		}
 
 		@Override
 		public void tick() {
 			projectile.tick();
-			if (projectile.isExpired() || projectile.isCollided())
+			if (projectile.isExpired() || projectile.isCollided()) {
+				world.addEffect(new FireBallVfx(projectile.getX(), projectile.getY(), explosionRadius, world));
 				markAsComplete();
+			}
+
 		}
 
 		@Override
@@ -139,6 +145,44 @@ public class MageEffects {
 			batch.begin();
 			shapeDrawer.filledCircle(projectile.getX(), projectile.getY(), missileVfxRadius);
 			batch.end();
+		}
+
+	}
+
+	static class FireBallVfx extends Effect {
+
+		private float x, y;
+
+		private static int explosionVfxDuration = 40;
+		private int framesElapsed = 0;
+		private float explosionRadius;
+
+		FireBallVfx(float x, float y, float explosionRadius, World world) {
+			super(world);
+			this.x = x;
+			this.y = y;
+
+			this.explosionRadius = explosionRadius;
+		}
+
+		@Override
+		public void tick() {
+			if (framesElapsed >= explosionVfxDuration) {
+				markAsComplete();
+			}
+			framesElapsed += 1;
+		}
+
+		@Override
+		public void render(SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
+			shapeDrawer.setColor(Color.ORANGE, getOpacity());
+			batch.begin();
+			shapeDrawer.filledCircle(x, y, explosionRadius);
+			batch.end();
+		}
+
+		private float getOpacity() {
+			return 0.7f * (1 - framesElapsed / (float) explosionVfxDuration);
 		}
 
 	}

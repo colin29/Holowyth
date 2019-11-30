@@ -178,6 +178,10 @@ public abstract class ProjectileBase {
 		return targets;
 	}
 
+	protected final boolean isAEnemy(Unit unit) {
+		return side != unit.getSide();
+	}
+
 	public boolean isCollided() {
 		return collided;
 	}

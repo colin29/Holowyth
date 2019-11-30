@@ -82,15 +82,26 @@ public class World implements WorldInfo {
 		tickEffects();
 	}
 
+	List<Effect> queuedEffects = new ArrayList<Effect>();
+
+	/**
+	 * Does not add the effect to effects immediately, but it will appear the next time tickEffects is called
+	 */
 	public void addEffect(Effect e) {
-		effects.add(e);
+		queuedEffects.add(e);
 	}
 
 	private void tickEffects() {
+		addQueuedEffects();
 		for (Effect e : effects) {
 			e.tick();
 		}
 		effects.removeIf((Effect e) -> e.isComplete());
+	}
+
+	private void addQueuedEffects() {
+		effects.addAll(queuedEffects);
+		queuedEffects.clear();
 	}
 
 	/**
