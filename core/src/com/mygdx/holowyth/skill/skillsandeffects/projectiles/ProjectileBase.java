@@ -46,12 +46,12 @@ public abstract class ProjectileBase {
 	// Sides and Colliding
 	protected final Unit.Side side;
 	protected final World world;
-	private float collisionRadius;
+	private float collisionRadius = 0;
 
 	// Extra info for sub-classes
 	protected Unit caster;
 
-	public ProjectileBase(float x, float y, float speed, float rotation, float collisionRadius, float maxDuration, Unit caster) {
+	public ProjectileBase(float x, float y, float speed, float rotation, float maxDuration, Unit caster) {
 		pos = new Point(x, y);
 		this.speed = speed;
 		this.rotation = rotation;
@@ -60,7 +60,6 @@ public abstract class ProjectileBase {
 
 		this.side = caster.getSide();
 		this.caster = caster;
-		this.collisionRadius = collisionRadius;
 
 		this.world = caster.getWorldMutable();
 	}
@@ -185,7 +184,6 @@ public abstract class ProjectileBase {
 	}
 
 	protected void detectCollisionWithObstacles() {
-
 		CircleCBInfo cb = new CircleCBImpl(pos.x, pos.y, collisionRadius);
 		((CircleCBImpl) cb).setVelocity(getVx(), getVy());
 
@@ -204,8 +202,8 @@ public abstract class ProjectileBase {
 		obstacleCollisions.addAll(CollisionDetection.getCirclePointCollisionInfos(cb, polyPoints));
 		if (!obstacleCollisions.isEmpty()) {
 			try {
-				CollisionInfo collision = CollisionDetection.getFirstCollisionInfo(cb, null, obstacleCollisions,
-						null);
+				// CollisionInfo collision = CollisionDetection.getFirstCollisionInfo(cb, null, obstacleCollisions,
+				// null);
 				onCollisionWithObstacle(getX(), getY());
 			} catch (HoloOperationException e) {
 				logger.warn(e.getMessage());
@@ -219,10 +217,13 @@ public abstract class ProjectileBase {
 	}
 
 	/**
-	 * Action that should happen when projectile collides. This is not necessarily the same unit as the target
+	 * Action that should happen when projectile collides with an enemy. This is not necessarily the same unit as the target
 	 */
 	protected abstract void onCollision(Unit enemy);
 
+	/**
+	 * Action that should happen when projectile collides with terrain. Default is to simply set collided without any other effect.
+	 */
 	protected void onCollisionWithObstacle(float x, float y) {
 		collided = true;
 	}
@@ -244,6 +245,13 @@ public abstract class ProjectileBase {
 
 	public boolean isCollided() {
 		return collided;
+	}
+
+	/**
+	 * Default radius is 0, set if desired. 0 radius looks better with most small projectiles.
+	 */
+	public void setCollisionRadius(float collisionRadius) {
+		this.collisionRadius = collisionRadius;
 	}
 
 }

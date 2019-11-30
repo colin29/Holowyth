@@ -123,7 +123,7 @@ public class CollisionDetection {
 	 * @param obstacleCollisions
 	 *            optional, pass null if you don't need to consider obstacle collisions
 	 * @param intersectDebugInfo
-	 *            optional, pass in an object to receive debug values
+	 *            optional, pass in to receive debug values
 	 * 
 	 * @return Information about the first collision along curBody's motion
 	 */

@@ -22,8 +22,8 @@ public class WindBladeBolt extends ProjectileBase {
 	Unit caster;
 	Unit target; // target is allowed to be null;
 
-	public WindBladeBolt(float x, float y, float damage, float collisionRadius, Unit caster, Unit target) {
-		super(x, y, speed, Point.getAngleInDegrees(caster.getPos(), target.getPos()), collisionRadius, maxDuration, caster);
+	public WindBladeBolt(float x, float y, float damage, Unit caster, Unit target) {
+		super(x, y, speed, Point.getAngleInDegrees(caster.getPos(), target.getPos()), maxDuration, caster);
 		this.damage = damage;
 		this.target = target;
 

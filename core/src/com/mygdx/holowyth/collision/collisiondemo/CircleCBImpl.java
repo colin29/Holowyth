@@ -8,15 +8,15 @@ public class CircleCBImpl implements CircleCB {
 	private float vx, vy;
 
 	/**
-	 * Usual concrete implementation of CircleCB as a POJO. The reason why CircleCB was turned into an interface was to
-	 * allow implementations where the data (state) was stored elsewhere
+	 * Usual concrete implementation of CircleCB as a POJO. The reason why CircleCB was turned into an interface was to allow implementations where
+	 * the data (state) was stored elsewhere
 	 */
 	public CircleCBImpl(float x, float y, float radius) {
 		this.x = x;
 		this.y = y;
 		this.radius = radius;
-		if (radius <= 0) {
-			throw new HoloIllegalArgumentsException("Radius must be positive, given: " + radius);
+		if (radius < 0) {
+			throw new HoloIllegalArgumentsException("Radius must be non-negative, given: " + radius);
 		}
 	}
 
