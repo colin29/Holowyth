@@ -4,13 +4,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.holowyth.collision.CircleCBInfo;
+import com.mygdx.holowyth.collision.CollisionDetection;
+import com.mygdx.holowyth.collision.CollisionInfo;
+import com.mygdx.holowyth.collision.ObstaclePoint;
+import com.mygdx.holowyth.collision.collisiondemo.CircleCBImpl;
+import com.mygdx.holowyth.collision.wallcollisiondemo.OrientedPoly;
 import com.mygdx.holowyth.combatDemo.World;
+import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
+import com.mygdx.holowyth.util.exceptions.HoloOperationException;
 
 /**
  * Implements the concepts of: <br>
@@ -21,6 +31,8 @@ import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
  * If you override an implementation (such as collided or duration), you should override the whole thing
  */
 public abstract class ProjectileBase {
+
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	protected final Point pos;
 
@@ -34,11 +46,12 @@ public abstract class ProjectileBase {
 	// Sides and Colliding
 	protected final Unit.Side side;
 	protected final World world;
+	private float collisionRadius;
 
 	// Extra info for sub-classes
 	protected Unit caster;
 
-	public ProjectileBase(float x, float y, float speed, float rotation, float maxDuration, Unit caster) {
+	public ProjectileBase(float x, float y, float speed, float rotation, float collisionRadius, float maxDuration, Unit caster) {
 		pos = new Point(x, y);
 		this.speed = speed;
 		this.rotation = rotation;
@@ -46,8 +59,8 @@ public abstract class ProjectileBase {
 		duration = maxDuration;
 
 		this.side = caster.getSide();
-
 		this.caster = caster;
+		this.collisionRadius = collisionRadius;
 
 		this.world = caster.getWorldMutable();
 	}
@@ -56,6 +69,7 @@ public abstract class ProjectileBase {
 	 * For consistency, default implementation should be <br>
 	 * move(); <br>
 	 * detectCollisionsWithEnemies(); <br>
+	 * detectCollisionWithObstacles() <br>
 	 * tickDuration();
 	 */
 	public abstract void tick();
@@ -126,6 +140,14 @@ public abstract class ProjectileBase {
 		return new Vector2(velocity);
 	}
 
+	public float getVx() {
+		return getVelocity().x;
+	}
+
+	public float getVy() {
+		return getVelocity().y;
+	}
+
 	private void calculateVelocity() {
 		velocity.set(speed, 0);
 		velocity.rotate(rotation);
@@ -162,10 +184,48 @@ public abstract class ProjectileBase {
 		}
 	}
 
+	protected void detectCollisionWithObstacles() {
+
+		CircleCBInfo cb = new CircleCBImpl(pos.x, pos.y, collisionRadius);
+		((CircleCBImpl) cb).setVelocity(getVx(), getVy());
+
+		List<OrientedPoly> polys = Polygons.calculateOrientedPolygons(world.getMap().polys);
+		List<CircleCBInfo> polyPoints = new ArrayList<CircleCBInfo>();
+		for (var poly : polys) {
+			for (var seg : poly.segments) {
+				polyPoints.add(new ObstaclePoint(seg.x1, seg.y1));
+			}
+		}
+
+		var obstacleCollisions = new ArrayList<CollisionInfo>();
+		obstacleCollisions.addAll(CollisionDetection.getCircleSegCollisionInfos(cb,
+				cb.getRadius(),
+				polys));
+		obstacleCollisions.addAll(CollisionDetection.getCirclePointCollisionInfos(cb, polyPoints));
+		if (!obstacleCollisions.isEmpty()) {
+			try {
+				CollisionInfo collision = CollisionDetection.getFirstCollisionInfo(cb, null, obstacleCollisions,
+						null);
+				onCollisionWithObstacle(getX(), getY());
+			} catch (HoloOperationException e) {
+				logger.warn(e.getMessage());
+				logger.warn("from: " + e.getFormattedStackTrace());
+				logger.warn("Skipping resolving this object's collision");
+				// Skip resolving this collision
+
+			}
+		}
+
+	}
+
 	/**
 	 * Action that should happen when projectile collides. This is not necessarily the same unit as the target
 	 */
 	protected abstract void onCollision(Unit enemy);
+
+	protected void onCollisionWithObstacle(float x, float y) {
+		collided = true;
+	}
 
 	protected List<Unit> getCollisionTargets() {
 		var units = new ArrayList<Unit>(world.getUnits());

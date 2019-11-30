@@ -33,8 +33,8 @@ public class MagicMissileBolt extends ProjectileBase {
 
 	Unit target; // target is allowed to be null;
 
-	public MagicMissileBolt(float x, float y, float damage, Unit target, Unit caster, List<Unit> units) {
-		super(x, y, intialSpeed, Point.getAngleInDegrees(caster.getPos(), target.getPos()), maxDuration, caster);
+	public MagicMissileBolt(float x, float y, float damage, float collisionRadius, Unit target, Unit caster, List<Unit> units) {
+		super(x, y, intialSpeed, Point.getAngleInDegrees(caster.getPos(), target.getPos()), collisionRadius, maxDuration, caster);
 		this.damage = damage;
 		this.target = target;
 
@@ -48,6 +48,7 @@ public class MagicMissileBolt extends ProjectileBase {
 
 		move();
 		detectCollisionsWithEnemies();
+		detectCollisionWithObstacles();
 		tickDuration();
 
 		handleTargetDead();

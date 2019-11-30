@@ -38,7 +38,10 @@ public class MageEffects {
 		public void begin() {
 			missiles = new ArrayList<MagicMissileBolt>();
 			for (int i = 0; i < 3; i++) {
-				missiles.add(new MagicMissileBolt(caster.x, caster.y + 18 * i, damage, target, caster, world.getUnits())); // space the missiles out
+				missiles.add(new MagicMissileBolt(caster.x, caster.y + 18 * i, damage, missileVfxRadius, target, caster, world.getUnits())); // space
+																																				// the
+																																				// missiles
+																																				// out
 			}
 		}
 
@@ -86,7 +89,7 @@ public class MageEffects {
 
 			if (framesElapsed % missileFiringInterval == 0 && missilesLeftToFire > 0) {
 				missilesLeftToFire = Math.max(0, missilesLeftToFire - 1);
-				missiles.add(new WindBladeBolt(caster.x, caster.y, damage, caster, target)); // space the missiles out
+				missiles.add(new WindBladeBolt(caster.x, caster.y, damage, missileVfxRadius, caster, target)); // space the missiles out
 			}
 
 			for (var m : missiles) {
@@ -126,7 +129,7 @@ public class MageEffects {
 
 		@Override
 		public void begin() {
-			projectile = new FireballBolt(damage, explosionRadius, caster, target);
+			projectile = new FireballBolt(damage, explosionRadius, missileVfxRadius, caster, target);
 		}
 
 		@Override

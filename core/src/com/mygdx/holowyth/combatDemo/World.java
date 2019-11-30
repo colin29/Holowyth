@@ -251,7 +251,7 @@ public class World implements WorldInfo {
 				obstacleCollisions.addAll(CollisionDetection.getCircleSegCollisionInfos(curBody,
 						curBody.getRadius(),
 						polys));
-				obstacleCollisions.addAll(getCirclePointCollisionInfos(curBody, obstaclePoints));
+				obstacleCollisions.addAll(CollisionDetection.getCirclePointCollisionInfos(curBody, obstaclePoints));
 
 				for (CircleCBInfo colidee : objectCollisions) {
 					logger.debug("Collision between units id [{} {}]", thisUnit.getID(),
@@ -280,25 +280,6 @@ public class World implements WorldInfo {
 
 			}
 		}
-	}
-
-	/**
-	 * Finds and calculates collision infos of a circle body vs wall point, while moving along the body's motion
-	 */
-	private List<CollisionInfo> getCirclePointCollisionInfos(CircleCBInfo curBody, List<CircleCBInfo> obstaclePoints) {
-
-		var collidingPoints = CollisionDetection.getCircleBodyCollisionsAlongLineSegment(curBody, obstaclePoints);
-
-		var infos = new ArrayList<CollisionInfo>();
-
-		Segment motion = new Segment(curBody.getX(), curBody.getY(), curBody.getX() + curBody.getVx(), curBody.getY() + curBody.getVy());
-		for (var point : collidingPoints) {
-			var info = CollisionDetection.getCircleCircleCollisionInfo(motion, curBody, point, null);
-			if (info != null) {
-				infos.add(info);
-			}
-		}
-		return infos;
 	}
 
 	private void applyFriction(Unit unit) {

@@ -15,8 +15,8 @@ public class FireballBolt extends ProjectileBase {
 
 	private Unit target;
 
-	public FireballBolt(float damage, float explosionRadius, Unit caster, Unit target) {
-		super(caster.x, caster.y, speed, Point.getAngleInDegrees(caster.getPos(), target.getPos()), maxDuration, caster);
+	public FireballBolt(float damage, float explosionRadius, float collisionRadius, Unit caster, Unit target) {
+		super(caster.x, caster.y, speed, Point.getAngleInDegrees(caster.getPos(), target.getPos()), collisionRadius, maxDuration, caster);
 		this.damage = damage;
 		this.explosionRadius = explosionRadius;
 
@@ -28,6 +28,7 @@ public class FireballBolt extends ProjectileBase {
 		turnTowardsTarget();
 		move();
 		detectCollisionsWithEnemies();
+		detectCollisionWithObstacles();
 		tickDuration();
 		handleTargetDead();
 	}
