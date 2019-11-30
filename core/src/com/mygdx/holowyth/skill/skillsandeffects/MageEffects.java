@@ -9,8 +9,11 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Polygon;
+import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.graphics.HoloGL;
+import com.mygdx.holowyth.skill.effect.CasterGroundEffect;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.skill.skillsandeffects.projectiles.ArcaneBoltBolt;
@@ -20,6 +23,8 @@ import com.mygdx.holowyth.skill.skillsandeffects.projectiles.ProjectileBase;
 import com.mygdx.holowyth.skill.skillsandeffects.projectiles.WindBladeBolt;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
+import com.mygdx.holowyth.util.dataobjects.Line;
+import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class MageEffects {
 
@@ -191,8 +196,8 @@ public class MageEffects {
 		private float x, y;
 
 		private static int explosionVfxDuration = 40;
-		private int framesElapsed = 0;
 		private float explosionRadius;
+		private int framesElapsed = 0;
 
 		FireBallVfx(float x, float y, float explosionRadius, World world) {
 			super(world);
@@ -220,6 +225,131 @@ public class MageEffects {
 
 		private float getOpacity() {
 			return 0.7f * (1 - framesElapsed / (float) explosionVfxDuration);
+		}
+
+	}
+
+	public static class HydroblastEffect extends CasterGroundEffect {
+
+		protected HydroblastEffect(Unit caster, float x, float y) {
+			super(caster, x, y);
+		}
+
+		float coneWidthDegrees = 50;
+		float coneLength = 150; // how far does the cone extend.
+		float coneAngle; // angle that the skill was aimed at
+
+		@Override
+		public void begin() {
+			coneAngle = Point.getAngleInDegrees(caster.getPos(), ground);
+		}
+
+		@Override
+		public void tick() {
+
+			for (Unit u : world.getUnits()) {
+				if (u == caster)
+					continue;
+				if (isUnitTouchingCone(u)) {
+					u.stats.applyMagicDamage(5);
+					u.stats.applySlow(0.6f, 60 * 4);
+				}
+			}
+			world.addEffect(
+					new HydroBlastVfx(caster.x, caster.y, coneAngle, coneWidthDegrees, coneLength, world));
+			markAsComplete();
+		}
+
+		private boolean isUnitTouchingCone(Unit unit) {
+			Vector2 calc = new Vector2();
+
+			calc.set(1, 0);
+			calc.rotate(coneAngle + coneWidthDegrees / 2);
+			Line leftLine = new Line(caster.x, caster.y, calc.x, calc.y);
+
+			calc.set(1, 0);
+			calc.rotate(coneAngle - coneWidthDegrees / 2);
+			Line rightLine = new Line(caster.x, caster.y, calc.x, calc.y);
+
+			// we need to displace these lines to account for the size of the targets
+
+			Vector2 displaceVec;
+			displaceVec = leftLine.getV().rotate(90).setLength(unit.getRadius());
+			leftLine.displace(displaceVec);
+
+			displaceVec = rightLine.getV().rotate(-90).setLength(unit.getRadius());
+			rightLine.displace(displaceVec);
+
+			var unitPos = unit.getPos();
+
+			boolean unitInRange = Point.calcDistance(caster.getPos(), unitPos) <= coneLength + unit.getRadius();
+			return !leftLine.doesPointLieOnTheLeft(unitPos) &&
+					rightLine.doesPointLieOnTheLeft(unitPos) &&
+					unitInRange;
+		}
+	}
+
+	static class HydroBlastVfx extends Effect {
+
+		private float x, y;
+
+		private static int vfxDuration = 100;
+		private int framesElapsed = 0;
+
+		private final Vector2 conePointLeft;
+		private final Vector2 conePointMiddle; // the point at the middle of the far end of the cone
+		private final Vector2 conePointRight;
+
+		HydroBlastVfx(float x, float y, float coneAngle, float coneWidthDegrees, float coneLength, World world) {
+			super(world);
+			this.x = x;
+			this.y = y;
+
+			var calc = new Vector2();
+
+			calc.set(coneLength, 0).rotate(coneAngle + coneWidthDegrees / 2);
+			conePointLeft = new Vector2(x, y).add(calc);
+
+			calc.set(coneLength, 0).rotate(coneAngle - coneWidthDegrees / 2);
+			conePointRight = new Vector2(x, y).add(calc);
+
+			calc.set(coneLength, 0).rotate(coneAngle);
+			conePointMiddle = new Vector2(x, y).add(calc);
+
+		}
+
+		@Override
+		public void tick() {
+			if (framesElapsed >= vfxDuration) {
+				markAsComplete();
+			}
+			framesElapsed += 1;
+		}
+
+		@Override
+		public void render(SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
+			shapeDrawer.setColor(Color.BLUE, getOpacity());
+
+			// approximate the actual conical hitbox
+			float[] vertices = new float[8];
+			vertices[0] = x;
+			vertices[1] = y;
+			vertices[2] = conePointLeft.x;
+			vertices[3] = conePointLeft.y;
+			vertices[4] = conePointMiddle.x;
+			vertices[5] = conePointMiddle.y;
+			vertices[6] = conePointRight.x;
+			vertices[7] = conePointRight.y;
+
+			Polygon cone = new Polygon(vertices);
+
+			batch.begin();
+			shapeDrawer.polygon(cone, 1.8f);
+			batch.end();
+		}
+
+		private float getOpacity() {
+			return 0.9f * (1 - framesElapsed / (float) vfxDuration);
 		}
 
 	}

@@ -521,6 +521,11 @@ public class UnitStats implements UnitStatsInfo {
 		return stun.getReelDurationRemaining();
 	}
 
+	@Override
+	public boolean isSlowed() {
+		return !slowEffects.isEmpty();
+	}
+
 	public void addSp(float amount) {
 		sp = Math.min(sp + amount, getMaxSp());
 	}

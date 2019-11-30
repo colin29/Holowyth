@@ -71,4 +71,6 @@ public interface UnitStatsInfo {
 	int getArmorPiercing();
 
 	int getArmor();
+
+	boolean isSlowed();
 }

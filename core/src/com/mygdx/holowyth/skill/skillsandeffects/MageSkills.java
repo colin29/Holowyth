@@ -1,5 +1,6 @@
 package com.mygdx.holowyth.skill.skillsandeffects;
 
+import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
 
@@ -9,7 +10,7 @@ public class MageSkills {
 			super();
 			name = "Magic Missile";
 			casting.castTime = 60 * 0.8f;
-			spCost = 10;
+			spCost = 12;
 			cooldown = 60 * 12;
 		}
 
@@ -39,7 +40,7 @@ public class MageSkills {
 			super();
 			name = "Wind Blades";
 			casting.castTime = 60 * 0.5f;
-			spCost = 8;
+			spCost = 10;
 			cooldown = 60 * 8;
 		}
 
@@ -61,6 +62,21 @@ public class MageSkills {
 		@Override
 		public void pluginTargeting(Unit caster, Unit target) {
 			setEffects(new MageEffects.FireBallEffect(caster, target));
+		}
+	}
+
+	public static class Hydroblast extends GroundSkill {
+		public Hydroblast() {
+			super();
+			name = "Hydroblast";
+			casting.castTime = 60 * 0.7f;
+			spCost = 14;
+			cooldown = 60 * 16;
+		}
+
+		@Override
+		public void pluginTargeting(Unit caster, float x, float y) {
+			setEffects(new MageEffects.HydroblastEffect(caster, x, y));
 		}
 	}
 

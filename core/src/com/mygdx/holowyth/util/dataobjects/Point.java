@@ -56,10 +56,11 @@ public class Point {
 	}
 
 	/**
-	 * @return a new point with the added values
 	 */
 	public Point add(float x, float y) {
-		return new Point(this.x + x, this.y + y);
+		this.x = x;
+		this.y = y;
+		return this;
 	}
 
 	public Vector2 toVector() {

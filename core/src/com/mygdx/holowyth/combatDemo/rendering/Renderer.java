@@ -151,7 +151,9 @@ public class Renderer {
 
 		unitMotion.renderUnitDestinations(Color.GREEN);
 
-		// 3: Render units and selection indicators
+		// 3: Render units and selection/status indicators
+
+		renderOutlineAroundSlowedUnits(); // lower priority indicators are drawn first
 
 		if (controls != null) {
 			controls.clearDeadUnitsFromSelection();
@@ -428,6 +430,13 @@ public class Renderer {
 		renderThickOutlineIfTrueForAllUnits(Color.ORANGE, (UnitInfo u) -> {
 			return u.getStats().isReeled();
 		});
+	}
+
+	private void renderOutlineAroundSlowedUnits() {
+		renderThickOutlineIfTrueForAllUnits(Color.SKY, (UnitInfo u) -> {
+			return u.getStats().isSlowed();
+		});
+
 	}
 
 	private float hpBarWidthBase = 30;

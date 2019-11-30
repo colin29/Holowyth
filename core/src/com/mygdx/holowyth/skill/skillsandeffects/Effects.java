@@ -80,7 +80,7 @@ public class Effects {
 
 		@Override
 		public void tick() {
-			applySplashAroundLocation(groundX, groundY, aoeRadius, mainDamage);
+			applySplashAroundLocation(ground.x, ground.y, aoeRadius, mainDamage);
 			fired = true;
 		}
 
@@ -115,7 +115,7 @@ public class Effects {
 
 		@Override
 		public void tick() {
-			knockBackEnemiesInRadiusTowardsCenter(groundX, groundY, aoeRadius, damage);
+			knockBackEnemiesInRadiusTowardsCenter(ground.x, ground.y, aoeRadius, damage);
 			markAsComplete();
 		}
 
@@ -152,9 +152,9 @@ public class Effects {
 
 		@Override
 		public void tick() {
-			knockBackEnemiesWithinRadius(groundX, groundY, aoeRadius, damage);
+			knockBackEnemiesWithinRadius(ground.x, ground.y, aoeRadius, damage);
 			var units = world.getUnits();
-			Point effectCenter = new Point(groundX, groundY);
+			Point effectCenter = new Point(ground.x, ground.y);
 			for (Unit unit : units) {
 				if (Point.calcDistance(effectCenter, unit.getPos()) <= aoeRadius) {
 					if (unit != caster) {

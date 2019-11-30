@@ -28,7 +28,7 @@ public class UnitSkills {
 		slot[2] = new MageSkills.MagicMissile();
 		slot[3] = new MageSkills.ArcaneBolt();
 		slot[4] = new MageSkills.WindBlades();
-		slot[5] = new Skills.ForcePush();
+		slot[5] = new MageSkills.Hydroblast();
 		slot[6] = new Skills.StaticShock();
 		slot[7] = new Skills.NovaFlare();
 	}
