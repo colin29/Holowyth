@@ -210,6 +210,9 @@ public class UnitMotion {
 		}
 	}
 
+	float actualSpeedLastFrame;
+	float maxAcceleration;
+
 	/**
 	 * Determines the unit's velocity based on path (and related state variables). Path must not be null
 	 * 
@@ -219,7 +222,7 @@ public class UnitMotion {
 	private void determineMovementFollowingPath() {
 
 		// Apply acceleration if the unit is not already at full speed.
-		// Acceleration is proportional to the current speed of the unit,
+		// Acceleration is inversely proportional to the current speed of the unit,
 		// but is capped at maxAccelFactor times the base rate.
 		if (plannedSpeed < speed && !isDecelerating) {
 			plannedSpeed = Math.min(plannedSpeed + Math.min(accelRate / plannedSpeed,
@@ -255,13 +258,22 @@ public class UnitMotion {
 			}
 		}
 
+		float speedWithSlow = plannedSpeed * self.stats.getMoveSpeedRatio();
+		maxAcceleration = Math.min(accelRate / speedWithSlow, +accelRate * maxAccelFactor); // same accel rate as normal movement
+
+		float maxAllowableSpeed = Math.max(startingSpeed, actualSpeedLastFrame + maxAcceleration);
+		if (speedWithSlow > maxAllowableSpeed) {
+			speedWithSlow = maxAllowableSpeed;
+		}
+		actualSpeedLastFrame = speedWithSlow;
+
 		// Determine unit movement
-		if (dist > plannedSpeed) {
+		if (dist > speedWithSlow) {
 			float sin = dy / dist;
 			float cos = dx / dist;
 
-			this.vx = cos * plannedSpeed * self.stats.getMoveSpeedRatio();
-			this.vy = sin * plannedSpeed * self.stats.getMoveSpeedRatio();
+			this.vx = cos * speedWithSlow;
+			this.vy = sin * speedWithSlow;
 		} else {
 			this.vx = dx;
 			this.vy = dy;
