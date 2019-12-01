@@ -71,6 +71,11 @@ public class FireballBolt extends ProjectileBase {
 		damageEnemiesInRange();
 	}
 
+	@Override
+	protected void onCollisionWithObstacle(float x, float y) {
+		damageEnemiesInRange();
+	}
+
 	private void damageEnemiesInRange() {
 		for (var unit : world.getUnits()) {
 			if (Point.calcDistance(pos, unit.getPos()) <= explosionRadius + unit.getRadius()) {

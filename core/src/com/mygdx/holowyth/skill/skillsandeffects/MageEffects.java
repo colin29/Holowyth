@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.effect.CasterGroundEffect;
@@ -237,6 +238,7 @@ public class MageEffects {
 
 		float coneWidthDegrees = 50;
 		float coneLength = 150; // how far does the cone extend.
+		float coneInnerLength = coneLength / 2; // there is an inner cone
 		float coneAngle; // angle that the skill was aimed at
 
 		@Override
@@ -251,12 +253,17 @@ public class MageEffects {
 				if (u == caster)
 					continue;
 				if (isUnitTouchingCone(u)) {
-					u.stats.applyMagicDamage(5);
+					if (isUnitWithinInnerRadius(u)) {
+						Vector2 knockbackVec = new Vector2(u.x, u.y).sub(caster.x, caster.y).setLength(0.8f);
+						u.stats.doKnockBackRollAgainst(20, 0, knockbackVec);
+						u.stats.applyMagicDamage(5);
+					}
 					u.stats.applySlow(0.6f, 60 * 4);
+
 				}
 			}
 			world.addEffect(
-					new HydroBlastVfx(caster.x, caster.y, coneAngle, coneWidthDegrees, coneLength, world));
+					new HydroBlastVfx(caster.x, caster.y, coneAngle, coneWidthDegrees, coneLength, coneInnerLength, world));
 			markAsComplete();
 		}
 
@@ -287,6 +294,10 @@ public class MageEffects {
 					rightLine.doesPointLieOnTheLeft(unitPos) &&
 					unitInRange;
 		}
+
+		private boolean isUnitWithinInnerRadius(Unit unit) {
+			return Point.calcDistance(caster.getPos(), unit.getPos()) <= coneInnerLength + unit.getRadius();
+		}
 	}
 
 	static class HydroBlastVfx extends Effect {
@@ -300,7 +311,11 @@ public class MageEffects {
 		private final Vector2 conePointMiddle; // the point at the middle of the far end of the cone
 		private final Vector2 conePointRight;
 
-		HydroBlastVfx(float x, float y, float coneAngle, float coneWidthDegrees, float coneLength, World world) {
+		private final Vector2 coneInnerPointLeft;
+		private final Vector2 coneInnerPointMiddle;
+		private final Vector2 coneInnerPointRight;
+
+		HydroBlastVfx(float x, float y, float coneAngle, float coneWidthDegrees, float coneLength, float coneInnerLength, World world) {
 			super(world);
 			this.x = x;
 			this.y = y;
@@ -315,6 +330,15 @@ public class MageEffects {
 
 			calc.set(coneLength, 0).rotate(coneAngle);
 			conePointMiddle = new Vector2(x, y).add(calc);
+
+			calc.set(coneInnerLength, 0).rotate(coneAngle + coneWidthDegrees / 2);
+			coneInnerPointLeft = new Vector2(x, y).add(calc);
+
+			calc.set(coneInnerLength, 0).rotate(coneAngle - coneWidthDegrees / 2);
+			coneInnerPointRight = new Vector2(x, y).add(calc);
+
+			calc.set(coneInnerLength, 0).rotate(coneAngle);
+			coneInnerPointMiddle = new Vector2(x, y).add(calc);
 
 		}
 
@@ -341,10 +365,14 @@ public class MageEffects {
 			vertices[6] = conePointRight.x;
 			vertices[7] = conePointRight.y;
 
+			Array<Vector2> innerConePath = new Array<Vector2>();
+			innerConePath.add(coneInnerPointLeft, coneInnerPointMiddle, coneInnerPointRight);
+
 			Polygon cone = new Polygon(vertices);
 
 			batch.begin();
 			shapeDrawer.polygon(cone, 1.8f);
+			shapeDrawer.path(innerConePath, 1.3f, true);
 			batch.end();
 		}
 

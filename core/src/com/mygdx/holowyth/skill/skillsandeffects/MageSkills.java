@@ -24,7 +24,7 @@ public class MageSkills {
 		public ArcaneBolt() {
 			super();
 			name = "Arcane Bolt";
-			casting.castTime = 60 * 1.2f;
+			casting.castTime = 60 * 1.3f;
 			spCost = 22;
 			cooldown = 60 * 18;
 		}
@@ -54,7 +54,7 @@ public class MageSkills {
 		public Fireball() {
 			super();
 			name = "Fireball";
-			casting.castTime = 60 * 1;
+			casting.castTime = 60 * 1.3f;
 			spCost = 16;
 			cooldown = 60 * 16;
 		}
@@ -69,7 +69,7 @@ public class MageSkills {
 		public Hydroblast() {
 			super();
 			name = "Hydroblast";
-			casting.castTime = 60 * 0.7f;
+			casting.castTime = 60 * 0.9f;
 			spCost = 14;
 			cooldown = 60 * 16;
 		}
