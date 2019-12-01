@@ -100,7 +100,7 @@ class UnitStun {
 		default:
 			throw new HoloAssertException("Unsupported state");
 		}
-		logger.debug("Stun time: {} (+{})", stunDurationRemaining, stunTimeAddedDebug);
+		logger.debug("Stun time: {} (+{}) (max: {})", stunDurationRemaining, stunTimeAddedDebug, maxStunDuration);
 	}
 
 	void applyKnockbackStun(float duration, Vector2 dv, float maxKnockBackVel, float maxStunDuration) {
@@ -140,19 +140,31 @@ class UnitStun {
 			return;
 		}
 
+		float reelTimeAddedDebug;
+
 		switch (state) {
 		case NORMAL:
 			beginReel(duration);
+			logger.debug("Reel time: {} (+{})", reelDurationRemaining, reelDurationRemaining);
 			break;
 		case REELED:
-			reelDurationRemaining += duration;
+			reelTimeAddedDebug = getReelTime(duration, maxDuration, reelDurationRemaining);
+			reelDurationRemaining += reelTimeAddedDebug;
+			logger.debug("Reel time: {} (+{}) (max: {})", reelDurationRemaining, reelTimeAddedDebug, maxDuration);
 			break;
 		case STUNNED:
-			deferredReelAmount += duration;
+			reelTimeAddedDebug = getReelTime(duration, maxDuration, deferredReelAmount);
+			deferredReelAmount += reelTimeAddedDebug;
+			logger.debug("Reel time: {} (+{}) (max: {}) (Deferred)", deferredReelAmount, reelTimeAddedDebug, maxDuration);
 			break;
 		default:
 			throw new HoloAssertException("Unsupported state");
 		}
+	}
+
+	private float getReelTime(float duration, float maxDuration, float existingReelTime) {
+		float prorateFactor = Math.max(0, 1 - existingReelTime / maxDuration);
+		return duration * prorateFactor;
 	}
 
 	boolean isStunned() {

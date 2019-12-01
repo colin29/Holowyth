@@ -343,6 +343,10 @@ public class UnitStats implements UnitStatsInfo {
 		applyDamageIgnoringArmor(damage, false);
 	}
 
+	private float defaultStunProration = 60; // means a duration of x gets prorated around a max of x+60 frames
+	private float defaultReelProration = 120;
+	private float defaultKnockbackProration = 1; // means a knockback length of 1 gets prorated around a max of len+1
+
 	/**
 	 * Applies the damage, doesn't do any damage reduction
 	 * 
@@ -368,7 +372,7 @@ public class UnitStats implements UnitStatsInfo {
 	 * @return
 	 */
 	public void doStunRollAgainst(int force, float stunDuration) {
-		doStunRollAgainst(force, stunDuration, stunDuration + 1, false, null, 0);
+		doStunRollAgainst(force, stunDuration, stunDuration + defaultStunProration, false, null, 0);
 	}
 
 	/**
@@ -383,13 +387,16 @@ public class UnitStats implements UnitStatsInfo {
 	 *            Affects velocity proration
 	 */
 	public void doKnockBackRollAgainst(int force, float stunDuration, Vector2 knockbackVel, float maxKnockbackVel) {
-		doStunRollAgainst(force, stunDuration, stunDuration + 60, true, knockbackVel, maxKnockbackVel);
+		doStunRollAgainst(force, stunDuration, stunDuration + defaultStunProration, true, knockbackVel, maxKnockbackVel);
 	}
 
 	public void doKnockBackRollAgainst(int force, float stunDuration, Vector2 knockbackVel) {
-		doStunRollAgainst(force, stunDuration, stunDuration + 60, true, knockbackVel, knockbackVel.len() + 1);
+		doStunRollAgainst(force, stunDuration, stunDuration + defaultStunProration, true, knockbackVel, knockbackVel.len() + 1);
 	}
 
+	/**
+	 * Even if the stun is partially resisted, the max stun duration remains original -- thus successive stuns can add up
+	 */
 	private void doStunRollAgainst(int force, float stunDuration, float maxStunDuration, boolean isKnockback, Vector2 knockbackVel,
 			float maxKnockbackVel) {
 
@@ -404,23 +411,23 @@ public class UnitStats implements UnitStatsInfo {
 			if (isKnockback) {
 				applyKnockbackStun(stunDuration, maxStunDuration, knockbackVel, maxKnockbackVel);
 			} else {
-				applyStun(stunDuration);
+				applyStun(stunDuration, maxStunDuration);
 			}
 		} else if (attackerResult > 0) { // reduced stun and/or knockback
 			float factor = attackerResult * 0.1f;
 			if (isKnockback) {
 				applyKnockbackStun(stunDuration * factor, maxStunDuration, knockbackVel.scl(factor), maxKnockbackVel);
 			} else {
-				applyStun(stunDuration * factor);
+				applyStun(stunDuration * factor, maxStunDuration);
 			}
 		} else if (attackerResult > -10) {
-			applyReel(stunDuration * (attackerResult + 20) * 0.1f);
+			applyReel(stunDuration * (attackerResult + 10) * 0.1f, stunDuration + defaultReelProration);
 		}
 
 	}
 
 	public void doReelRollAgainst(int force, float reelDuration) {
-		doReelRollAgainst(force, reelDuration, reelDuration + 2);
+		doReelRollAgainst(force, reelDuration, reelDuration + defaultReelProration);
 	}
 
 	public void doReelRollAgainst(int force, float reelDuration, float maxReelDuration) {
@@ -444,7 +451,7 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	public void applyStun(float duration) {
-		stun.applyStun(duration, duration + 1); // thus a 0.5 sec stun will prorate around a 1.5sec max, 3sec -> 4 sec max
+		stun.applyStun(duration, duration + 60); // thus a 0.5 sec stun will prorate around a 1.5sec max, 3sec -> 4 sec max
 	}
 
 	public void applyStun(float duration, float maxStunDuration) {
@@ -457,7 +464,7 @@ public class UnitStats implements UnitStatsInfo {
 	 * @param dv
 	 */
 	public void applyKnockbackStun(float duration, float maxStunDuration, Vector2 dv) {
-		applyKnockbackStun(duration, maxStunDuration, dv, dv.len());
+		applyKnockbackStun(duration, maxStunDuration, dv, dv.len() + 1);
 	}
 
 	/**
@@ -486,7 +493,7 @@ public class UnitStats implements UnitStatsInfo {
 	 * Use default stun proration
 	 */
 	public void applyKnockbackStunWithoutVelProrate(float duration, Vector2 dv) {
-		applyKnockbackStunWithoutVelProrate(duration, duration + 60, dv);
+		applyKnockbackStunWithoutVelProrate(duration, duration + defaultStunProration, dv);
 	}
 
 	public void applyKnockbackStunWithoutVelProrate(float duration, float maxStunDuration, Vector2 dv) {
@@ -504,7 +511,7 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	public void applyReel(float duration) {
-		applyReel(duration, duration + 2);
+		applyReel(duration, duration + defaultReelProration);
 	}
 
 	public void applyReel(float duration, float maxReelDuration) {
