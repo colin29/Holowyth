@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.skill;
 
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
 
 /**
@@ -22,10 +23,12 @@ public class Casting implements Cloneable, CastingInfo {
 
 	public boolean isInterruptedByDamageOrReel = true;
 
-	Skill skill;
+	private boolean displayedSkillName = false;
+
+	Skill parent;
 
 	public Casting(Skill parent) {
-		this.skill = parent;
+		this.parent = parent;
 	}
 
 	public void begin(Unit caster) {
@@ -35,11 +38,18 @@ public class Casting implements Cloneable, CastingInfo {
 		}
 		castTimeRemaining = castTime;
 		onBeginCast();
-		caster.getWorld().getGfx().makeSkillNameEffect(skill.name + "!", caster);
 	}
 
 	public void tick() {
 		castTimeRemaining -= 1;
+
+		Unit caster = parent.caster;
+		if (castTimeRemaining <= 25 && !displayedSkillName) {
+			if (caster.getSide() == Side.PLAYER || Holo.debugShowEnemyCastingProgress) {
+				caster.getWorld().getGfx().makeSkillNameEffect(parent.name + "!", caster);
+			}
+		}
+
 		if (castTimeRemaining <= 0) {
 			completed = true;
 			onFinishCast();

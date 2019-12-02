@@ -8,6 +8,7 @@ import com.mygdx.holowyth.skill.effect.CasterEffect;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 import com.mygdx.holowyth.util.exceptions.HoloException;
 
 /**
@@ -111,6 +112,10 @@ public class Skill implements Cloneable, SkillInfo {
 	 * Tick happens every frame, and continues as long as the unit remains casting or channeling the skill
 	 */
 	public void tick() {
+
+		if (isSlottedSkill()) {
+			throw new HoloAssertException("Should not be ticking a slotted skill.");
+		}
 
 		if (status == Status.CASTING) {
 			casting.tick();
@@ -229,6 +234,7 @@ public class Skill implements Cloneable, SkillInfo {
 	public Object clone() throws CloneNotSupportedException {
 		Skill newInstance = (Skill) super.clone();
 		newInstance.casting = (Casting) this.casting.clone();
+		newInstance.casting.parent = newInstance;
 		return newInstance;
 	}
 
@@ -247,6 +253,10 @@ public class Skill implements Cloneable, SkillInfo {
 
 	public String getDescription() {
 		return "no description";
+	}
+
+	public boolean isSlottedSkill() {
+		return parent == null;
 	}
 
 }

@@ -372,6 +372,10 @@ public class Renderer {
 
 		for (UnitInfo unit : world.getUnits()) {
 
+			if (unit.getSide() != Side.PLAYER && !Holo.debugShowEnemyCastingProgress) {
+				continue;
+			}
+
 			SkillInfo skill = unit.getActiveSkill();
 			if (skill != null && skill.getStatus() == Status.CASTING) {
 				final float castBarVertSpacing = 8; // space between the bottom of the unit and the top of the hpbar

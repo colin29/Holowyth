@@ -27,7 +27,7 @@ public class SkillNameEffect extends Effect {
 		this.worldCamera = worldCamera;
 	}
 
-	float maxDuration = 100;
+	float maxDuration = 50;
 	float framesElapsed = 0;
 	private String textStr;
 	private Label skillText;
@@ -36,10 +36,8 @@ public class SkillNameEffect extends Effect {
 	public void begin() {
 		skillText = new Label(textStr, skin);
 
-		Vector3 worldPos = new Vector3(unit.getX(), unit.getY(), 0);
-		Vector3 vec = worldCamera.project(worldPos);
 		stage.addActor(skillText);
-		skillText.setPosition(vec.x - skillText.getWidth() / 2, vec.y + 25);
+		updateTextLocation();
 	}
 
 	@Override
@@ -48,8 +46,14 @@ public class SkillNameEffect extends Effect {
 			skillText.remove();
 			markAsComplete();
 		}
-
+		updateTextLocation();
 		framesElapsed += 1;
+	}
+
+	private void updateTextLocation() {
+		Vector3 worldPos = new Vector3(unit.getX(), unit.getY(), 0);
+		Vector3 vec = worldCamera.project(worldPos);
+		skillText.setPosition(vec.x - skillText.getWidth() / 2, vec.y + 25);
 	}
 
 	public void forceEnd() {

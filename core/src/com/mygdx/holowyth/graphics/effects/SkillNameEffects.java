@@ -16,6 +16,8 @@ public class SkillNameEffects {
 			effect.tick();
 		}
 		effects = filterByValue(effects, (e) -> !e.isComplete());
+
+		// needs to reset the text location
 	}
 
 	private static <K, V> Map<K, V> filterByValue(Map<K, V> map, Predicate<V> predicate) {
