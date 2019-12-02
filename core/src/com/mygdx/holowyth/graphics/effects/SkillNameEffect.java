@@ -52,4 +52,9 @@ public class SkillNameEffect extends Effect {
 		framesElapsed += 1;
 	}
 
+	public void forceEnd() {
+		skillText.remove();
+		markAsComplete();
+	}
+
 }

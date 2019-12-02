@@ -34,7 +34,8 @@ public class EffectsHandler {
 	SparksEffectHandler sparksManager;
 
 	ArrayList<DamageEffect> damageEffects = new ArrayList<DamageEffect>();
-	ArrayList<SkillNameEffect> skillNameEffects = new ArrayList<>();
+
+	SkillNameEffects skillNameEffects = new SkillNameEffects();
 
 	public EffectsHandler(SpriteBatch batch, OrthographicCamera camera, Stage stage, Skin skin, DebugStore debugStore) {
 		this.batch = batch;
@@ -100,16 +101,14 @@ public class EffectsHandler {
 				iter.remove();
 			}
 		}
-		for (var effect : skillNameEffects) {
-			effect.tick();
-		}
-		skillNameEffects.removeIf((e) -> e.isComplete());
+
+		skillNameEffects.tick();
 	}
 
 	public void makeSkillNameEffect(String text, UnitInfo unit) {
 		var effect = new SkillNameEffect(text, unit, worldCamera, (World) unit.getWorld(), stage, skin);
 		effect.begin();
-		skillNameEffects.add(effect);
+		skillNameEffects.addSkillTextOn(unit, effect);
 	}
 
 	public boolean useScatteringDamageEffect = false;
