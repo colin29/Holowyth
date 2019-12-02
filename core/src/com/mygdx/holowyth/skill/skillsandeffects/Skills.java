@@ -41,7 +41,7 @@ public class Skills {
 			casting.castTime = 60;
 			spCost = 10;
 			cooldown = 20;
-			aimingHelperRadius = Effects.ExplosionEffect.aoeRadius;
+			defaultAimingHelperRadius = Effects.ExplosionEffect.aoeRadius;
 		}
 
 		@Override
@@ -64,7 +64,7 @@ public class Skills {
 			casting.isInterruptedByDamageOrReel = true;
 			spCost = 0;
 			cooldown = 20;
-			aimingHelperRadius = Effects.ImplosionEffect.aoeRadius;
+			defaultAimingHelperRadius = Effects.ImplosionEffect.aoeRadius;
 		}
 
 		@Override
@@ -86,7 +86,7 @@ public class Skills {
 			casting.castTime = 200;
 			spCost = 10;
 			cooldown = 20;
-			aimingHelperRadius = Effects.NovaFlareEffect.aoeRadius;
+			defaultAimingHelperRadius = Effects.NovaFlareEffect.aoeRadius;
 		}
 
 		@Override

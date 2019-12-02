@@ -259,4 +259,8 @@ public class Skill implements Cloneable, SkillInfo {
 		return parent == null;
 	}
 
+	public World getWorld() {
+		return world;
+	}
+
 }

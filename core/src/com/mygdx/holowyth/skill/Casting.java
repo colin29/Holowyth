@@ -45,7 +45,7 @@ public class Casting implements Cloneable, CastingInfo {
 
 		Unit caster = parent.caster;
 		if (castTimeRemaining <= 25 && !displayedSkillName) {
-			if (caster.getSide() == Side.PLAYER || Holo.debugShowEnemyCastingProgress) {
+			if (caster.getSide() == Side.PLAYER || Holo.debugDisplayEnemyCastingProgress) {
 				caster.getWorld().getGfx().makeSkillNameEffect(parent.name + "!", caster);
 			}
 		}

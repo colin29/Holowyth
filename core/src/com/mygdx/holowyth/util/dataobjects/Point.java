@@ -23,6 +23,11 @@ public class Point {
 		this.y = p.y;
 	}
 
+	public Point(Vector2 vec) {
+		this.x = vec.x;
+		this.y = vec.y;
+	}
+
 	public void set(float x, float y) {
 		this.x = x;
 		this.y = y;

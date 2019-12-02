@@ -133,9 +133,6 @@ public class Renderer {
 
 		batch.setProjectionMatrix(worldCamera.combined);
 
-		renderCastingCircleIfSkill();
-		// renderCircleIfAimingSkillGround();
-
 		renderUnitHpSpBars();
 
 		// 1: Render Map
@@ -174,6 +171,11 @@ public class Renderer {
 
 		// debug.renderUnitIdsOnUnits();
 
+		// Render Aiming graphics
+		renderCastingCircleIfSkill();
+		renderAimingHelperIfSkillHas();
+		// renderCircleIfAimingSkillGround();
+
 		// 3.5: Render arrows
 
 		debug.renderUnitKnockbackVelocities();
@@ -210,8 +212,22 @@ public class Renderer {
 		if (controls.getContext() == Context.SKILL_GROUND) {
 			var curSkill = (GroundSkill) controls.getCurSkill();
 			var cursorPos = getWorldCoordinatesOfMouseCursor();
-			HoloGL.renderCircleOutline(cursorPos.x, cursorPos.y, curSkill.aimingHelperRadius, Color.RED);
+			HoloGL.renderCircleOutline(cursorPos.x, cursorPos.y, curSkill.defaultAimingHelperRadius, Color.RED);
 		}
+	}
+
+	private void renderAimingHelperIfSkillHas() {
+
+		if (controls.getContext() == Context.SKILL_GROUND) {
+			var curSkill = (GroundSkill) controls.getCurSkill();
+			if (curSkill.aimingGraphic == null)
+				return;
+
+			var cursorPos = getWorldCoordinatesOfMouseCursor();
+			var unit = controls.getSelectedUnits().first();
+			curSkill.aimingGraphic.render(cursorPos, unit, world, batch, shapeDrawer, game.assets);
+		}
+
 	}
 
 	private void renderCastingCircleIfSkill() {
@@ -220,7 +236,7 @@ public class Renderer {
 			var curSkill = (GroundSkill) controls.getCurSkill();
 			var cursorPos = getWorldCoordinatesOfMouseCursor();
 
-			if (curSkill.aimingHelperRadius == 0)
+			if (curSkill.defaultAimingHelperRadius == 0)
 				return;
 
 			TextureRegion magicCircle = new TextureRegion(game.assets.get("img/effects/magicCircle_blue.png", Texture.class));
@@ -229,7 +245,7 @@ public class Renderer {
 			// Sprite sprite = new Sprite(magicCircle);
 			// sprite.set
 
-			float width = curSkill.aimingHelperRadius * 2 * 1.04f;
+			float width = curSkill.defaultAimingHelperRadius * 2 * 1.04f;
 			HoloSprite sprite = new HoloSprite(magicCircle, cursorPos.x, cursorPos.y, width, 0, 0);
 
 			float revsPerSecond = 1f / 40;
@@ -372,7 +388,7 @@ public class Renderer {
 
 		for (UnitInfo unit : world.getUnits()) {
 
-			if (unit.getSide() != Side.PLAYER && !Holo.debugShowEnemyCastingProgress) {
+			if (unit.getSide() != Side.PLAYER && !Holo.debugDisplayEnemyCastingProgress) {
 				continue;
 			}
 

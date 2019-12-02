@@ -236,9 +236,9 @@ public class MageEffects {
 			super(caster, x, y);
 		}
 
-		float coneWidthDegrees = 50;
-		float coneLength = 150; // how far does the cone extend.
-		float coneInnerLength = coneLength / 2; // there is an inner cone
+		static float coneWidthDegrees = 50;
+		static float coneLength = 150; // how far does the cone extend.
+		static float coneInnerLength = coneLength / 2; // there is an inner cone
 		float coneAngle; // angle that the skill was aimed at
 
 		@Override
@@ -315,6 +315,16 @@ public class MageEffects {
 		private final Vector2 coneInnerPointMiddle;
 		private final Vector2 coneInnerPointRight;
 
+		/**
+		 * @param x
+		 * @param y
+		 *            casting location of the spell
+		 * @param coneAngle
+		 * @param coneWidthDegrees
+		 * @param coneLength
+		 * @param coneInnerLength
+		 * @param world
+		 */
 		HydroBlastVfx(float x, float y, float coneAngle, float coneWidthDegrees, float coneLength, float coneInnerLength, World world) {
 			super(world);
 			this.x = x;
