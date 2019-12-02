@@ -165,9 +165,11 @@ public class Renderer {
 			renderOutlineAroundBusyRetreatingUnits();
 			renderOutlineAroundBusyCastingUnits();
 		}
+
 		renderOutlineAroundKnockbackedUnits();
-		renderOutlineAroundStunnedUnits();
 		renderOutlineAroundReeledUnits();
+		renderOutlineAroundBlindedUnits();
+		renderOutlineAroundStunnedUnits();
 
 		// debug.renderUnitIdsOnUnits();
 
@@ -456,7 +458,12 @@ public class Renderer {
 		renderThickOutlineIfTrueForAllUnits(Color.SKY, (UnitInfo u) -> {
 			return u.getStats().isSlowed();
 		});
+	}
 
+	private void renderOutlineAroundBlindedUnits() {
+		renderThickOutlineIfTrueForAllUnits(Color.YELLOW, (UnitInfo u) -> {
+			return u.getStats().isBlinded();
+		});
 	}
 
 	private float hpBarWidthBase = 30;

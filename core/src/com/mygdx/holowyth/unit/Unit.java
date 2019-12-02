@@ -368,7 +368,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 		
 		private boolean isUseSkillAllowed() {
-			return isGeneralOrderAllowed();
+			return isGeneralOrderAllowed()
+					&& !stats.isBlinded();
 		}
 		
 		/**
@@ -410,6 +411,14 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	public void interruptNormal() {
 		if (isCasting() || isChannelling()) {
 			activeSkill.interrupt(false);
+		}
+	}
+
+	public void interruptRangedSkills() {
+		if (isCasting() || isChannelling()) {
+			if (activeSkill != null && activeSkill.isRangedPhysicalOrMagicSkill()) {
+				activeSkill.interrupt(false);
+			}
 		}
 	}
 

@@ -1,7 +1,9 @@
 package com.mygdx.holowyth.skill;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.skill.effect.CasterEffect;
@@ -23,7 +25,7 @@ import com.mygdx.holowyth.util.exceptions.HoloException;
  * @author Colin Ta
  *
  */
-public class Skill implements Cloneable, SkillInfo {
+public abstract class Skill implements Cloneable, SkillInfo {
 
 	public float cooldown; // in game frames
 
@@ -51,6 +53,12 @@ public class Skill implements Cloneable, SkillInfo {
 	public Casting casting = new Casting(this); // default behaviour, can assign over this from a sub class.
 
 	public boolean hasChannelingBehaviour = false;
+
+	public enum Tag {
+		MAGIC, RANGED_MAGIC, RANGED
+	}
+
+	private final Set<Tag> tags = new LinkedHashSet<Tag>();
 
 	/**
 	 * Channeled *effects* is not implemented yet. Those effects need to be specially marked 'channeling', and when the skill channel is interrupted
@@ -261,6 +269,14 @@ public class Skill implements Cloneable, SkillInfo {
 
 	public World getWorld() {
 		return world;
+	}
+
+	public boolean isRangedPhysicalOrMagicSkill() {
+		return tags.contains(Tag.RANGED) || tags.contains(Tag.RANGED_MAGIC);
+	}
+
+	protected void addTag(Tag tag) {
+		tags.add(tag);
 	}
 
 }

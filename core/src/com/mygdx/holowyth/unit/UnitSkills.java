@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.skillsandeffects.MageSkills;
 import com.mygdx.holowyth.skill.skillsandeffects.Skills;
+import com.mygdx.holowyth.skill.skillsandeffects.WarriorSkills;
 import com.mygdx.holowyth.util.exceptions.HoloException;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
@@ -30,11 +31,12 @@ public class UnitSkills {
 
 		slot[1] = new MageSkills.Fireball();
 		slot[2] = new MageSkills.MagicMissile();
-		slot[3] = new MageSkills.ArcaneBolt();
-		slot[4] = new MageSkills.WindBlades();
+		slot[3] = new MageSkills.Thunderclap();
+		slot[4] = new MageSkills.BlindingFlash();
 		slot[5] = new MageSkills.Hydroblast();
 		slot[6] = new Skills.StaticShock();
-		slot[7] = new Skills.NovaFlare();
+		slot[7] = new WarriorSkills.RageBlow();
+
 	}
 
 	/**

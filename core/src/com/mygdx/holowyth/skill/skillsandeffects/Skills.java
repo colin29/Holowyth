@@ -25,6 +25,7 @@ public class Skills {
 			name = "Static Shock";
 			spCost = 10;
 			cooldown = 60;
+			addTag(Tag.MAGIC);
 		}
 
 		@Override
@@ -42,6 +43,7 @@ public class Skills {
 			spCost = 10;
 			cooldown = 20;
 			defaultAimingHelperRadius = Effects.ExplosionEffect.aoeRadius;
+			addTag(Tag.RANGED_MAGIC);
 		}
 
 		@Override
@@ -65,6 +67,7 @@ public class Skills {
 			spCost = 0;
 			cooldown = 20;
 			defaultAimingHelperRadius = Effects.ImplosionEffect.aoeRadius;
+			addTag(Tag.RANGED_MAGIC);
 		}
 
 		@Override
@@ -87,6 +90,7 @@ public class Skills {
 			spCost = 10;
 			cooldown = 20;
 			defaultAimingHelperRadius = Effects.NovaFlareEffect.aoeRadius;
+			addTag(Tag.RANGED_MAGIC);
 		}
 
 		@Override
@@ -99,6 +103,7 @@ public class Skills {
 		public ForcePush() {
 			super();
 			name = "Force Push";
+			addTag(Tag.RANGED_MAGIC);
 		}
 
 		@Override

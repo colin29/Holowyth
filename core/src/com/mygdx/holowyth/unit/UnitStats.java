@@ -21,6 +21,7 @@ import com.mygdx.holowyth.unit.statuseffect.BasicAttackSlowEffect;
 import com.mygdx.holowyth.unit.statuseffect.SlowEffect;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**
  * Simple stat fields are exposed public, while those which may trigger extra handling will be exposed through getters and setters
@@ -59,6 +60,7 @@ public class UnitStats implements UnitStatsInfo {
 	// Equips and status
 	private final EquippedItems equip = new EquippedItems();
 	private final List<SlowEffect> slowEffects = new LinkedList<SlowEffect>();
+	private float blindDurationRemaining;
 	private final UnitStun stun;
 
 	// test stats
@@ -102,6 +104,7 @@ public class UnitStats implements UnitStatsInfo {
 		slowEffects.forEach((effect) -> effect.tickDuration());
 		slowEffects.removeIf((effect) -> effect.isExpired());
 
+		blindDurationRemaining = Math.max(0, blindDurationRemaining - 1);
 	}
 
 	/**
@@ -500,6 +503,20 @@ public class UnitStats implements UnitStatsInfo {
 		stun.applyKnockbackStunWithoutVelProrate(duration, maxStunDuration, dv);
 	}
 
+	public void applyBlind(float duration) {
+
+		if (duration < 0) {
+			throw new HoloIllegalArgumentsException("duration must be non-negative");
+		}
+		if (!isBlinded()) {
+			self.interruptRangedSkills();
+			blindDurationRemaining = duration;
+		} else {
+			blindDurationRemaining += duration;
+		}
+
+	}
+
 	@Override
 	public boolean isStunned() {
 		return stun.isStunned();
@@ -531,6 +548,11 @@ public class UnitStats implements UnitStatsInfo {
 	@Override
 	public boolean isSlowed() {
 		return !slowEffects.isEmpty();
+	}
+
+	@Override
+	public boolean isBlinded() {
+		return blindDurationRemaining > 0;
 	}
 
 	public void addSp(float amount) {

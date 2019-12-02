@@ -73,4 +73,6 @@ public interface UnitStatsInfo {
 	int getArmor();
 
 	boolean isSlowed();
+
+	boolean isBlinded();
 }

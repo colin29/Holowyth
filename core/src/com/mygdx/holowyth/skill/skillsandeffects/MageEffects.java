@@ -392,4 +392,96 @@ public class MageEffects {
 
 	}
 
+	static class ThunderclapEffect extends CasterGroundEffect {
+
+		static float aoeRadius = 80f;
+
+		protected ThunderclapEffect(Unit caster, float x, float y) {
+			super(caster, x, y);
+		}
+
+		@Override
+		public void tick() {
+			for (Unit unit : world.getUnits()) {
+				if (Point.calcDistance(ground, unit.getPos()) <= aoeRadius + unit.getRadius()) {
+					if (unit.getSide() != caster.getSide()) {
+						unit.stats.doStunRollAgainst(18, 60 * 1.5f);
+					} else {
+						unit.stats.doStunRollAgainst(8, 60 * 1.5f);
+					}
+				}
+			}
+			markAsComplete();
+			world.addEffect(new CircleOutlineVfx(ground.x, ground.y, aoeRadius, Color.ORANGE, world));
+		}
+
+	}
+
+	static class CircleOutlineVfx extends Effect {
+
+		private static int vfxDuration = 80;
+
+		private float x, y;
+		private float aoeRadius;
+		private int framesElapsed = 0;
+
+		private Color color;
+
+		public CircleOutlineVfx(float x, float y, float aoeRadius, Color vfxColor, World world) {
+			super(world);
+			this.aoeRadius = aoeRadius;
+
+			this.x = x;
+			this.y = y;
+			this.color = vfxColor;
+		}
+
+		@Override
+		public void tick() {
+			if (framesElapsed >= vfxDuration) {
+				markAsComplete();
+			}
+			framesElapsed += 1;
+		}
+
+		@Override
+		public void render(SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
+			shapeDrawer.setColor(color, getOpacity());
+
+			batch.begin();
+			shapeDrawer.circle(x, y, aoeRadius);
+			batch.end();
+		}
+
+		private float getOpacity() {
+			return 0.9f * (1 - framesElapsed / (float) vfxDuration);
+		}
+
+	}
+
+	static class BlindingFlashEffect extends CasterGroundEffect {
+
+		static float aoeRadius = 80f;
+
+		protected BlindingFlashEffect(Unit caster, float x, float y) {
+			super(caster, x, y);
+		}
+
+		@Override
+		public void tick() {
+			for (Unit unit : world.getUnits()) {
+				if (Point.calcDistance(ground, unit.getPos()) <= aoeRadius + unit.getRadius()) {
+					if (unit.getSide() != caster.getSide()) {
+						unit.stats.applyBlind(60 * 4f);
+					} else {
+						unit.stats.applyBlind(60 * 2f);
+					}
+				}
+			}
+			markAsComplete();
+			world.addEffect(new CircleOutlineVfx(ground.x, ground.y, aoeRadius, Color.YELLOW, world));
+		}
+
+	}
+
 }
