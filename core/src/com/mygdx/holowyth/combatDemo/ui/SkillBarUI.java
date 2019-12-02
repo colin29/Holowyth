@@ -87,13 +87,18 @@ public class SkillBarUI {
 			// Make button
 			var button = new TextButton("(" + i + ")", skin);
 			Skill skill = skills[i];
-			if (skill == null)
-				continue;
-
 			skillBar.add(button);
-			String skillText = "(" + i + ")\n" + skill.name.substring(0, 5);
-			button.setText(skillText);
-			button.getLabel().setWrap(true);
+
+			if (skill == null) {
+				String skillText = "(" + i + ")\n";
+				button.setText(skillText);
+				button.getLabel().setWrap(true);
+				continue;
+			} else {
+				String skillText = "(" + i + ")\n" + skill.name.substring(0, 5);
+				button.setText(skillText);
+				button.getLabel().setWrap(true);
+			}
 
 			// Make Hover Panel
 			final Table hoverPanel = new Table();

@@ -644,7 +644,10 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	 * Updates attacking units
 	 */
 	public void tickAttacking() {
-		attackCooldownRemaining = Math.max(0, attackCooldownRemaining - 1); // cooldown ticks even when unit not attacking
+
+		if (!isCastingOrChanneling()) {
+			attackCooldownRemaining = Math.max(0, attackCooldownRemaining - 1); // cooldown ticks even when unit not attacking
+		}
 
 		if (isAttacking()) {
 			if (attacking.stats.isDead()) {
@@ -801,6 +804,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		return currentOrder == Order.RETREAT && retreatDurationRemaining > 0;
 	}
 
+	@Override
 	public WorldInfo getWorld() {
 		return world;
 	}

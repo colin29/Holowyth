@@ -1,5 +1,6 @@
 package com.mygdx.holowyth.unit.interfaces;
 
+import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.skill.SkillInfo;
 import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.Unit.Side;
@@ -55,4 +56,6 @@ public interface UnitInfo {
 	float getAttackCooldownRemaining();
 
 	float getAttackCooldown();
+
+	WorldInfo getWorld();
 }

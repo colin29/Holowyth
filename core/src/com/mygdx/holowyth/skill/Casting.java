@@ -22,10 +22,10 @@ public class Casting implements Cloneable, CastingInfo {
 
 	public boolean isInterruptedByDamageOrReel = true;
 
-	Skill parent;
+	Skill skill;
 
 	public Casting(Skill parent) {
-		this.parent = parent;
+		this.skill = parent;
 	}
 
 	public void begin(Unit caster) {
@@ -35,6 +35,7 @@ public class Casting implements Cloneable, CastingInfo {
 		}
 		castTimeRemaining = castTime;
 		onBeginCast();
+		caster.getWorld().getGfx().makeSkillNameEffect(skill.name + "!", caster);
 	}
 
 	public void tick() {

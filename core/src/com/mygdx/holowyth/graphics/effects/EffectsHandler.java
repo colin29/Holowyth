@@ -6,7 +6,11 @@ import java.util.ListIterator;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.graphics.effects.DamageEffect.PresetType;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.DataUtil;
@@ -20,26 +24,34 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
  */
 public class EffectsHandler {
 
-	Holowyth game;
+	private final SpriteBatch batch;
 	OrthographicCamera worldCamera;
+
+	private Skin skin;
+
+	private final Stage stage;
 
 	SparksEffectHandler sparksManager;
 
 	ArrayList<DamageEffect> damageEffects = new ArrayList<DamageEffect>();
+	ArrayList<SkillNameEffect> skillNameEffects = new ArrayList<>();
 
-	public EffectsHandler(Holowyth game, OrthographicCamera camera, DebugStore debugStore) {
-		this.game = game;
+	public EffectsHandler(SpriteBatch batch, OrthographicCamera camera, Stage stage, Skin skin, DebugStore debugStore) {
+		this.batch = batch;
 		this.worldCamera = camera;
+
+		this.stage = stage;
+		this.skin = skin;
 
 		// DebugValues debugValues = debugStore.registerComponent("Effects");
 		// debugValues.add("damageEffect count", () -> damageEffects.size());
 
-		sparksManager = new SparksEffectHandler(game, camera, debugStore);
+		sparksManager = new SparksEffectHandler(batch, camera, debugStore);
 	}
 
 	public void renderDamageEffects() {
-		game.batch.setProjectionMatrix(worldCamera.combined);
-		game.batch.begin();
+		batch.setProjectionMatrix(worldCamera.combined);
+		batch.begin();
 
 		for (DamageEffect d : damageEffects) {
 			BitmapFont font;
@@ -71,9 +83,9 @@ public class EffectsHandler {
 
 			font.getColor().a = d.getCurrentOpacity();
 
-			font.draw(game.batch, d.text, d.x - width / 2, d.y + height / 2);
+			font.draw(batch, d.text, d.x - width / 2, d.y + height / 2);
 		}
-		game.batch.end();
+		batch.end();
 	}
 
 	/**
@@ -88,6 +100,16 @@ public class EffectsHandler {
 				iter.remove();
 			}
 		}
+		for (var effect : skillNameEffects) {
+			effect.tick();
+		}
+		skillNameEffects.removeIf((e) -> e.isComplete());
+	}
+
+	public void makeSkillNameEffect(String text, UnitInfo unit) {
+		var effect = new SkillNameEffect(text, unit, worldCamera, (World) unit.getWorld(), stage, skin);
+		effect.begin();
+		skillNameEffects.add(effect);
 	}
 
 	public boolean useScatteringDamageEffect = false;

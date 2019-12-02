@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.skill.Skill;
-import com.mygdx.holowyth.skill.skillsandeffects.MageSkills;
-import com.mygdx.holowyth.skill.skillsandeffects.Skills;
+import com.mygdx.holowyth.skill.skillsandeffects.RangerSkills;
+import com.mygdx.holowyth.skill.skillsandeffects.WarriorSkills;
 import com.mygdx.holowyth.util.exceptions.HoloException;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
@@ -24,13 +24,17 @@ public class UnitSkills {
 	 */
 	Skill[] slot = new Skill[11];
 	{
-		slot[1] = new MageSkills.Fireball();
-		slot[2] = new MageSkills.MagicMissile();
-		slot[3] = new MageSkills.ArcaneBolt();
-		slot[4] = new MageSkills.WindBlades();
-		slot[5] = new MageSkills.Hydroblast();
-		slot[6] = new Skills.StaticShock();
-		slot[7] = new Skills.NovaFlare();
+
+		slot[1] = new WarriorSkills.RageBlow();
+		slot[2] = new RangerSkills.CrossSlash();
+
+		// slot[1] = new MageSkills.Fireball();
+		// slot[2] = new MageSkills.MagicMissile();
+		// slot[3] = new MageSkills.ArcaneBolt();
+		// slot[4] = new MageSkills.WindBlades();
+		// slot[5] = new MageSkills.Hydroblast();
+		// slot[6] = new Skills.StaticShock();
+		// slot[7] = new Skills.NovaFlare();
 	}
 
 	/**

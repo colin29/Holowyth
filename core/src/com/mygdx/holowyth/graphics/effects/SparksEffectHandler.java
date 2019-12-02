@@ -23,14 +23,14 @@ public class SparksEffectHandler {
 	SpriteBatch batch;
 	OrthographicCamera camera;
 
-	SparksEffectHandler(Holowyth game, OrthographicCamera camera, DebugStore debugStore) {
+	SparksEffectHandler(SpriteBatch batch, OrthographicCamera camera, DebugStore debugStore) {
 		effectBlueprint = new ParticleEffect();
 		effectBlueprint.load(Gdx.files.internal(Holowyth.ASSETS_PATH + "vfx/sparks.p"),
 				Gdx.files.internal(Holowyth.ASSETS_PATH + "vfx"));
 		effectBlueprint.setPosition(300, 300);
 		effectPool = new ParticleEffectPool(effectBlueprint, 20, 20);
 
-		this.batch = game.batch;
+		this.batch = batch;
 		this.camera = camera;
 
 		// DebugValues debugValues = debugStore.registerComponent("Sparks Manager");

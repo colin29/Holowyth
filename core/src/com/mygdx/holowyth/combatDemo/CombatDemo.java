@@ -1,7 +1,5 @@
 package com.mygdx.holowyth.combatDemo;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,6 +141,8 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	private Unit playerUnit;
 
+	private CombatPrototyping testing;
+
 	/**
 	 * Initializes neccesary game components. <br>
 	 * Creates map-lifetime components and sets up application-lifetime components. <br>
@@ -151,13 +151,20 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	 */
 	@Override
 	protected void mapStartup() {
+		initializeMapLifetimeComponents();
 
-		effects = new EffectsHandler(game, camera, debugStore);
+		testing.setupPlannedScenario();
+	}
+
+	private void initializeMapLifetimeComponents() {
 
 		// Init Pathing
 		pathingModule.initForMap(this.map);
 
 		// Init World
+
+		effects = new EffectsHandler(game.batch, camera, stage, skin, debugStore);
+
 		world = new World(this.map, pathingModule, debugStore, effects);
 
 		// Init Unit controls
@@ -175,20 +182,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		// UI
 		combatDemoUI.onMapStartup();
 
-		/* Test Area */
+		// Testing
+		testing = new CombatPrototyping(world, unitControls);
 
-		// Create test units
-		// playerUnit = world.createPlayerUnit();
-		// unitControls.selectedUnits.add(playerUnit);
-		// world.spawnSomeEnemyUnits();
-
-		playerUnit = CombatPrototyping.spawnSomePlayerUnits(world).get(0);
-
-		List<Unit> enemies = CombatPrototyping.spawnSomeEnemyUnits(world);
-		// player.orderAttackUnit(enemy);
-		// for (Unit enemy : enemies) {
-		// enemy.orderAttackUnit(playerUnit);
-		// }
 	}
 
 	@Override
