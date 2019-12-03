@@ -188,6 +188,9 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	@Override
 	public void orderMove(float x, float y) {
 		if (!isMoveOrderAllowed()) {
+			if (stats.isStunned()) {
+				tryToDeferOrder(Order.MOVE, null, x, y);
+			}
 			return;
 		}
 		if (motion.pathFindTowardsPoint(x, y)) {
@@ -217,6 +220,9 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		Unit unit = (Unit) unitOrd; // underlying objects must hold the same type
 
 		if (!isAttackOrderAllowed(unit)) {
+			if (stats.isStunned()) {
+				tryToDeferOrder(isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT, (Unit) unitOrd, 0, 0);
+			}
 			return false;
 		}
 		if (unit == this) {
@@ -271,6 +277,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 				attackMoveDestY = y;
 				this.currentOrder = Order.ATTACKMOVE;
 			}
+		} else if (stats.isStunned()) {
+			tryToDeferOrder(Order.ATTACKMOVE, null, x, y);
 		}
 
 	}
@@ -279,6 +287,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	public void orderRetreat(float x, float y) {
 		if (isRetreatOrderAllowed()) {
 			retreat(x, y);
+		} else if (stats.isStunned()) {
+			tryToDeferOrder(Order.RETREAT, null, x, y);
 		}
 	}
 
@@ -310,6 +320,8 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	@Override
 	public void orderStop() {
 		if (!isStopOrderAllowed()) {
+			if (stats.isStunned())
+				clearDeferredOrder();
 			return;
 		}
 		stopUnit();
@@ -317,6 +329,10 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public void orderUseSkill(Skill skill) {
+
+		if (stats.isStunned()) {
+			clearDeferredOrder(); // deferring a skill order is not supported but it will still clear an existing deferred order
+		}
 
 		if (!isUseSkillAllowed()) {
 			return;
@@ -374,6 +390,7 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 			return isGeneralOrderAllowed()
 					&& !stats.isBlinded();
 		}
+		
 		
 		/**
 		 * Returns the conditions which are shared by most ordinary orders
@@ -465,37 +482,69 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * Caches the current order so it can try to resume when the stun expires
+	 * Caches the given order so it can try to resume when the stun expires
+	 * 
+	 * @param order
+	 * @param target
+	 *            Optional, if the order requires it
+	 * @param x
+	 *            Optional
+	 * @param y
 	 */
-	void deferCurrentOrder() {
-		deferredOrder = Order.NONE;
-		deferredOrderTarget = null;
-		deferredOrderX = 0;
-		deferredOrderY = 0;
+	void tryToDeferOrder(Order order, Unit target, float x, float y) {
 
-		switch (currentOrder) {
+		logger.debug("Deferring order: {} {} {} {}", order.toString(), target != null ? target.getName() : "null", x, y);
 
+		clearDeferredOrder();
+
+		deferredOrder = order;
+		switch (order) {
 		case ATTACKMOVE:
-			deferredOrder = currentOrder;
-			deferredOrderX = attackMoveDestX;
-			deferredOrderY = attackMoveDestY;
+			deferredOrderX = x;
+			deferredOrderY = y;
 			break;
 		case MOVE:
-			deferredOrder = currentOrder;
-			deferredOrderX = motion.getDest().x;
-			deferredOrderY = motion.getDest().y;
+			deferredOrderX = x;
+			deferredOrderY = y;
 			break;
 
 		case ATTACKUNIT_HARD:
 		case ATTACKUNIT_SOFT:
-			deferredOrder = currentOrder;
 			deferredOrderTarget = target;
 			break;
 
 		case RETREAT:
-			deferredOrder = Order.RETREAT;
-			deferredOrderX = motion.getDest().x;
-			deferredOrderY = motion.getDest().y;
+			deferredOrderX = x;
+			deferredOrderY = y;
+			break;
+
+		case NONE:
+			break;
+		default:
+			throw new HoloAssertException("Unhandled order type");
+		}
+	}
+
+	/**
+	 * Caches the current order so it can try to resume when the stun expires
+	 */
+	void deferCurrentOrder() {
+
+		clearDeferredOrder();
+
+		switch (currentOrder) {
+		case ATTACKMOVE:
+			tryToDeferOrder(currentOrder, null, attackMoveDestX, attackMoveDestY);
+			break;
+		case MOVE:
+			tryToDeferOrder(currentOrder, null, motion.getDest().x, motion.getDest().y);
+			break;
+		case ATTACKUNIT_HARD:
+		case ATTACKUNIT_SOFT:
+			tryToDeferOrder(currentOrder, target, 0, 0);
+			break;
+		case RETREAT:
+			tryToDeferOrder(currentOrder, target, motion.getDest().x, motion.getDest().y);
 			break;
 		case NONE:
 			break;
@@ -503,6 +552,13 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 			throw new HoloAssertException("Unhandled order type");
 		}
 
+	}
+
+	private void clearDeferredOrder() {
+		deferredOrder = Order.NONE;
+		deferredOrderTarget = null;
+		deferredOrderX = 0;
+		deferredOrderY = 0;
 	}
 
 	// Tick Logic

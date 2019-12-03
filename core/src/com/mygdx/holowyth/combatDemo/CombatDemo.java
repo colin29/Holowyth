@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.combatDemo.rendering.Renderer;
 import com.mygdx.holowyth.combatDemo.ui.CombatDemoUI;
+import com.mygdx.holowyth.combatDemo.ui.GameLog;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
@@ -237,18 +238,28 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	}
 
 	private void pauseGame() {
-		gamePaused = true;
+		if (!gamePaused) {
+			gamePaused = true;
+			getGameLog().addMessage("Game Paused");
+		}
 	}
 
 	/**
 	 * If game is already running, has no effect
 	 */
 	private void unpauseGame() {
-		gamePaused = false;
+		if (gamePaused) {
+			gamePaused = false;
+			getGameLog().addMessage("Game Unpaused");
+		}
 	}
 
 	private boolean isGamePaused() {
 		return gamePaused;
+	}
+
+	public GameLog getGameLog() {
+		return combatDemoUI.getGameLog();
 	}
 
 }

@@ -168,6 +168,7 @@ public class Controls extends InputProcessorAdapter {
 		bindNumberKeysToSkills();
 
 		functionBindings.bindFunctionToKey(() -> setSPToMax(), Keys.Q);
+		functionBindings.bindFunctionToKey(() -> orderSelectedUnitsToStop(), Keys.S);
 
 	}
 
@@ -188,6 +189,12 @@ public class Controls extends InputProcessorAdapter {
 	private void setSPToMax() {
 		for (Unit unit : selectedUnits) {
 			unit.stats.setSp(unit.stats.getMaxSp());
+		}
+	}
+
+	private void orderSelectedUnitsToStop() {
+		for (Unit unit : selectedUnits) {
+			unit.orderStop();
 		}
 	}
 

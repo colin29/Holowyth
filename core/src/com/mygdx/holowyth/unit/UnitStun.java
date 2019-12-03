@@ -214,6 +214,7 @@ class UnitStun {
 		stunDurationRemaining = 0;
 		beginReel(Math.max(120, deferredReelAmount));
 		deferredReelAmount = 0;
+		logger.debug("stun ended");
 		self.tryToResumeDeferredOrder(); // important to call this AFTER stun state de-set, ie. unit.isStunned() returns false.
 	}
 
