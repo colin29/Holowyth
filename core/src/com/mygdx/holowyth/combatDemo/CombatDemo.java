@@ -51,7 +51,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	World world;
 
 	// Graphical Components
-	EffectsHandler effects; // keeps track of vfx effects
+	EffectsHandler gfx; // keeps track of vfx effects
 
 	// Input
 	private InputMultiplexer multiplexer = new InputMultiplexer();
@@ -96,6 +96,13 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		functionBindings.bindFunctionToKey(() -> {
 			goBreak = true;
 		}, Keys.B); // break point
+		functionBindings.bindFunctionToKey(() -> {
+			if (isGamePaused()) {
+				unpauseGame();
+			} else {
+				pauseGame();
+			}
+		}, Keys.E);
 	}
 
 	public static boolean goBreak = false; // debug variable
@@ -119,11 +126,13 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		ifTimeElapsedTickWorld();
 	}
 
+	private boolean gamePaused = false;
+
 	private void ifTimeElapsedTickWorld() {
 		timer.start(1000 / Holo.GAME_FPS);
-		if (timer.taskReady()) {
+		if (timer.taskReady() && !gamePaused) {
 			world.tick();
-			effects.tick();
+			gfx.tick();
 		}
 	}
 
@@ -163,9 +172,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		// Init World
 
-		effects = new EffectsHandler(game.batch, camera, stage, skin, debugStore);
+		gfx = new EffectsHandler(game.batch, camera, stage, skin, debugStore);
 
-		world = new World(this.map, pathingModule, debugStore, effects);
+		world = new World(this.map, pathingModule, debugStore, gfx);
 
 		// Init Unit controls
 		if (unitControls != null) {
@@ -177,7 +186,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		// Set Renderer to render world and other map-lifetime components
 		renderer.setWorld(world);
 		renderer.setUnitControls(unitControls);
-		renderer.setEffectsHandler(effects);
+		renderer.setEffectsHandler(gfx);
 
 		// UI
 		combatDemoUI.onMapStartup();
@@ -225,6 +234,21 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	public Controls getControls() {
 		return unitControls;
+	}
+
+	private void pauseGame() {
+		gamePaused = true;
+	}
+
+	/**
+	 * If game is already running, has no effect
+	 */
+	private void unpauseGame() {
+		gamePaused = false;
+	}
+
+	private boolean isGamePaused() {
+		return gamePaused;
 	}
 
 }

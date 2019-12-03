@@ -603,7 +603,6 @@ public class Controls extends InputProcessorAdapter {
 		}
 
 		if (selected != null) {
-			selected.stats.printInfo();
 			return selected;
 		} else {
 			return null;

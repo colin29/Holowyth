@@ -58,7 +58,7 @@ public abstract class Skill implements Cloneable, SkillInfo {
 		MAGIC, RANGED_MAGIC, RANGED
 	}
 
-	private final Set<Tag> tags = new LinkedHashSet<Tag>();
+	private Set<Tag> tags = new LinkedHashSet<Tag>();
 
 	/**
 	 * Channeled *effects* is not implemented yet. Those effects need to be specially marked 'channeling', and when the skill channel is interrupted
@@ -241,6 +241,9 @@ public abstract class Skill implements Cloneable, SkillInfo {
 	@Override
 	public Object clone() throws CloneNotSupportedException {
 		Skill newInstance = (Skill) super.clone();
+		newInstance.effects = new ArrayList<CasterEffect>();
+		newInstance.tags = new LinkedHashSet<Tag>(tags);
+
 		newInstance.casting = (Casting) this.casting.clone();
 		newInstance.casting.parent = newInstance;
 		return newInstance;

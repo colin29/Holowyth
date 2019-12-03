@@ -87,7 +87,7 @@ public class SkillBarUI {
 			// Make button
 			var button = new TextButton("(" + i + ")", skin);
 			Skill skill = skills[i];
-			skillBar.add(button);
+			skillBar.add(button).size(50);
 
 			if (skill == null) {
 				String skillText = "(" + i + ")\n";
@@ -95,9 +95,10 @@ public class SkillBarUI {
 				button.getLabel().setWrap(true);
 				continue;
 			} else {
-				String skillText = "(" + i + ")\n" + skill.name.substring(0, 5);
+				String skillText = "(" + i + ")\n" + skill.name;
+				button.getLabel().setEllipsis("");
 				button.setText(skillText);
-				button.getLabel().setWrap(true);
+				button.getCell(button.getLabel()).minSize(0); // minSize(0) is a bug fix to make truncation work
 			}
 
 			// Make Hover Panel

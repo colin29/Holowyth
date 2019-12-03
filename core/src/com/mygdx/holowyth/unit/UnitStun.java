@@ -187,6 +187,7 @@ class UnitStun {
 	}
 
 	private void beginStun(float duration) {
+		self.deferCurrentOrder();
 		self.motion.stopCurrentMovement();
 		self.clearOrder();
 		self.stopAttacking();
@@ -197,7 +198,6 @@ class UnitStun {
 	}
 
 	private void beginReel(float duration) {
-
 		// reeling doesn't interrupt attacking or motion, unlike stun
 		self.interruptNormal();
 
@@ -207,10 +207,14 @@ class UnitStun {
 		self.addAttackCooldownRemaining(self.getAttackCooldown());
 	}
 
+	/**
+	 * Must be called whenever a stun ends.
+	 */
 	private void endStun() {
 		stunDurationRemaining = 0;
 		beginReel(Math.max(120, deferredReelAmount));
 		deferredReelAmount = 0;
+		self.tryToResumeDeferredOrder(); // important to call this AFTER stun state de-set, ie. unit.isStunned() returns false.
 	}
 
 	private void endReeled() {

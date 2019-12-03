@@ -23,6 +23,7 @@ import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValue;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
@@ -69,16 +70,22 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 	private static int curId = 0;
 	private final int id;
 
-	/**
-	 * todo
-	 */
-	public boolean debugIsOnIllegalLocation = false;
 	public int debugNumOfUnitsCollidingWith = 0;
 
 	// Orders
 
 	Order currentOrder = Order.NONE;
 	Unit target; // target for the current command.
+	private float attackMoveDestX;
+	private float attackMoveDestY;
+
+	/**
+	 * When a unit stops being stunned, the unit will try to adopt this order. Should not be null.
+	 */
+	private Order deferredOrder = Order.NONE;
+	private Unit deferredOrderTarget; // if the order specifies it
+	private float deferredOrderX;
+	private float deferredOrderY;
 
 	// Combat
 	/** The unit this unit is attacking. Attacking a unit <--> being engaged. */
@@ -117,10 +124,6 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 						// non-trivial task
 		PLAYER, ENEMY
 	}
-
-	// Order-specific
-	private float attackMoveDestX;
-	private float attackMoveDestY;
 
 	/**
 	 * A unit's order represents whether it has any persistent order on it that would determine its behaviour. Note that a unit without a command
@@ -429,6 +432,77 @@ public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
 		if (isCasting() || isChannelling()) {
 			activeSkill.interrupt(true);
 		}
+	}
+
+	void tryToResumeDeferredOrder() {
+
+		switch (deferredOrder) {
+		case ATTACKMOVE:
+			orderAttackMove(deferredOrderX, deferredOrderY);
+			break;
+		case MOVE:
+			orderMove(deferredOrderX, deferredOrderY);
+			break;
+		case ATTACKUNIT_HARD:
+			orderAttackUnit(deferredOrderTarget, true);
+			break;
+		case ATTACKUNIT_SOFT:
+			orderAttackUnit(deferredOrderTarget, false);
+			break;
+		case RETREAT:
+			orderMove(deferredOrderX, deferredOrderY); // a unit that is stunned should already not be attacking, thus a move order is sufficient
+			deferredOrder = Order.MOVE;
+			break;
+		case NONE:
+			break;
+		default:
+			throw new HoloAssertException("Unhandled order type");
+		}
+		deferredOrder = Order.NONE;
+		deferredOrderTarget = null;
+		deferredOrderX = 0;
+		deferredOrderY = 0;
+	}
+
+	/**
+	 * Caches the current order so it can try to resume when the stun expires
+	 */
+	void deferCurrentOrder() {
+		deferredOrder = Order.NONE;
+		deferredOrderTarget = null;
+		deferredOrderX = 0;
+		deferredOrderY = 0;
+
+		switch (currentOrder) {
+
+		case ATTACKMOVE:
+			deferredOrder = currentOrder;
+			deferredOrderX = attackMoveDestX;
+			deferredOrderY = attackMoveDestY;
+			break;
+		case MOVE:
+			deferredOrder = currentOrder;
+			deferredOrderX = motion.getDest().x;
+			deferredOrderY = motion.getDest().y;
+			break;
+
+		case ATTACKUNIT_HARD:
+		case ATTACKUNIT_SOFT:
+			deferredOrder = currentOrder;
+			deferredOrderTarget = target;
+			break;
+
+		case RETREAT:
+			deferredOrder = Order.RETREAT;
+			deferredOrderX = motion.getDest().x;
+			deferredOrderY = motion.getDest().y;
+			break;
+		case NONE:
+			break;
+		default:
+			throw new HoloAssertException("Unhandled order type");
+		}
+
 	}
 
 	// Tick Logic
