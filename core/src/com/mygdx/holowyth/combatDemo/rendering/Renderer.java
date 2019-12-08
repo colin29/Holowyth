@@ -85,6 +85,8 @@ public class Renderer {
 	private UnitMotionRenderer unitMotion;
 	private SandBoxRenderer sandbox;
 
+	private TiledMapRenderer tiled;
+
 	/**
 	 * The game, worldCamera, and other screen-lifetime modules are passed in.
 	 * 
@@ -110,6 +112,7 @@ public class Renderer {
 		pathfinding = new PathfindingRenderer(this, pathingModule);
 		unitMotion = new UnitMotionRenderer(this);
 		sandbox = new SandBoxRenderer(this);
+		tiled = new TiledMapRenderer(this);
 	}
 
 	private static TextureRegion get1PixelWhiteTextureRegion() {
@@ -133,6 +136,7 @@ public class Renderer {
 
 		batch.setProjectionMatrix(worldCamera.combined);
 
+		tiled.render();
 		renderUnitHpSpBars();
 
 		// 1: Render Map

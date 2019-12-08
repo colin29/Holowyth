@@ -118,6 +118,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	@Override
 	public void render(float delta) {
 		stage.act();
+		handleMousePanning(delta);
 		renderer.render(delta);
 
 		updateTitleBarInformation();
@@ -125,6 +126,33 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		combatDemoUI.onRender();
 
 		ifTimeElapsedTickWorld();
+
+	}
+
+	/**
+	 * Pan the view if the mouse is near the edge of the screen
+	 */
+	private void handleMousePanning(float delta) {
+
+		int x = Gdx.input.getX();
+		int y = Gdx.input.getY();
+
+		final int screenHeight = Gdx.graphics.getHeight();
+		final int screenWidth = Gdx.graphics.getWidth();
+
+		float scrollMargin = 40f;
+		float scrollSpeed = 300; // pixels per second
+
+		if (y > screenHeight - scrollMargin)
+			camera.translate(0, -scrollSpeed * delta);
+		if (y < scrollMargin)
+			camera.translate(0, scrollSpeed * delta);
+
+		if (x > screenWidth - scrollMargin)
+			camera.translate(scrollSpeed * delta, 0);
+		if (x < scrollMargin)
+			camera.translate(-scrollSpeed * delta, 0);
+
 	}
 
 	private boolean gamePaused = false;
@@ -161,6 +189,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	 */
 	@Override
 	protected void mapStartup() {
+		map.polys.clear(); // Pretend there's no obstacles while I'm testing tiled maps
+		map.setDimensions(1200, 1200);
+
 		initializeMapLifetimeComponents();
 
 		testing.setupPlannedScenario();
