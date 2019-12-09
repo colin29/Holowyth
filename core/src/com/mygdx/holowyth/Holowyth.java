@@ -6,7 +6,11 @@ import java.lang.reflect.InvocationTargetException;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.kotcrab.vis.ui.VisUI;
@@ -14,6 +18,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.mygdx.holowyth.editor.PolyMapEditor;
 import com.mygdx.holowyth.graphics.HoloGL;
+import com.mygdx.holowyth.util.ShapeDrawerPlus;
 
 public class Holowyth extends Game {
 
@@ -38,6 +43,7 @@ public class Holowyth extends Game {
 	public FileChooser fileChooser;
 
 	Class<? extends Screen> screenClassToLoad;
+	private ShapeDrawerPlus shapeDrawer;
 
 	public Holowyth() {
 		this(PolyMapEditor.class);
@@ -72,6 +78,8 @@ public class Holowyth extends Game {
 		batch = new SpriteBatch();
 		shapeRenderer = new ShapeRenderer();
 		HoloGL.setShapeRenderer(shapeRenderer);
+
+		shapeDrawer = new ShapeDrawerPlus(batch, get1PixelWhiteTextureRegion());
 	}
 
 	private void initFileChoosers() {
@@ -107,6 +115,17 @@ public class Holowyth extends Game {
 				| InvocationTargetException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public ShapeDrawerPlus getShapeDrawer() {
+		return shapeDrawer;
+	}
+
+	private static TextureRegion get1PixelWhiteTextureRegion() {
+		var labelColor = new Pixmap(1, 1, Pixmap.Format.RGB888);
+		labelColor.setColor(Color.WHITE);
+		labelColor.fill();
+		return new TextureRegion(new Texture(labelColor));
 	}
 
 }

@@ -874,26 +874,10 @@
  <tile id="1741" terrain="0,0,19,0"/>
  <tile id="1742" terrain="0,19,19,19"/>
  <tile id="1743" terrain="19,0,19,19"/>
- <tile id="1744" terrain=",,,20">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="7.45455" y="8" width="16.5455" height="16"/>
-  </objectgroup>
- </tile>
- <tile id="1745" terrain=",,20,">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="8" width="16.5455" height="16"/>
-  </objectgroup>
- </tile>
- <tile id="1746" terrain=",20,20,20">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="0" width="24" height="24"/>
-  </objectgroup>
- </tile>
- <tile id="1747" terrain="20,,20,20">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="0" width="24" height="24"/>
-  </objectgroup>
- </tile>
+ <tile id="1744" terrain=",,,20"/>
+ <tile id="1745" terrain=",,20,"/>
+ <tile id="1746" terrain=",20,20,20"/>
+ <tile id="1747" terrain="20,,20,20"/>
  <tile id="1748" terrain=",,,21"/>
  <tile id="1749" terrain=",,21,"/>
  <tile id="1750" terrain=",21,21,21"/>
@@ -914,26 +898,10 @@
  <tile id="1789" terrain="19,0,0,0"/>
  <tile id="1790" terrain="19,19,0,19"/>
  <tile id="1791" terrain="19,19,19,0"/>
- <tile id="1792" terrain=",20,,">
-  <objectgroup draworder="index" id="2">
-   <object id="6" x="7.45455" y="0.0909091" width="16.5455" height="16"/>
-  </objectgroup>
- </tile>
- <tile id="1793" terrain="20,,,">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="0" width="16.5455" height="16"/>
-  </objectgroup>
- </tile>
- <tile id="1794" terrain="20,20,,20">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="0" width="24" height="24"/>
-  </objectgroup>
- </tile>
- <tile id="1795" terrain="20,20,20,">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="0" width="24" height="24"/>
-  </objectgroup>
- </tile>
+ <tile id="1792" terrain=",20,,"/>
+ <tile id="1793" terrain="20,,,"/>
+ <tile id="1794" terrain="20,20,,20"/>
+ <tile id="1795" terrain="20,20,20,"/>
  <tile id="1796" terrain=",21,,"/>
  <tile id="1797" terrain="21,,,"/>
  <tile id="1798" terrain="21,21,,21"/>
@@ -954,26 +922,10 @@
  <tile id="1837" terrain="0,0,19,19"/>
  <tile id="1838" terrain="0,0,19,19"/>
  <tile id="1839" terrain="0,0,19,0"/>
- <tile id="1840" terrain=",,,20">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="7" y="0.197268" width="16.8182" height="23.6055"/>
-  </objectgroup>
- </tile>
- <tile id="1841" terrain=",,20,20">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="4.63636" width="24.0455" height="19.2544"/>
-  </objectgroup>
- </tile>
- <tile id="1842" terrain=",,20,20">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="0.0681591" y="4.64553" width="24.0455" height="19.2544"/>
-  </objectgroup>
- </tile>
- <tile id="1843" terrain=",,20,">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="5.72727" width="16.3636" height="18.2727"/>
-  </objectgroup>
- </tile>
+ <tile id="1840" terrain=",,,20"/>
+ <tile id="1841" terrain=",,20,20"/>
+ <tile id="1842" terrain=",,20,20"/>
+ <tile id="1843" terrain=",,20,"/>
  <tile id="1844" terrain=",,,21"/>
  <tile id="1845" terrain=",,21,21"/>
  <tile id="1846" terrain=",,21,21"/>
@@ -994,18 +946,10 @@
  <tile id="1885" terrain="19,19,19,19"/>
  <tile id="1886" terrain="19,19,19,19"/>
  <tile id="1887" terrain="19,0,19,0"/>
- <tile id="1888" terrain=",20,,20">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="7" y="0" width="16.9091" height="23.9691"/>
-  </objectgroup>
- </tile>
+ <tile id="1888" terrain=",20,,20"/>
  <tile id="1889" terrain="20,20,20,20"/>
  <tile id="1890" terrain="20,20,20,20"/>
- <tile id="1891" terrain="20,,20,">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="0.0909091" width="19.4545" height="23.9091"/>
-  </objectgroup>
- </tile>
+ <tile id="1891" terrain="20,,20,"/>
  <tile id="1892" terrain=",21,,21"/>
  <tile id="1893" terrain="21,21,21,21"/>
  <tile id="1894" terrain="21,21,21,21"/>
@@ -1026,18 +970,10 @@
  <tile id="1933" terrain="19,19,19,19"/>
  <tile id="1934" terrain="19,19,19,19"/>
  <tile id="1935" terrain="19,0,19,0"/>
- <tile id="1936" terrain=",20,,20">
-  <objectgroup draworder="index" id="2">
-   <object id="11" x="7" y="-0.0909091" width="16.9091" height="23.9691"/>
-  </objectgroup>
- </tile>
+ <tile id="1936" terrain=",20,,20"/>
  <tile id="1937" terrain="20,20,20,20"/>
  <tile id="1938" terrain="20,20,20,20"/>
- <tile id="1939" terrain="20,,20,">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="-0.0878037" y="0.122052" width="21.2145" height="23.9691"/>
-  </objectgroup>
- </tile>
+ <tile id="1939" terrain="20,,20,"/>
  <tile id="1940" terrain=",21,,21"/>
  <tile id="1941" terrain="21,21,21,21"/>
  <tile id="1942" terrain="21,21,21,21"/>
@@ -1058,29 +994,10 @@
  <tile id="1981" terrain="19,19,0,0"/>
  <tile id="1982" terrain="19,19,0,0"/>
  <tile id="1983" terrain="19,0,0,0"/>
- <tile id="1984" terrain=",20,,">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="12.2727" y="0" width="11.7273" height="16.1509"/>
-  </objectgroup>
- </tile>
- <tile id="1985" terrain="20,20,,">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="0" width="24" height="17.6964"/>
-  </objectgroup>
- </tile>
- <tile id="1986" terrain="20,20,,">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="0" width="24" height="17.6964"/>
-  </objectgroup>
- </tile>
- <tile id="1987" terrain="20,,,">
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="-0.0610221" width="18.1236" height="17.6964"/>
-   <object id="2" x="0.0610221" y="17.7574">
-    <polyline points="0,0 -0.0610221,-17.6964"/>
-   </object>
-  </objectgroup>
- </tile>
+ <tile id="1984" terrain=",20,,"/>
+ <tile id="1985" terrain="20,20,,"/>
+ <tile id="1986" terrain="20,20,,"/>
+ <tile id="1987" terrain="20,,,"/>
  <tile id="1988" terrain=",21,,"/>
  <tile id="1989" terrain="21,21,,"/>
  <tile id="1990" terrain="21,21,,"/>

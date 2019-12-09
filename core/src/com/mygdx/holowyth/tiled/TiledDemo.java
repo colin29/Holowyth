@@ -1,14 +1,23 @@
 package com.mygdx.holowyth.tiled;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Polyline;
+import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.util.ShapeDrawerPlus;
+import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.template.BaseHoloScreen;
 
 public class TiledDemo extends BaseHoloScreen implements InputProcessor {
@@ -18,15 +27,20 @@ public class TiledDemo extends BaseHoloScreen implements InputProcessor {
 	private OrthogonalTiledMapRenderer tiledMapRenderer;
 	private TiledMap map;
 
+	private ShapeDrawerPlus shapeDrawer;
+
 	public TiledDemo(Holowyth game) {
 		super(game);
 		loadMap();
 		Gdx.input.setInputProcessor(this);
+		shapeDrawer = game.getShapeDrawer();
 	}
 
 	public void loadMap() {
 		map = new MyAtlasTmxMapLoader().load("assets/maps/forest1.tmx");
 		tiledMapRenderer = new OrthogonalTiledMapRenderer(map);
+
+		readCollisionObjectsFromMap();
 	}
 
 	@Override
@@ -41,52 +55,85 @@ public class TiledDemo extends BaseHoloScreen implements InputProcessor {
 		tiledMapRenderer.setView(camera);
 		tiledMapRenderer.render();
 
+		renderSegs();
+
 	}
 
-	/**
-	 * Pan the view if the mouse is near the edge of the screen
-	 */
-	private void handleMousePanning(float delta) {
+	private void renderSegs() {
+		batch.setProjectionMatrix(camera.combined);
+		batch.begin();
+		for (Segment seg : segs) {
+			shapeDrawer.line(seg.x1, seg.y1, seg.x2, seg.y2);
+		}
+		batch.end();
 
-		int x = Gdx.input.getX();
-		int y = Gdx.input.getY();
+	}
 
-		final int screenHeight = Gdx.graphics.getHeight();
-		final int screenWidth = Gdx.graphics.getWidth();
+	List<Segment> segs = new ArrayList<Segment>();
 
-		float scrollMargin = 40f;
-		float scrollSpeed = 300 * delta; // pixels per second
+	private void readCollisionObjectsFromMap() {
 
-		float origX = camera.position.x;
-		float origY = camera.position.y;
+		var collisionLayer = map.getLayers().get("Collision");
 
-		if (y > screenHeight - scrollMargin)
-			camera.translate(0, -scrollSpeed + snapLeftoverY);
-		if (y < scrollMargin)
-			camera.translate(0, scrollSpeed + snapLeftoverY);
+		MapObjects objects = collisionLayer.getObjects();
 
-		if (x > screenWidth - scrollMargin)
-			camera.translate(scrollSpeed + snapLeftoverX, 0);
-		if (x < scrollMargin)
-			camera.translate(-scrollSpeed + snapLeftoverX, 0);
+		// there are several other types, Rectangle is probably the most common one
+		for (PolylineMapObject object : objects.getByType(PolylineMapObject.class)) {
 
-		System.out.println("Actual movespeed: " + (camera.position.x - origX - snapLeftoverX) / delta); // should be averaging 300
+			Polyline polyline = object.getPolyline();
+			float[] vertices = polyline.getTransformedVertices();
 
-		snapCameraAndSaveRemainder();
+			Vector2 end = new Vector2(vertices[0], vertices[1]);
+			Vector2 start = new Vector2();
 
-		System.out.println(camera.position.x - origX);
+			// i represent the current line segment (for example with 6 floats, there are 3 points, and 2 total line segments)
+			for (int i = 1; i < vertices.length / 2; i += 1) {
+				start.set(end);
+				end.set(vertices[i * 2], vertices[i * 2 + 1]);
 
-		snapLeftoverX = 0;
-		snapLeftoverY = 0;
+				segs.add(new Segment(start.x, start.y, end.x, end.y));
+				logger.debug("Added ({} {}) ({},{})", start.x, start.y, end.x, end.y);
+			}
+
+		}
 
 	}
 
 	private float snapLeftoverX;
 	private float snapLeftoverY;
 
+	/**
+	 * Pan the view if the mouse is near the edge of the screen
+	 */
+	private void handleMousePanning(float delta) {
+
+		final int mouseX = Gdx.input.getX();
+		final int mouseY = Gdx.input.getY();
+
+		final int screenHeight = Gdx.graphics.getHeight();
+		final int screenWidth = Gdx.graphics.getWidth();
+
+		final float scrollMargin = 40f;
+		final float scrollSpeed = 300 * delta; // do X pixels per second
+
+		if (mouseY > screenHeight - scrollMargin)
+			camera.translate(0, -scrollSpeed + snapLeftoverY);
+		if (mouseY < scrollMargin)
+			camera.translate(0, scrollSpeed + snapLeftoverY);
+
+		if (mouseX > screenWidth - scrollMargin)
+			camera.translate(scrollSpeed + snapLeftoverX, 0);
+		if (mouseX < scrollMargin)
+			camera.translate(-scrollSpeed + snapLeftoverX, 0);
+
+		snapLeftoverX = 0;
+		snapLeftoverY = 0;
+
+		snapCameraAndSaveRemainder();
+	}
+
 	/*
-	 * Accumulate the leftovers and apply them to later movement, in order to prevent panning slow-down due to repeated rounding. Matters only with
-	 * slow panning or high frame rate
+	 * Accumulate the leftovers and apply them to later movement, in order to prevent slow-down or inconsistencies due to repeated rounding.
 	 */
 	private void snapCameraAndSaveRemainder() {
 
@@ -95,8 +142,8 @@ public class TiledDemo extends BaseHoloScreen implements InputProcessor {
 
 		camera.position.set(Math.round(camera.position.x), Math.round(camera.position.y), 0);
 
-		snapLeftoverX -= dx;
-		snapLeftoverY -= dy;
+		snapLeftoverX = -1 * dx;
+		snapLeftoverY = -1 * dy;
 	}
 
 	@Override

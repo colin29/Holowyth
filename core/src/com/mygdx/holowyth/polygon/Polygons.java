@@ -3,7 +3,7 @@ package com.mygdx.holowyth.polygon;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mygdx.holowyth.collision.wallcollisiondemo.OrientedPoly;
+import com.mygdx.holowyth.util.dataobjects.OrientedPoly;
 
 /**
  * Convenience class to use instead of typing ArrayList<Polygon>

@@ -20,6 +20,8 @@ import com.mygdx.holowyth.collision.collisiondemo.CircleCB;
 import com.mygdx.holowyth.collision.collisiondemo.CircleCBImpl;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
+import com.mygdx.holowyth.util.dataobjects.OrientedPoly;
+import com.mygdx.holowyth.util.dataobjects.OrientedSeg;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 

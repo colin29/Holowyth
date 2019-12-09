@@ -9,7 +9,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -100,7 +99,7 @@ public class Renderer {
 
 		batch = game.batch;
 		shapeRenderer = game.shapeRenderer;
-		shapeDrawer = new ShapeDrawerPlus(batch, get1PixelWhiteTextureRegion());
+		shapeDrawer = game.getShapeDrawer();
 
 		this.game = game;
 
@@ -113,13 +112,6 @@ public class Renderer {
 		unitMotion = new UnitMotionRenderer(this);
 		sandbox = new SandBoxRenderer(this);
 		tiled = new TiledMapRenderer(this);
-	}
-
-	private static TextureRegion get1PixelWhiteTextureRegion() {
-		var labelColor = new Pixmap(1, 1, Pixmap.Format.RGB888);
-		labelColor.setColor(Color.WHITE);
-		labelColor.fill();
-		return new TextureRegion(new Texture(labelColor));
 	}
 
 	/*

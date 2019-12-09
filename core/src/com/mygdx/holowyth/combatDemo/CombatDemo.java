@@ -152,11 +152,10 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		if (mouseX < scrollMargin)
 			camera.translate(-scrollSpeed + snapLeftoverX, 0);
 
-		snapCameraAndSaveRemainder();
-
 		snapLeftoverX = 0;
 		snapLeftoverY = 0;
 
+		snapCameraAndSaveRemainder();
 	}
 
 	private float snapLeftoverX;
@@ -172,8 +171,8 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		camera.position.set(Math.round(camera.position.x), Math.round(camera.position.y), 0);
 
-		snapLeftoverX -= dx;
-		snapLeftoverY -= dy;
+		snapLeftoverX = -1 * dx;
+		snapLeftoverY = -1 * dy;
 	}
 
 	private boolean gamePaused = false;
