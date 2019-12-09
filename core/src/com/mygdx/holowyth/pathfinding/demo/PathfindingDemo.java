@@ -125,7 +125,6 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
 		unitControls.renderSelectionBox(PFUnitControls.defaultSelectionBoxColor);
 		// Rendering Test area;
-		pathingModule.renderExpandedMapPolygons();
 
 		// UI
 		stage.act(delta);
@@ -458,7 +457,8 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 				}
 
 				// Take this motion if it's valid, otherwise don't move unit.
-				if (HoloPF.isEdgePathable(u.x, u.y, curDestx, curDesty, pathingModule.getExpandedMapPolys(), colBodies,
+				if (HoloPF.isSegmentPathable(u.x, u.y, curDestx, curDesty, pathingModule.getObstacleExpandedSegs(), pathingModule.getObstaclePoints(),
+						colBodies,
 						u.getRadius())) {
 					u.x = curDestx;
 					u.y = curDesty;

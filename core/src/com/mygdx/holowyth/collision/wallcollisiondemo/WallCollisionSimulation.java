@@ -53,7 +53,7 @@ public class WallCollisionSimulation {
 		polygons.clear();
 		polygons.addAll(src);
 		orientedPolys.clear();
-		orientedPolys.addAll(Polygons.calculateOrientedPolygons(polygons));
+		orientedPolys.addAll(OrientedPoly.calculateOrientedPolygons(polygons));
 		updateObstaclePoints();
 		recalculateObjectCollision();
 	}

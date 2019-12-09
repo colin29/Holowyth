@@ -2,6 +2,7 @@ package com.mygdx.holowyth.pathfinding;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.List;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
@@ -9,6 +10,7 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.mygdx.holowyth.polygon.Polygon;
 import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.dataobjects.OrientedSeg;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 
@@ -23,41 +25,41 @@ import de.lighti.clipper.Point.LongPoint;
  */
 public class HoloPF {
 
-	/**
-	 * Determines whether an edge is pathable against a set of collision bodies (map polygons and unit circles)
-	 * 
-	 * @param x
-	 * @param y
-	 * @param x2
-	 * @param y2
-	 * @param polys
-	 * @param cbs
-	 *            The collision bodies for units
-	 * @return
-	 */
-	public static boolean isEdgePathable(float x, float y, float x2, float y2, Polygons polys, ArrayList<CBInfo> cbs,
-			float unitRadius) {
-		boolean intersects = false;
-		if (polys != null) {
-			for (Polygon polygon : polys) {
-				for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
-					if (Line2D.linesIntersect(x, y, x2, y2, polygon.floats[i], polygon.floats[i + 1],
-							polygon.floats[(i + 2) % polygon.count], polygon.floats[(i + 3) % polygon.count])) {
-						intersects = true;
-					}
-				}
-			}
-		}
-
-		// Check against unit circles
-		for (CBInfo cb : cbs) {
-			if (Line2D.ptSegDistSq(x, y, x2, y2, cb.x, cb.y) < (cb.unitRadius + unitRadius)
-					* (cb.unitRadius + unitRadius)) {
-				intersects = true;
-			}
-		}
-		return !intersects;
-	}
+	// /**
+	// * Determines whether an edge is pathable against a set of collision bodies (map polygons and unit circles)
+	// *
+	// * @param x
+	// * @param y
+	// * @param x2
+	// * @param y2
+	// * @param polys
+	// * @param cbs
+	// * The collision bodies for units
+	// * @return
+	// */
+	// public static boolean isEdgePathable(float x, float y, float x2, float y2, Polygons polys, ArrayList<CBInfo> cbs,
+	// float unitRadius) {
+	// boolean intersects = false;
+	// if (polys != null) {
+	// for (Polygon polygon : polys) {
+	// for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
+	// if (Line2D.linesIntersect(x, y, x2, y2, polygon.floats[i], polygon.floats[i + 1],
+	// polygon.floats[(i + 2) % polygon.count], polygon.floats[(i + 3) % polygon.count])) {
+	// intersects = true;
+	// }
+	// }
+	// }
+	// }
+	//
+	// // Check against unit circles
+	// for (CBInfo cb : cbs) {
+	// if (Line2D.ptSegDistSq(x, y, x2, y2, cb.x, cb.y) < (cb.unitRadius + unitRadius)
+	// * (cb.unitRadius + unitRadius)) {
+	// intersects = true;
+	// }
+	// }
+	// return !intersects;
+	// }
 
 	/**
 	 * If the edge given collides with a polygon, returns a segment describing that collision
@@ -115,7 +117,7 @@ public class HoloPF {
 	 * @param polys
 	 * @return
 	 */
-	public static boolean isEdgePathable(float x, float y, float x2, float y2, Polygons polys) {
+	public static boolean isSegmentPathable(float x, float y, float x2, float y2, Polygons polys) {
 		boolean intersects = false;
 		for (Polygon polygon : polys) {
 			for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
@@ -126,6 +128,64 @@ public class HoloPF {
 			}
 		}
 		return !intersects;
+	}
+
+	private static Segment tempSeg = new Segment(0, 0, 0, 0);
+
+	/**
+	 * Checks pathability based on obstacles AND other units
+	 * 
+	 */
+	public static boolean isSegmentPathable(float x1, float y1, float x2, float y2, List<OrientedSeg> obstacleExpandedSegs,
+			List<Point> obstaclePoints, List<CBInfo> unitCBs,
+			float thisUnitRadius) {
+		tempSeg.set(x1, y1, x2, y2);
+		return isSegmentPathable(tempSeg, obstacleExpandedSegs, obstaclePoints, unitCBs, thisUnitRadius);
+	}
+
+	/**
+	 * 
+	 * 
+	 * @param motion
+	 * @param obstacleExpandedSegs
+	 * @param obstaclePoints
+	 * @param unitCBs
+	 * @param curUnitsRadius
+	 * @return
+	 */
+	public static boolean isSegmentPathable(Segment motion, List<OrientedSeg> obstacleExpandedSegs, List<Point> obstaclePoints, List<CBInfo> unitCBs,
+			float thisUnitRadius) {
+		// TODO: make a new list, unit bodies in in as additional points
+
+		return isSegmentPathable(motion, obstacleExpandedSegs, obstaclePoints, thisUnitRadius);
+	}
+
+	private static boolean isSegmentPathableAgainstUnit(Segment motion, CBInfo unitCB, float thisUnitRadius) {
+		// TODO
+		return true;
+	}
+
+	public static boolean isSegmentPathableAgainstObstacles(float x1, float y1, float x2, float y2, List<OrientedSeg> displacedSegs,
+			List<Point> points,
+			float unitRadius) {
+		tempSeg.set(x1, y1, x2, y2);
+		return isSegmentPathable(tempSeg, displacedSegs, points, unitRadius);
+	}
+
+	/**
+	 * TODO: stub
+	 * 
+	 * @param motion
+	 *            The motion of the unit
+	 * @param displacedSegs
+	 *            The obstacle segs, already displaced outwards by {unit radius}
+	 * @param points
+	 *            The unmodified obstacle corners
+	 * @param unitRadius
+	 * @return
+	 */
+	public static boolean isSegmentPathable(Segment motion, List<OrientedSeg> displacedSegs, List<Point> points, float unitRadius) {
+		return true;
 	}
 
 	/**
@@ -236,12 +296,11 @@ public class HoloPF {
 	/**
 	 * @param maxCellDistance
 	 *            how many cells away to draw from (e.g. distance 1 would consider 9 cells)
-	 * @return A list of the nearest reachable vertexes, sorted in order of distance. (Note: these are live graph
-	 *         references)
+	 * @return A list of the nearest reachable vertexes, sorted in order of distance. (Note: these are live graph references)
 	 * 
-	 * @reachable reachable is a vertex property in the graph saying that the vertex was explored during floodfill after
-	 *            handling map polygons. It doesn't guarantee pathability in the dynamic context because the floodfill
-	 *            isn't redone each time the dynamic graph is set (against unit bodies).
+	 * @reachable reachable is a vertex property in the graph saying that the vertex was explored during floodfill after handling map polygons. It
+	 *            doesn't guarantee pathability in the dynamic context because the floodfill isn't redone each time the dynamic graph is set (against
+	 *            unit bodies).
 	 */
 	public static ArrayList<Vertex> findNearbyReachableVertexes(Point p, Vertex[][] graph, int graphWidth,
 			int graphHeight, int maxCellDistance) {

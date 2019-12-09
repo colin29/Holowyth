@@ -1,11 +1,12 @@
 package com.mygdx.holowyth.pathfinding;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.mygdx.holowyth.polygon.Polygons;
+import com.mygdx.holowyth.util.dataobjects.OrientedSeg;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 
@@ -21,16 +22,19 @@ public class PathSmoother {
 	private Path path2s;
 
 	/**
-	 * @param origPath Should not be null 
-	 * @param unitRadius Radius of the pathing unit
+	 * @param origPath
+	 *            Should not be null
+	 * @param unitRadius
+	 *            Radius of the pathing unit
 	 * @return A new path that is a smoothed version of the given path
 	 */
-	public Path smoothPath(Path origPath, Polygons polys, ArrayList<CBInfo> cbs, float unitRadius) {
+	public Path smoothPath(Path origPath, List<OrientedSeg> obstacleExpandedSegs,
+			List<Point> obstaclePoints, ArrayList<CBInfo> cbs, float unitRadius) {
 
 		path0s = origPath.deepCopy();
 		path1s = null;
 		path2s = null;
-		
+
 		// Path is at least length 3
 		if (origPath.size() <= 1) {
 			return origPath;
@@ -46,7 +50,8 @@ public class PathSmoother {
 		while (iter.hasNext()) {
 			next = iter.next();
 
-			if (HoloPF.isEdgePathable(prev.x, prev.y, next.x, next.y, polys, cbs, unitRadius)) {
+			if (HoloPF.isSegmentPathable(prev.x, prev.y, next.x, next.y, obstacleExpandedSegs,
+					obstaclePoints, cbs, unitRadius)) {
 
 				iter.previous();
 				iter.previous();
@@ -60,86 +65,35 @@ public class PathSmoother {
 			}
 		}
 
-		path2s = doSecondarySmoothing(path1s, polys, cbs, unitRadius);
-//		System.out.println("Number of isEdgePathableCalls: "  + testCount);
+		path2s = doSecondarySmoothing(path1s, obstacleExpandedSegs,
+				obstaclePoints, cbs, unitRadius);
+		// System.out.println("Number of isEdgePathableCalls: " + testCount);
 		return path2s;
 	}
 
-	private float s1SegLength = 15f;
-
-	/**
-	 * @param path
-	 *            Assumes path is at least length 2
-	 * @return A path that has been further broken up into segments no more than a set length.
-	 */
-	@SuppressWarnings("unused")
-	private Path segmentPath(Path origPath) {
-
-		Path path = origPath.deepCopy();
-
-		ListIterator<Point> iter = path.listIterator();
-		Point a, b;
-		a = iter.next();
-		b = iter.next();
-		
-		float dx, dy;
-		int numParts;
-		Point p;
-		
-		while (true) {
-			dx = b.x - a.x;
-			dy = b.y - a.y;
-
-			Segment seg = new Segment(a, b);
-			
-			float len = seg.getLength();
-			if (len > s1SegLength) {
-				numParts = (int) Math.ceil((len / s1SegLength));
-				
-				//need to insert n-1 parts in between "a" and "b"
-				//iterator is currently after "b"
-				iter.previous();
-				for(int i=1; i<numParts; i++){
-					p = new Point(a.x + dx*i/numParts, a.y + dy*i/numParts); 
-					iter.add(p);
-				}
-				//iterator is currently before "b". We want it after "b".
-				iter.next();
-			}
-			
-			if(iter.hasNext()){
-				a = b;
-				b = iter.next();
-			}else{
-				System.out.format("Slicer: returned a path with length %s %n", path.size());
-				return path;
-			}
-		}
-
-	}
-
-	private float thresholdRegular = 70;//70; // in world units
+	private float thresholdRegular = 70;// 70; // in world units
 	private float minSubDivisionRegular = 15;
 	private float ratio = 2.0f / 3;
 
-	private float thresholdLast = 4; //the last part (2 segements) of a path is always smoothed. (The first part is too)
+	private float thresholdLast = 4; // the last part (2 segements) of a path is always smoothed. (The first part is too)
 	private float minSubDivisionLast = 2;
-	
+
 	ArrayList<Point> segPoints = new ArrayList<Point>();
 	ArrayList<Point> nextPoints = new ArrayList<Point>();
 
 	Segment bestCut;
 
-	
 	int testCount;
+
 	/**
 	 * 
 	 * @return A new path that is a smoothed version of the given path
 	 */
-	private Path doSecondarySmoothing(Path origPath, Polygons polys, ArrayList<CBInfo> cbs, float unitRadius) {
-		
+	private Path doSecondarySmoothing(Path origPath, List<OrientedSeg> obstacleExpandedSegs,
+			List<Point> obstaclePoints, ArrayList<CBInfo> cbs, float unitRadius) {
+
 		testCount = 0;
-		
+
 		Path path = origPath.deepCopy();
 
 		if (path.size() < 3) {
@@ -154,11 +108,10 @@ public class PathSmoother {
 		c = iter.next();
 
 		boolean isFirstSeg = true;
-		
+
 		while (true) {
 			Segment seg = new Segment(a.x, a.y, b.x, b.y);
 			Segment next = new Segment(b.x, b.y, c.x, c.y);
-
 
 			ArrayList<Float> segLengths = new ArrayList<Float>();
 			ArrayList<Float> nextLengths = new ArrayList<Float>();
@@ -166,26 +119,22 @@ public class PathSmoother {
 			segPoints.clear();
 			nextPoints.clear();
 
+			// We smooth the first and last parts of the path more rigorously
 
-			
-			//We smooth the first and last parts of the path more rigorously
-			
-			//iterator is after "c". If this is the last part, iter.next() should return false;
-			
+			// iterator is after "c". If this is the last part, iter.next() should return false;
+
 			float threshold;
 			float minSubDivision;
-			
-			if(!iter.hasNext() || isFirstSeg){
+
+			if (!iter.hasNext() || isFirstSeg) {
 				threshold = thresholdLast;
 				minSubDivision = minSubDivisionLast;
 				isFirstSeg = false;
-			}else{
+			} else {
 				threshold = thresholdRegular;
 				minSubDivision = minSubDivisionRegular;
 			}
-			
-			 
-			
+
 			// Consider every segment that is longer than the threshold:
 
 			// If the segment is not longer than the threshold, move on to the next segment
@@ -233,9 +182,10 @@ public class PathSmoother {
 
 			for (int i = 0; i < segLengths.size(); i++) {
 				for (int j = 0; j < nextLengths.size(); j++) {
-					testCount+=1;
-					if (HoloPF.isEdgePathable(segPoints.get(i).x, segPoints.get(i).y, nextPoints.get(j).x,
-							nextPoints.get(j).y, polys, cbs, unitRadius)) {
+					testCount += 1;
+					if (HoloPF.isSegmentPathable(segPoints.get(i).x, segPoints.get(i).y, nextPoints.get(j).x,
+							nextPoints.get(j).y, obstacleExpandedSegs,
+							obstaclePoints, cbs, unitRadius)) {
 						score = segLengths.get(i) * nextLengths.get(j);
 						if (score > maxScore) {
 							maxScore = score;
@@ -247,7 +197,7 @@ public class PathSmoother {
 			}
 			if (maxScore > 0) {
 				// If there was a legal best cut, make that cut:
-//				System.out.format("Make the cut with points %s and %s %n", bestSeg, bestNext);
+				// System.out.format("Make the cut with points %s and %s %n", bestSeg, bestNext);
 				bestCut = new Segment(segPoints.get(bestSeg).x, segPoints.get(bestSeg).y, nextPoints.get(bestNext).x,
 						nextPoints.get(bestNext).y);
 
@@ -290,7 +240,7 @@ public class PathSmoother {
 	/**
 	 * Render debugging info
 	 */
-	public void render(ShapeRenderer shapeRenderer) {
+	public void renderIntermediateLinesDebug(ShapeRenderer shapeRenderer) {
 
 		// Render the initial and intermediate lines
 		HoloPF.renderPath(this.path0s, Color.PINK, false, 2f, shapeRenderer);
@@ -317,23 +267,23 @@ public class PathSmoother {
 		// shapeRenderer.end();
 
 	}
-	
+
 	/**
 	 * @return The unsmoothed and partially smoothed path of the last unit processed. The fields can be null if the pathfinding failed.
 	 */
-	public PathsInfo getPathInfo(){
+	public PathsInfo getPathInfo() {
 		PathsInfo paths = new PathsInfo();
 		paths.pathSmoothed0 = this.path0s;
 		paths.pathSmoothed1 = this.path1s;
-		paths.finalPath = this.path2s; 
+		paths.finalPath = this.path2s;
 		return paths;
 	}
-	
+
 	/**
 	 * Data class, stores the unsmoothed and partially smoothed paths of a unit.
 	 */
 	public static class PathsInfo {
-	 	public Path pathSmoothed0;
+		public Path pathSmoothed0;
 		public Path pathSmoothed1;
 		public Path finalPath;
 	}

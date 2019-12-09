@@ -18,7 +18,6 @@ import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.unit.Unit;
@@ -40,7 +39,7 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
 public class World implements WorldInfo {
 
-	PathingModule pathingModule;
+	PathingModule pathing;
 	Field map; // Each world instance is tied to a single map (specifically, is
 				// loaded from a single map)
 
@@ -60,7 +59,7 @@ public class World implements WorldInfo {
 
 	public World(Field map, PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects) {
 		this.map = map;
-		this.pathingModule = pathingModule;
+		this.pathing = pathingModule;
 		this.gfx = effects;
 
 		this.debugStore = debugStore;
@@ -196,8 +195,8 @@ public class World implements WorldInfo {
 				 */
 				final float minProgress = 0.20f * thisUnit.motion.getVelocityMagnitude();
 
-				if (HoloPF.isEdgePathable(thisUnit.x, thisUnit.y, curDestx, curDesty,
-						pathingModule.getExpandedMapPolys(), colBodies,
+				if (HoloPF.isSegmentPathable(thisUnit.x, thisUnit.y, curDestx, curDesty,
+						pathing.getObstacleExpandedSegs(), pathing.getObstaclePoints(), colBodies,
 						thisUnit.getRadius())
 						&& new Segment(thisUnit.x, thisUnit.y, curDestx, curDesty).getLength() > 0.05 * minProgress) {
 					// System.out.println("block distance" + new Segment(u.x, u.y, curDestx, curDesty).getLength());
@@ -239,7 +238,7 @@ public class World implements WorldInfo {
 				List<CircleCBInfo> objectCollisions = CollisionDetection.getCircleBodyCollisionsAlongLineSegment(motion,
 						curBody.getRadius(), allOtherBodies);
 
-				List<OrientedPoly> polys = Polygons.calculateOrientedPolygons(map.polys);
+				List<OrientedPoly> polys = OrientedPoly.calculateOrientedPolygons(map.polys);
 				List<CircleCBInfo> obstaclePoints = new ArrayList<CircleCBInfo>();
 				for (var poly : polys) {
 					for (var seg : poly.segments) {
@@ -504,7 +503,7 @@ public class World implements WorldInfo {
 
 	@Override
 	public PathingModule getPathingModule() {
-		return pathingModule;
+		return pathing;
 	}
 
 	@Override

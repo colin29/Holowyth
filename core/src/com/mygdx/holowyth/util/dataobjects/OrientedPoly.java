@@ -68,5 +68,16 @@ public class OrientedPoly {
 		return new Polygon(points);
 	}
 
-	// We know the points are defined in order
+	/**
+	 * Calculates oriented polygons based given polygons
+	 * 
+	 * @param polygons
+	 */
+	public static List<OrientedPoly> calculateOrientedPolygons(ArrayList<Polygon> polys) {
+		var orientedPolys = new ArrayList<OrientedPoly>();
+		for (Polygon poly : polys) {
+			orientedPolys.add(new OrientedPoly(poly));
+		}
+		return orientedPolys;
+	}
 }

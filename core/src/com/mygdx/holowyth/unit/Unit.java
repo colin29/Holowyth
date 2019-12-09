@@ -14,7 +14,7 @@ import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.Path;
-import com.mygdx.holowyth.pathfinding.UnitInterPF;
+import com.mygdx.holowyth.pathfinding.UnitPF;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.Skill.Status;
 import com.mygdx.holowyth.unit.behaviours.UnitUtil;
@@ -51,7 +51,7 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
  * <b>motion.isBeingKnockedBack()</b> -- a unit being knocked back cannot be given new orders or perform any action (it may retain its old order,
  * depending on the type)
  */
-public class Unit implements UnitInterPF, UnitInfo, UnitOrderable {
+public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	public float x, y;
 

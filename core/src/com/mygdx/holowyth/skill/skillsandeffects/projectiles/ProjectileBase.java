@@ -14,7 +14,6 @@ import com.mygdx.holowyth.collision.CollisionInfo;
 import com.mygdx.holowyth.collision.ObstaclePoint;
 import com.mygdx.holowyth.collision.collisiondemo.CircleCBImpl;
 import com.mygdx.holowyth.combatDemo.World;
-import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.dataobjects.OrientedPoly;
@@ -182,7 +181,7 @@ public abstract class ProjectileBase {
 		CircleCBInfo cb = new CircleCBImpl(pos.x, pos.y, collisionRadius);
 		((CircleCBImpl) cb).setVelocity(getVx(), getVy());
 
-		List<OrientedPoly> polys = Polygons.calculateOrientedPolygons(world.getMap().polys);
+		List<OrientedPoly> polys = OrientedPoly.calculateOrientedPolygons(world.getMap().polys);
 		List<CircleCBInfo> polyPoints = new ArrayList<CircleCBInfo>();
 		for (var poly : polys) {
 			for (var seg : poly.segments) {

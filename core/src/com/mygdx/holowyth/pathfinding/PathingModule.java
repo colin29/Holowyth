@@ -2,6 +2,7 @@ package com.mygdx.holowyth.pathfinding;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -10,12 +11,12 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.utils.Queue;
-import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.PathSmoother.PathsInfo;
-import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Coord;
+import com.mygdx.holowyth.util.dataobjects.OrientedPoly;
+import com.mygdx.holowyth.util.dataobjects.OrientedSeg;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
@@ -32,14 +33,17 @@ public class PathingModule {
 	// Rendering and pipeline variables
 	OrthographicCamera camera;
 	ShapeRenderer shapeRenderer;
-	private Polygons expandedMapPolys = new Polygons();
+
 	private Field map;
 	private AStarSearch pathing;
 
-	PathSmoother smoother = new PathSmoother();
+	private PathSmoother smoother = new PathSmoother();
+
+	private List<Point> obstaclePoints = new ArrayList<Point>();
+	private List<OrientedSeg> obstacleExpandedSegs = new ArrayList<OrientedSeg>();
 
 	// Debug
-	HashMap<UnitInterPF, PathsInfo> intermediatePaths;
+	HashMap<UnitPF, PathsInfo> intermediatePaths;
 
 	/**
 	 * @Lifetime can be from app start to app shutdown. Call initFormap() whenever a new map is loaded.
@@ -58,15 +62,33 @@ public class PathingModule {
 	public void initForMap(Field map) {
 		this.map = map;
 
-		expandedMapPolys = HoloPF.expandPolygons(map.polys, Holo.UNIT_RADIUS); // We require one set for each distinct
-																				// size of unit, for now just one.
-		createGraph();
+		List<OrientedPoly> polys = OrientedPoly.calculateOrientedPolygons(map.polys);
+		initObstaclePoints(polys);
+		initExpandedObstacleSegs(polys);
+
+		initGraphs();
 		floodFillGraph();
 
 		pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE, map.width(), map.height());
 
 		// Debug
-		intermediatePaths = new HashMap<UnitInterPF, PathsInfo>();
+		intermediatePaths = new HashMap<UnitPF, PathsInfo>();
+	}
+
+	private void initObstaclePoints(List<OrientedPoly> polys) {
+		obstaclePoints.clear();
+		for (OrientedPoly poly : polys) {
+			for (var seg : poly.segments) {
+				obstaclePoints.add(seg.startPoint()); // start point of all segments will get us all points
+			}
+		}
+	}
+
+	private void initExpandedObstacleSegs(List<OrientedPoly> polys) {
+		obstacleExpandedSegs.clear();
+		for (OrientedPoly poly : polys) {
+			obstacleExpandedSegs.addAll(poly.segments);
+		}
 	}
 
 	// Graph construction
@@ -77,13 +99,13 @@ public class PathingModule {
 
 	// Unit pathfinding
 
-	public Path findPathForUnit(UnitInterPF unit, float dx, float dy, List<? extends UnitInterPF> units) {
+	public Path findPathForUnit(UnitPF unit, float dx, float dy, List<? extends UnitPF> units) {
 
 		// For pathfinding, need to get expanded geometry of unit collision bodies as well
 
 		ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
 
-		for (UnitInterPF a : units) {
+		for (UnitPF a : units) {
 			if (unit.equals(a)) { // don't consider the unit's own collision body
 				continue;
 			}
@@ -115,31 +137,22 @@ public class PathingModule {
 		if (!Holo.debugPathfindingIgnoreUnits) {
 			setDynamicGraph(colBodies, unit);
 		}
-		Path newPath = pathing.doAStar(unit.getX(), unit.getY(), dx, dy, expandedMapPolys, colBodies, dynamicGraph,
+		Path newPath = pathing.doAStar(unit.getX(), unit.getY(), dx, dy, obstacleExpandedSegs, obstaclePoints, colBodies, dynamicGraph,
 				unit.getRadius()); // use the dynamic graph
 
 		if (newPath != null) {
-			Path finalPath = smoother.smoothPath(newPath, expandedMapPolys, colBodies, unit.getRadius());
-			PathsInfo info = smoother.getPathInfo();
-			intermediatePaths.put(unit, info);
+			Path finalPath = smoother.smoothPath(newPath, obstacleExpandedSegs, obstaclePoints, colBodies, unit.getRadius());
+			// PathsInfo info = smoother.getPathInfo();
+			// intermediatePaths.put(unit, info);
 			return finalPath;
 		}
+
 		return newPath;
 	}
 
 	// Getters
 
-	/**
-	 * Note: expanded map polygons are used both by the pathfinding module and for collision detection, but they are
-	 * kept with pathfinding by convention.
-	 * 
-	 * @return
-	 */
-	public Polygons getExpandedMapPolys() {
-		return expandedMapPolys;
-	}
-
-	private void createGraph() {
+	private void initGraphs() {
 		graphWidth = (int) Math.floor(map.width() / CELL_SIZE) + 1;
 		graphHeight = (int) Math.floor(map.height() / CELL_SIZE) + 1;
 
@@ -167,51 +180,51 @@ public class PathingModule {
 		q.addLast(new Coord(0, 0));
 
 		Coord c;
-		Vertex v;
+		Vertex vertex;
 		Vertex suc;
 		while (q.size > 0) {
 			c = q.removeFirst();
-			v = graph[c.y][c.x];
+			vertex = graph[c.y][c.x];
 
-			v.reachable = true;
-			fillInVertex(v, c.x, c.y, expandedMapPolys);
+			vertex.reachable = true;
+			fillInVertex(vertex, c.x, c.y);
 
-			if (v.N && !(suc = graph[c.y + 1][c.x]).reachable) {
+			if (vertex.N && !(suc = graph[c.y + 1][c.x]).reachable) {
 				q.addLast(new Coord(c.x, c.y + 1));
 				suc.reachable = true;
 			}
 
-			if (v.S && !(suc = graph[c.y - 1][c.x]).reachable) { // really hate to do this formatting but...
+			if (vertex.S && !(suc = graph[c.y - 1][c.x]).reachable) {
 				q.addLast(new Coord(c.x, c.y - 1));
 				suc.reachable = true;
 			}
 
-			if (v.W && !(suc = graph[c.y][c.x - 1]).reachable) {
+			if (vertex.W && !(suc = graph[c.y][c.x - 1]).reachable) {
 				q.addLast(new Coord(c.x - 1, c.y));
 				suc.reachable = true;
 			}
 
-			if (v.E && !(suc = graph[c.y][c.x + 1]).reachable) {
+			if (vertex.E && !(suc = graph[c.y][c.x + 1]).reachable) {
 				q.addLast(new Coord(c.x + 1, c.y));
 				suc.reachable = true;
 			}
 
-			if (v.NW && !(suc = graph[c.y + 1][c.x - 1]).reachable) {
+			if (vertex.NW && !(suc = graph[c.y + 1][c.x - 1]).reachable) {
 				q.addLast(new Coord(c.x - 1, c.y + 1));
 				suc.reachable = true;
 			}
 
-			if (v.NE && !(suc = graph[c.y + 1][c.x + 1]).reachable) {
+			if (vertex.NE && !(suc = graph[c.y + 1][c.x + 1]).reachable) {
 				q.addLast(new Coord(c.x + 1, c.y + 1));
 				suc.reachable = true;
 			}
 
-			if (v.SW && !(suc = graph[c.y - 1][c.x - 1]).reachable) {
+			if (vertex.SW && !(suc = graph[c.y - 1][c.x - 1]).reachable) {
 				q.addLast(new Coord(c.x - 1, c.y - 1));
 				suc.reachable = true;
 			}
 
-			if (v.SE && !(suc = graph[c.y - 1][c.x + 1]).reachable) {
+			if (vertex.SE && !(suc = graph[c.y - 1][c.x + 1]).reachable) {
 				q.addLast(new Coord(c.x + 1, c.y - 1));
 				suc.reachable = true;
 			}
@@ -221,28 +234,30 @@ public class PathingModule {
 	/**
 	 * Calculates the pathing information for a single vertex
 	 */
-	private void fillInVertex(Vertex v, int ix, int iy, Polygons polys) {
-		int x = ix * CELL_SIZE;
-		int y = iy * CELL_SIZE;
+	private void fillInVertex(Vertex vertex, int indexX, int indexY) {
+		float x = indexX * CELL_SIZE;
+		float y = indexY * CELL_SIZE;
 		// v.N = isPointWithinMap(ix+CELL_SIZE + );
-		v.N = HoloPF.isEdgePathable(x, y, x, y + CELL_SIZE, polys);
-		v.S = HoloPF.isEdgePathable(x, y, x, y - CELL_SIZE, polys);
-		v.W = HoloPF.isEdgePathable(x, y, x - CELL_SIZE, y, polys);
-		v.E = HoloPF.isEdgePathable(x, y, x + CELL_SIZE, y, polys);
 
-		v.NW = HoloPF.isEdgePathable(x, y, x - CELL_SIZE, y + CELL_SIZE, polys);
-		v.NE = HoloPF.isEdgePathable(x, y, x + CELL_SIZE, y + CELL_SIZE, polys);
-		v.SW = HoloPF.isEdgePathable(x, y, x - CELL_SIZE, y - CELL_SIZE, polys);
-		v.SE = HoloPF.isEdgePathable(x, y, x + CELL_SIZE, y - CELL_SIZE, polys);
+		float unitRadius = Holo.UNIT_RADIUS;
+		vertex.N = HoloPF.isSegmentPathableAgainstObstacles(x, y, x, y + CELL_SIZE, obstacleExpandedSegs, obstaclePoints, unitRadius);
+		vertex.S = HoloPF.isSegmentPathableAgainstObstacles(x, y, x, y - CELL_SIZE, obstacleExpandedSegs, obstaclePoints, unitRadius);
+		vertex.W = HoloPF.isSegmentPathableAgainstObstacles(x, y, x - CELL_SIZE, y, obstacleExpandedSegs, obstaclePoints, unitRadius);
+		vertex.E = HoloPF.isSegmentPathableAgainstObstacles(x, y, x + CELL_SIZE, y, obstacleExpandedSegs, obstaclePoints, unitRadius);
 
-		if (ix == 0)
-			v.W = v.NW = v.SW = false;
-		if (ix == graphWidth - 1)
-			v.E = v.NE = v.SE = false;
-		if (iy == 0)
-			v.S = v.SW = v.SE = false;
-		if (iy == graphHeight - 1)
-			v.N = v.NW = v.NE = false;
+		vertex.NW = HoloPF.isSegmentPathableAgainstObstacles(x, y, x - CELL_SIZE, y + CELL_SIZE, obstacleExpandedSegs, obstaclePoints, unitRadius);
+		vertex.NE = HoloPF.isSegmentPathableAgainstObstacles(x, y, x + CELL_SIZE, y + CELL_SIZE, obstacleExpandedSegs, obstaclePoints, unitRadius);
+		vertex.SW = HoloPF.isSegmentPathableAgainstObstacles(x, y, x - CELL_SIZE, y - CELL_SIZE, obstacleExpandedSegs, obstaclePoints, unitRadius);
+		vertex.SE = HoloPF.isSegmentPathableAgainstObstacles(x, y, x + CELL_SIZE, y - CELL_SIZE, obstacleExpandedSegs, obstaclePoints, unitRadius);
+
+		if (indexX == 0)
+			vertex.W = vertex.NW = vertex.SW = false;
+		if (indexX == graphWidth - 1)
+			vertex.E = vertex.NE = vertex.SE = false;
+		if (indexY == 0)
+			vertex.S = vertex.SW = vertex.SE = false;
+		if (indexY == graphHeight - 1)
+			vertex.N = vertex.NW = vertex.NE = false;
 	}
 
 	// Unit pathfinding
@@ -258,7 +273,7 @@ public class PathingModule {
 	 * @param u
 	 *            The pathing unit
 	 */
-	private void setDynamicGraph(ArrayList<CBInfo> infos, UnitInterPF u) {
+	private void setDynamicGraph(ArrayList<CBInfo> infos, UnitPF u) {
 
 		for (CBInfo cb : infos) {
 			prospects = new ArrayList<Vertex>();
@@ -329,7 +344,7 @@ public class PathingModule {
 	}
 
 	/**
-	 * Reverts the dynamic graph back to the orignal graph. The current method is simple brute-force.
+	 * Reverts the dynamic graph back to the orignal graph. The method currently sets every vertex back
 	 */
 	private void revertDynamicGraph() {
 		for (int y = 0; y < graphHeight; y++) { // change later to use a stack of modifications or something.
@@ -438,8 +453,8 @@ public class PathingModule {
 	/**
 	 * Render intermediate paths for all units in the list
 	 */
-	public void renderIntermediateAndFinalPaths(List<? extends UnitInterPF> units) {
-		for (UnitInterPF unit : units) {
+	public void renderIntermediateAndFinalPaths(List<? extends UnitPF> units) {
+		for (UnitPF unit : units) {
 			PathsInfo info = intermediatePaths.get(unit);
 			if (info != null && (unit.getPath() != null || Holo.continueShowingPathAfterArrival)) {
 				if (info.finalPath != null) {
@@ -451,11 +466,6 @@ public class PathingModule {
 		}
 	}
 
-	public void renderExpandedMapPolygons() {
-		shapeRenderer.setProjectionMatrix(camera.combined);
-		HoloGL.renderPolygons(expandedMapPolys, Color.GRAY);
-	}
-
 	// Getters
 
 	private void drawLine(int ix, int iy, int ix2, int iy2) {
@@ -465,6 +475,14 @@ public class PathingModule {
 	private void renderPath(Path path, Color color, boolean renderPoints) {
 		float pathThickness = 2f;
 		HoloPF.renderPath(path, color, renderPoints, pathThickness, shapeRenderer);
+	}
+
+	public List<Point> getObstaclePoints() {
+		return Collections.unmodifiableList(obstaclePoints);
+	}
+
+	public List<OrientedSeg> getObstacleExpandedSegs() {
+		return Collections.unmodifiableList(obstacleExpandedSegs);
 	}
 
 }

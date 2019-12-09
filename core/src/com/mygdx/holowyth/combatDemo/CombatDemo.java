@@ -207,7 +207,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	 */
 	@Override
 	protected void mapStartup() {
-		map.polys.clear(); // Pretend there's no obstacles while I'm testing tiled maps
+		// map.polys.clear(); // Pretend there's no obstacles while I'm testing tiled maps
 		map.setDimensions(1200, 1200);
 
 		initializeMapLifetimeComponents();

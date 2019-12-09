@@ -111,7 +111,7 @@ public class Renderer {
 		pathfinding = new PathfindingRenderer(this, pathingModule);
 		unitMotion = new UnitMotionRenderer(this);
 		sandbox = new SandBoxRenderer(this);
-		tiled = new TiledMapRenderer(this);
+		// tiled = new TiledMapRenderer(this);
 	}
 
 	/*
@@ -128,16 +128,8 @@ public class Renderer {
 
 		batch.setProjectionMatrix(worldCamera.combined);
 
-		tiled.render();
+		// tiled.render();
 		renderUnitHpSpBars();
-
-		// 1: Render Map
-
-		// if (this.map != null) {
-		// renderMapPolygons();
-		// pathingModule.renderExpandedMapPolygons();
-		// renderMapBoundaries();
-		// }
 
 		// 2: Render unit paths
 		pathfinding.renderPaths(false);
@@ -188,7 +180,6 @@ public class Renderer {
 
 		if (this.map != null) {
 			renderMapObstacles();
-			pathingModule.renderExpandedMapPolygons();
 			renderMapBoundaries();
 		}
 
