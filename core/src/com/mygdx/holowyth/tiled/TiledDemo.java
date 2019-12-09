@@ -92,7 +92,6 @@ public class TiledDemo extends BaseHoloScreen implements InputProcessor {
 				end.set(vertices[i * 2], vertices[i * 2 + 1]);
 
 				segs.add(new Segment(start.x, start.y, end.x, end.y));
-				logger.debug("Added ({} {}) ({},{})", start.x, start.y, end.x, end.y);
 			}
 
 		}
