@@ -271,7 +271,7 @@ public class AStarSearch {
 	 *         was invalid but a substitute has been found.
 	 */
 	private int findClosestPathableVertex(float goalX, float goalY, List<OrientedSeg> obstacleExpandedSegs, List<Point> obstaclePoints,
-			List<CBInfo> cbs,
+			List<CBInfo> unitCbs,
 			Vertex[][] graph, float unitRadius, boolean allowCorrection, Point correctedLocation) {
 		substituteLocationFound = false;
 		Point goalPoint = new Point(goalX, goalY);
@@ -284,7 +284,7 @@ public class AStarSearch {
 		for (Vertex v : reachable) {
 			// there must be a pathable line from the target destination to the vertex, AND that vertex must be a
 			// reachable one
-			if (HoloPF.isSegmentPathable(goalX, goalY, v.ix * CELL_SIZE, v.iy * CELL_SIZE, obstacleExpandedSegs, obstaclePoints, cbs, unitRadius)
+			if (HoloPF.isSegmentPathable(goalX, goalY, v.ix * CELL_SIZE, v.iy * CELL_SIZE, obstacleExpandedSegs, obstaclePoints, unitCbs, unitRadius)
 					&& v.reachable) {
 				startIx = v.ix;
 				startIy = v.iy;

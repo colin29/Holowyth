@@ -15,9 +15,6 @@ dependencies {
 
 	compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"	
 	
-	// Pathfinding
-	compile files('lib/clipper.jar')
-
 	// Util
 	compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.9'

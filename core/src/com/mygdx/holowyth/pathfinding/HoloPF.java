@@ -7,17 +7,11 @@ import java.util.List;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.mygdx.holowyth.polygon.Polygon;
-import com.mygdx.holowyth.polygon.Polygons;
+import com.badlogic.gdx.math.Intersector;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.OrientedSeg;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
-
-import de.lighti.clipper.Clipper.EndType;
-import de.lighti.clipper.Clipper.JoinType;
-import de.lighti.clipper.ClipperOffset;
-import de.lighti.clipper.Point.LongPoint;
 
 /**
  * Contains helper functions related to pathfinding and geometry
@@ -25,81 +19,15 @@ import de.lighti.clipper.Point.LongPoint;
  */
 public class HoloPF {
 
-	// /**
-	// * Determines whether an edge is pathable against a set of collision bodies (map polygons and unit circles)
-	// *
-	// * @param x
-	// * @param y
-	// * @param x2
-	// * @param y2
-	// * @param polys
-	// * @param cbs
-	// * The collision bodies for units
-	// * @return
-	// */
-	// public static boolean isEdgePathable(float x, float y, float x2, float y2, Polygons polys, ArrayList<CBInfo> cbs,
-	// float unitRadius) {
-	// boolean intersects = false;
-	// if (polys != null) {
-	// for (Polygon polygon : polys) {
-	// for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
-	// if (Line2D.linesIntersect(x, y, x2, y2, polygon.floats[i], polygon.floats[i + 1],
-	// polygon.floats[(i + 2) % polygon.count], polygon.floats[(i + 3) % polygon.count])) {
-	// intersects = true;
-	// }
-	// }
-	// }
-	// }
-	//
-	// // Check against unit circles
-	// for (CBInfo cb : cbs) {
-	// if (Line2D.ptSegDistSq(x, y, x2, y2, cb.x, cb.y) < (cb.unitRadius + unitRadius)
-	// * (cb.unitRadius + unitRadius)) {
-	// intersects = true;
-	// }
-	// }
-	// return !intersects;
-	// }
-
-	/**
-	 * If the edge given collides with a polygon, returns a segment describing that collision
-	 * 
-	 * @return
-	 */
-	public static Segment rayCastAgainstPolygons(float x, float y, float x2, float y2, Polygons polys) {
-		ArrayList<Segment> segs = new ArrayList<Segment>();
-		boolean intersects = false;
-		if (polys != null) {
-			for (Polygon polygon : polys) {
-				for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
-					if (Line2D.linesIntersect(x, y, x2, y2, polygon.floats[i], polygon.floats[i + 1],
-							polygon.floats[(i + 2) % polygon.count], polygon.floats[(i + 3) % polygon.count])) {
-						segs.add(new Segment(polygon.floats[i], polygon.floats[i + 1],
-								polygon.floats[(i + 2) % polygon.count], polygon.floats[(i + 3) % polygon.count]));
-						intersects = true;
-					}
-				}
-			}
-		}
-		if (intersects) {
-			// Find the first seg to intersect
-			// TODO:
-
-			return null;
-		} else {
-			return null;
-		}
-	}
-
-	public static ArrayList<CBInfo> getUnitCollisions(float x, float y, float x2, float y2, ArrayList<CBInfo> cbs,
-			float unitRadius) {
+	public static ArrayList<CBInfo> detectCollisionsFromUnitMoving(float x, float y, float x2, float y2, ArrayList<CBInfo> cbs,
+			float thisUnitRadius) {
 		@SuppressWarnings("unused")
 		boolean intersects = false;
 		ArrayList<CBInfo> collisions = new ArrayList<CBInfo>();
 		// Check against unit circles
 		for (CBInfo cb : cbs) {
-			if (Line2D.ptSegDistSq(x, y, x2, y2, cb.x, cb.y) < (cb.unitRadius + unitRadius)
-					* (cb.unitRadius + unitRadius)) {
+			if (Line2D.ptSegDistSq(x, y, x2, y2, cb.x, cb.y) < (cb.unitRadius + thisUnitRadius)
+					* (cb.unitRadius + thisUnitRadius)) {
 				intersects = true;
 				collisions.add(cb);
 			}
@@ -107,34 +35,10 @@ public class HoloPF {
 		return collisions;
 	}
 
-	/**
-	 * Determines whether an edge is pathable against a set of collision bodies (just map polygons)
-	 * 
-	 * @param x
-	 * @param y
-	 * @param x2
-	 * @param y2
-	 * @param polys
-	 * @return
-	 */
-	public static boolean isSegmentPathable(float x, float y, float x2, float y2, Polygons polys) {
-		boolean intersects = false;
-		for (Polygon polygon : polys) {
-			for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
-				if (Line2D.linesIntersect(x, y, x2, y2, polygon.floats[i], polygon.floats[i + 1],
-						polygon.floats[(i + 2) % polygon.count], polygon.floats[(i + 3) % polygon.count])) {
-					intersects = true;
-				}
-			}
-		}
-		return !intersects;
-	}
-
 	private static Segment tempSeg = new Segment(0, 0, 0, 0);
 
 	/**
 	 * Checks pathability based on obstacles AND other units
-	 * 
 	 */
 	public static boolean isSegmentPathable(float x1, float y1, float x2, float y2, List<OrientedSeg> obstacleExpandedSegs,
 			List<Point> obstaclePoints, List<CBInfo> unitCBs,
@@ -144,64 +48,48 @@ public class HoloPF {
 	}
 
 	/**
-	 * 
-	 * 
-	 * @param motion
-	 * @param obstacleExpandedSegs
-	 * @param obstaclePoints
-	 * @param unitCBs
-	 * @param curUnitsRadius
-	 * @return
+	 * Checks pathability based on obstacles AND other units
 	 */
 	public static boolean isSegmentPathable(Segment motion, List<OrientedSeg> obstacleExpandedSegs, List<Point> obstaclePoints, List<CBInfo> unitCBs,
 			float thisUnitRadius) {
-		// TODO: make a new list, unit bodies in in as additional points
-
-		return isSegmentPathable(motion, obstacleExpandedSegs, obstaclePoints, thisUnitRadius);
-	}
-
-	private static boolean isSegmentPathableAgainstUnit(Segment motion, CBInfo unitCB, float thisUnitRadius) {
-		// TODO
-		return true;
+		for (var other : unitCBs) {
+			if (Intersector.distanceSegmentPoint(motion.x1, motion.y1, motion.x2, motion.y2, other.x, other.y) <= thisUnitRadius + other.unitRadius) {
+				return false;
+			}
+		}
+		return isSegmentPathableAgainstObstacles(motion, obstacleExpandedSegs, obstaclePoints, thisUnitRadius);
 	}
 
 	public static boolean isSegmentPathableAgainstObstacles(float x1, float y1, float x2, float y2, List<OrientedSeg> displacedSegs,
 			List<Point> points,
 			float unitRadius) {
 		tempSeg.set(x1, y1, x2, y2);
-		return isSegmentPathable(tempSeg, displacedSegs, points, unitRadius);
+		return isSegmentPathableAgainstObstacles(tempSeg, displacedSegs, points, unitRadius);
 	}
 
 	/**
-	 * TODO: stub
-	 * 
 	 * @param motion
 	 *            The motion of the unit
-	 * @param displacedSegs
+	 * @param obstacleExpandedSegs
 	 *            The obstacle segs, already displaced outwards by {unit radius}
-	 * @param points
-	 *            The unmodified obstacle corners
+	 * @param obstaclePoints
 	 * @param unitRadius
 	 * @return
 	 */
-	public static boolean isSegmentPathable(Segment motion, List<OrientedSeg> displacedSegs, List<Point> points, float unitRadius) {
-		return true;
-	}
+	public static boolean isSegmentPathableAgainstObstacles(Segment motion, List<OrientedSeg> obstacleExpandedSegs, List<Point> obstaclePoints,
+			float unitRadius) {
 
-	/**
-	 * Determines whether an edge is pathable against a single polygon.
-	 * 
-	 * @return
-	 */
-	public static boolean isEdgePathableAgainstPoly(float x, float y, float x2, float y2, Polygon polygon) {
-		boolean intersects = false;
-		for (int i = 0; i <= polygon.count - 2; i += 2) { // for each polygon edge
-			if (Line2D.linesIntersect(x, y, x2, y2, polygon.floats[i], polygon.floats[i + 1],
-					polygon.floats[(i + 2) % polygon.count], polygon.floats[(i + 3) % polygon.count])) {
-				intersects = true;
+		for (var seg : obstacleExpandedSegs) {
+			if (Line2D.linesIntersect(motion.x1, motion.y1, motion.x2, motion.y2, seg.x1, seg.y1, seg.x2, seg.y2)) {
+				return false;
 			}
 		}
-		return !intersects;
+		for (var point : obstaclePoints) {
+			if (Intersector.distanceSegmentPoint(motion.x1, motion.y1, motion.x2, motion.y2, point.x, point.y) <= unitRadius) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public static void renderPath(Path path, Color color, boolean renderPoints, float thickness,
@@ -250,47 +138,6 @@ public class HoloPF {
 			shapeRenderer.end();
 
 		}
-	}
-
-	/**
-	 * @return returns a new set of polygons which are expanded
-	 */
-	public static Polygons expandPolygons(Polygons origPolys, float delta) {
-
-		Polygons polys = new Polygons();
-
-		de.lighti.clipper.Paths solution = new de.lighti.clipper.Paths();
-
-		de.lighti.clipper.Path solPath = new de.lighti.clipper.Path();
-
-		for (Polygon poly : origPolys) {
-			ClipperOffset co = new ClipperOffset(1.4, 0.25f);
-
-			de.lighti.clipper.Path path = new de.lighti.clipper.Path();
-			// load the polygon data into the path
-			for (int i = 0; i < poly.count; i += 2) {
-				path.add(new LongPoint((long) poly.floats[i], (long) poly.floats[i + 1]));
-			}
-			co.addPath(path, JoinType.MITER, EndType.CLOSED_POLYGON);
-			co.execute(solution, delta);
-
-			solPath = solution.get(0);
-			// Polygon newPoly = new Polygon();
-			// vertexes
-
-			// Reload the result data back into a polygon
-			float[] polyData = new float[solPath.size() * 2];
-
-			for (int i = 0; i < solPath.size(); i++) {
-				polyData[2 * i] = solPath.get(i).getX();
-				polyData[2 * i + 1] = solPath.get(i).getY();
-			}
-
-			polys.add(new Polygon(polyData, solPath.size() * 2));
-		}
-
-		return polys;
-
 	}
 
 	/**

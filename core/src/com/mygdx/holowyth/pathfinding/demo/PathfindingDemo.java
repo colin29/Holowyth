@@ -108,7 +108,6 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		// renderDynamicGraph(false);
 
 		if (this.map != null) {
-			// renderExpandedPolygons();
 			renderMapPolygons();
 
 			renderMapBoundaries();
@@ -418,7 +417,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 				c.unitRadius = a.getRadius();
 				colBodies.add(c);
 			}
-			ArrayList<CBInfo> collisions = HoloPF.getUnitCollisions(motion.x1, motion.y1, motion.x2, motion.y2,
+			ArrayList<CBInfo> collisions = HoloPF.detectCollisionsFromUnitMoving(motion.x1, motion.y1, motion.x2, motion.y2,
 					colBodies, u.getRadius());
 			if (collisions.isEmpty()) {
 				u.x += u.vx;

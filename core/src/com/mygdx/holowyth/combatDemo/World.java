@@ -141,7 +141,7 @@ public class World implements WorldInfo {
 
 			Segment motion = new Segment(thisUnit.x, thisUnit.y, destX, destY);
 
-			ArrayList<CBInfo> collisions = HoloPF.getUnitCollisions(motion.x1, motion.y1, motion.x2, motion.y2,
+			ArrayList<CBInfo> collisions = HoloPF.detectCollisionsFromUnitMoving(motion.x1, motion.y1, motion.x2, motion.y2,
 					colBodies, thisUnit.getRadius());
 			thisUnit.debugNumOfUnitsCollidingWith = collisions.size();
 			if (collisions.size() > 0) {
