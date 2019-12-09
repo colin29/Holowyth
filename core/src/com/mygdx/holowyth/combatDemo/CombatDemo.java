@@ -88,7 +88,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		Table debugInfo = combatDemoUI.getDebugInfo();
 		functionBindings.bindFunctionToKey(() -> debugInfo.setVisible(!debugInfo.isVisible()), Keys.GRAVE); // tilde key
-		functionBindings.bindFunctionToKey(() -> playerUnit.stats.setHp(playerUnit.stats.getMaxHp()), Keys.Q); // heal player to max
 		functionBindings.bindFunctionToKey(() -> {
 			for (Unit unit : unitControls.getSelectedUnits()) {
 				unit.stats.printInfo();
@@ -103,7 +102,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 			} else {
 				pauseGame();
 			}
-		}, Keys.E);
+		}, Keys.Y);
 	}
 
 	public static boolean goBreak = false; // debug variable
@@ -134,25 +133,47 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	 */
 	private void handleMousePanning(float delta) {
 
-		int x = Gdx.input.getX();
-		int y = Gdx.input.getY();
+		final int mouseX = Gdx.input.getX();
+		final int mouseY = Gdx.input.getY();
 
 		final int screenHeight = Gdx.graphics.getHeight();
 		final int screenWidth = Gdx.graphics.getWidth();
 
-		float scrollMargin = 40f;
-		float scrollSpeed = 300; // pixels per second
+		final float scrollMargin = 40f;
+		final float scrollSpeed = 300 * delta; // do X pixels per second
 
-		if (y > screenHeight - scrollMargin)
-			camera.translate(0, -scrollSpeed * delta);
-		if (y < scrollMargin)
-			camera.translate(0, scrollSpeed * delta);
+		if (mouseY > screenHeight - scrollMargin)
+			camera.translate(0, -scrollSpeed + snapLeftoverY);
+		if (mouseY < scrollMargin)
+			camera.translate(0, scrollSpeed + snapLeftoverY);
 
-		if (x > screenWidth - scrollMargin)
-			camera.translate(scrollSpeed * delta, 0);
-		if (x < scrollMargin)
-			camera.translate(-scrollSpeed * delta, 0);
+		if (mouseX > screenWidth - scrollMargin)
+			camera.translate(scrollSpeed + snapLeftoverX, 0);
+		if (mouseX < scrollMargin)
+			camera.translate(-scrollSpeed + snapLeftoverX, 0);
 
+		snapCameraAndSaveRemainder();
+
+		snapLeftoverX = 0;
+		snapLeftoverY = 0;
+
+	}
+
+	private float snapLeftoverX;
+	private float snapLeftoverY;
+
+	/*
+	 * Accumulate the leftovers and apply them to later movement, in order to prevent slow-down or inconsistencies due to repeated rounding.
+	 */
+	private void snapCameraAndSaveRemainder() {
+
+		float dx = Math.round(camera.position.x) - camera.position.x;
+		float dy = Math.round(camera.position.y) - camera.position.y;
+
+		camera.position.set(Math.round(camera.position.x), Math.round(camera.position.y), 0);
+
+		snapLeftoverX -= dx;
+		snapLeftoverY -= dy;
 	}
 
 	private boolean gamePaused = false;
@@ -176,8 +197,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	@Override
 	public void dispose() {
 	}
-
-	private Unit playerUnit;
 
 	private CombatPrototyping testing;
 

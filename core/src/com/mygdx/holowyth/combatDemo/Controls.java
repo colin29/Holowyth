@@ -161,12 +161,7 @@ public class Controls extends InputProcessorAdapter {
 			}
 		});
 
-		// functionBindings.bindFunctionToKey(() -> useSkillInSlot(1), Keys.NUM_1);
-		// functionBindings.bindFunctionToKey(() -> useSkillInSlot(2), Keys.NUM_2);
-		// functionBindings.bindFunctionToKey(() -> useSkillInSlot(3), Keys.NUM_3);
-
 		bindNumberKeysToSkills();
-
 		functionBindings.bindFunctionToKey(() -> setSPToMax(), Keys.Q);
 		functionBindings.bindFunctionToKey(() -> orderSelectedUnitsToStop(), Keys.S);
 
