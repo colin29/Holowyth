@@ -9,6 +9,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.holowyth.Holowyth;
@@ -17,7 +18,9 @@ import com.mygdx.holowyth.combatDemo.ui.CombatDemoUI;
 import com.mygdx.holowyth.combatDemo.ui.GameLog;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
+import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.tiled.MyAtlasTmxMapLoader;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.template.DemoScreen;
@@ -84,7 +87,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		// Load map and test units
 
-		loadMapFromDisk(Holo.mapsDirectory + Holo.editorInitialMap);
+		// loadMapFromDisk(Holo.mapsDirectory + Holo.editorInitialMap);
+		map = new Field(1200, 1200);
+		mapStartup();
 
 		Table debugInfo = combatDemoUI.getDebugInfo();
 		functionBindings.bindFunctionToKey(() -> debugInfo.setVisible(!debugInfo.isVisible()), Keys.GRAVE); // tilde key
@@ -207,18 +212,19 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	 */
 	@Override
 	protected void mapStartup() {
-		// map.polys.clear(); // Pretend there's no obstacles while I'm testing tiled maps
-		map.setDimensions(1200, 1200);
-
 		initializeMapLifetimeComponents();
 
 		testing.setupPlannedScenario();
 	}
 
+	TiledMap tiledMap;
+
 	private void initializeMapLifetimeComponents() {
 
+		tiledMap = new MyAtlasTmxMapLoader().load("assets/maps/forest1.tmx");
+
 		// Init Pathing
-		pathingModule.initForMap(this.map);
+		pathingModule.initForTiledMap(tiledMap, map);
 
 		// Init World
 
@@ -235,6 +241,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		// Set Renderer to render world and other map-lifetime components
 		renderer.setWorld(world);
+		renderer.setTiledMap(tiledMap);
 		renderer.setUnitControls(unitControls);
 		renderer.setEffectsHandler(gfx);
 

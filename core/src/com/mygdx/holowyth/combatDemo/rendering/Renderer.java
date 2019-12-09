@@ -15,6 +15,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -111,7 +112,7 @@ public class Renderer {
 		pathfinding = new PathfindingRenderer(this, pathingModule);
 		unitMotion = new UnitMotionRenderer(this);
 		sandbox = new SandBoxRenderer(this);
-		// tiled = new TiledMapRenderer(this);
+		tiled = new TiledMapRenderer(this);
 	}
 
 	/*
@@ -128,7 +129,7 @@ public class Renderer {
 
 		batch.setProjectionMatrix(worldCamera.combined);
 
-		// tiled.render();
+		tiled.render();
 		renderUnitHpSpBars();
 
 		// 2: Render unit paths
@@ -463,6 +464,10 @@ public class Renderer {
 
 	public void setUnitControls(Controls unitControls) {
 		this.controls = unitControls;
+	}
+
+	public void setTiledMap(TiledMap tiledMap) {
+		tiled.setMap(tiledMap);
 	}
 
 	/*

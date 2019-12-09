@@ -1,27 +1,36 @@
 package com.mygdx.holowyth.combatDemo.rendering;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
-import com.mygdx.holowyth.tiled.MyAtlasTmxMapLoader;
 
 public class TiledMapRenderer extends SubRenderer {
 
-	public TiledMapRenderer(Renderer renderer) {
-		super(renderer);
-		loadMap();
-	}
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private TiledMap map;
 	private OrthogonalTiledMapRenderer tiledMapRenderer;
 
-	public void loadMap() {
-		map = new MyAtlasTmxMapLoader().load("assets/maps/forest1.tmx");
-		tiledMapRenderer = new OrthogonalTiledMapRenderer(map);
+	TiledMap map;
+
+	public TiledMapRenderer(Renderer renderer) {
+		super(renderer);
 	}
 
 	public void render() {
-		tiledMapRenderer.setView((OrthographicCamera) worldCamera);
-		tiledMapRenderer.render();
+		if (map != null) {
+			tiledMapRenderer.setView((OrthographicCamera) worldCamera);
+			tiledMapRenderer.render();
+		}
+	}
+
+	public void setMap(TiledMap map) {
+		this.map = map;
+		if (map != null) {
+			tiledMapRenderer = new OrthogonalTiledMapRenderer(map);
+			logger.debug("Set new map {}");
+		}
 	}
 }

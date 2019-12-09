@@ -10,6 +10,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.utils.Queue;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.PathSmoother.PathsInfo;
@@ -66,6 +67,25 @@ public class PathingModule {
 		initObstaclePoints(polys);
 		initExpandedObstacleSegs(polys);
 
+		initForMapHelper();
+	}
+
+	/*
+	 * Re-inits for the given map. This is kind of legacy, but we still pass in a map for surrounding info
+	 */
+	public void initForTiledMap(TiledMap map, Field mapLegacy) {
+		this.map = mapLegacy;
+
+		// TODO:
+
+		// initObstaclePoints(polys);
+		// initExpandedObstacleSegs(polys);
+
+		initForMapHelper();
+
+	}
+
+	private void initForMapHelper() {
 		initGraphs();
 		floodFillGraph();
 
