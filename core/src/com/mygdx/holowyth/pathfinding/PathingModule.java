@@ -114,13 +114,17 @@ public class PathingModule {
 
 			// i represent the current line segment (for example with 6 floats, there are 3 points, and 2 total line segments)
 			for (int i = 1; i < vertices.length / 2; i += 1) {
+
 				start.set(end);
 				end.set(vertices[i * 2], vertices[i * 2 + 1]);
 
 				var seg = new OrientedSeg(start.x, start.y, end.x, end.y);
 				seg.isClockwise = false; // In the editor we draw segs so that right is the "outside".
 
-				obstaclePoints.add(new Point(start.x, start.y));
+				if (i == 1) {
+					obstaclePoints.add(new Point(start.x, start.y));
+				}
+				obstaclePoints.add(new Point(end.x, end.y));
 				obstacleSegs.add(seg);
 				obstacleExpandedSegs.add(seg.getOutwardlyDisplacedSegment(Holo.UNIT_RADIUS));
 			}
@@ -143,7 +147,7 @@ public class PathingModule {
 		obstaclePoints.clear();
 		for (OrientedPoly poly : polys) {
 			for (var seg : poly.segments) {
-				obstaclePoints.add(seg.startPoint()); // start point of all segments will get us all points
+				obstaclePoints.add(seg.startPoint());
 			}
 		}
 	}
@@ -236,12 +240,10 @@ public class PathingModule {
 
 	private void floodFillGraph() {
 
-		// Start with 0,0
-
 		Queue<Coord> q = new Queue<Coord>();
-		q.ensureCapacity(graphWidth); // for a graph size x * y, you'd expect max entries on the order of max(x, y)
+		q.ensureCapacity(graphWidth);
 
-		q.addLast(new Coord(0, 0));
+		q.addLast(new Coord(0, 0)); // Start flood fill from 0,0
 
 		Coord c;
 		Vertex vertex;

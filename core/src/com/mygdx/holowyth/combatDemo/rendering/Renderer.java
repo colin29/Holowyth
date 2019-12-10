@@ -1,5 +1,6 @@
 package com.mygdx.holowyth.combatDemo.rendering;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 import org.slf4j.Logger;
@@ -38,6 +39,7 @@ import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
+import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
  * Handles all of CombatDemo's rendering <br>
@@ -139,6 +141,8 @@ public class Renderer {
 		if (Gdx.input.isKeyPressed(Keys.M)) {
 			pathingModule.renderGraph(true);
 			HoloGL.renderSegs(pathingModule.getObstacleExpandedSegs(), Color.PINK);
+			renderCircles(pathingModule.getObstaclePoints(), Holo.UNIT_RADIUS, Color.PINK);
+
 		}
 
 		// 2: Render unit paths
@@ -190,7 +194,7 @@ public class Renderer {
 
 		if (tiled.isMapLoaded()) {
 			renderMapObstacles();
-			renderMapBoundaries();
+			// renderMapBoundaries();
 		}
 
 		// Render effects
@@ -270,6 +274,15 @@ public class Renderer {
 		Vector3 vec = new Vector3(); // World coordinates of the click.
 		vec = worldCamera.unproject(vec.set(Gdx.input.getX(), Gdx.input.getY(), 0));
 		return new Vector2(vec.x, vec.y);
+	}
+
+	private void renderCircles(List<Point> points, float radius, Color color) {
+		batch.begin();
+		shapeDrawer.setColor(color);
+		for (var point : pathingModule.getObstaclePoints()) {
+			shapeDrawer.circle(point.x, point.y, radius);
+		}
+		batch.end();
 	}
 
 	private void renderEffects() {
