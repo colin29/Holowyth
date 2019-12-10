@@ -36,6 +36,7 @@ public class UnitSkills {
 		slot[5] = new MageSkills.Hydroblast();
 		slot[6] = new Skills.StaticShock();
 		slot[7] = new WarriorSkills.RageBlow();
+		slot[8] = new MageSkills.ArcaneBolt();
 
 	}
 

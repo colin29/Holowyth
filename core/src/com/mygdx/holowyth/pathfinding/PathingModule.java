@@ -77,6 +77,7 @@ public class PathingModule {
 		List<OrientedPoly> polys = OrientedPoly.calculateOrientedPolygons(map.polys);
 		initObstaclePoints(polys);
 		initExpandedObstacleSegs(polys);
+		addCollisionForMapBoundary();
 
 		initForMapHelper();
 	}
@@ -89,6 +90,7 @@ public class PathingModule {
 		mapHeight = height;
 
 		readObstaclesFromTiledMap(map);
+		addCollisionForMapBoundary();
 
 		initForMapHelper();
 
@@ -131,6 +133,28 @@ public class PathingModule {
 
 		}
 
+	}
+
+	private void addCollisionForMapBoundary() {
+
+		// Need to define these in CCW direction, pathable side is to the right
+		var left = new OrientedSeg(0, 0, 0, mapHeight);
+		var top = new OrientedSeg(0, mapHeight, mapWidth, mapHeight);
+		var right = new OrientedSeg(mapWidth, mapHeight, mapWidth, 0);
+		var bottom = new OrientedSeg(mapWidth, 0, 0, 0);
+
+		var segs = new ArrayList<OrientedSeg>();
+		segs.add(bottom);
+		segs.add(right);
+		segs.add(top);
+		segs.add(left);
+
+		obstacleSegs.addAll(segs);
+
+		for (var seg : segs) {
+			obstaclePoints.add(seg.startPoint());
+			obstacleExpandedSegs.add(seg.getOutwardlyDisplacedSegment(Holo.UNIT_RADIUS));
+		}
 	}
 
 	private void initForMapHelper() {
@@ -243,7 +267,7 @@ public class PathingModule {
 		Queue<Coord> q = new Queue<Coord>();
 		q.ensureCapacity(graphWidth);
 
-		q.addLast(new Coord(0, 0)); // Start flood fill from 0,0
+		q.addLast(new Coord(2, 2)); // start flood fill from this position
 
 		Coord c;
 		Vertex vertex;
