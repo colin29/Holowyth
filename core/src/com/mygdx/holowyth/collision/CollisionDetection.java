@@ -77,16 +77,14 @@ public class CollisionDetection {
 	 */
 	public static List<CollisionInfo> getCircleSegCollisionInfos(CircleCBInfo objectBody,
 			float thisRadius,
-			List<OrientedPoly> polys) {
+			List<OrientedSeg> expandedSegs) {
 
 		Segment objectMotion = new Segment(objectBody.getX(), objectBody.getY(), objectBody.getX() + objectBody.getVx(),
 				objectBody.getY() + objectBody.getVy());
 
 		var infos = new ArrayList<CollisionInfo>();
 
-		var segs = getObstacleExpandedSegs(polys, thisRadius);
-
-		for (var seg : segs) {
+		for (var seg : expandedSegs) {
 			Point intersection = lineSegsIntersect(objectMotion, seg);
 			if (intersection != null) {
 

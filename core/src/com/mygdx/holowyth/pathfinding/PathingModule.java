@@ -10,7 +10,11 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.math.Polyline;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Queue;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.PathSmoother.PathsInfo;
@@ -24,6 +28,8 @@ import com.mygdx.holowyth.util.dataobjects.Point;
  * Handles pathfinding for the app's needs <br>
  * Knows how to render certain information about itself
  * 
+ * Also exposes extracted obstacle information about the loaded map
+ * 
  * Has application lifetime.
  * 
  * @author Colin Ta
@@ -35,13 +41,17 @@ public class PathingModule {
 	OrthographicCamera camera;
 	ShapeRenderer shapeRenderer;
 
-	private Field map;
+	// private Field map;
 	private AStarSearch pathing;
 
 	private PathSmoother smoother = new PathSmoother();
 
-	private List<Point> obstaclePoints = new ArrayList<Point>();
-	private List<OrientedSeg> obstacleExpandedSegs = new ArrayList<OrientedSeg>();
+	private final List<Point> obstaclePoints = new ArrayList<Point>();
+	private final List<OrientedSeg> obstacleSegs = new ArrayList<OrientedSeg>();
+	private final List<OrientedSeg> obstacleExpandedSegs = new ArrayList<OrientedSeg>();
+
+	private int mapWidth; // should only be changed when a new map is loaded
+	private int mapHeight;
 
 	// Debug
 	HashMap<UnitPF, PathsInfo> intermediatePaths;
@@ -61,7 +71,8 @@ public class PathingModule {
 	 * Re-inits for the given map
 	 */
 	public void initForMap(Field map) {
-		this.map = map;
+		mapWidth = map.width();
+		mapHeight = map.height();
 
 		List<OrientedPoly> polys = OrientedPoly.calculateOrientedPolygons(map.polys);
 		initObstaclePoints(polys);
@@ -71,17 +82,50 @@ public class PathingModule {
 	}
 
 	/*
-	 * Re-inits for the given map. This is kind of legacy, but we still pass in a map for surrounding info
+	 * Re-inits for the given map.
 	 */
-	public void initForTiledMap(TiledMap map, Field mapLegacy) {
-		this.map = mapLegacy;
+	public void initForTiledMap(TiledMap map, int width, int height) {
+		mapWidth = width;
+		mapHeight = height;
 
-		// TODO:
-
-		// initObstaclePoints(polys);
-		// initExpandedObstacleSegs(polys);
+		readObstaclesFromTiledMap(map);
 
 		initForMapHelper();
+
+	}
+
+	private void readObstaclesFromTiledMap(TiledMap map) {
+
+		obstaclePoints.clear();
+		obstacleSegs.clear();
+		obstacleExpandedSegs.clear();
+
+		var collisionLayer = map.getLayers().get("Collision");
+
+		MapObjects objects = collisionLayer.getObjects();
+
+		for (PolylineMapObject object : objects.getByType(PolylineMapObject.class)) {
+
+			Polyline polyline = object.getPolyline();
+			float[] vertices = polyline.getTransformedVertices();
+
+			Vector2 end = new Vector2(vertices[0], vertices[1]);
+			Vector2 start = new Vector2();
+
+			// i represent the current line segment (for example with 6 floats, there are 3 points, and 2 total line segments)
+			for (int i = 1; i < vertices.length / 2; i += 1) {
+				start.set(end);
+				end.set(vertices[i * 2], vertices[i * 2 + 1]);
+
+				var seg = new OrientedSeg(start.x, start.y, end.x, end.y);
+				seg.isClockwise = false; // In the editor we draw segs so that right is the "outside".
+
+				obstaclePoints.add(new Point(start.x, start.y));
+				obstacleSegs.add(seg);
+				obstacleExpandedSegs.add(seg.getOutwardlyDisplacedSegment(Holo.UNIT_RADIUS));
+			}
+
+		}
 
 	}
 
@@ -89,7 +133,7 @@ public class PathingModule {
 		initGraphs();
 		floodFillGraph();
 
-		pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE, map.width(), map.height());
+		pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE, mapWidth, mapHeight);
 
 		// Debug
 		intermediatePaths = new HashMap<UnitPF, PathsInfo>();
@@ -173,8 +217,8 @@ public class PathingModule {
 	// Getters
 
 	private void initGraphs() {
-		graphWidth = (int) Math.floor(map.width() / CELL_SIZE) + 1;
-		graphHeight = (int) Math.floor(map.height() / CELL_SIZE) + 1;
+		graphWidth = (int) Math.floor(mapWidth / CELL_SIZE) + 1;
+		graphHeight = (int) Math.floor(mapHeight / CELL_SIZE) + 1;
 
 		graph = new Vertex[graphHeight][graphWidth];
 		for (int y = 0; y < graphHeight; y++) {
@@ -503,6 +547,15 @@ public class PathingModule {
 
 	public List<OrientedSeg> getObstacleExpandedSegs() {
 		return Collections.unmodifiableList(obstacleExpandedSegs);
+	}
+
+	/**
+	 * Get the original, non-expanded obstacle segs
+	 * 
+	 * @return
+	 */
+	public List<OrientedSeg> getObstacleSegs() {
+		return Collections.unmodifiableList(obstacleSegs);
 	}
 
 }

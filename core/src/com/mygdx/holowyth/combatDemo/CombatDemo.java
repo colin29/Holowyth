@@ -9,7 +9,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.holowyth.Holowyth;
@@ -18,9 +17,7 @@ import com.mygdx.holowyth.combatDemo.ui.CombatDemoUI;
 import com.mygdx.holowyth.combatDemo.ui.GameLog;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
-import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.tiled.MyAtlasTmxMapLoader;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.template.DemoScreen;
@@ -88,8 +85,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		// Load map and test units
 
 		// loadMapFromDisk(Holo.mapsDirectory + Holo.editorInitialMap);
-		map = new Field(1200, 1200);
-		mapStartup();
+		loadMapFromDisk(Holo.mapsDirectory + "/forest1.tmx");
 
 		Table debugInfo = combatDemoUI.getDebugInfo();
 		functionBindings.bindFunctionToKey(() -> debugInfo.setVisible(!debugInfo.isVisible()), Keys.GRAVE); // tilde key
@@ -213,24 +209,22 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	@Override
 	protected void mapStartup() {
 		initializeMapLifetimeComponents();
-
 		testing.setupPlannedScenario();
 	}
 
-	TiledMap tiledMap;
-
 	private void initializeMapLifetimeComponents() {
 
-		tiledMap = new MyAtlasTmxMapLoader().load("assets/maps/forest1.tmx");
+		final int mapWidth = (Integer) map.getProperties().get("widthPixels");
+		final int mapHeight = (Integer) map.getProperties().get("heightPixels");
 
 		// Init Pathing
-		pathingModule.initForTiledMap(tiledMap, map);
+		pathingModule.initForTiledMap(map, mapWidth, mapHeight);
 
 		// Init World
 
 		gfx = new EffectsHandler(game.batch, camera, stage, skin, debugStore);
 
-		world = new World(this.map, pathingModule, debugStore, gfx);
+		world = new World(mapWidth, mapHeight, pathingModule, debugStore, gfx);
 
 		// Init Unit controls
 		if (unitControls != null) {
@@ -241,7 +235,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		// Set Renderer to render world and other map-lifetime components
 		renderer.setWorld(world);
-		renderer.setTiledMap(tiledMap);
+		renderer.setTiledMap(map, mapWidth, mapHeight);
 		renderer.setUnitControls(unitControls);
 		renderer.setEffectsHandler(gfx);
 

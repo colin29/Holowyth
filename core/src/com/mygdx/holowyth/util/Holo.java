@@ -11,7 +11,11 @@ import com.badlogic.gdx.graphics.Color;
 public class Holo {
 
 	// Paths
-	public static String mapsDirectory = HoloIO.getCanonicalPathElseNull("./saveFiles/");
+	public static String simpleMapsDirectory = HoloIO.getCanonicalPathElseNull("./saveFiles/");
+	public static String mapsDirectory = HoloIO.getCanonicalPathElseNull("assets/maps/");
+
+	// Demos
+	public static String initialSimpleMap = "/complexMap.map"; // "/blankMap.map"; // only for demos that use simple maps
 
 	// Initial Settings (only apply at startup)
 	public static boolean enableCursorGrabbing = false;
@@ -67,9 +71,6 @@ public class Holo {
 
 	public static float defaultUnitAttackChaseRange = 225;
 	public static float alliedUnitsAttackChaseRange = 175;
-
-	// Editor
-	public static String editorInitialMap = "/complexMap.map"; // "/blankMap.map";
 
 	// Debug display
 	public static boolean debugPanelShowAtStartup = true;

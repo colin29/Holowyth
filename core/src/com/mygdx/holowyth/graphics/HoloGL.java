@@ -61,6 +61,24 @@ public class HoloGL {
 		shapeRenderer.end();
 	}
 
+	public static void renderPoints(List<Point> points, Color color) {
+		shapeRenderer.begin(ShapeType.Line);
+		shapeRenderer.setColor(color);
+		for (var point : points) {
+			shapeRenderer.point(point.x, point.y, 0);
+		}
+		shapeRenderer.end();
+	}
+
+	public static <S extends Segment> void renderSegs(List<S> segs, Color color) {
+		shapeRenderer.begin(ShapeType.Line);
+		shapeRenderer.setColor(color);
+		for (S seg : segs) {
+			shapeRenderer.line(seg.x1, seg.y1, seg.x2, seg.y2);
+		}
+		shapeRenderer.end();
+	}
+
 	public static void renderPolygon(Polygon poly, Color color) {
 		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setColor(color);
@@ -101,12 +119,16 @@ public class HoloGL {
 	}
 
 	public static void renderMapBoundaries(Field map) {
+		renderMapBoundaries(map.width(), map.height());
+	}
+
+	public static void renderMapBoundaries(int mapWidth, int mapHeight) {
 		shapeRenderer.setColor(0.5f, 0.5f, 0.5f, 1);
 		shapeRenderer.begin(ShapeType.Line);
 
-		Vector2 topRight = new Vector2(map.width(), map.height());
-		Vector2 topLeft = new Vector2(0, map.height());
-		Vector2 botRight = new Vector2(map.width(), 0);
+		Vector2 topRight = new Vector2(mapWidth, mapHeight);
+		Vector2 topLeft = new Vector2(0, mapHeight);
+		Vector2 botRight = new Vector2(mapWidth, 0);
 		Vector2 botLeft = new Vector2(0, 0);
 		shapeRenderer.line(topLeft, topRight);
 		shapeRenderer.line(botLeft, botRight);

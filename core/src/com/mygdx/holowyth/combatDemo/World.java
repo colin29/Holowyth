@@ -14,7 +14,6 @@ import com.mygdx.holowyth.collision.ObstaclePoint;
 import com.mygdx.holowyth.collision.ObstacleSeg;
 import com.mygdx.holowyth.collision.UnitAdapterCircleCB;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
-import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
@@ -24,7 +23,6 @@ import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloAssert;
-import com.mygdx.holowyth.util.dataobjects.OrientedPoly;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.exceptions.HoloOperationException;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
@@ -40,8 +38,6 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 public class World implements WorldInfo {
 
 	PathingModule pathing;
-	Field map; // Each world instance is tied to a single map (specifically, is
-				// loaded from a single map)
 
 	EffectsHandler gfx;
 	DebugStore debugStore;
@@ -57,8 +53,13 @@ public class World implements WorldInfo {
 
 	private List<Effect> effects = new ArrayList<Effect>();
 
-	public World(Field map, PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects) {
-		this.map = map;
+	private final int mapWidth;
+	private final int mapHeight;
+
+	public World(int mapWidth, int mapHeight, PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects) {
+		this.mapWidth = mapWidth;
+		this.mapHeight = mapHeight;
+
 		this.pathing = pathingModule;
 		this.gfx = effects;
 
@@ -238,18 +239,15 @@ public class World implements WorldInfo {
 				List<CircleCBInfo> objectCollisions = CollisionDetection.getCircleBodyCollisionsAlongLineSegment(motion,
 						curBody.getRadius(), allOtherBodies);
 
-				List<OrientedPoly> polys = OrientedPoly.calculateOrientedPolygons(map.polys);
 				List<CircleCBInfo> obstaclePoints = new ArrayList<CircleCBInfo>();
-				for (var poly : polys) {
-					for (var seg : poly.segments) {
-						obstaclePoints.add(new ObstaclePoint(seg.x1, seg.y1));
-					}
+				for (var point : pathing.getObstaclePoints()) {
+					obstaclePoints.add(new ObstaclePoint(point.x, point.y));
 				}
 
 				List<CollisionInfo> obstacleCollisions = new ArrayList<CollisionInfo>();
 				obstacleCollisions.addAll(CollisionDetection.getCircleSegCollisionInfos(curBody,
 						curBody.getRadius(),
-						polys));
+						pathing.getObstacleExpandedSegs()));
 				obstacleCollisions.addAll(CollisionDetection.getCirclePointCollisionInfos(curBody, obstaclePoints));
 
 				for (CircleCBInfo colidee : objectCollisions) {
@@ -509,10 +507,6 @@ public class World implements WorldInfo {
 	@Override
 	public EffectsHandler getGfx() {
 		return gfx;
-	}
-
-	public Field getMap() {
-		return map;
 	}
 
 	public DebugStore getDebugStore() {

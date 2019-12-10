@@ -676,7 +676,7 @@ public class PolyMapEditor implements Screen, InputProcessor {
 		});
 
 		stage.addActor(game.fileChooser);
-		game.fileChooser.setDirectory(Holo.mapsDirectory);
+		game.fileChooser.setDirectory(Holo.simpleMapsDirectory);
 	}
 
 	private void openFileChooserToLoadMap() {
@@ -695,7 +695,7 @@ public class PolyMapEditor implements Screen, InputProcessor {
 			}
 		});
 
-		game.fileChooser.setDirectory(Holo.mapsDirectory);
+		game.fileChooser.setDirectory(Holo.simpleMapsDirectory);
 	}
 
 }

@@ -92,6 +92,31 @@ public class HoloPF {
 		return true;
 	}
 
+	/**
+	 * Use this when have irregular sized entities
+	 */
+	public static boolean isSegmentPathableAgainstObstaclesNonExpandedSeg(Segment motion, List<OrientedSeg> obstacleSegs,
+			List<Point> obstaclePoints,
+			float objectRadius) {
+
+		var expandedSegs = new ArrayList<OrientedSeg>();
+		for (var seg : obstacleSegs) {
+			expandedSegs.add(seg.getOutwardlyDisplacedSegment(objectRadius));
+		}
+
+		for (var seg : expandedSegs) {
+			if (Line2D.linesIntersect(motion.x1, motion.y1, motion.x2, motion.y2, seg.x1, seg.y1, seg.x2, seg.y2)) {
+				return false;
+			}
+		}
+		for (var point : obstaclePoints) {
+			if (Intersector.distanceSegmentPoint(motion.x1, motion.y1, motion.x2, motion.y2, point.x, point.y) <= objectRadius) {
+				return false;
+			}
+		}
+		return true;
+	}
+
 	public static void renderPath(Path path, Color color, boolean renderPoints, float thickness,
 			ShapeRenderer shapeRenderer) {
 		if (path != null) {

@@ -19,7 +19,7 @@ public class TiledMapRenderer extends SubRenderer {
 		super(renderer);
 	}
 
-	public void render() {
+	public void renderMap() {
 		if (map != null) {
 			tiledMapRenderer.setView((OrthographicCamera) worldCamera);
 			tiledMapRenderer.render();
@@ -32,5 +32,9 @@ public class TiledMapRenderer extends SubRenderer {
 			tiledMapRenderer = new OrthogonalTiledMapRenderer(map);
 			logger.debug("Set new map {}");
 		}
+	}
+
+	public boolean isMapLoaded() {
+		return map != null;
 	}
 }

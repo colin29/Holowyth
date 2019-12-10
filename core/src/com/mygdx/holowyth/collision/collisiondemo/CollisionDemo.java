@@ -5,11 +5,11 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.graphics.HoloGL;
-import com.mygdx.holowyth.util.template.DemoScreen;
+import com.mygdx.holowyth.util.template.SimpleMapDemoScreen;
 import com.mygdx.holowyth.util.tools.Timer;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
-public class CollisionDemo extends DemoScreen {
+public class CollisionDemo extends SimpleMapDemoScreen {
 
 	private DebugStore debugStore = new DebugStore();
 

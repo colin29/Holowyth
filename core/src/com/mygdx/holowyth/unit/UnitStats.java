@@ -128,8 +128,6 @@ public class UnitStats implements UnitStatsInfo {
 		sp = getMaxSp();
 
 		slowEffects.clear();
-
-		printInfo();
 	}
 
 	// Combat/Attacking methods

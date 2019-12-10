@@ -10,9 +10,9 @@ import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
-import com.mygdx.holowyth.util.template.DemoScreen;
+import com.mygdx.holowyth.util.template.SimpleMapDemoScreen;
 
-public class RayCastDemo extends DemoScreen {
+public class RayCastDemo extends SimpleMapDemoScreen {
 
 	public RayCastDemo(Holowyth game) {
 		super(game);

@@ -8,18 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.collision.CircleCBInfo;
-import com.mygdx.holowyth.collision.CollisionDetection;
-import com.mygdx.holowyth.collision.CollisionInfo;
-import com.mygdx.holowyth.collision.ObstaclePoint;
-import com.mygdx.holowyth.collision.collisiondemo.CircleCBImpl;
 import com.mygdx.holowyth.combatDemo.World;
+import com.mygdx.holowyth.pathfinding.HoloPF;
+import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
-import com.mygdx.holowyth.util.dataobjects.OrientedPoly;
 import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
-import com.mygdx.holowyth.util.exceptions.HoloOperationException;
 
 /**
  * Implements the concepts of: <br>
@@ -178,36 +174,13 @@ public abstract class ProjectileBase {
 	}
 
 	protected void detectCollisionWithObstacles() {
-		CircleCBInfo cb = new CircleCBImpl(pos.x, pos.y, collisionRadius);
-		((CircleCBImpl) cb).setVelocity(getVx(), getVy());
-
-		List<OrientedPoly> polys = OrientedPoly.calculateOrientedPolygons(world.getMap().polys);
-		List<CircleCBInfo> polyPoints = new ArrayList<CircleCBInfo>();
-		for (var poly : polys) {
-			for (var seg : poly.segments) {
-				polyPoints.add(new ObstaclePoint(seg.x1, seg.y1));
-			}
+		PathingModule pathing = world.getPathingModule();
+		final var motion = new Segment(pos.x, pos.y, pos.x + getVx(), pos.y + getVy());
+		if (!HoloPF.isSegmentPathableAgainstObstaclesNonExpandedSeg(motion, pathing.getObstacleSegs(), pathing.getObstaclePoints(),
+				collisionRadius)) {
+			onCollisionWithObstacle(getX(), getY());
+			collided = true;
 		}
-
-		var obstacleCollisions = new ArrayList<CollisionInfo>();
-		obstacleCollisions.addAll(CollisionDetection.getCircleSegCollisionInfos(cb,
-				cb.getRadius(),
-				polys));
-		obstacleCollisions.addAll(CollisionDetection.getCirclePointCollisionInfos(cb, polyPoints));
-		if (!obstacleCollisions.isEmpty()) {
-			try {
-				// CollisionInfo collision = CollisionDetection.getFirstCollisionInfo(cb, null, obstacleCollisions,
-				// null);
-				onCollisionWithObstacle(getX(), getY());
-				collided = true;
-			} catch (HoloOperationException e) {
-				logger.warn(e.getMessage());
-				logger.warn("from: " + e.getFormattedStackTrace());
-				logger.warn("Skipping resolving this projectile's collision");
-				// Skip resolving this collision
-			}
-		}
-
 	}
 
 	/**

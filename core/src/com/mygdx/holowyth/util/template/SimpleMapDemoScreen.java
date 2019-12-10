@@ -1,25 +1,22 @@
 package com.mygdx.holowyth.util.template;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.maps.MapProperties;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.tiled.MyAtlasTmxMapLoader;
+import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.exceptions.HoloException;
+import com.mygdx.holowyth.util.HoloIO;
+import com.mygdx.holowyth.util.exception.ErrorCode;
+import com.mygdx.holowyth.util.exception.HoloException;
 
 /**
- * Works with a TMX map
+ * Works with the simple kind of map, which is used in older demos which have no need to load TMX map
  * 
  * Provides the common base functionality of a demo to be able to have a currently loaded map, and to get maps from disk
  * 
@@ -30,16 +27,14 @@ import com.mygdx.holowyth.util.exceptions.HoloException;
  * @author Colin Ta
  *
  */
-public abstract class DemoScreen extends BaseHoloScreen implements InputProcessor {
-
-	Logger logger = LoggerFactory.getLogger(DemoScreen.class);
+public abstract class SimpleMapDemoScreen extends BaseHoloScreen implements InputProcessor {
 
 	/**
 	 * The currently loaded map
 	 */
-	protected TiledMap map;
+	protected Field map;
 
-	protected DemoScreen(Holowyth game) {
+	protected SimpleMapDemoScreen(Holowyth game) {
 		super(game);
 	}
 
@@ -55,7 +50,7 @@ public abstract class DemoScreen extends BaseHoloScreen implements InputProcesso
 			public void selected(Array<FileHandle> file) {
 				System.out.println("Selected file: " + file.get(0).file().getAbsolutePath());
 
-				loadMapFromDisk(file.get(0).file().getPath()); // tmx map loader uses relative path
+				loadMapFromDisk(file.get(0).file().getAbsolutePath());
 			}
 		});
 
@@ -66,12 +61,19 @@ public abstract class DemoScreen extends BaseHoloScreen implements InputProcesso
 	 * Gets a map from disk, then loads it.
 	 */
 	protected void loadMapFromDisk(String pathname) {
-		TiledMap loadedMap = new MyAtlasTmxMapLoader().load(pathname);
-		logger.debug(pathname);
-		loadMap(loadedMap);
+		try {
+			Field loadedMap = HoloIO.getMapFromDisk(pathname);
+			loadMap(loadedMap);
+		} catch (HoloException e) {
+			if (e.code == ErrorCode.IO_EXCEPTION) {
+				System.out.println("IO Error, map not loaded");
+				return;
+			}
+		}
+
 	}
 
-	protected void loadMap(TiledMap newMap) {
+	protected void loadMap(Field newMap) {
 
 		if (this.map != null) {
 			mapShutdown();
@@ -83,27 +85,9 @@ public abstract class DemoScreen extends BaseHoloScreen implements InputProcesso
 			return;
 		}
 
-		try {
-			MapProperties prop = newMap.getProperties();
-			int tileWidth = (Integer) prop.get("tilewidth");
-			int tileHeight = (Integer) prop.get("tileheight");
-
-			int width = (Integer) prop.get("width");
-			int height = (Integer) prop.get("height");
-
-			prop.put("widthPixels", Integer.valueOf(tileWidth * width)); // use camel case for custom properties
-			prop.put("heightPixels", Integer.valueOf(tileHeight * height));
-
-			// logger.debug("{} {})", tileWidth, tileHeight);
-		} catch (NullPointerException e) {
-			throw new HoloException("Map load failed, missing properties", e);
-		}
-
 		this.map = newMap;
-
-		// width="50" height="50" tilewidth="24" tileheight="24"
-
-		// camera.position.set(newMap.width() / 2, newMap.height() / 2, 0);
+		newMap.hasUnsavedChanges = false;
+		camera.position.set(newMap.width() / 2, newMap.height() / 2, 0);
 
 		System.out.println("New map loaded");
 
@@ -111,7 +95,14 @@ public abstract class DemoScreen extends BaseHoloScreen implements InputProcesso
 	}
 
 	protected void updateTitleBarInformation() {
-		// TODO for TMX map
+		if (this.map == null) {
+			Gdx.graphics.setTitle(Holo.titleName + " --- " + "No map loaded");
+		} else {
+			String starText;
+			starText = (this.map.hasUnsavedChanges) ? "*" : "";
+			Gdx.graphics.setTitle(
+					Holo.titleName + " --- " + map.name + " [" + map.width() + "x" + map.height() + "] " + starText);
+		}
 	}
 
 	protected abstract void mapStartup();

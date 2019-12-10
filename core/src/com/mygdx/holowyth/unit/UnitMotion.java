@@ -13,10 +13,8 @@ import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit.Order;
-import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
-import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
 public class UnitMotion {
 
@@ -93,16 +91,6 @@ public class UnitMotion {
 		this.self = self;
 		units = world.getUnits();
 		pathing = world.getPathingModule();
-
-		if (self.side == Side.PLAYER) {
-
-			System.out.println(self.getWorldMutable().getDebugStore());
-
-			@SuppressWarnings("unused")
-			DebugValues debugValues = self.getWorldMutable().getDebugStore().registerComponent("Player unit Motion");
-			// debugValues.add("Distance to nextWayPoint", () ->
-			// DataUtil.getRoundedString(getDistanceToNextWayPoint()));
-		}
 	}
 
 	public void tick() {

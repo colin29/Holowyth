@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -26,7 +27,6 @@ import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.HoloSprite;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
-import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.Skill.Status;
 import com.mygdx.holowyth.skill.SkillInfo;
@@ -69,8 +69,11 @@ public class Renderer {
 
 	// Map lifetime components
 	private World world;
-	private Field map;
 	private EffectsHandler gfx;
+
+	// Map info
+	private int mapWidth;
+	private int mapHeight;
 
 	// Graphics options
 
@@ -129,8 +132,14 @@ public class Renderer {
 
 		batch.setProjectionMatrix(worldCamera.combined);
 
-		tiled.render();
+		tiled.renderMap();
 		renderUnitHpSpBars();
+
+		// Debug pathing
+		if (Gdx.input.isKeyPressed(Keys.M)) {
+			pathingModule.renderGraph(true);
+			HoloGL.renderSegs(pathingModule.getObstacleExpandedSegs(), Color.PINK);
+		}
 
 		// 2: Render unit paths
 		pathfinding.renderPaths(false);
@@ -179,7 +188,7 @@ public class Renderer {
 
 		// 1: Render Obstacle Lines
 
-		if (this.map != null) {
+		if (tiled.isMapLoaded()) {
 			renderMapObstacles();
 			renderMapBoundaries();
 		}
@@ -305,13 +314,14 @@ public class Renderer {
 
 	private void renderMapObstacles() {
 		shapeRenderer.setProjectionMatrix(worldCamera.combined);
-		shapeRenderer.setColor(Color.BLACK);
-		HoloGL.renderPolygons(map.polys);
+
+		HoloGL.renderPoints(pathingModule.getObstaclePoints(), Color.GRAY);
+		HoloGL.renderSegs(pathingModule.getObstacleSegs(), Color.GRAY);
 	}
 
 	private void renderMapBoundaries() {
 		shapeRenderer.setProjectionMatrix(worldCamera.combined);
-		HoloGL.renderMapBoundaries(map);
+		HoloGL.renderMapBoundaries(mapWidth, mapHeight);
 	}
 
 	private void renderUnitHpSpBars() {
@@ -466,8 +476,10 @@ public class Renderer {
 		this.controls = unitControls;
 	}
 
-	public void setTiledMap(TiledMap tiledMap) {
+	public void setTiledMap(TiledMap tiledMap, int mapWidth, int mapHeight) {
 		tiled.setMap(tiledMap);
+		this.mapWidth = mapWidth;
+		this.mapHeight = mapHeight;
 	}
 
 	/*
@@ -475,7 +487,6 @@ public class Renderer {
 	 */
 	public void setWorld(World world) {
 		this.world = world;
-		map = world.getMap();
 	}
 
 	public World getWorld() {

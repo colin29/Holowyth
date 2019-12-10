@@ -189,8 +189,8 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		Gdx.input.setInputProcessor(multiplexer);
 
 		// openFileChooserToLoadMap();
-		if (Holo.editorInitialMap != null) {
-			loadMap(HoloIO.getMapFromDisk(Holo.mapsDirectory + Holo.editorInitialMap));
+		if (Holo.initialSimpleMap != null) {
+			loadMap(HoloIO.getMapFromDisk(Holo.simpleMapsDirectory + Holo.initialSimpleMap));
 		}
 	}
 
@@ -503,7 +503,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 			}
 		});
 
-		game.fileChooser.setDirectory(Holo.mapsDirectory);
+		game.fileChooser.setDirectory(Holo.simpleMapsDirectory);
 	}
 
 	private void loadMapFromDisk(String pathname) {

@@ -10,10 +10,10 @@ import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
-import com.mygdx.holowyth.util.template.DemoScreen;
+import com.mygdx.holowyth.util.template.SimpleMapDemoScreen;
 import com.mygdx.holowyth.util.template.adapters.InputProcessorAdapter;
 
-public class WallCollisionDemo extends DemoScreen {
+public class WallCollisionDemo extends SimpleMapDemoScreen {
 
 	// Components
 	Renderer renderer;
@@ -29,7 +29,7 @@ public class WallCollisionDemo extends DemoScreen {
 		renderer.setSimulation(simulation);
 		renderer.setClearColor(backgroundColor);
 
-		loadMapFromDisk(Holo.mapsDirectory + Holo.editorInitialMap);
+		loadMapFromDisk(Holo.simpleMapsDirectory + Holo.initialSimpleMap);
 
 		multiplexer.addProcessor(myInputProcessor);
 
