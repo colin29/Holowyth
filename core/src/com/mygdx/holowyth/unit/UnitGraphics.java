@@ -26,7 +26,7 @@ public class UnitGraphics {
 	private final int SPRITE_WIDTH = 32;
 	private final int SPRITE_HEIGHT = 32;
 
-	private AnimatedSprite chibi = new AnimatedSprite();
+	private AnimatedSprite animatedSprite; // can be null
 
 	private Animation<TextureRegion> activeAnimation;
 	private Animation<TextureRegion> prevAnimation;
@@ -35,11 +35,11 @@ public class UnitGraphics {
 
 	UnitGraphics(Unit parent) {
 		this.self = parent;
-		activeAnimation = chibi.getDown();
-		prevAnimation = activeAnimation;
 	}
 
 	public void updateAndRender(float delta, SpriteBatch batch) {
+		if (animatedSprite == null)
+			return;
 
 		updateActiveAnimation(delta);
 
@@ -63,13 +63,13 @@ public class UnitGraphics {
 
 		logger.debug("Angle {}", angle);
 		if (angle < horizontalAngleSize || angle >= 360 - horizontalAngleSize) {
-			setActiveAnimation(chibi.getRight());
+			setActiveAnimation(animatedSprite.getRight());
 		} else if (angle < 180 - horizontalAngleSize) {
-			setActiveAnimation(chibi.getUp());
+			setActiveAnimation(animatedSprite.getUp());
 		} else if (angle < 180 + horizontalAngleSize) {
-			setActiveAnimation(chibi.getLeft());
+			setActiveAnimation(animatedSprite.getLeft());
 		} else if (angle < 360 - horizontalAngleSize) {
-			setActiveAnimation(chibi.getDown());
+			setActiveAnimation(animatedSprite.getDown());
 		}
 
 		if (activeAnimation == prevAnimation && !self.motion.isBeingKnockedBack() && !self.isAttacking()) {
@@ -92,6 +92,14 @@ public class UnitGraphics {
 		if (activeAnimation != newState) {
 			activeAnimation = newState;
 			stateTime = 0;
+		}
+	}
+
+	public void setAnimatedSprite(AnimatedSprite sprite) {
+		animatedSprite = sprite;
+		if (animatedSprite != null) {
+			activeAnimation = animatedSprite.getDown();
+			prevAnimation = activeAnimation;
 		}
 	}
 

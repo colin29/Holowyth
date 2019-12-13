@@ -18,6 +18,7 @@ import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.effect.Effect;
+import com.mygdx.holowyth.unit.Animations;
 import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
@@ -37,14 +38,14 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
 public class World implements WorldInfo {
 
-	PathingModule pathing;
-
-	EffectsHandler gfx;
-	DebugStore debugStore;
-
-	private UnitCollection units = new UnitCollection();
-
 	Logger logger = LoggerFactory.getLogger(this.getClass());
+
+	final PathingModule pathing;
+	final EffectsHandler gfx;
+	final Animations animations;
+	final DebugStore debugStore;
+
+	private final UnitCollection units = new UnitCollection();
 
 	private float knockBackCollisionElasticityDefault = 0.06f;
 	private float knockBackCollisionElasticityReboundsOffUnit = 0.33f;
@@ -56,12 +57,13 @@ public class World implements WorldInfo {
 	private final int mapWidth;
 	private final int mapHeight;
 
-	public World(int mapWidth, int mapHeight, PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects) {
+	public World(int mapWidth, int mapHeight, PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects, Animations animations) {
 		this.mapWidth = mapWidth;
 		this.mapHeight = mapHeight;
 
 		this.pathing = pathingModule;
 		this.gfx = effects;
+		this.animations = animations;
 
 		this.debugStore = debugStore;
 
@@ -516,6 +518,10 @@ public class World implements WorldInfo {
 	@Override
 	public List<Effect> getEffects() {
 		return effects;
+	}
+
+	public Animations getAnimations() {
+		return animations;
 	}
 
 }

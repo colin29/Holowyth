@@ -8,7 +8,10 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 /**
- * Supports loading and storing state of its child animations. Does not include notion of position
+ * 
+ * Holds the animation information of 1 animated sprite. Multiple units can refer to and use the same animated sprite.
+ * 
+ * Supports loading and storing state of its child animations.
  * 
  * @author Colin Ta
  *
@@ -22,8 +25,8 @@ public class AnimatedSprite {
 
 	private Texture walkSheet;
 
-	public AnimatedSprite() {
-		walkSheet = new Texture(Gdx.files.internal("assets/sprites/pipo-charachip028d.png"));
+	public AnimatedSprite(String path) {
+		walkSheet = new Texture(Gdx.files.internal(path));
 		TextureRegion[][] tmp = TextureRegion.split(walkSheet,
 				32,
 				32);

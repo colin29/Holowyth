@@ -18,6 +18,7 @@ import com.mygdx.holowyth.combatDemo.ui.GameLog;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.unit.Animations;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.template.DemoScreen;
@@ -68,6 +69,8 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	DebugStore debugStore = new DebugStore();
 	private FunctionBindings functionBindings = new FunctionBindings();
 
+	private Animations animations;
+
 	public CombatDemo(final Holowyth game) {
 		super(game);
 
@@ -113,6 +116,8 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		renderer = new Renderer(game, camera, stage, pathingModule);
 		renderer.setClearColor(backgroundColor);
+
+		animations = new Animations();
 	}
 
 	@Override
@@ -224,7 +229,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		gfx = new EffectsHandler(game.batch, camera, stage, skin, debugStore);
 
-		world = new World(mapWidth, mapHeight, pathingModule, debugStore, gfx);
+		world = new World(mapWidth, mapHeight, pathingModule, debugStore, gfx, animations);
 
 		// Init Unit controls
 		if (unitControls != null) {
