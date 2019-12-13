@@ -18,9 +18,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.dataobjects.Segment;
-import com.mygdx.holowyth.util.template.BaseHoloScreen;
+import com.mygdx.holowyth.util.template.HoloBaseScreen;
 
-public class TiledDemo extends BaseHoloScreen implements InputProcessor {
+public class TiledDemo extends HoloBaseScreen implements InputProcessor {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 

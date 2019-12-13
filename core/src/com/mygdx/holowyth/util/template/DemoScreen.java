@@ -30,7 +30,7 @@ import com.mygdx.holowyth.util.exceptions.HoloException;
  * @author Colin Ta
  *
  */
-public abstract class DemoScreen extends BaseHoloScreen implements InputProcessor {
+public abstract class DemoScreen extends HoloBaseScreen implements InputProcessor {
 
 	Logger logger = LoggerFactory.getLogger(DemoScreen.class);
 

@@ -27,7 +27,7 @@ import com.mygdx.holowyth.util.exception.HoloException;
  * @author Colin Ta
  *
  */
-public abstract class SimpleMapDemoScreen extends BaseHoloScreen implements InputProcessor {
+public abstract class SimpleMapDemoScreen extends HoloBaseScreen implements InputProcessor {
 
 	/**
 	 * The currently loaded map

@@ -59,6 +59,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public final UnitMotion motion;
 	public final UnitStats stats;
 	public final UnitSkills skills;
+	public final UnitGraphics graphics;
 
 	// World Fields
 	List<Unit> units;
@@ -150,6 +151,11 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	public Unit(float x, float y, WorldInfo world, Side side, String name) {
+		this(x, y, world, side);
+		setName(name);
+	}
+
 	public Unit(float x, float y, WorldInfo world, Side side) {
 		this.id = Unit.getNextId();
 		idToUnit.put(id, this);
@@ -168,6 +174,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		motion = new UnitMotion(this, world);
 		stats = new UnitStats(this);
 		skills = new UnitSkills(this);
+		graphics = new UnitGraphics(this);
 
 		if (this.side == Side.PLAYER) {
 			DebugValues debugValues = this.getWorldMutable().getDebugStore().registerComponent("Player unit");
@@ -176,11 +183,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 			debugValues.add("speed", () -> motion.getCurPlannedSpeed());
 		}
-	}
-
-	public Unit(float x, float y, WorldInfo world, Side side, String name) {
-		this(x, y, world, side);
-		setName(name);
 	}
 
 	// Orders

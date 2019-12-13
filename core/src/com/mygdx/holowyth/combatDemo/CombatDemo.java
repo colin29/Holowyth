@@ -35,6 +35,8 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
  */
 public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	// Rendering and pipeline variables
 	Renderer renderer;
 
@@ -65,8 +67,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	// For debugging and playtesting
 	DebugStore debugStore = new DebugStore();
 	private FunctionBindings functionBindings = new FunctionBindings();
-
-	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public CombatDemo(final Holowyth game) {
 		super(game);

@@ -532,6 +532,14 @@ public class UnitMotion {
 		return new Vector2(vx, vy);
 	}
 
+	public Vector2 getVelocityRegardlessOfMode() {
+		if (isBeingKnockedBack()) {
+			return getKnockbackVelocity();
+		} else {
+			return getVelocity();
+		}
+	}
+
 	/**
 	 * Eventually will replace isBeingKnocked back, but not fully implemented ...
 	 */

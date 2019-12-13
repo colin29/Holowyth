@@ -160,7 +160,7 @@ public class Renderer {
 			pathfinding.renderUnitExpandedHitBodies();
 		}
 
-		renderUnits();
+		renderUnits(delta);
 
 		if (controls != null) {
 			controls.renderSelectionBox(Controls.defaultSelectionBoxColor);
@@ -291,7 +291,7 @@ public class Renderer {
 		}
 	}
 
-	private void renderUnits() {
+	private void renderUnits(float delta) {
 		if (Holo.useTestSprites) {
 			sandbox.renderUnitsWithTestSprites();
 		} else {
@@ -313,14 +313,16 @@ public class Renderer {
 				shapeDrawer.filledCircle(unit.x, unit.y, Holo.UNIT_RADIUS);
 
 			}
-
 			for (Unit unit : world.getUnits()) {
 				shapeDrawer.setColor(Color.BLACK);
 				shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
 				shapeDrawer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
 			}
-
 			batch.end();
+
+			for (Unit unit : world.getUnits()) {
+				unit.graphics.updateAndRender(delta, batch);
+			}
 
 		}
 	}
