@@ -25,7 +25,6 @@ import com.mygdx.holowyth.util.HoloAssert;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.exceptions.HoloOperationException;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
-import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
 /**
  * Has map lifetime
@@ -64,9 +63,6 @@ public class World implements WorldInfo {
 		this.animations = animations;
 
 		this.debugStore = debugStore;
-
-		@SuppressWarnings("unused")
-		DebugValues debugValues = debugStore.registerComponent("World");
 	}
 
 	/**

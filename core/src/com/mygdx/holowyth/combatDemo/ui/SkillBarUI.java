@@ -1,5 +1,7 @@
 package com.mygdx.holowyth.combatDemo.ui;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +28,7 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
  */
 
 public class SkillBarUI {
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private Stage stage;
 	private Table root;
@@ -33,8 +36,6 @@ public class SkillBarUI {
 	private Skin skin;
 
 	private Controls controls;
-
-	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
 	 * Creates a new skillbar UI and adds it to the stage
@@ -56,10 +57,9 @@ public class SkillBarUI {
 
 		controls.addListener(new ControlsListener() {
 			@Override
-			public void unitSelectionModified() {
+			public void unitSelectionModified(List<UnitInfo> selectedUnits) {
 				root.clear();
 
-				var selectedUnits = controls.getSelectedUnitReadOnly();
 				if (selectedUnits.size() == 1) {
 					regenerateSkillBar(selectedUnits.get(0));
 				}

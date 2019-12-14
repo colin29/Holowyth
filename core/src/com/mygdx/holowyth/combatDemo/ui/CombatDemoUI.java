@@ -20,6 +20,7 @@ public class CombatDemoUI {
 	// Sub-components
 	DebugStoreUI debugStoreUI;
 	SkillBarUI skillBarUI;
+	StatsPanelUI statsPanelUI;
 
 	// Widgets
 	Label coordInfo;
@@ -39,11 +40,10 @@ public class CombatDemoUI {
 	public CombatDemoUI(Stage stage, DebugStore debugStore, Skin skin, CombatDemo combatDemo) {
 		this.skin = skin;
 		this.stage = stage;
-		debugStoreUI = new DebugStoreUI(debugStore);
 		this.debugStore = debugStore;
-
 		this.self = combatDemo;
 
+		debugStoreUI = new DebugStoreUI(debugStore);
 		gameLog = new GameLog(stage);
 
 		createUI();
@@ -89,10 +89,13 @@ public class CombatDemoUI {
 	public void onMapStartup() {
 		debugStoreUI.populateDebugValueDisplay();
 		skillBarUI = new SkillBarUI(stage, debugStore, skin, self.getControls());
+		statsPanelUI = new StatsPanelUI(stage, skin);
+		self.getControls().addListener(statsPanelUI);
 	}
 
 	public void onMapShutdown() {
 		skillBarUI.remove();
+		statsPanelUI.remove();
 	}
 
 	public void onRender() {

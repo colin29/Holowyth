@@ -2,6 +2,7 @@ package com.mygdx.holowyth.combatDemo;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -722,7 +723,7 @@ public class Controls extends InputProcessorAdapter {
 		if (context == Context.SKILL_GROUND || context == Context.SKILL_UNIT) {
 			context = Context.NONE;
 		}
-		listeners.forEach((l) -> l.unitSelectionModified());
+		listeners.forEach((l) -> l.unitSelectionModified(Collections.unmodifiableList(getSelectedUnitReadOnly())));
 	}
 
 	private Set<ControlsListener> listeners = new LinkedHashSet<ControlsListener>();
@@ -737,7 +738,11 @@ public class Controls extends InputProcessorAdapter {
 	}
 
 	public static abstract class ControlsListener {
-		public abstract void unitSelectionModified();
+		/**
+		 * @param list
+		 *            of units is unmodifiable
+		 */
+		public abstract void unitSelectionModified(List<UnitInfo> selectedUnits);
 	}
 
 	/**
