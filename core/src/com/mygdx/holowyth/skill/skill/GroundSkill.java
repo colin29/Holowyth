@@ -1,10 +1,10 @@
 package com.mygdx.holowyth.skill.skill;
 
 import com.mygdx.holowyth.combatDemo.rendering.AimingGraphic;
-import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.unit.Unit;
 
-public abstract class GroundSkill extends Skill {
+public abstract class GroundSkill extends ActiveSkill {
 
 	public float defaultAimingHelperRadius; // if not using can ignore
 

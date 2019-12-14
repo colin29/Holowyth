@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.unit.AnimatedSprite;
 import com.mygdx.holowyth.unit.Animations;
 import com.mygdx.holowyth.unit.Unit;
@@ -88,15 +89,25 @@ public class CombatPrototyping {
 		}
 
 		List<Unit> players = new ArrayList<Unit>();
-
 		for (var p : scenario.playerSpawnLocs) {
-			var unit = world.spawnUnit(p.x, p.y, Unit.Side.PLAYER);
+			var unit = new Unit(p.x, p.y, Unit.Side.PLAYER, world);
 			unit.setName("Player");
-			loadPlayerUnitStats(unit.stats);
-			unit.stats.prepareUnit();
+			loadHumanBaseStats(unit.stats);
 			players.add(unit);
+			world.addUnit(unit);
 		}
+		setPlayerUnitSprites(players);
+		addPassiveSkills(players);
 
+		for (var p : scenario.enemySpawnLocs) {
+			var unit = new Unit(p.x, p.y, Unit.Side.ENEMY, world);
+			unit.setName("Goblin");
+			loadEnemyUnitStats(unit.stats);
+			world.addUnit(unit);
+		}
+	}
+
+	private void setPlayerUnitSprites(List<Unit> players) {
 		AnimatedSprite[] sprites = new AnimatedSprite[3];
 		Animations animations = world.getAnimations();
 
@@ -107,48 +118,37 @@ public class CombatPrototyping {
 		for (int i = 0; i < players.size(); i++) {
 			players.get(i).graphics.setAnimatedSprite(sprites[i % 3]);
 		}
+	}
 
-		for (var p : scenario.enemySpawnLocs) {
-			var enemyUnit = world.spawnUnit(p.x, p.y, Unit.Side.ENEMY);
-			enemyUnit.setName("Goblin");
-			loadEnemyUnitStats(enemyUnit.stats);
-			enemyUnit.stats.prepareUnit();
+	private void addPassiveSkills(List<Unit> players) {
+		for (int i = 0; i < players.size(); i++) {
+			if (i % 3 == 0 || i % 3 == 1) {
+				Unit u = players.get(i);
+				u.skills.addSkill(PassiveSkills.basicCombatTraining);
+			}
 		}
 	}
 
 	private void loadEnemyUnitStats(UnitStats unit) {
-
-		unit.testAtk = 0;
-		unit.testDef = 5;
-
 		unit.maxHpBase = 100;
 		unit.maxSpBase = 50;
 
-		unit.level = 0;
-
-		unit.testDamage = 5;
-
-		unit.fortBase = 12;
-
-		unit.armorBase = 2;
-		unit.percentageArmorBase = 0.15f;
-
+		unit.atkDamageBase = 5;
+		unit.atkBase = 0;
+		unit.defBase = 5;
+		unit.forceBase = 3;
+		unit.stabBase = 3;
 	}
 
-	private void loadPlayerUnitStats(UnitStats unit) {
-
-		unit.testAtk = 5;
-		unit.testDef = 5;
-
+	private void loadHumanBaseStats(UnitStats unit) {
 		unit.maxHpBase = 100;
-		unit.maxSpBase = 50;
+		unit.maxSpBase = 100;
+		unit.atkDamageBase = 2;
 
-		unit.level = 0;
-
-		unit.testDamage = 7;
-
-		unit.fortBase = 5;
-		// unit.baseMoveSpeed = Holo.defaultUnitMoveSpeed * 3;
+		unit.atkBase = 3;
+		unit.defBase = 4;
+		unit.forceBase = 3;
+		unit.stabBase = 3;
 	}
 
 	public static class CombatScenario {

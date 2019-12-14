@@ -61,7 +61,6 @@ public class UnitGraphics {
 
 		float horizontalAngleSize = 45;
 
-		logger.debug("Angle {}", angle);
 		if (angle < horizontalAngleSize || angle >= 360 - horizontalAngleSize) {
 			setActiveAnimation(animatedSprite.getRight());
 		} else if (angle < 180 - horizontalAngleSize) {

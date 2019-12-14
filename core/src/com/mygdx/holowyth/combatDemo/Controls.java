@@ -29,7 +29,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.combatDemo.ui.GameLog;
 import com.mygdx.holowyth.graphics.HoloGL;
-import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
 import com.mygdx.holowyth.skill.skill.UnitGroundSkill;
@@ -178,8 +178,8 @@ public class Controls extends InputProcessorAdapter {
 
 	float clickX, clickY; // Current click in world coordinates
 
-	Skill skillToUse = new Skills.Explosion();
-	Skill curSkill = null;
+	ActiveSkill skillToUse = new Skills.Explosion();
+	ActiveSkill curSkill = null;
 
 	private void setSPToMax() {
 		for (Unit unit : selectedUnits) {
@@ -831,7 +831,7 @@ public class Controls extends InputProcessorAdapter {
 		return context;
 	}
 
-	public Skill getCurSkill() {
+	public ActiveSkill getCurSkill() {
 		return curSkill;
 	}
 

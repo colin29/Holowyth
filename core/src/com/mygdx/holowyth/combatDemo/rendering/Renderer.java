@@ -29,7 +29,7 @@ import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.HoloSprite;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.skill.Skill.Status;
+import com.mygdx.holowyth.skill.ActiveSkill.Status;
 import com.mygdx.holowyth.skill.SkillInfo;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.skill.skill.GroundSkill;

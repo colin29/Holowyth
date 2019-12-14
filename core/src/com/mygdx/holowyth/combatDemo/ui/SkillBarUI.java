@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mygdx.holowyth.combatDemo.Controls;
 import com.mygdx.holowyth.combatDemo.Controls.ControlsListener;
 import com.mygdx.holowyth.graphics.HoloGL;
-import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
@@ -80,13 +80,13 @@ public class SkillBarUI {
 		skillBar.row().size(50).space(10);
 		skillBar.pad(20);
 
-		Skill[] skills = unit.getSkills().getSkillSlots();
+		ActiveSkill[] skills = unit.getSkills().getSkillSlots();
 
 		for (int i = 1; i <= 8; i++) {
 
 			// Make button
 			var button = new TextButton("(" + i + ")", skin);
-			Skill skill = skills[i];
+			ActiveSkill skill = skills[i];
 			skillBar.add(button).size(50);
 
 			if (skill == null) {
@@ -147,7 +147,7 @@ public class SkillBarUI {
 
 	static class SkillButton extends TextButton {
 
-		public SkillButton(String text, Skin skin, Skill skill) {
+		public SkillButton(String text, Skin skin, ActiveSkill skill) {
 			super(text, skin);
 
 		}

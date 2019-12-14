@@ -15,8 +15,8 @@ import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitPF;
-import com.mygdx.holowyth.skill.Skill;
-import com.mygdx.holowyth.skill.Skill.Status;
+import com.mygdx.holowyth.skill.ActiveSkill;
+import com.mygdx.holowyth.skill.ActiveSkill.Status;
 import com.mygdx.holowyth.unit.behaviours.UnitUtil;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
@@ -147,16 +147,16 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	/**
 	 * The skill the character is actively casting or channelling, else null. The Skill class will reset this when the active portion has finished.
 	 */
-	private Skill activeSkill;
+	private ActiveSkill activeSkill;
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public Unit(float x, float y, WorldInfo world, Side side, String name) {
-		this(x, y, world, side);
+		this(x, y, side, world);
 		setName(name);
 	}
 
-	public Unit(float x, float y, WorldInfo world, Side side) {
+	public Unit(float x, float y, Side side, WorldInfo world) {
 		this.id = Unit.getNextId();
 		idToUnit.put(id, this);
 		logger.debug("Placed unit id [{}]: ", id);
@@ -330,7 +330,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	@Override
-	public void orderUseSkill(Skill skill) {
+	public void orderUseSkill(ActiveSkill skill) {
 
 		if (stats.isStunned()) {
 			clearDeferredOrder(); // deferring a skill order is not supported but it will still clear an existing deferred order
@@ -965,11 +965,11 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	@Override
-	public Skill getActiveSkill() {
+	public ActiveSkill getActiveSkill() {
 		return activeSkill;
 	}
 
-	public void setActiveSkill(Skill activeSkill) {
+	public void setActiveSkill(ActiveSkill activeSkill) {
 		this.activeSkill = activeSkill;
 	}
 

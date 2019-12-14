@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.skill.skill;
 
-import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.unit.Unit;
 
 /**
@@ -9,7 +9,7 @@ import com.mygdx.holowyth.unit.Unit;
  * @author Colin Ta
  *
  */
-public abstract class NoneSkill extends Skill {
+public abstract class NoneSkill extends ActiveSkill {
 	protected NoneSkill() {
 		super(Targeting.NONE);
 	}

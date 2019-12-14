@@ -1,7 +1,7 @@
 package com.mygdx.holowyth.skill;
 
-import com.mygdx.holowyth.skill.Skill.Status;
-import com.mygdx.holowyth.skill.Skill.Targeting;
+import com.mygdx.holowyth.skill.ActiveSkill.Status;
+import com.mygdx.holowyth.skill.ActiveSkill.Targeting;
 
 public interface SkillInfo {
 	public boolean areEffectsSet();

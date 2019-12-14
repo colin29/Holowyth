@@ -1,8 +1,13 @@
 package com.mygdx.holowyth.unit;
 
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.skillsandeffects.MageSkills;
 import com.mygdx.holowyth.skill.skillsandeffects.Skills;
@@ -20,10 +25,12 @@ public class UnitSkills {
 		self = unit;
 	}
 
+	private Set<Skill> skills = new LinkedHashSet<Skill>();
+
 	/**
 	 * Slot 0 is unused atm, but can be used.
 	 */
-	Skill[] slot = new Skill[11];
+	ActiveSkill[] slot = new ActiveSkill[11];
 	{
 
 		// slot[1] = new WarriorSkills.RageBlow();
@@ -46,7 +53,7 @@ public class UnitSkills {
 	 * 
 	 * @return A cloned instance of the skill, or null if there was no skill in that slot
 	 */
-	public Skill getSkillInSlot(int slotNumber) {
+	public ActiveSkill getSkillInSlot(int slotNumber) {
 		if (slotNumber < 0 || slotNumber > 10) {
 			throw new HoloIllegalArgumentsException("slot number must be between 0 and 10");
 		}
@@ -57,7 +64,7 @@ public class UnitSkills {
 		}
 
 		try {
-			Skill skill = (Skill) slot[slotNumber].clone();
+			ActiveSkill skill = (ActiveSkill) slot[slotNumber].clone();
 			skill.setParent(slot[slotNumber]);
 			return skill;
 		} catch (CloneNotSupportedException e) {
@@ -69,7 +76,7 @@ public class UnitSkills {
 	 * 
 	 * @return the skill slots, where you can access the original skill instances. Slots go from indexes 1-10, 0 is unused.
 	 */
-	public Skill[] getSkillSlots() {
+	public ActiveSkill[] getSkillSlots() {
 		return slot;
 	}
 
@@ -80,7 +87,18 @@ public class UnitSkills {
 				skill.tickCooldown();
 			}
 		}
+	}
 
+	public boolean addSkill(Skill s) {
+		return skills.add(s);
+	}
+
+	public boolean removeSkill(Skill s) {
+		return skills.remove(s);
+	}
+
+	public Set<Skill> getSkills() {
+		return Collections.unmodifiableSet(skills);
 	}
 
 }

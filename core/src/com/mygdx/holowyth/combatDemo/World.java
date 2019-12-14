@@ -19,9 +19,7 @@ import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Animations;
-import com.mygdx.holowyth.unit.PresetUnits;
 import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloAssert;
 import com.mygdx.holowyth.util.dataobjects.Segment;
@@ -455,32 +453,20 @@ public class World implements WorldInfo {
 		return Holo.collisionClearanceDistance * (u.motion.getVelocityMagnitude() / Holo.defaultUnitMoveSpeed);
 	}
 
-	public void spawnSomeEnemyUnits() {
-		ArrayList<Unit> someUnits = new ArrayList<Unit>();
-		someUnits.add(spawnUnit(500, 237, Unit.Side.ENEMY));
-		someUnits.add(spawnUnit(450, 300, Unit.Side.ENEMY));
-		someUnits.add(spawnUnit(400, 350, Unit.Side.ENEMY));
-		someUnits.add(spawnUnit(350, 283, Unit.Side.ENEMY));
-		someUnits.add(spawnUnit(402, 259, Unit.Side.ENEMY));
-		someUnits.add(spawnUnit(442, 239, Unit.Side.ENEMY));
-
-		for (Unit unit : someUnits) {
-			PresetUnits.loadUnitStats2(unit.stats);
-			PresetUnits.loadBasicWeapon(unit.stats);
-			unit.setName("Goblin");
-			unit.stats.prepareUnit();
+	/**
+	 * Adds and prepares the unit.
+	 * 
+	 * Should not add a unit that already exists in the world
+	 * 
+	 * @param u
+	 */
+	public void addUnit(Unit u) {
+		if (units.getUnits().contains(u)) {
+			logger.warn("Tried to add a unit that already exists, ignoring: {}", u.getName());
+			return;
 		}
-		return;
-	}
-
-	public Unit spawnUnit(float x, float y, Side side) {
-		return spawnUnit(x, y, side, "Unnamed Unit");
-	}
-
-	public Unit spawnUnit(float x, float y, Side side, String name) {
-		Unit u = new Unit(x, y, this, side, name);
+		u.stats.prepareUnit();
 		units.addUnit(u);
-		return u;
 	}
 
 	/**

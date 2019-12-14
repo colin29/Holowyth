@@ -1,28 +1,16 @@
 package com.mygdx.holowyth.unit;
 
+import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.util.Holo;
 
 public class UnitStatCalculator {
 
-	// Calculated stats
-	private int str, agi, fort, percep; // core stats
-	private int maxHp, maxSp;
-	private int atk, def, force, stab, acc, dodge;
-
-	private int armor, armorPiercing;
-	private float percentageArmor, armorNegation;
-
-	// Helper Stats (for summing up stat contributions). 'i' stands for interim
-	private int strBonus, agiBonus, fortBonus, perceptBonus;
-	private int iAtk, iDef, iForce, iStab, iAcc, iDodge;
-	private int iArmor, iArmorPiercing;
-	private float iDmgReduction, iArmorNegation;
-
+	final UnitStatValues my;
 	private final UnitStats self;
-	private float damage;
 
 	UnitStatCalculator(UnitStats self) {
 		this.self = self;
+		this.my = new UnitStatValues();
 	}
 
 	/**
@@ -30,188 +18,196 @@ public class UnitStatCalculator {
 	 */
 	void recalculateStats() {
 
-		// 1: calculate equipment bonuses
-
-		strBonus = 0;
-		agiBonus = 0;
-		fortBonus = 0;
-		perceptBonus = 0;
-
 		var equip = self.getEquip();
 
-		addCoreStatBonusesFor(equip.head, equip.torso, equip.mainHand, equip.accessory1, equip.accessory2);
-		if (equip.mainHand != equip.offHand) { // avoid adding bonuses from a 2H-wielded weapon twice
-			addCoreStatBonusesFor(equip.offHand);
-		}
+		var equipBonus = calculateCoreStatEquipBonuses(equip.head, equip.torso, equip.mainHand, equip.accessory1, equip.accessory2);
+		var skillBonus = calculateSkillStatBonuses();
 
-		str = self.strBase + strBonus;
-		agi = self.agiBase + agiBonus;
-		fort = self.fortBase + fortBonus;
-		percep = self.perceptBase + perceptBonus;
+		if (equip.mainHand != equip.offHand) // don't count a 2H weapon twice
+			equipBonus.add(calculateCoreStatEquipBonuses(equip.offHand));
 
-		// 2: calculate hp/sp
+		my.str = self.strBase + equipBonus.str;
+		my.agi = self.agiBase + equipBonus.agi;
+		my.fort = self.fortBase + equipBonus.fort;
+		my.percep = self.perceptBase + equipBonus.percep;
 
-		maxHp = Holo.debugHighHpUnits ? self.maxHpBase * 10 : self.maxHpBase; // Math.round(baseMaxHp * (1 + 0.1f * (fort - 5)));
-		maxSp = self.maxSpBase;
+		my.atk = self.atkBase + equipBonus.atk + skillBonus.atk;
+		my.def = self.defBase + equipBonus.def + skillBonus.def;
+		my.force = self.forceBase + equipBonus.force + skillBonus.force;
+		my.stab = self.stabBase + equipBonus.stab + skillBonus.stab;
 
-		// 3: calculate derived stats
+		my.armor = self.armorBase + equipBonus.armor;
+		my.percentArmor = self.percentArmorBase + equipBonus.percentArmor;
+		my.armorPiercing = self.armorPiercingBase + equipBonus.armorPiercing;
+		my.armorNegate = self.armorNegationBase + equipBonus.armorNegate;
 
-		iAtk = 0;
-		iDef = 0;
-		iForce = 0;
-		iStab = 0;
-		iAcc = 0;
-		iDodge = 0;
+		// Base stats have no effect atm
 
-		iArmor = 0;
-		iDmgReduction = 0;
-		iArmorPiercing = 0;
-		iArmorNegation = 0;
+		final float weaponDamage = self.isWieldingAWeapon() ? self.getEquip().mainHand.damage : 0;
+		my.damage = self.atkDamageBase + weaponDamage + skillBonus.damage;
 
-		addDerivedStatBonusesFor(equip.head, equip.torso, equip.mainHand, equip.accessory1, equip.accessory2);
-		if (equip.mainHand != equip.offHand) {
-			addDerivedStatBonusesFor(equip.offHand);
-		}
-
-		int levelBonus = (self.level) * 2;
-		int mid = 0;
-
-		if (self.useTestAtkDef) {
-			atk = self.testAtk;
-			def = self.testDef;
-		} else {
-			atk = iAtk;
-			def = iDef;
-		}
-
-		force = levelBonus + iForce + 2 * (str - mid);
-		stab = levelBonus + iStab + 2 * (fort - mid) + 1 * (str - mid);
-		acc = levelBonus + iAcc + 2 * (percep - mid);
-		dodge = levelBonus + iDodge + 2 * (agi - mid);
-
-		armor = self.armorBase + iArmor;
-		percentageArmor = self.percentageArmorBase + iDmgReduction;
-		armorPiercing = self.armorPiercingBase + iArmorPiercing;
-		armorNegation = self.armorNegationBase + iArmorNegation;
-
-		damage = calcDamage();
+		my.maxHp = Holo.debugHighHpUnits ? self.maxHpBase * 10 : self.maxHpBase;
+		my.maxSp = self.maxSpBase;
 
 	}
 
-	private float calcDamage() {
-		if (self.useTestDamage && self.testDamage != 0) {
-			return self.testDamage;
-		} else {
-			float weaponDamage = self.isWieldingAWeapon() ? self.getEquip().mainHand.damage : 1;
-			float strengthBonus = (getStr() - 5) * 0.1f;
-			return weaponDamage * (1 + strengthBonus);
+	public static class UnitStatValues {
+		public int str, agi, fort, percep; // core stats
+		public int maxHp, maxSp;
+		public int atk, def, force, stab, acc, dodge;
+
+		public int armor, armorPiercing;
+		public float percentArmor, armorNegate;
+
+		public float damage;
+
+		/**
+		 * adds the given values to the first set of values
+		 */
+		public UnitStatValues add(UnitStatValues other) {
+			str += other.str;
+			agi += other.agi;
+			fort += other.fort;
+			percep += other.percep;
+
+			maxHp += other.maxHp;
+			maxSp += other.maxSp;
+
+			atk += other.atk;
+			def += other.def;
+			force += other.force;
+			stab += other.stab;
+			acc += other.acc;
+			dodge += other.dodge;
+
+			armor += other.armor;
+			armorPiercing += other.armorPiercing;
+			percentArmor += other.percentArmor;
+			armorNegate += other.armorNegate;
+
+			damage += other.damage;
+
+			return this;
 		}
 	}
 
-	private void addCoreStatBonusesFor(Item... items) {
+	private UnitStatValues calculateSkillStatBonuses() {
+		var skills = self.self.skills.getSkills();
+
+		UnitStatValues skillBonus = new UnitStatValues();
+		for (Skill skill : skills) {
+			skillBonus.atk += skill.atkBonus;
+			skillBonus.def += skill.defBonus;
+			skillBonus.force += skill.forceBonus;
+			skillBonus.stab += skill.stabBonus;
+
+			skillBonus.damage += skill.damBonus;
+		}
+		return skillBonus;
+	}
+
+	private UnitStatValues calculateCoreStatEquipBonuses(Item... items) {
+
+		UnitStatValues equipBonus = new UnitStatValues();
+
 		for (Item item : items) {
 			if (item != null) {
-				strBonus += item.strBonus;
-				agiBonus += item.agiBonus;
-				fortBonus += item.fortBonus;
-				perceptBonus += item.percepBonus;
+				equipBonus.str += item.strBonus;
+				equipBonus.agi += item.agiBonus;
+				equipBonus.fort += item.fortBonus;
+				equipBonus.percep += item.percepBonus;
+
+				equipBonus.atk += item.atkBonus;
+				equipBonus.def += item.defBonus;
+				equipBonus.force += item.forceBonus;
+				equipBonus.stab += item.stabBonus;
+				equipBonus.acc += item.accBonus;
+				equipBonus.dodge += item.dodgeBonus;
+
+				equipBonus.armor += item.armorBonus;
+				equipBonus.percentArmor += item.dmgReductionBonus;
+				equipBonus.armorPiercing += item.armorPiercingBonus;
+				equipBonus.armorNegate += item.armorNegationBonus;
 			}
 		}
-	}
+		return equipBonus;
 
-	private void addDerivedStatBonusesFor(Item... items) {
-
-		for (Item item : items) {
-			if (item != null) {
-				iAtk += item.atkBonus;
-				iDef += item.defBonus;
-				iForce += item.forceBonus;
-				iStab += item.stabBonus;
-				iAcc += item.accBonus;
-				iDodge += item.dodgeBonus;
-
-				iArmor += item.armorBonus;
-				iDmgReduction += item.dmgReductionBonus;
-				iArmorPiercing += item.armorPiercingBonus;
-				iArmorNegation += item.armorNegationBonus;
-			}
-		}
 	}
 
 	public int getStr() {
-		return str;
+		return my.str;
 	}
 
 	public int getAgi() {
-		return agi;
+		return my.agi;
 	}
 
 	public int getFort() {
-		return fort;
+		return my.fort;
 	}
 
 	public int getPercep() {
-		return percep;
+		return my.percep;
 	}
 
 	public int getMaxHp() {
-		return maxHp;
+		return my.maxHp;
 	}
 
 	public int getMaxSp() {
-		return maxSp;
+		return my.maxSp;
 	}
 
 	public int getAtk() {
-		return atk;
+		return my.atk;
 	}
 
 	public int getDef() {
-		return def;
+		return my.def;
 	}
 
 	public int getForce() {
-		return force;
+		return my.force;
 	}
 
 	public int getStab() {
-		return stab;
+		return my.stab;
 	}
 
 	public int getAcc() {
-		return acc;
+		return my.acc;
 	}
 
 	public int getDodge() {
-		return dodge;
+		return my.dodge;
 	}
 
 	public int getArmor() {
-		return armor;
+		return my.armor;
 	}
 
 	public int getArmorPiercing() {
-		return armorPiercing;
+		return my.armorPiercing;
 	}
 
 	public float getPercentageArmor() {
-		return percentageArmor;
+		return my.percentArmor;
 	}
 
 	public float getArmorNegation() {
-		return armorNegation;
+		return my.armorNegate;
 	}
 
 	public void setMaxHp(int maxHp) {
-		this.maxHp = maxHp;
+		my.maxHp = maxHp;
 	}
 
 	public void setMaxSp(int maxSp) {
-		this.maxSp = maxSp;
+		my.maxSp = maxSp;
 	}
 
 	public float getDamage() {
-		return damage;
+		return my.damage;
 	}
 
 }

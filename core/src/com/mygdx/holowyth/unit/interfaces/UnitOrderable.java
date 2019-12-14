@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.unit.interfaces;
 
-import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.skill.ActiveSkill;
 
 public interface UnitOrderable extends UnitInfo {
 
@@ -25,7 +25,7 @@ public interface UnitOrderable extends UnitInfo {
 	 */
 	void orderStop();
 
-	void orderUseSkill(Skill skill);
+	void orderUseSkill(ActiveSkill skill);
 
 	boolean isCompletelyIdle();
 

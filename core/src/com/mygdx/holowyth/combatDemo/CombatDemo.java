@@ -71,6 +71,8 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	private Animations animations;
 
+	private boolean mouseScrollEnabled = false;
+
 	public CombatDemo(final Holowyth game) {
 		super(game);
 
@@ -107,6 +109,11 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 				pauseGame();
 			}
 		}, Keys.Y);
+
+		functionBindings.bindFunctionToKey(() -> {
+			mouseScrollEnabled = !mouseScrollEnabled;
+			getGameLog().addMessage(mouseScrollEnabled ? "Mouse scroll enabled" : "Mouse scroll disabled");
+		}, Keys.E);
 	}
 
 	public static boolean goBreak = false; // debug variable
@@ -138,6 +145,9 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	 * Pan the view if the mouse is near the edge of the screen
 	 */
 	private void handleMousePanning(float delta) {
+
+		if (!mouseScrollEnabled)
+			return;
 
 		final int mouseX = Gdx.input.getX();
 		final int mouseY = Gdx.input.getY();

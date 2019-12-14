@@ -44,18 +44,22 @@ public class UnitStats implements UnitStatsInfo {
 	private final UnitStatCalculator calc;
 
 	// Stats
-	private String name;
+	private String name = "DefaultName";
 	float hp;
 	float sp;
 	public int level;
 
-	// Base attributes
-	public int maxHpBase, maxSpBase;
+	// Base core stats
 	public int strBase, agiBase, fortBase, perceptBase;
 
-	// Base other attributes
+	// Base derived stats
+	public int maxHpBase, maxSpBase;
+
+	public int atkDamageBase;
+	public int atkBase, defBase, forceBase, stabBase;
+
 	public int armorBase, armorPiercingBase; // Mainly for npc monsters and testing, most units have 0
-	public float percentageArmorBase, armorNegationBase;
+	public float percentArmorBase, armorNegationBase;
 
 	// Equips and status
 	private final EquippedItems equip = new EquippedItems();
@@ -63,12 +67,6 @@ public class UnitStats implements UnitStatsInfo {
 	private float blindDurationRemaining;
 	private final UnitStun stun;
 
-	// test stats
-	public boolean useTestDamage = true;
-	public boolean useTestAtkDef = true;
-	public int testDamage; // If set, the unit will simply do this much base damage instead of using stat and armor calculations
-	public int testAtk;
-	public int testDef;
 	// end test stats
 
 	public enum UnitType { // Player-like characters have their derived stats calculated like players. Monsters do not.
@@ -92,7 +90,9 @@ public class UnitStats implements UnitStatsInfo {
 
 	public UnitStats(String name, Unit unit) {
 		this(unit);
-		this.name = name;
+		if (name != null) {
+			this.name = name;
+		}
 	}
 
 	public void tick() {
@@ -615,16 +615,14 @@ public class UnitStats implements UnitStatsInfo {
 		String s = "";
 		s += String.format("Unit [%s]  hp: %s/%d  sp: %s/%d  <level %d>%n", name, getRoundedString(hp), getMaxHp(), getRoundedString(sp), getMaxSp(),
 				level);
-		s += String.format("Core stats: STR %d, AGI %d, FORT %d, PERCEP %d%n", getStr(), getAgi(), getFort(), getPercep());
-		// s += String.format("Derived stats: Atk %d, Def %d%n", getAtk(), getDef());
-		s += String.format("Derived stats: Force %d, Stab %d%n", getForce(), getStab());
-		// s += String.format("Derived stats: Atk %d, Def %d, Force %d, Stab %d, Acc %d, Dodge %d%n", atk, def, force,
-		// stab, acc, dodge);
-
-		s += "Other stats: \n";
-		s += String.format(" -Damage %s, AP %d, Armor Negation %s %n", getRoundedString(getDamage()),
-				getArmorPiercing(), DataUtil.getAsPercentage(getArmorNegation()));
-		s += String.format(" -Armor %d + %s %n", getArmor(), DataUtil.getAsPercentage(getPercentageArmor()));
+		// s += String.format("Core stats: STR %d, AGI %d, FORT %d, PERCEP %d%n", getStr(), getAgi(), getFort(), getPercep());
+		s += String.format("Derived stats: Atk %d | Def %d | Force %d | Stab %d%n", getAtk(), getDef(), getForce(),
+				getStab());
+		s += String.format(" -Damage: %s%n", getDamage());
+		// s += "Other stats: \n";
+		// s += String.format(" -AP %d, Armor Negation %s %n", getArmorPiercing(), DataUtil.getAsPercentage(getArmorNegation()));
+		//
+		// s += String.format(" -Armor %d + %s %n", getArmor(), DataUtil.getAsPercentage(getPercentageArmor()));
 
 		if (includeEquipmentInfo) {
 			s += "Equipped Items:\n";

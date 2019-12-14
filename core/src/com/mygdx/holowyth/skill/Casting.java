@@ -25,9 +25,9 @@ public class Casting implements Cloneable, CastingInfo {
 
 	private boolean displayedSkillName = false;
 
-	Skill parent;
+	ActiveSkill parent;
 
-	public Casting(Skill parent) {
+	public Casting(ActiveSkill parent) {
 		this.parent = parent;
 	}
 
