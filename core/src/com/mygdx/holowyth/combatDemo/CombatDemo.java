@@ -114,6 +114,10 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 			mouseScrollEnabled = !mouseScrollEnabled;
 			getGameLog().addMessage(mouseScrollEnabled ? "Mouse scroll enabled" : "Mouse scroll disabled");
 		}, Keys.E);
+
+		functionBindings.bindFunctionToKey(() -> {
+			combatDemoUI.getStatsPanelUI().toggleDetailedView();
+		}, Keys.V);
 	}
 
 	public static boolean goBreak = false; // debug variable

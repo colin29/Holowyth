@@ -18,20 +18,20 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStoreUI;
 public class CombatDemoUI {
 
 	// Sub-components
-	DebugStoreUI debugStoreUI;
-	SkillBarUI skillBarUI;
-	StatsPanelUI statsPanelUI;
+	private DebugStoreUI debugStoreUI;
+	private SkillBarUI skillBarUI;
+	private StatsPanelUI statsPanelUI;
 
 	// Widgets
-	Label coordInfo;
+	private Label coordText;
 
 	// Debugging
-	DebugStore debugStore;
+	private DebugStore debugStore;
 
 	private Stage stage;
 	private Table root = new Table();
 
-	Skin skin;
+	private Skin skin;
 
 	private GameLog gameLog;
 
@@ -69,14 +69,14 @@ public class CombatDemoUI {
 	 * Adds a small coordinate text that displays the mouse cursor position in world coordinates
 	 */
 	private void createCoordinateText() {
-		coordInfo = new Label("(000, 000)\n", skin);
-		coordInfo.setColor(Color.BLACK);
-		stage.addActor(coordInfo);
-		coordInfo.setPosition(Gdx.graphics.getWidth() - coordInfo.getWidth() - 4, 4);
+		coordText = new Label("(000, 000)\n", skin);
+		coordText.setColor(Color.BLACK);
+		stage.addActor(coordText);
+		coordText.setPosition(Gdx.graphics.getWidth() - coordText.getWidth() - 4, 4);
 	}
 
 	public Label getCoordInfo() {
-		return coordInfo;
+		return coordText;
 	}
 
 	/**
@@ -90,12 +90,12 @@ public class CombatDemoUI {
 		debugStoreUI.populateDebugValueDisplay();
 		skillBarUI = new SkillBarUI(stage, debugStore, skin, self.getControls());
 		statsPanelUI = new StatsPanelUI(stage, skin);
-		self.getControls().addListener(statsPanelUI);
+		self.getControls().addListener(getStatsPanelUI());
 	}
 
 	public void onMapShutdown() {
 		skillBarUI.remove();
-		statsPanelUI.remove();
+		getStatsPanelUI().remove();
 	}
 
 	public void onRender() {
@@ -113,6 +113,10 @@ public class CombatDemoUI {
 
 	public GameLog getGameLog() {
 		return gameLog;
+	}
+
+	public StatsPanelUI getStatsPanelUI() {
+		return statsPanelUI;
 	}
 
 }

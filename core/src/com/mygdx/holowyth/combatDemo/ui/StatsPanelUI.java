@@ -41,6 +41,8 @@ public class StatsPanelUI extends ControlsListener {
 
 	private Table detailedPanel;
 
+	private boolean showDetailedPanel = true;
+
 	public StatsPanelUI(Stage stage, Skin skin) {
 		this.skin = skin;
 		this.stage = stage;
@@ -117,14 +119,11 @@ public class StatsPanelUI extends ControlsListener {
 
 	@Override
 	public void unitSelectionModified(List<UnitInfo> selectedUnits) {
-
 		if (selectedUnits.size() == 1) {
-			// statPanel.setVisible(true);
-			detailedPanel.setVisible(true);
+			setVisible(true);
 			update(selectedUnits.get(0).getStats());
 		} else {
-			statPanel.setVisible(false);
-			detailedPanel.setVisible(false);
+			setVisible(false);
 		}
 
 	}
@@ -193,6 +192,25 @@ public class StatsPanelUI extends ControlsListener {
 
 	public void remove() {
 		statPanel.remove();
+	}
+
+	public void setVisible(boolean value) {
+		if (value) {
+			statPanel.setVisible(!showDetailedPanel);
+			detailedPanel.setVisible(showDetailedPanel);
+		} else {
+			statPanel.setVisible(false);
+			detailedPanel.setVisible(false);
+		}
+	}
+
+	public boolean isVisible() {
+		return statPanel.isVisible() || detailedPanel.isVisible();
+	}
+
+	public void toggleDetailedView() {
+		showDetailedPanel = !showDetailedPanel;
+		setVisible(isVisible());
 	}
 
 }
