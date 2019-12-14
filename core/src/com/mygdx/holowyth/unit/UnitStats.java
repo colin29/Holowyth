@@ -49,17 +49,19 @@ public class UnitStats implements UnitStatsInfo {
 	float sp;
 	public int level;
 
-	// Base core stats
-	public int strBase, agiBase, fortBase, perceptBase;
+	public final UnitStatValues base = new UnitStatValues();
 
-	// Base derived stats
-	public int maxHpBase, maxSpBase;
-
-	public int atkDamageBase;
-	public int atkBase, defBase, forceBase, stabBase;
-
-	public int armorBase, armorPiercingBase; // Mainly for npc monsters and testing, most units have 0
-	public float percentArmorBase, armorNegationBase;
+	// // Base core stats
+	// public int strBase, agiBase, fortBase, perceptBase;
+	//
+	// // Base derived stats
+	// public int maxHpBase, maxSpBase;
+	//
+	// public int atkDamageBase;
+	// public int atkBase, defBase, forceBase, stabBase;
+	//
+	// public int armorBase, armorPiercingBase; // Mainly for npc monsters and testing, most units have 0
+	// public float percentArmorBase, armorNegationBase;
 
 	// Equips and status
 	private final EquippedItems equip = new EquippedItems();
@@ -771,12 +773,12 @@ public class UnitStats implements UnitStatsInfo {
 
 	@Override
 	public int getBaseMaxHp() {
-		return maxHpBase;
+		return base.maxHp;
 	}
 
 	@Override
 	public int getBaseMaxSp() {
-		return maxSpBase;
+		return base.maxSp;
 	}
 
 	@Override
@@ -887,6 +889,33 @@ public class UnitStats implements UnitStatsInfo {
 	@Override
 	public float getArmorNegation() {
 		return calc.getArmorNegation();
+	}
+
+	@Override
+	public UnitStatValues getBaseStats() {
+		try {
+			return (UnitStatValues) base.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public UnitStatValues getEquipBonuses() {
+		try {
+			return (UnitStatValues) calc.equipBonus.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public UnitStatValues getSkillBonuses() {
+		try {
+			return (UnitStatValues) calc.skillBonus.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }

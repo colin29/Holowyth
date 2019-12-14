@@ -93,11 +93,11 @@ public class CombatPrototyping {
 			var unit = new Unit(p.x, p.y, Unit.Side.PLAYER, world);
 			unit.setName("Player");
 			loadHumanBaseStats(unit.stats);
+			addPassiveSkills(players);
 			players.add(unit);
 			world.addUnit(unit);
 		}
 		setPlayerUnitSprites(players);
-		addPassiveSkills(players);
 
 		for (var p : scenario.enemySpawnLocs) {
 			var unit = new Unit(p.x, p.y, Unit.Side.ENEMY, world);
@@ -130,25 +130,25 @@ public class CombatPrototyping {
 	}
 
 	private void loadEnemyUnitStats(UnitStats unit) {
-		unit.maxHpBase = 100;
-		unit.maxSpBase = 50;
+		unit.base.maxHp = 100;
+		unit.base.maxSp = 50;
 
-		unit.atkDamageBase = 5;
-		unit.atkBase = 0;
-		unit.defBase = 5;
-		unit.forceBase = 3;
-		unit.stabBase = 3;
+		unit.base.damage = 5;
+		unit.base.atk = 0;
+		unit.base.def = 5;
+		unit.base.force = 3;
+		unit.base.stab = 3;
 	}
 
 	private void loadHumanBaseStats(UnitStats unit) {
-		unit.maxHpBase = 100;
-		unit.maxSpBase = 100;
-		unit.atkDamageBase = 2;
+		unit.base.maxHp = 100;
+		unit.base.maxSp = 100;
+		unit.base.damage = 2;
 
-		unit.atkBase = 3;
-		unit.defBase = 4;
-		unit.forceBase = 3;
-		unit.stabBase = 3;
+		unit.base.atk = 3;
+		unit.base.def = 4;
+		unit.base.force = 3;
+		unit.base.stab = 3;
 	}
 
 	public static class CombatScenario {

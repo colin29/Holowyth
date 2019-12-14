@@ -90,7 +90,9 @@ public class UnitSkills {
 	}
 
 	public boolean addSkill(Skill s) {
-		return skills.add(s);
+		boolean added = skills.add(s);
+		self.stats.recalculateStats();
+		return added;
 	}
 
 	public boolean removeSkill(Skill s) {

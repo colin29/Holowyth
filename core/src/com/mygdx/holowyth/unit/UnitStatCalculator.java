@@ -8,6 +8,10 @@ public class UnitStatCalculator {
 	final UnitStatValues my;
 	private final UnitStats self;
 
+	// After recalculateStats() is called, these will accurately reflect the combined skill and equip bonuses
+	final UnitStatValues skillBonus = new UnitStatValues();
+	final UnitStatValues equipBonus = new UnitStatValues();
+
 	UnitStatCalculator(UnitStats self) {
 		this.self = self;
 		this.my = new UnitStatValues();
@@ -26,75 +30,34 @@ public class UnitStatCalculator {
 		if (equip.mainHand != equip.offHand) // don't count a 2H weapon twice
 			equipBonus.add(calculateCoreStatEquipBonuses(equip.offHand));
 
-		my.str = self.strBase + equipBonus.str;
-		my.agi = self.agiBase + equipBonus.agi;
-		my.fort = self.fortBase + equipBonus.fort;
-		my.percep = self.perceptBase + equipBonus.percep;
+		my.str = self.base.str + equipBonus.str;
+		my.agi = self.base.agi + equipBonus.agi;
+		my.fort = self.base.fort + equipBonus.fort;
+		my.percep = self.base.percep + equipBonus.percep;
 
-		my.atk = self.atkBase + equipBonus.atk + skillBonus.atk;
-		my.def = self.defBase + equipBonus.def + skillBonus.def;
-		my.force = self.forceBase + equipBonus.force + skillBonus.force;
-		my.stab = self.stabBase + equipBonus.stab + skillBonus.stab;
+		my.atk = self.base.atk + equipBonus.atk + skillBonus.atk;
+		my.def = self.base.def + equipBonus.def + skillBonus.def;
+		my.force = self.base.force + equipBonus.force + skillBonus.force;
+		my.stab = self.base.stab + equipBonus.stab + skillBonus.stab;
 
-		my.armor = self.armorBase + equipBonus.armor;
-		my.percentArmor = self.percentArmorBase + equipBonus.percentArmor;
-		my.armorPiercing = self.armorPiercingBase + equipBonus.armorPiercing;
-		my.armorNegate = self.armorNegationBase + equipBonus.armorNegate;
+		my.armor = self.base.armor + equipBonus.armor;
+		my.percentArmor = self.base.percentArmor + equipBonus.percentArmor;
+		my.armorPiercing = self.base.armorPiercing + equipBonus.armorPiercing;
+		my.armorNegate = self.base.armorNegate + equipBonus.armorNegate;
 
-		// Base stats have no effect atm
+		// stats have no effect atm
 
 		final float weaponDamage = self.isWieldingAWeapon() ? self.getEquip().mainHand.damage : 0;
-		my.damage = self.atkDamageBase + weaponDamage + skillBonus.damage;
+		my.damage = self.base.damage + weaponDamage + skillBonus.damage;
 
-		my.maxHp = Holo.debugHighHpUnits ? self.maxHpBase * 10 : self.maxHpBase;
-		my.maxSp = self.maxSpBase;
-
-	}
-
-	public static class UnitStatValues {
-		public int str, agi, fort, percep; // core stats
-		public int maxHp, maxSp;
-		public int atk, def, force, stab, acc, dodge;
-
-		public int armor, armorPiercing;
-		public float percentArmor, armorNegate;
-
-		public float damage;
-
-		/**
-		 * adds the given values to the first set of values
-		 */
-		public UnitStatValues add(UnitStatValues other) {
-			str += other.str;
-			agi += other.agi;
-			fort += other.fort;
-			percep += other.percep;
-
-			maxHp += other.maxHp;
-			maxSp += other.maxSp;
-
-			atk += other.atk;
-			def += other.def;
-			force += other.force;
-			stab += other.stab;
-			acc += other.acc;
-			dodge += other.dodge;
-
-			armor += other.armor;
-			armorPiercing += other.armorPiercing;
-			percentArmor += other.percentArmor;
-			armorNegate += other.armorNegate;
-
-			damage += other.damage;
-
-			return this;
-		}
+		my.maxHp = Holo.debugHighHpUnits ? self.base.maxHp * 10 : self.base.maxHp;
+		my.maxSp = self.base.maxSp;
 	}
 
 	private UnitStatValues calculateSkillStatBonuses() {
+		skillBonus.zero();
 		var skills = self.self.skills.getSkills();
 
-		UnitStatValues skillBonus = new UnitStatValues();
 		for (Skill skill : skills) {
 			skillBonus.atk += skill.atkBonus;
 			skillBonus.def += skill.defBonus;
@@ -107,9 +70,7 @@ public class UnitStatCalculator {
 	}
 
 	private UnitStatValues calculateCoreStatEquipBonuses(Item... items) {
-
-		UnitStatValues equipBonus = new UnitStatValues();
-
+		equipBonus.zero();
 		for (Item item : items) {
 			if (item != null) {
 				equipBonus.str += item.strBonus;

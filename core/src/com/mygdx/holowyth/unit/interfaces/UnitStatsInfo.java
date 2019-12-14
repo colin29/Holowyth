@@ -1,5 +1,7 @@
 package com.mygdx.holowyth.unit.interfaces;
 
+import com.mygdx.holowyth.unit.UnitStatValues;
+
 public interface UnitStatsInfo {
 	float getHp();
 
@@ -75,4 +77,10 @@ public interface UnitStatsInfo {
 	boolean isSlowed();
 
 	boolean isBlinded();
+
+	UnitStatValues getSkillBonuses();
+
+	UnitStatValues getEquipBonuses();
+
+	UnitStatValues getBaseStats();
 }
