@@ -837,11 +837,6 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	@Override
-	public int getAcc() {
-		return calc.getAcc();
-	}
-
-	@Override
 	public int getDodge() {
 		return calc.getDodge();
 	}

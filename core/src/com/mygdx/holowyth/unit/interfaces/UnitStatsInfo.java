@@ -35,8 +35,6 @@ public interface UnitStatsInfo {
 
 	int getStab();
 
-	int getAcc();
-
 	int getDodge();
 
 	int getStr();

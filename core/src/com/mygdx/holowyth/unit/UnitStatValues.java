@@ -3,7 +3,7 @@ package com.mygdx.holowyth.unit;
 public class UnitStatValues implements Cloneable {
 	public int str, agi, fort, percep; // core stats
 	public int maxHp, maxSp;
-	public int atk, def, force, stab, acc, dodge;
+	public int atk, def, force, stab, dodge;
 
 	public int armor, armorPiercing;
 	public float percentArmor, armorNegate;
@@ -23,7 +23,6 @@ public class UnitStatValues implements Cloneable {
 		def = 0;
 		force = 0;
 		stab = 0;
-		acc = 0;
 		dodge = 0;
 
 		armor = 0;
@@ -50,7 +49,6 @@ public class UnitStatValues implements Cloneable {
 		def += other.def;
 		force += other.force;
 		stab += other.stab;
-		acc += other.acc;
 		dodge += other.dodge;
 
 		armor += other.armor;

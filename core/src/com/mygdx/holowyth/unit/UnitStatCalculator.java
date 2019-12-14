@@ -82,7 +82,6 @@ public class UnitStatCalculator {
 				equipBonus.def += item.defBonus;
 				equipBonus.force += item.forceBonus;
 				equipBonus.stab += item.stabBonus;
-				equipBonus.acc += item.accBonus;
 				equipBonus.dodge += item.dodgeBonus;
 
 				equipBonus.armor += item.armorBonus;
@@ -133,10 +132,6 @@ public class UnitStatCalculator {
 
 	public int getStab() {
 		return my.stab;
-	}
-
-	public int getAcc() {
-		return my.acc;
 	}
 
 	public int getDodge() {
