@@ -111,7 +111,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 			} else {
 				pauseGame();
 			}
-		}, Keys.Y);
+		}, Keys.SPACE);
 
 		functionBindings.bindFunctionToKey(() -> {
 			mouseScrollEnabled = !mouseScrollEnabled;

@@ -99,7 +99,7 @@ public class CombatDemoUI {
 	}
 
 	public void onRender() {
-		stage.setDebugAll(Gdx.input.isKeyPressed(Keys.SPACE));
+		stage.setDebugAll(Gdx.input.isKeyPressed(Keys.B));
 		debugStoreUI.updateDebugValueDisplay();
 	}
 

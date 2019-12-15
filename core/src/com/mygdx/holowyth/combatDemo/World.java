@@ -76,6 +76,19 @@ public class World implements WorldInfo {
 		tickAttacking();
 
 		tickEffects();
+
+		removeDeadUnits();
+	}
+
+	private void removeDeadUnits() {
+		List<Unit> deadUnits = new ArrayList<Unit>();
+		for (var u : units.getUnits()) {
+			if (u.isDead())
+				deadUnits.add(u);
+		}
+		for (var u : deadUnits) {
+			units.removeUnit(u);
+		}
 	}
 
 	List<Effect> queuedEffects = new ArrayList<Effect>();

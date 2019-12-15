@@ -47,13 +47,13 @@ public class Holo {
 	}
 
 	// Unit behaviour
-	public static boolean idleEnemyUnitsAggro = false;
+	public static boolean idleEnemyUnitsAggro = true;
 
 	// Debug Cheats
-	public static boolean debugFastCastEnbabled = true;
-	public static boolean debugSkillCooldownDisabled = true;
-	public static boolean debugHighHpUnits = true;
-	public static boolean debugNoManaCost = true;
+	public static boolean debugFastCastEnbabled = false;
+	public static boolean debugSkillCooldownDisabled = false;
+	public static boolean debugHighHpUnits = false;
+	public static boolean debugNoManaCost = false;
 
 	public static boolean debugDisplayEnemyCastingProgress = true;
 

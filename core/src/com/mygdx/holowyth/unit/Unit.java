@@ -574,6 +574,9 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 * 
 	 */
 	public void tickLogic() {
+		if (isDead())
+			return;
+
 		motion.tick();
 		stats.tick();
 
@@ -789,6 +792,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 * Updates attacking units
 	 */
 	public void tickAttacking() {
+		if (isDead())
+			return;
 
 		if (!isCastingOrChanneling()) {
 			attackCooldownRemaining = Math.max(0, attackCooldownRemaining - 1); // cooldown ticks even when unit not attacking
@@ -854,8 +859,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		if (isAttacking()) {
 			stopAttacking();
 		}
-
-		getWorldMutable().removeUnit(this);
+		// Don't actually remove the unit here -- world will handle that
 	}
 
 	// For now we allow multiple player characters

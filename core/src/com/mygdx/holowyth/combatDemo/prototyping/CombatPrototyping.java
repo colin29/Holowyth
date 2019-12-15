@@ -10,9 +10,9 @@ import com.mygdx.holowyth.combatDemo.Controls;
 import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.unit.UnitStats;
 import com.mygdx.holowyth.unit.sprite.AnimatedSprite;
 import com.mygdx.holowyth.unit.sprite.Animations;
+import com.mygdx.holowyth.unit.units.Monsters;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
@@ -94,7 +94,7 @@ public class CombatPrototyping {
 		for (var p : scenario.playerSpawnLocs) {
 			var unit = new Unit(p.x, p.y, Unit.Side.PLAYER, world);
 			unit.setName("Player");
-			loadHumanBaseStats(unit.stats);
+			unit.stats.base.set(Monsters.baseHuman);
 			players.add(unit);
 			world.addUnit(unit);
 		}
@@ -105,7 +105,7 @@ public class CombatPrototyping {
 		for (var p : scenario.enemySpawnLocs) {
 			var unit = new Unit(p.x, p.y, Unit.Side.ENEMY, world);
 			unit.setName("Goblin");
-			loadEnemyUnitStats(unit.stats);
+			unit.stats.base.set(Monsters.goblin);
 			world.addUnit(unit);
 		}
 	}
@@ -144,28 +144,6 @@ public class CombatPrototyping {
 		u3.setName("Sonia");
 		u3.getEquip().equip(Equips.staff.copy());
 
-	}
-
-	private void loadEnemyUnitStats(UnitStats unit) {
-		unit.base.maxHp = 100;
-		unit.base.maxSp = 50;
-
-		unit.base.damage = 5;
-		unit.base.atk = 0;
-		unit.base.def = 5;
-		unit.base.force = 3;
-		unit.base.stab = 3;
-	}
-
-	private void loadHumanBaseStats(UnitStats unit) {
-		unit.base.maxHp = 100;
-		unit.base.maxSp = 100;
-		unit.base.damage = 2;
-
-		unit.base.atk = 3;
-		unit.base.def = 4;
-		unit.base.force = 3;
-		unit.base.stab = 3;
 	}
 
 	public static class CombatScenario {
