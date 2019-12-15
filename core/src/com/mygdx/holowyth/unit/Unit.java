@@ -21,6 +21,7 @@ import com.mygdx.holowyth.unit.behaviours.UnitUtil;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
+import com.mygdx.holowyth.unit.sprite.UnitGraphics;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.exceptions.HoloAssertException;

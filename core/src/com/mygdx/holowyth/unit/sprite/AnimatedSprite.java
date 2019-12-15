@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.unit;
+package com.mygdx.holowyth.unit.sprite;
 
 import java.util.ArrayList;
 

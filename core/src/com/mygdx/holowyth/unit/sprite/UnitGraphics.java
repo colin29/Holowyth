@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.unit;
+package com.mygdx.holowyth.unit.sprite;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
@@ -33,7 +34,7 @@ public class UnitGraphics {
 
 	private TextureRegion currentFrame;
 
-	UnitGraphics(Unit parent) {
+	public UnitGraphics(Unit parent) {
 		this.self = parent;
 	}
 

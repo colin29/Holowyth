@@ -9,10 +9,10 @@ import org.slf4j.LoggerFactory;
 import com.mygdx.holowyth.combatDemo.Controls;
 import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
-import com.mygdx.holowyth.unit.AnimatedSprite;
-import com.mygdx.holowyth.unit.Animations;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.UnitStats;
+import com.mygdx.holowyth.unit.sprite.AnimatedSprite;
+import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
