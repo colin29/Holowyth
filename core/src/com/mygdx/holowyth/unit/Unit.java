@@ -60,6 +60,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public final UnitStats stats;
 	public final UnitSkills skills;
 	public final UnitGraphics graphics;
+	public final UnitEquip equip;
 
 	// World Fields
 	List<Unit> units;
@@ -174,6 +175,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		motion = new UnitMotion(this, world);
 		stats = new UnitStats(this);
 		skills = new UnitSkills(this);
+		equip = new UnitEquip(this);
+
 		graphics = new UnitGraphics(this);
 
 		if (this.side == Side.PLAYER) {
