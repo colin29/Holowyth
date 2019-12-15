@@ -81,4 +81,6 @@ public interface UnitStatsInfo {
 	UnitStatValues getEquipBonuses();
 
 	UnitStatValues getBaseStats();
+
+	float getDamage();
 }

@@ -24,11 +24,11 @@ public class UnitStatCalculator {
 
 		var equip = self.getEquip();
 
-		var equipBonus = calculateCoreStatEquipBonuses(equip.head, equip.torso, equip.mainHand, equip.accessory1, equip.accessory2);
-		var skillBonus = calculateSkillStatBonuses();
+		calculateSkillStatBonuses(skillBonus);
+		calculateEquipStatBonuses(equipBonus, equip.head, equip.torso, equip.mainHand, equip.accessory1, equip.accessory2);
 
 		if (equip.mainHand != equip.offHand) // don't count a 2H weapon twice
-			equipBonus.add(calculateCoreStatEquipBonuses(equip.offHand));
+			addEquipStatBonuses(equipBonus, equip.offHand);
 
 		my.str = self.base.str + equipBonus.str;
 		my.agi = self.base.agi + equipBonus.agi;
@@ -47,51 +47,54 @@ public class UnitStatCalculator {
 
 		// stats have no effect atm
 
-		final float weaponDamage = self.isWieldingAWeapon() ? self.getEquip().mainHand.damage : 0;
+		final float weaponDamage = self.isWieldingAWeapon() ? self.getEquip().mainHand.bonus.damage : 0;
 		my.damage = self.base.damage + weaponDamage + skillBonus.damage;
 
 		my.maxHp = Holo.debugHighHpUnits ? self.base.maxHp * 10 : self.base.maxHp;
 		my.maxSp = self.base.maxSp;
 	}
 
-	private UnitStatValues calculateSkillStatBonuses() {
-		skillBonus.zero();
+	private void calculateSkillStatBonuses(UnitStatValues values) {
+		values.zero();
 		var skills = self.self.skills.getSkills();
 
 		for (Skill skill : skills) {
-			skillBonus.atk += skill.atkBonus;
-			skillBonus.def += skill.defBonus;
-			skillBonus.force += skill.forceBonus;
-			skillBonus.stab += skill.stabBonus;
+			values.damage += skill.damBonus;
 
-			skillBonus.damage += skill.damBonus;
+			values.atk += skill.atkBonus;
+			values.def += skill.defBonus;
+			values.force += skill.forceBonus;
+			values.stab += skill.stabBonus;
 		}
-		return skillBonus;
 	}
 
-	private UnitStatValues calculateCoreStatEquipBonuses(Item... items) {
-		equipBonus.zero();
+	private void calculateEquipStatBonuses(UnitStatValues values, Item... items) {
+		values.zero();
+		addEquipStatBonuses(values, items);
+	}
+
+	private void addEquipStatBonuses(UnitStatValues values, Item... items) {
 		for (Item item : items) {
 			if (item != null) {
-				equipBonus.str += item.strBonus;
-				equipBonus.agi += item.agiBonus;
-				equipBonus.fort += item.fortBonus;
-				equipBonus.percep += item.percepBonus;
+				values.str += item.bonus.str;
+				values.agi += item.bonus.agi;
+				values.fort += item.bonus.fort;
+				values.percep += item.bonus.percep;
 
-				equipBonus.atk += item.atkBonus;
-				equipBonus.def += item.defBonus;
-				equipBonus.force += item.forceBonus;
-				equipBonus.stab += item.stabBonus;
-				equipBonus.dodge += item.dodgeBonus;
+				values.damage += item.bonus.damage;
 
-				equipBonus.armor += item.armorBonus;
-				equipBonus.percentArmor += item.dmgReductionBonus;
-				equipBonus.armorPiercing += item.armorPiercingBonus;
-				equipBonus.armorNegate += item.armorNegationBonus;
+				values.atk += item.bonus.atk;
+				values.def += item.bonus.def;
+				values.force += item.bonus.force;
+				values.stab += item.bonus.stab;
+				values.dodge += item.bonus.dodge;
+
+				values.armor += item.bonus.armor;
+				values.percentArmor += item.bonus.percentArmor;
+				values.armorPiercing += item.bonus.armorPiercing;
+				values.armorNegate += item.bonus.armorNegate;
 			}
 		}
-		return equipBonus;
-
 	}
 
 	public int getStr() {

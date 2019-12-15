@@ -30,7 +30,7 @@ public class DataUtil {
 		return df.format(value);
 	}
 
-	public static String getRoundedString(float value, int decimalPlaces) {
+	public static String round(float value, int decimalPlaces) {
 		if (isNotFinite(value))
 			return getNonFiniteString(value);
 		String marker = "";

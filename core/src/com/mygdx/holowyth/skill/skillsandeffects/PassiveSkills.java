@@ -14,6 +14,4 @@ public class PassiveSkills {
 			damBonus = 1;
 		}
 	};
-
-	// Fighters have a passive skill, called "Basic Combat Training", that gives them +2 atk, +2 def, +2 Stab, +1 damage
 }

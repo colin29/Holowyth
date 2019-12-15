@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.combatDemo.prototyping.CombatPrototyping;
 import com.mygdx.holowyth.combatDemo.rendering.Renderer;
 import com.mygdx.holowyth.combatDemo.ui.CombatDemoUI;
 import com.mygdx.holowyth.combatDemo.ui.GameLog;
@@ -100,8 +101,10 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 			}
 		}, Keys.W); // print info on all selected units
 		functionBindings.bindFunctionToKey(() -> {
-			goBreak = true;
-		}, Keys.B); // break point
+			for (Unit unit : unitControls.getSelectedUnits()) {
+				unit.stats.printInfo();
+			}
+		}, Keys.E); // print info+equipment
 		functionBindings.bindFunctionToKey(() -> {
 			if (isGamePaused()) {
 				unpauseGame();
@@ -113,14 +116,12 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		functionBindings.bindFunctionToKey(() -> {
 			mouseScrollEnabled = !mouseScrollEnabled;
 			getGameLog().addMessage(mouseScrollEnabled ? "Mouse scroll enabled" : "Mouse scroll disabled");
-		}, Keys.E);
+		}, Keys.U);
 
 		functionBindings.bindFunctionToKey(() -> {
 			combatDemoUI.getStatsPanelUI().toggleDetailedView();
 		}, Keys.V);
 	}
-
-	public static boolean goBreak = false; // debug variable
 
 	private void initializeAppLifetimeComponents() {
 		pathingModule = new PathingModule(camera, shapeRenderer);

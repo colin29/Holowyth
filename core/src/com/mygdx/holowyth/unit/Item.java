@@ -16,28 +16,30 @@ public class Item {
 		EQUIPMENT, CONSUMABLE, OTHER
 	}
 
-	public ItemType itemType;
-
 	public enum EquipType {
 		HEADGEAR, ARMOR, WEAPON, SHIELD, ACCESSORY
 	}
 
-	public EquipType equipType;
-
-	public int damage;
-
-	public int strBonus, agiBonus, fortBonus, percepBonus;
-	public int atkBonus, defBonus, forceBonus, stabBonus, accBonus, dodgeBonus;
-
-	public int armorBonus;
-	public float dmgReductionBonus; // is a percentage reduction
-
 	public String name;
 
-	public int armorPiercingBonus; // both of these stack additively.
-	public float armorNegationBonus;
+	public ItemType itemType;
+	public EquipType equipType;
 
+	public final UnitStatValues bonus = new UnitStatValues();
 	public boolean is2HWeapon;
+
+	private boolean isTemplate;
+
+	public Item copy() {
+		Item item = new Item(this.name);
+
+		item.itemType = itemType;
+		item.equipType = equipType;
+
+		item.bonus.set(bonus);
+		item.is2HWeapon = is2HWeapon;
+		return item;
+	}
 
 	public Item(String name, EquipType equipType) {
 		this(name, ItemType.EQUIPMENT);
@@ -49,12 +51,17 @@ public class Item {
 		this.itemType = itemType;
 	}
 
-	public Item(String name) {
-		this.name = name;
-	}
-
 	public Item() {
 		this("Untitled Item");
+	}
+
+	public Item(String name) {
+		this(name, false);
+	}
+
+	public Item(String name, boolean isTemplate) {
+		this.name = name;
+		this.isTemplate = isTemplate;
 	}
 
 	public void printInfo() {
@@ -64,8 +71,8 @@ public class Item {
 	public String getInfo() {
 		String s = "";
 		s += String.format("[%s]  %s%n", name, getCompleteItemType());
-		if (damage > 0) {
-			s += String.format(" Damage: %d%n", damage);
+		if (bonus.damage > 0) {
+			s += String.format(" Damage: %d%n", bonus.damage);
 		}
 		s += " " + getListOfEquipBonuses();
 		return s;
@@ -92,23 +99,22 @@ public class Item {
 			ordering.add(statBonusLabel);
 		};
 
-		registerStat.accept("str", strBonus);
-		registerStat.accept("agi", agiBonus);
-		registerStat.accept("fort", fortBonus);
-		registerStat.accept("percep", percepBonus);
+		registerStat.accept("str", bonus.str);
+		registerStat.accept("agi", bonus.agi);
+		registerStat.accept("fort", bonus.fort);
+		registerStat.accept("percep", bonus.percep);
 
-		registerStat.accept("atk", atkBonus);
-		registerStat.accept("def", defBonus);
-		registerStat.accept("force", forceBonus);
-		registerStat.accept("stab", stabBonus);
-		registerStat.accept("acc", accBonus);
-		registerStat.accept("dodge", dodgeBonus);
+		registerStat.accept("atk", bonus.atk);
+		registerStat.accept("def", bonus.def);
+		registerStat.accept("force", bonus.force);
+		registerStat.accept("stab", bonus.stab);
+		registerStat.accept("dodge", bonus.dodge);
 
-		registerStat.accept("Armor", armorBonus);
-		registerStat.accept("DR", dmgReductionBonus);
+		registerStat.accept("Armor", bonus.armor);
+		registerStat.accept("DR", bonus.percentArmor);
 
-		registerStat.accept("AP", armorPiercingBonus);
-		registerStat.accept("Armor Negate", armorNegationBonus);
+		registerStat.accept("AP", bonus.armorPiercing);
+		registerStat.accept("Armor Negate", bonus.armorNegate);
 
 		String s = "";
 
@@ -134,5 +140,16 @@ public class Item {
 		s = StringUtils.removeEnd(s, ", ");
 		s += "\n";
 		return s;
+	}
+
+	/**
+	 * Items that are templates are meant to be copied and should not be equipped
+	 */
+	public void markAsTemplate() {
+		isTemplate = true;
+	}
+
+	public boolean isTemplate() {
+		return isTemplate;
 	}
 }

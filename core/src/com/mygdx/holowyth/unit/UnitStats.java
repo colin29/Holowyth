@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
+import com.mygdx.holowyth.unit.Item.ItemType;
 import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.unit.statuseffect.BasicAttackSlowEffect;
@@ -64,7 +65,7 @@ public class UnitStats implements UnitStatsInfo {
 	// public float percentArmorBase, armorNegationBase;
 
 	// Equips and status
-	private final EquippedItems equip = new EquippedItems();
+	private final EquippedItems equip = new EquippedItems(this);
 	private final List<SlowEffect> slowEffects = new LinkedList<SlowEffect>();
 	private float blindDurationRemaining;
 	private final UnitStun stun;
@@ -131,11 +132,6 @@ public class UnitStats implements UnitStatsInfo {
 
 		slowEffects.clear();
 	}
-
-	// Combat/Attacking methods
-
-	private float accChanceFloor = 0.05f;
-	private float accChanceCeiling = 1f;
 
 	/**
 	 * Called when an the unit makes an actual strike
@@ -607,6 +603,10 @@ public class UnitStats implements UnitStatsInfo {
 		System.out.println(getInfo());
 	}
 
+	public void printInfo(boolean includeEquipmentInfo) {
+		System.out.println(getInfo(includeEquipmentInfo));
+	}
+
 	public String getInfo() {
 		return getInfo(false);
 	}
@@ -686,13 +686,28 @@ public class UnitStats implements UnitStatsInfo {
 		return equip;
 	}
 
+	/**
+	 * 2H weapons not fully supported yet
+	 * 
+	 * @author Colin Ta
+	 *
+	 */
 	public static class EquippedItems {
+
+		private final UnitStats self;
+
+		Logger logger = LoggerFactory.getLogger(this.getClass());
+
 		public Item head;
 		public Item mainHand;
 		public Item offHand;
 		public Item torso;
 		public Item accessory1;
 		public Item accessory2;
+
+		public EquippedItems(UnitStats self) {
+			this.self = self;
+		}
 
 		public boolean isWielding2HWeapon() {
 			// TODO:
@@ -734,6 +749,42 @@ public class UnitStats implements UnitStatsInfo {
 				map.put(slotLabels.get(i), curItems.get(i));
 			}
 			return map;
+		}
+
+		/**
+		 * 
+		 * @return true if the equip was successful
+		 */
+		public boolean equip(Item equip) {
+			if (equip.itemType != ItemType.EQUIPMENT) {
+				logger.info("Trying to equip a non-equipment item");
+				return false;
+			}
+
+			switch (equip.equipType) {
+			case ACCESSORY:
+				accessory1 = equip;
+				// If slot 1 occupied but slot 2 free, put in slot 2 instead.
+				break;
+			case ARMOR:
+				torso = equip;
+				break;
+			case HEADGEAR:
+				head = equip;
+				break;
+			case SHIELD:
+				offHand = equip;
+				// TODO: if wielding a 2 handed item, then must de-equip
+				break;
+			case WEAPON:
+				mainHand = equip;
+				// TODO: if is 2 handed weapon, needs to assign both slots
+				break;
+			default:
+				return false;
+			}
+			self.recalculateStats();
+			return true;
 		}
 
 	}
@@ -812,6 +863,7 @@ public class UnitStats implements UnitStatsInfo {
 		return getMoveSpeed() / baseMoveSpeed;
 	}
 
+	@Override
 	public float getDamage() {
 		return calc.getDamage();
 	}

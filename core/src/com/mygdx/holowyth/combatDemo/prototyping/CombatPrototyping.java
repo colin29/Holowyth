@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.combatDemo;
+package com.mygdx.holowyth.combatDemo.prototyping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mygdx.holowyth.combatDemo.Controls;
+import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.unit.AnimatedSprite;
 import com.mygdx.holowyth.unit.Animations;
@@ -93,11 +95,12 @@ public class CombatPrototyping {
 			var unit = new Unit(p.x, p.y, Unit.Side.PLAYER, world);
 			unit.setName("Player");
 			loadHumanBaseStats(unit.stats);
-			addPassiveSkills(players);
 			players.add(unit);
 			world.addUnit(unit);
 		}
+
 		setPlayerUnitSprites(players);
+		setUpThreeUnitScenario(players);
 
 		for (var p : scenario.enemySpawnLocs) {
 			var unit = new Unit(p.x, p.y, Unit.Side.ENEMY, world);
@@ -120,13 +123,27 @@ public class CombatPrototyping {
 		}
 	}
 
-	private void addPassiveSkills(List<Unit> players) {
-		for (int i = 0; i < players.size(); i++) {
-			if (i % 3 == 0 || i % 3 == 1) {
-				Unit u = players.get(i);
-				u.skills.addSkill(PassiveSkills.basicCombatTraining);
-			}
+	private void setUpThreeUnitScenario(List<Unit> players) {
+
+		if (players.size() < 3) {
+			return;
 		}
+
+		var u1 = players.get(0).stats;
+		var u2 = players.get(1).stats;
+		var u3 = players.get(2).stats;
+
+		u1.setName("Lecia");
+		u1.self.skills.addSkill(PassiveSkills.basicCombatTraining);
+		u1.getEquip().equip(Equips.longSword.copy());
+
+		u2.setName("Elvin");
+		u2.self.skills.addSkill(PassiveSkills.basicCombatTraining);
+		u2.getEquip().equip(Equips.longSword.copy());
+
+		u3.setName("Sonia");
+		u3.getEquip().equip(Equips.staff.copy());
+
 	}
 
 	private void loadEnemyUnitStats(UnitStats unit) {

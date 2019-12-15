@@ -9,7 +9,6 @@ import java.util.TreeMap;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.mygdx.holowyth.test.demos.stats.StatsDemo;
 import com.mygdx.holowyth.test.demos.ui.UIDemo;
 import com.mygdx.holowyth.test.sandbox.Test1;
 import com.mygdx.holowyth.test.sandbox.Test2;
@@ -41,8 +40,6 @@ public class SelectLauncher {
 	public static void addApps() {
 		addApp(Test1.class);
 		addApp(Test2.class);
-
-		addApp(StatsDemo.class, smallWindow);
 
 		LwjglApplicationConfiguration uiConfig;
 
