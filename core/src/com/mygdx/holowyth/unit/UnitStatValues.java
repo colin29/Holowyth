@@ -1,5 +1,8 @@
 package com.mygdx.holowyth.unit;
 
+/**
+ * Used to represent stat values -- also used for additive bonuses
+ */
 public class UnitStatValues implements Cloneable {
 	public int str, agi, fort, percep; // core stats
 	public int maxHp, maxSp;

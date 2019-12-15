@@ -102,7 +102,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		}, Keys.W); // print info on all selected units
 		functionBindings.bindFunctionToKey(() -> {
 			for (Unit unit : unitControls.getSelectedUnits()) {
-				unit.stats.printInfo();
+				unit.stats.printInfo(true);
 			}
 		}, Keys.E); // print info+equipment
 		functionBindings.bindFunctionToKey(() -> {

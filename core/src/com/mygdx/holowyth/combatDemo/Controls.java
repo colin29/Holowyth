@@ -40,6 +40,7 @@ import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
+import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -159,6 +160,21 @@ public class Controls extends InputProcessorAdapter {
 				return u.getAttacking() != null ? u.getAttacking().getName() : null;
 			} else {
 				return "N/A";
+			}
+		});
+
+		debugValues.add("Num equip slots filled of one unit", () -> {
+			if (selectedUnits.size() == 1) {
+				Unit u = selectedUnits.first();
+				int count = 0;
+				for (Equip e : u.equip.getEquipSlots().values()) {
+					if (e != null) {
+						count += 1;
+					}
+				}
+				return count;
+			} else {
+				return 0;
 			}
 		});
 

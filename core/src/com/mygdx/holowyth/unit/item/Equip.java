@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.unit;
+package com.mygdx.holowyth.unit.item;
 
 import static com.mygdx.holowyth.util.DataUtil.getAsPercentage;
 
@@ -9,59 +9,42 @@ import java.util.function.BiConsumer;
 import org.apache.commons.lang3.StringUtils;
 
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.holowyth.unit.UnitStatValues;
 
-public class Item {
-
-	public enum ItemType {
-		EQUIPMENT, CONSUMABLE, OTHER
-	}
+/**
+ * Only equips have bonuses
+ *
+ */
+public class Equip extends Item {
 
 	public enum EquipType {
 		HEADGEAR, ARMOR, WEAPON, SHIELD, ACCESSORY
 	}
 
-	public String name;
-
-	public ItemType itemType;
 	public EquipType equipType;
-
 	public final UnitStatValues bonus = new UnitStatValues();
 	public boolean is2HWeapon;
 
-	private boolean isTemplate;
-
-	public Item copy() {
-		Item item = new Item(this.name);
-
-		item.itemType = itemType;
-		item.equipType = equipType;
-
-		item.bonus.set(bonus);
-		item.is2HWeapon = is2HWeapon;
-		return item;
-	}
-
-	public Item(String name, EquipType equipType) {
-		this(name, ItemType.EQUIPMENT);
+	public Equip(String name, EquipType equipType) {
+		this.name = name;
+		this.itemType = ItemType.EQUIP;
 		this.equipType = equipType;
 	}
 
-	public Item(String name, ItemType itemType) {
-		this(name);
-		this.itemType = itemType;
-	}
-
-	public Item() {
-		this("Untitled Item");
-	}
-
-	public Item(String name) {
+	public Equip(String name) {
 		this(name, false);
 	}
 
-	public Item(String name, boolean isTemplate) {
+	public Equip(String name, boolean isTemplate) {
 		this.name = name;
 		this.isTemplate = isTemplate;
+	}
+
+	public Equip copy() {
+		Equip item = new Equip(name, equipType);
+		item.bonus.set(bonus);
+		item.is2HWeapon = is2HWeapon;
+		return item;
 	}
 
 	public void printInfo() {
@@ -72,21 +55,21 @@ public class Item {
 		String s = "";
 		s += String.format("[%s]  %s%n", name, getCompleteItemType());
 		if (bonus.damage > 0) {
-			s += String.format(" Damage: %d%n", bonus.damage);
+			s += String.format(" Damage: %f%n", bonus.damage);
 		}
-		s += " " + getListOfEquipBonuses();
+		s += " " + getEquipBonusesAsText();
 		return s;
 	}
 
 	public String getCompleteItemType() {
-		if (itemType == Item.ItemType.EQUIPMENT) {
+		if (itemType == Equip.ItemType.EQUIP) {
 			return equipType.toString() + " (Equip)";
 		} else {
 			return itemType.toString();
 		}
 	}
 
-	public String getListOfEquipBonuses() {
+	public String getEquipBonusesAsText() {
 		// Need to handle both ints and floats
 		Map<String, Object> m = new HashMap<String, Object>();
 		Array<String> ordering = new Array<String>(); // order which to display stat bonuses in, if any.
@@ -140,16 +123,5 @@ public class Item {
 		s = StringUtils.removeEnd(s, ", ");
 		s += "\n";
 		return s;
-	}
-
-	/**
-	 * Items that are templates are meant to be copied and should not be equipped
-	 */
-	public void markAsTemplate() {
-		isTemplate = true;
-	}
-
-	public boolean isTemplate() {
-		return isTemplate;
 	}
 }

@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.unit;
 
 import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.unit.UnitEquip.Slot;
 import com.mygdx.holowyth.util.Holo;
 
 public class UnitStatCalculator {
@@ -25,30 +26,16 @@ public class UnitStatCalculator {
 		var equip = self.getEquip();
 
 		calculateSkillStatBonuses(skillBonus);
-		calculateEquipStatBonuses(equipBonus, equip.head, equip.torso, equip.mainHand, equip.accessory1, equip.accessory2);
+		calculateEquipStatBonuses(equipBonus, Slot.HEAD, Slot.TORSO, Slot.MAIN_HAND, Slot.ACCESSORY1, Slot.ACCESSORY2);
 
-		if (equip.mainHand != equip.offHand) // don't count a 2H weapon twice
-			addEquipStatBonuses(equipBonus, equip.offHand);
+		if (equip.getEquip(Slot.MAIN_HAND) != equip.getEquip(Slot.OFF_HAND)) // don't count a 2H weapon twice
+			addEquipStatBonuses(equipBonus, Slot.OFF_HAND);
 
-		my.str = self.base.str + equipBonus.str;
-		my.agi = self.base.agi + equipBonus.agi;
-		my.fort = self.base.fort + equipBonus.fort;
-		my.percep = self.base.percep + equipBonus.percep;
+		my.set(self.base);
+		my.add(skillBonus);
+		my.add(equipBonus);
 
-		my.atk = self.base.atk + equipBonus.atk + skillBonus.atk;
-		my.def = self.base.def + equipBonus.def + skillBonus.def;
-		my.force = self.base.force + equipBonus.force + skillBonus.force;
-		my.stab = self.base.stab + equipBonus.stab + skillBonus.stab;
-
-		my.armor = self.base.armor + equipBonus.armor;
-		my.percentArmor = self.base.percentArmor + equipBonus.percentArmor;
-		my.armorPiercing = self.base.armorPiercing + equipBonus.armorPiercing;
-		my.armorNegate = self.base.armorNegate + equipBonus.armorNegate;
-
-		// stats have no effect atm
-
-		final float weaponDamage = self.isWieldingAWeapon() ? self.getEquip().mainHand.bonus.damage : 0;
-		my.damage = self.base.damage + weaponDamage + skillBonus.damage;
+		// By default bonuses are simply added, overwrite the value if desired
 
 		my.maxHp = Holo.debugHighHpUnits ? self.base.maxHp * 10 : self.base.maxHp;
 		my.maxSp = self.base.maxSp;
@@ -68,31 +55,16 @@ public class UnitStatCalculator {
 		}
 	}
 
-	private void calculateEquipStatBonuses(UnitStatValues values, Item... items) {
+	private void calculateEquipStatBonuses(UnitStatValues values, Slot... slots) {
 		values.zero();
-		addEquipStatBonuses(values, items);
+		addEquipStatBonuses(values, slots);
 	}
 
-	private void addEquipStatBonuses(UnitStatValues values, Item... items) {
-		for (Item item : items) {
+	private void addEquipStatBonuses(UnitStatValues values, Slot... slots) {
+		for (Slot slot : slots) {
+			var item = self.getEquip().getEquip(slot);
 			if (item != null) {
-				values.str += item.bonus.str;
-				values.agi += item.bonus.agi;
-				values.fort += item.bonus.fort;
-				values.percep += item.bonus.percep;
-
-				values.damage += item.bonus.damage;
-
-				values.atk += item.bonus.atk;
-				values.def += item.bonus.def;
-				values.force += item.bonus.force;
-				values.stab += item.bonus.stab;
-				values.dodge += item.bonus.dodge;
-
-				values.armor += item.bonus.armor;
-				values.percentArmor += item.bonus.percentArmor;
-				values.armorPiercing += item.bonus.armorPiercing;
-				values.armorNegate += item.bonus.armorNegate;
+				values.add(item.bonus);
 			}
 		}
 	}

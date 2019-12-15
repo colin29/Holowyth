@@ -1,17 +1,17 @@
 package com.mygdx.holowyth.combatDemo.prototyping;
 
-import com.mygdx.holowyth.unit.Item;
-import com.mygdx.holowyth.unit.Item.EquipType;
+import com.mygdx.holowyth.unit.item.Equip;
+import com.mygdx.holowyth.unit.item.Equip.EquipType;
 
 /**
- * Static utility class for mocking up units
+ * Contains equipment templates which can be copied and given to units
  * 
  * @author Colin Ta
  *
  */
 public class Equips {
 
-	public final static Item longSword = new Item("Long Sword", EquipType.WEAPON) {
+	public final static Equip longSword = new Equip("Long Sword", EquipType.WEAPON) {
 		{
 			markAsTemplate();
 			bonus.damage = 5;
@@ -22,7 +22,7 @@ public class Equips {
 		}
 	};
 
-	public final static Item staff = new Item("Staff", EquipType.WEAPON) {
+	public final static Equip staff = new Equip("Staff", EquipType.WEAPON) {
 		{
 			markAsTemplate();
 			bonus.damage = 2;

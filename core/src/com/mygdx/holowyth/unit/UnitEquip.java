@@ -1,13 +1,13 @@
 package com.mygdx.holowyth.unit;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.badlogic.gdx.utils.Array;
-import com.mygdx.holowyth.unit.Item.ItemType;
+import com.mygdx.holowyth.unit.item.Equip;
+import com.mygdx.holowyth.util.exceptions.HoloAssertException;
+import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**
  * 2H weapons not fully supported yet
@@ -21,93 +21,167 @@ public class UnitEquip {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	public Item head;
-	public Item mainHand;
-	public Item offHand;
-	public Item torso;
-	public Item accessory1;
-	public Item accessory2;
+	private EquippedItemsMap equips = new EquippedItemsMap();
 
 	public UnitEquip(Unit self) {
 		this.self = self;
 	}
 
-	public boolean isWielding2HWeapon() {
-		// TODO:
-		return false;
-	}
+	public enum Slot {
+		HEAD, MAIN_HAND, OFF_HAND, TORSO, ACCESSORY1, ACCESSORY2;
 
-	public static final Array<String> slotLabels = new Array<String>();
-	static {
-		slotLabels.addAll("Head", "Main Hand", "Off Hand", "Torso", "Accessory 1", "Accessory 2");
-	}
-
-	/**
-	 * Note that the returned value will become outdated if any items are equipped/un-equipped
-	 * 
-	 * Like the fields, null means no item equipped
-	 * 
-	 * @return A list of the items in each field, in order. Each index corresponds to an equip slot, so null is a valid value
-	 */
-	Array<Item> getArrayOfEquipSlots() {
-		Array<Item> a = new Array<Item>();
-		a.addAll(head, mainHand, offHand, torso, accessory1, accessory2);
-		assert (a.size == slotLabels.size);
-		return a;
-	}
-
-	/**
-	 * Allows other classes to consistently get all the equip slots and their content in order <br>
-	 * Note that the returned map will become outdated if any items are equipped/un-equipped. <br>
-	 * Like the fields, null means no item equipped. Some items, namely 2h weapons will appear in both hand slots <br>
-	 * 
-	 * @return A map of the equip slots, slotName -> Item
-	 */
-	public Map<String, Item> getIteratableMap() {
-		Map<String, Item> map = new HashMap<String, Item>();
-
-		Array<Item> curItems = getArrayOfEquipSlots();
-
-		for (int i = 0; i < slotLabels.size; i++) {
-			map.put(slotLabels.get(i), curItems.get(i));
+		public String getName() {
+			switch (this) {
+			case HEAD:
+				return "head";
+			case MAIN_HAND:
+				return "Main Hand";
+			case OFF_HAND:
+				return "Off Hand";
+			case TORSO:
+				return "Torso";
+			case ACCESSORY1:
+				return "Accessory 1";
+			case ACCESSORY2:
+				return "Accessory 2";
+			default:
+				throw new HoloAssertException("Unhandled Equip slot");
+			}
 		}
-		return map;
 	}
+
+	// /**
+	// * Note that the returned value will become outdated if any items are equipped/un-equipped
+	// *
+	// * Null means no item equipped
+	// *
+	// * @return A list of the items in each field, in order. Each index corresponds to an equip slot, so nulls are possible
+	// */
+	// Array<Equip> getEquipSlotsAsArray() {
+	// Array<Equip> a = new Array<Equip>();
+	// a.addAll(head, mainHand, offHand, torso, accessory1, accessory2);
+	//
+	// for (var equipSlot : EquipSlot.values()) {
+	//
+	// }
+	//
+	// return a;
+	// }
+
+	// /**
+	// * Allows other classes to consistently get all the equip slots and their content in order <br>
+	// * Note that the returned map will become outdated if any items are equipped/un-equipped. <br>
+	// * Like the fields, null means no item equipped. Some items, namely 2h weapons will appear in both hand slots <br>
+	// *
+	// * @return A map of the equip slots, slotName -> Item
+	// */
+	// public Map<String, Equip> getIteratableMap() {
+	// Map<String, Equip> map = new HashMap<String, Equip>();
+	//
+	// Array<Equip> curItems = getEquipSlotsAsArray();
+	//
+	// for (int i = 0; i < slotLabels.size; i++) {
+	// map.equip(slotLabels.get(i), curItems.get(i));
+	// }
+	// return map;
+	// }
 
 	/**
 	 * 
 	 * @return true if the equip was successful
 	 */
-	public boolean equip(Item equip) {
-		if (equip.itemType != ItemType.EQUIPMENT) {
-			logger.info("Trying to equip a non-equipment item");
+	public boolean equip(Equip item) {
+		// Don't report null equip, let the underlying collection throw an exception
+		if (this.hasEquipped(item)) {
+			logger.info("Tried to equip {} which is already equipped by {}", item.name, self.getName());
 			return false;
 		}
 
-		switch (equip.equipType) {
-		case ACCESSORY:
-			accessory1 = equip;
-			// TODO: If slot 1 occupied but slot 2 free, put in slot 2 instead.
+		switch (item.equipType) {
+		case HEADGEAR:
+			equips.put(Slot.HEAD, item);
 			break;
 		case ARMOR:
-			torso = equip;
-			break;
-		case HEADGEAR:
-			head = equip;
-			break;
-		case SHIELD:
-			offHand = equip;
-			// TODO: if wielding a 2 handed item, then must de-equip
+			equips.put(Slot.TORSO, item);
 			break;
 		case WEAPON:
-			mainHand = equip;
-			// TODO: if is 2 handed weapon, needs to assign both slots
+			clearMainHandSlot();
+			if (item.is2HWeapon) {
+				equips.put(Slot.MAIN_HAND, item);
+				equips.put(Slot.OFF_HAND, item);
+			} else {
+				equips.put(Slot.MAIN_HAND, item);
+			}
+			break;
+		case SHIELD:
+			clearOffHandSlot();
+			equips.put(Slot.OFF_HAND, item);
+			break;
+		case ACCESSORY:
+			if (equips.isNull(Slot.ACCESSORY1) && equips.isNull(Slot.ACCESSORY2)) {
+				equips.put(Slot.ACCESSORY2, item);
+			} else {
+				equips.put(Slot.ACCESSORY1, item);
+			}
 			break;
 		default:
-			return false;
+			throw new HoloAssertException("Unhandled equipment type");
 		}
 		self.stats.recalculateStats();
 		return true;
+	}
+
+	private void clearMainHandSlot() {
+		if (is2HWieldingWeapon()) {
+			equips.remove(Slot.MAIN_HAND);
+			equips.remove(Slot.OFF_HAND);
+		} else {
+			equips.remove(Slot.MAIN_HAND);
+		}
+	}
+
+	private void clearOffHandSlot() {
+		if (is2HWieldingWeapon()) {
+			equips.remove(Slot.MAIN_HAND);
+			equips.remove(Slot.OFF_HAND);
+		} else {
+			equips.remove(Slot.OFF_HAND);
+		}
+	}
+
+	public boolean unequip(Equip item) {
+		if (item == null)
+			throw new HoloIllegalArgumentsException("Can't unequip a null item");
+		if (!hasEquipped(item)) {
+			logger.info("Tried to unequip {}, but item is not equipped by {}", item.name, self.getName());
+			return false;
+		}
+		for (Slot slot : Slot.values()) {
+			if (equips.get(slot) == item) {
+				equips.remove(slot);
+			}
+		}
+		return true;
+	}
+
+	public boolean hasEquipped(Equip equip) {
+		return equips.contains(equip);
+	}
+
+	public Equip getEquip(Slot slot) {
+		return equips.get(slot);
+	}
+
+	/**
+	 * @return Read-only collection of the equip slots
+	 */
+	public Map<Slot, Equip> getEquipSlots() {
+		return equips.getReadOnlyMap();
+	}
+
+	public boolean is2HWieldingWeapon() {
+		return !equips.isNull(Slot.MAIN_HAND) &&
+				equips.get(Slot.MAIN_HAND) == equips.get(Slot.OFF_HAND);
 	}
 
 }

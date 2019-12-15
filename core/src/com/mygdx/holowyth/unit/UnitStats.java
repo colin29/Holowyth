@@ -5,7 +5,6 @@ import static com.mygdx.holowyth.util.DataUtil.getRoundedString;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;
@@ -14,7 +13,9 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.unit.Unit.Order;
+import com.mygdx.holowyth.unit.UnitEquip.Slot;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
+import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.unit.statuseffect.BasicAttackSlowEffect;
 import com.mygdx.holowyth.unit.statuseffect.SlowEffect;
 import com.mygdx.holowyth.util.DataUtil;
@@ -623,14 +624,14 @@ public class UnitStats implements UnitStatsInfo {
 	private String getEquippedItemsAsString() {
 		String s = "";
 
-		Map<String, Item> map = getEquip().getIteratableMap();
+		final var equip = self.equip;
 
-		for (String slotLabel : UnitEquip.slotLabels) {
-			Item item = map.get(slotLabel);
+		for (Slot slot : UnitEquip.Slot.values()) {
+			Equip item = equip.getEquip(slot);
 			if (item != null) {
-				s += " -" + slotLabel + ": " + item.name + "\n";
+				s += " -" + slot.getName() + ": " + item.name + "\n";
 			} else {
-				s += " -" + slotLabel + ": [None]\n";
+				s += " -" + slot.getName() + ": [None]\n";
 			}
 		}
 
@@ -638,11 +639,12 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	private String getInfoForAllEquippedItems() {
-		// Get a list of all distinct items (different names)
+		// Get a list of all different named items
 
-		List<Item> distinctItems = new ArrayList<Item>();
+		List<Equip> distinctItems = new ArrayList<Equip>();
 
-		for (Item item : getEquip().getArrayOfEquipSlots()) {
+		final var equip = self.equip;
+		for (Equip item : equip.getEquipSlots().values()) {
 			if (item == null)
 				continue;
 			if (distinctItems.stream().noneMatch(i -> i.name == item.name)) {
@@ -651,7 +653,7 @@ public class UnitStats implements UnitStatsInfo {
 		}
 
 		String s = "";
-		for (Item item : distinctItems) {
+		for (Equip item : distinctItems) {
 			s += item.getInfo();
 		}
 		return s;
@@ -659,10 +661,6 @@ public class UnitStats implements UnitStatsInfo {
 
 	public boolean isDead() {
 		return hp <= 0;
-	}
-
-	public boolean isWieldingAWeapon() {
-		return getEquip().mainHand != null;
 	}
 
 	public UnitEquip getEquip() {
