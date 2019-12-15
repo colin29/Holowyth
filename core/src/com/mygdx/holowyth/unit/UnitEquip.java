@@ -10,10 +10,7 @@ import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**
- * 2H weapons not fully supported yet
- * 
  * @author Colin Ta
- *
  */
 public class UnitEquip {
 
@@ -49,42 +46,6 @@ public class UnitEquip {
 			}
 		}
 	}
-
-	// /**
-	// * Note that the returned value will become outdated if any items are equipped/un-equipped
-	// *
-	// * Null means no item equipped
-	// *
-	// * @return A list of the items in each field, in order. Each index corresponds to an equip slot, so nulls are possible
-	// */
-	// Array<Equip> getEquipSlotsAsArray() {
-	// Array<Equip> a = new Array<Equip>();
-	// a.addAll(head, mainHand, offHand, torso, accessory1, accessory2);
-	//
-	// for (var equipSlot : EquipSlot.values()) {
-	//
-	// }
-	//
-	// return a;
-	// }
-
-	// /**
-	// * Allows other classes to consistently get all the equip slots and their content in order <br>
-	// * Note that the returned map will become outdated if any items are equipped/un-equipped. <br>
-	// * Like the fields, null means no item equipped. Some items, namely 2h weapons will appear in both hand slots <br>
-	// *
-	// * @return A map of the equip slots, slotName -> Item
-	// */
-	// public Map<String, Equip> getIteratableMap() {
-	// Map<String, Equip> map = new HashMap<String, Equip>();
-	//
-	// Array<Equip> curItems = getEquipSlotsAsArray();
-	//
-	// for (int i = 0; i < slotLabels.size; i++) {
-	// map.equip(slotLabels.get(i), curItems.get(i));
-	// }
-	// return map;
-	// }
 
 	/**
 	 * 
