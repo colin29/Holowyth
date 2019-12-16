@@ -105,7 +105,7 @@ public class Renderer {
 
 		batch = game.batch;
 		shapeRenderer = game.shapeRenderer;
-		shapeDrawer = game.getShapeDrawer();
+		shapeDrawer = game.shapeDrawer;
 
 		this.game = game;
 

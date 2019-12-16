@@ -43,7 +43,7 @@ public class Holowyth extends Game {
 	public FileChooser fileChooser;
 
 	Class<? extends Screen> screenClassToLoad;
-	private ShapeDrawerPlus shapeDrawer;
+	public ShapeDrawerPlus shapeDrawer;
 
 	public Holowyth() {
 		this(PolyMapEditor.class);
@@ -115,10 +115,6 @@ public class Holowyth extends Game {
 				| InvocationTargetException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public ShapeDrawerPlus getShapeDrawer() {
-		return shapeDrawer;
 	}
 
 	private static TextureRegion get1PixelWhiteTextureRegion() {

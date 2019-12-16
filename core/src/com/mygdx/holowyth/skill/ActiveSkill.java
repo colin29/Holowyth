@@ -276,6 +276,10 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 		return tags.contains(Tag.RANGED) || tags.contains(Tag.RANGED_MAGIC);
 	}
 
+	public boolean isOnCooldown() {
+		return curCooldown > 0;
+	}
+
 	protected void addTag(Tag tag) {
 		tags.add(tag);
 	}

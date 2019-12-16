@@ -188,9 +188,9 @@ public class Controls extends InputProcessorAdapter {
 
 		for (int offset = 0; offset < 9; offset++) { // bind keys 1-9
 			final int slotNumber = 1 + offset;
-			functionBindings.bindFunctionToKey(() -> useSkillInSlot(slotNumber), Keys.NUM_1 + offset);
+			functionBindings.bindFunctionToKey(() -> orderSelectedUnitToUseSkillInSlot(slotNumber), Keys.NUM_1 + offset);
 		}
-		functionBindings.bindFunctionToKey(() -> useSkillInSlot(10), Keys.NUM_0); // also bind the 0 key
+		functionBindings.bindFunctionToKey(() -> orderSelectedUnitToUseSkillInSlot(10), Keys.NUM_0); // also bind the 0 key
 	}
 
 	float clickX, clickY; // Current click in world coordinates
@@ -211,9 +211,9 @@ public class Controls extends InputProcessorAdapter {
 	}
 
 	/**
-	 * Input from 1-9, and 0.
+	 * This order will bring up the targeting UI, so it only makes sense for the player targeting
 	 */
-	private void useSkillInSlot(int slotNumber) {
+	public void orderSelectedUnitToUseSkillInSlot(int slotNumber) {
 
 		if (selectedUnits.size() == 1) {
 
@@ -230,6 +230,8 @@ public class Controls extends InputProcessorAdapter {
 			}
 			if (curSkill.getParent().curCooldown > 0 && !Holo.debugSkillCooldownDisabled) {
 				logger.info("{} is on cooldown", curSkill.name);
+				gameLog.addErrorMessage(String.format("%s is on cooldown (%s seconds remaining}", curSkill.name,
+						DataUtil.round(curSkill.curCooldown / Holo.GAME_FPS, 1)));
 				return;
 			}
 
@@ -753,7 +755,7 @@ public class Controls extends InputProcessorAdapter {
 		listeners.remove(l);
 	}
 
-	public static abstract class ControlsListener {
+	public interface ControlsListener {
 		/**
 		 * @param list
 		 *            of units is unmodifiable

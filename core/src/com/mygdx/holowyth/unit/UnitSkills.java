@@ -25,10 +25,12 @@ public class UnitSkills {
 		self = unit;
 	}
 
+	public static final int NUM_SKILL_SLOTS = 10;
+
 	private Set<Skill> skills = new LinkedHashSet<Skill>();
 
 	/**
-	 * Slot 0 is unused atm, but can be used.
+	 * Slot 0 cannot be used
 	 */
 	ActiveSkill[] slot = new ActiveSkill[11];
 	{
@@ -49,13 +51,13 @@ public class UnitSkills {
 
 	/**
 	 * @param slotNumber
-	 *            between 0 and 10.
+	 *            between 1 and 10.
 	 * 
 	 * @return A cloned instance of the skill, or null if there was no skill in that slot
 	 */
 	public ActiveSkill getSkillInSlot(int slotNumber) {
-		if (slotNumber < 0 || slotNumber > 10) {
-			throw new HoloIllegalArgumentsException("slot number must be between 0 and 10");
+		if (slotNumber < 1 || slotNumber > 10) {
+			throw new HoloIllegalArgumentsException("slot number must be between 1 and 10");
 		}
 
 		if (slot[slotNumber] == null) {

@@ -23,6 +23,15 @@ public class ShapeDrawerPlus extends ShapeDrawer {
 		circle(x, y, 0.5f);
 	}
 
+	public void filledRectangle(float x, float y, float width, float height) {
+		// float lineStep = 1f;
+		// for (float i = radius; i > 0; i -= radiusStep) {
+		// circle(x, y, i);
+		// }
+		// TODO: stub
+		rectangle(x, y, width, height);
+	}
+
 	/**
 	 * Convience method for scaling a color to a certain alpha.
 	 */

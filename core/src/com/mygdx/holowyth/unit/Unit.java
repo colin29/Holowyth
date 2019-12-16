@@ -333,6 +333,10 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		stopUnit();
 	}
 
+	/**
+	 * @param skill
+	 *            The skill must have effects set already
+	 */
 	@Override
 	public void orderUseSkill(ActiveSkill skill) {
 

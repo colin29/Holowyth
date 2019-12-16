@@ -24,7 +24,7 @@ import com.mygdx.holowyth.util.HoloUI;
  * @author Colin Ta
  *
  */
-public class StatsPanelUI extends ControlsListener {
+public class StatsPanelUI implements ControlsListener {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 

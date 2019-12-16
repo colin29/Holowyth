@@ -99,8 +99,11 @@ public class CombatDemoUI {
 	}
 
 	public void onRender() {
-		stage.setDebugAll(Gdx.input.isKeyPressed(Keys.B));
+		stage.setDebugAll(Gdx.input.isKeyPressed(Keys.C));
 		debugStoreUI.updateDebugValueDisplay();
+
+		skillBarUI.update();
+		skillBarUI.render(self.getCameras(), self.batch, self.shapeDrawer, self.assets);
 	}
 
 	public void updateMouseCoordLabel(int screenX, int screenY, Camera camera) {

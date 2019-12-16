@@ -33,7 +33,7 @@ public class TiledDemo extends HoloBaseScreen implements InputProcessor {
 		super(game);
 		loadMap();
 		Gdx.input.setInputProcessor(this);
-		shapeDrawer = game.getShapeDrawer();
+		shapeDrawer = game.shapeDrawer;
 	}
 
 	public void loadMap() {

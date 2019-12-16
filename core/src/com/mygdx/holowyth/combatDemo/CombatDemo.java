@@ -78,8 +78,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		super(game);
 
 		skin = game.skin;
-		shapeRenderer = game.shapeRenderer;
-
 		initializeAppLifetimeComponents();
 
 		combatDemoUI = new CombatDemoUI(stage, debugStore, skin, this);
