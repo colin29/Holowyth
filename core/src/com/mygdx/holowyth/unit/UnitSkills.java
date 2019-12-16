@@ -1,7 +1,9 @@
 package com.mygdx.holowyth.unit;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -9,9 +11,6 @@ import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.Skill;
-import com.mygdx.holowyth.skill.skillsandeffects.MageSkills;
-import com.mygdx.holowyth.skill.skillsandeffects.Skills;
-import com.mygdx.holowyth.skill.skillsandeffects.WarriorSkills;
 import com.mygdx.holowyth.util.exceptions.HoloException;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
@@ -38,14 +37,14 @@ public class UnitSkills {
 		// slot[1] = new WarriorSkills.RageBlow();
 		// slot[2] = new RangerSkills.CrossSlash();
 
-		slot[1] = new MageSkills.Fireball();
-		slot[2] = new MageSkills.MagicMissile();
-		slot[3] = new MageSkills.Thunderclap();
-		slot[4] = new MageSkills.BlindingFlash();
-		slot[5] = new MageSkills.Hydroblast();
-		slot[6] = new Skills.StaticShock();
-		slot[7] = new WarriorSkills.RageBlow();
-		slot[8] = new MageSkills.ArcaneBolt();
+		// slot[1] = new MageSkills.Fireball();
+		// slot[2] = new MageSkills.MagicMissile();
+		// slot[3] = new MageSkills.Thunderclap();
+		// slot[4] = new MageSkills.BlindingFlash();
+		// slot[5] = new MageSkills.Hydroblast();
+		// slot[6] = new Skills.StaticShock();
+		// slot[7] = new WarriorSkills.RageBlow();
+		// slot[8] = new MageSkills.ArcaneBolt();
 
 	}
 
@@ -91,6 +90,11 @@ public class UnitSkills {
 		}
 	}
 
+	/**
+	 * Doesn't add a skill to the skill bar
+	 * 
+	 * @return
+	 */
 	public boolean addSkill(Skill s) {
 		boolean added = skills.add(s);
 		self.stats.recalculateStats();
@@ -99,6 +103,28 @@ public class UnitSkills {
 
 	public boolean removeSkill(Skill s) {
 		return skills.remove(s);
+	}
+
+	public void slotSkills(ActiveSkill... skills) {
+		slotSkills(Arrays.asList(skills));
+	}
+
+	/**
+	 * Clears the unit skill slots, then tries to slot as many skills in as possible
+	 * 
+	 * @param activeSkills
+	 * @return
+	 */
+	public void slotSkills(List<ActiveSkill> skills) {
+		for (int i = 0; i < slot.length; i++) {
+			slot[i] = null;
+		}
+		for (int i = 0; i < skills.size(); i++) {
+			if (i + 1 > NUM_SKILL_SLOTS) {
+				return;
+			}
+			slot[i + 1] = skills.get(i);
+		}
 	}
 
 	public Set<Skill> getSkills() {

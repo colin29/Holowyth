@@ -114,7 +114,7 @@ public class MageSkills {
 		public BlindingFlash() {
 			super();
 			name = "Blinding Flash";
-			casting.castTime = 0;// 60 * 1.8f;
+			casting.castTime = 60 * 1.8f;
 			spCost = 18;
 			cooldown = 60 * 24;
 			addTag(Tag.RANGED_MAGIC);

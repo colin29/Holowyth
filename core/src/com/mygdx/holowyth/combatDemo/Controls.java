@@ -236,7 +236,8 @@ public class Controls extends InputProcessorAdapter {
 			}
 
 			if (!curSkill.hasEnoughSp(unit)) {
-				System.out.println("not enough sp");
+				logger.info("{} not enough sp", curSkill.name);
+				gameLog.addErrorMessage("Not enough sp!");
 				return;
 			}
 

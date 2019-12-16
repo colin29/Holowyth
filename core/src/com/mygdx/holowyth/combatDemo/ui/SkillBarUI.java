@@ -233,7 +233,6 @@ public class SkillBarUI implements ControlsListener {
 			if (skill != null && skill.isOnCooldown()) {
 
 				float cooldownFractionRemaining = Math.min(1, skill.curCooldown / skill.cooldown);
-				logger.debug("{}", cooldownFractionRemaining);
 
 				temp = button.localToStageCoordinates(temp.setZero());
 				shapeDrawer.filledRectangle(temp.x, temp.y, button.getWidth(), button.getHeight() * cooldownFractionRemaining);

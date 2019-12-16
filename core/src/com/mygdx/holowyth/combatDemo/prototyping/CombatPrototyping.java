@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.combatDemo.prototyping;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -8,7 +9,10 @@ import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.combatDemo.Controls;
 import com.mygdx.holowyth.combatDemo.World;
+import com.mygdx.holowyth.skill.ActiveSkill;
+import com.mygdx.holowyth.skill.skillsandeffects.MageSkills;
 import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
+import com.mygdx.holowyth.skill.skillsandeffects.WarriorSkills;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.sprite.AnimatedSprite;
 import com.mygdx.holowyth.unit.sprite.Animations;
@@ -129,21 +133,35 @@ public class CombatPrototyping {
 			return;
 		}
 
-		var u1 = players.get(0).stats;
-		var u2 = players.get(1).stats;
-		var u3 = players.get(2).stats;
+		List<ActiveSkill> warriorSkills = Arrays.asList(new WarriorSkills.RageBlow());
 
-		u1.setName("Lecia");
-		u1.self.skills.addSkill(PassiveSkills.basicCombatTraining);
-		u1.getEquip().equip(Equips.longSword.copy());
+		{
+			var u = players.get(0);
+			u.setName("Lecia");
+			u.stats.self.skills.addSkill(PassiveSkills.basicCombatTraining);
+			u.skills.slotSkills(warriorSkills);
+			u.equip.equip(Equips.longSword.copy());
+		}
+		{
+			var u = players.get(1);
+			u.setName("Elvin");
+			u.skills.addSkill(PassiveSkills.basicCombatTraining);
+			u.skills.slotSkills(warriorSkills);
+			u.stats.getEquip().equip(Equips.longSword.copy());
+		}
+		{
+			var u = players.get(2);
+			u.setName("Sonia");
+			u.skills.slotSkills(
+					new MageSkills.Fireball(),
+					new MageSkills.MagicMissile(),
+					new MageSkills.ArcaneBolt(),
+					new MageSkills.Hydroblast(),
+					new MageSkills.Thunderclap(),
+					new MageSkills.BlindingFlash());
+			u.stats.getEquip().equip(Equips.staff.copy());
 
-		u2.setName("Elvin");
-		u2.self.skills.addSkill(PassiveSkills.basicCombatTraining);
-		u2.getEquip().equip(Equips.longSword.copy());
-
-		u3.setName("Sonia");
-		u3.getEquip().equip(Equips.staff.copy());
-
+		}
 	}
 
 	public static class CombatScenario {
