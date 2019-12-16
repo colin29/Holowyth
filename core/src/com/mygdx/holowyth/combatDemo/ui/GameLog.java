@@ -7,7 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
-import com.badlogic.gdx.utils.Align;
 import com.mygdx.holowyth.Holowyth;
 
 public class GameLog {
@@ -32,6 +31,7 @@ public class GameLog {
 		debugStyleError = new LabelStyle(Holowyth.fonts.debugFont(), Color.RED);
 
 		logPanel.left();
+		logPanel.fill();
 
 		root.add(logPanel);
 
@@ -40,7 +40,6 @@ public class GameLog {
 	public void addMessage(String str, boolean isErrorMessage) {
 		var msg = new GameLogMessage(str, isErrorMessage);
 		logPanel.addActor(msg);
-		msg.setAlignment(Align.left);
 		msg.addAction(Actions.sequence(Actions.delay(7f), Actions.fadeOut(0.5f), Actions.removeActor()));
 	}
 

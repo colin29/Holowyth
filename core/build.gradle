@@ -8,7 +8,7 @@ dependencies {
 
 	// Libgdx
 	compile "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
-	implementation 'space.earlygrey:shapedrawer:1.2.0'
+	implementation 'space.earlygrey:shapedrawer:2.1.0'
 	
 	// UI
 	compile "com.kotcrab.vis:vis-ui:$visuiVersion"

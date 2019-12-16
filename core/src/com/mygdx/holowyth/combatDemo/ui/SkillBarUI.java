@@ -220,16 +220,25 @@ public class SkillBarUI implements ControlsListener {
 
 	private Vector2 temp = new Vector2();
 
+	private Color skillCoolDownOverlayColor = new Color(1, 1, 1, 0.25f);
+
 	public void render(Cameras cameras, SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
 		batch.begin();
 		batch.setProjectionMatrix(cameras.fixedCamera.combined);
 
-		shapeDrawer.setColor(Color.RED);
-		// shapeDrawer.setAlpha(0.5f);
+		shapeDrawer.setColor(skillCoolDownOverlayColor);
 
 		for (SkillButton button : skillButtons) {
-			temp = button.localToStageCoordinates(temp.setZero());
-			shapeDrawer.filledRectangle(temp.x, temp.y, button.getWidth(), button.getHeight());
+			var skill = button.skill;
+			if (skill != null && skill.isOnCooldown()) {
+
+				float cooldownFractionRemaining = Math.min(1, skill.curCooldown / skill.cooldown);
+				logger.debug("{}", cooldownFractionRemaining);
+
+				temp = button.localToStageCoordinates(temp.setZero());
+				shapeDrawer.filledRectangle(temp.x, temp.y, button.getWidth(), button.getHeight() * cooldownFractionRemaining);
+			}
+
 		}
 
 		batch.end();
