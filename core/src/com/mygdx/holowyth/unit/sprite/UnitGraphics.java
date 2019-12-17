@@ -75,6 +75,7 @@ public class UnitGraphics {
 		if (activeAnimation == prevAnimation && !self.motion.isBeingKnockedBack() && !self.isAttacking()) {
 			stateTime += delta;
 		}
+		prevAnimation = activeAnimation;
 
 	}
 

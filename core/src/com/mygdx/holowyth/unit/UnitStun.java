@@ -100,7 +100,7 @@ class UnitStun {
 		default:
 			throw new HoloAssertException("Unsupported state");
 		}
-		logger.debug("Stun time: {} (+{}) (max: {})", stunDurationRemaining, stunTimeAddedDebug, maxStunDuration);
+		logger.debug("{} Stun time: {} (+{}) (max: {})", self.getName(), stunDurationRemaining, stunTimeAddedDebug, maxStunDuration);
 	}
 
 	void applyKnockbackStun(float duration, Vector2 dv, float maxKnockBackVel, float maxStunDuration) {
@@ -187,7 +187,7 @@ class UnitStun {
 	}
 
 	private void beginStun(float duration) {
-		self.deferCurrentOrder();
+		self.orderDeferring.deferCurrentOrder();
 		self.motion.stopCurrentMovement();
 		self.clearOrder();
 		self.stopAttacking();
@@ -214,8 +214,8 @@ class UnitStun {
 		stunDurationRemaining = 0;
 		beginReel(Math.max(120, deferredReelAmount));
 		deferredReelAmount = 0;
-		logger.debug("stun ended");
-		self.tryToResumeDeferredOrder(); // important to call this AFTER stun state de-set, ie. unit.isStunned() returns false.
+		logger.debug("{} stun ended", self.getName());
+		self.orderDeferring.tryToResumeDeferredOrder(); // important to call this AFTER stun state de-set, ie. unit.isStunned() returns false.
 	}
 
 	private void endReeled() {

@@ -78,7 +78,7 @@ public class StatsPanelUI implements ControlsListener {
 		statPanel.add(nameText);
 		statPanel.row();
 
-		createStatPanelRow("damage:", simpleStatText.damage);
+		createStatPanelRow("dam:", simpleStatText.damage);
 		createStatPanelRow("atk:", simpleStatText.atk);
 		createStatPanelRow("def:", simpleStatText.def);
 		createStatPanelRow("force:", simpleStatText.force);

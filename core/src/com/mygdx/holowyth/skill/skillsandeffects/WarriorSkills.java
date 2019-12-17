@@ -9,10 +9,10 @@ public class WarriorSkills {
 		public RageBlow() {
 			super();
 			name = "Rage Blow";
-			casting.castTime = 60 * 0.8f;
+			casting.castTime = 60 * 1f;
 			casting.isInterruptedByDamageOrReel = false;
-			spCost = 8;
-			cooldown = 60 * 15;
+			spCost = 12;
+			cooldown = 60 * 17;
 		}
 
 		@Override
@@ -20,6 +20,25 @@ public class WarriorSkills {
 			if (!caster.isAttacking())
 				return false;
 			setEffects(new WarriorEffects.RageBlowEffect(caster, caster.getAttacking()));
+			return true;
+		}
+	}
+
+	public static class Bash extends NoneSkill {
+		public Bash() {
+			super();
+			name = "Bash";
+			casting.castTime = 60 * 0.7f;
+			casting.isInterruptedByDamageOrReel = false;
+			spCost = 8;
+			cooldown = 60 * 13;
+		}
+
+		@Override
+		public boolean pluginTargeting(Unit caster) {
+			if (!caster.isAttacking())
+				return false;
+			setEffects(new WarriorEffects.BashEffect(caster, caster.getAttacking()));
 			return true;
 		}
 	}

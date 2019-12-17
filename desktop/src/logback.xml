@@ -20,6 +20,9 @@
 	</logger>
 	<logger name="com.mygdx.holowyth.unit.UnitStun" level="DEBUG">
 	</logger>
+	
+	<logger name="com.mygdx.holowyth.unit.UnitOrderDeferring" level="INFO" />
+
 
 	<logger name="com.mygdx.holowyth.collision" level="INFO">
 	</logger>	

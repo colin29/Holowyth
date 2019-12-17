@@ -38,7 +38,7 @@ public class CombatPrototyping {
 	final CombatScenario threeVsThreeClose = new CombatScenario();
 	final CombatScenario threeVsThreeFar = new CombatScenario();
 
-	public CombatScenario scenario = threeVsThreeClose;
+	public CombatScenario scenario = threeVsThreeFar;
 
 	public CombatPrototyping(World world, Controls controls) {
 		this.world = world;
@@ -133,7 +133,7 @@ public class CombatPrototyping {
 			return;
 		}
 
-		List<ActiveSkill> warriorSkills = Arrays.asList(new WarriorSkills.RageBlow());
+		List<ActiveSkill> warriorSkills = Arrays.asList(new WarriorSkills.RageBlow(), new WarriorSkills.Bash());
 
 		{
 			var u = players.get(0);
@@ -156,6 +156,7 @@ public class CombatPrototyping {
 					new MageSkills.Fireball(),
 					new MageSkills.MagicMissile(),
 					new MageSkills.ArcaneBolt(),
+					new MageSkills.WindBlades(),
 					new MageSkills.Hydroblast(),
 					new MageSkills.Thunderclap(),
 					new MageSkills.BlindingFlash());

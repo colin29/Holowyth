@@ -24,7 +24,6 @@ import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.unit.sprite.UnitGraphics;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
-import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValue;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
@@ -54,6 +53,8 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
  */
 public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	public float x, y;
 
 	// Components
@@ -62,6 +63,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public final UnitSkills skills;
 	public final UnitGraphics graphics;
 	public final UnitEquip equip;
+	public final UnitOrderDeferring orderDeferring;
 
 	// World Fields
 	List<Unit> units;
@@ -79,16 +81,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	Order currentOrder = Order.NONE;
 	Unit target; // target for the current command.
-	private float attackMoveDestX;
-	private float attackMoveDestY;
-
-	/**
-	 * When a unit stops being stunned, the unit will try to adopt this order. Should not be null.
-	 */
-	private Order deferredOrder = Order.NONE;
-	private Unit deferredOrderTarget; // if the order specifies it
-	private float deferredOrderX;
-	private float deferredOrderY;
+	float attackMoveDestX;
+	float attackMoveDestY;
 
 	// Combat
 	/** The unit this unit is attacking. Attacking a unit <--> being engaged. */
@@ -151,8 +145,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	private ActiveSkill activeSkill;
 
-	Logger logger = LoggerFactory.getLogger(this.getClass());
-
 	public Unit(float x, float y, WorldInfo world, Side side, String name) {
 		this(x, y, side, world);
 		setName(name);
@@ -177,6 +169,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		stats = new UnitStats(this);
 		skills = new UnitSkills(this);
 		equip = new UnitEquip(this);
+		orderDeferring = new UnitOrderDeferring(this);
 
 		graphics = new UnitGraphics(this);
 
@@ -195,7 +188,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public void orderMove(float x, float y) {
 		if (!isMoveOrderAllowed()) {
 			if (stats.isStunned()) {
-				tryToDeferOrder(Order.MOVE, null, x, y);
+				orderDeferring.tryToDeferOrder(Order.MOVE, null, x, y);
 			}
 			return;
 		}
@@ -227,7 +220,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 		if (!isAttackOrderAllowed(unit)) {
 			if (stats.isStunned()) {
-				tryToDeferOrder(isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT, (Unit) unitOrd, 0, 0);
+				orderDeferring.tryToDeferOrder(isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT, (Unit) unitOrd, 0, 0);
 			}
 			return false;
 		}
@@ -284,7 +277,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 				this.currentOrder = Order.ATTACKMOVE;
 			}
 		} else if (stats.isStunned()) {
-			tryToDeferOrder(Order.ATTACKMOVE, null, x, y);
+			orderDeferring.tryToDeferOrder(Order.ATTACKMOVE, null, x, y);
 		}
 
 	}
@@ -294,7 +287,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		if (isRetreatOrderAllowed()) {
 			retreat(x, y);
 		} else if (stats.isStunned()) {
-			tryToDeferOrder(Order.RETREAT, null, x, y);
+			orderDeferring.tryToDeferOrder(Order.RETREAT, null, x, y);
 		}
 	}
 
@@ -327,7 +320,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public void orderStop() {
 		if (!isStopOrderAllowed()) {
 			if (stats.isStunned())
-				clearDeferredOrder();
+				orderDeferring.clearDeferredOrder();
 			return;
 		}
 		stopUnit();
@@ -341,7 +334,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public void orderUseSkill(ActiveSkill skill) {
 
 		if (stats.isStunned()) {
-			clearDeferredOrder(); // deferring a skill order is not supported but it will still clear an existing deferred order
+			orderDeferring.clearDeferredOrder(); // deferring a skill order is not supported but it will still clear an existing deferred order
 		}
 
 		if (!isUseSkillAllowed()) {
@@ -459,116 +452,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		if (isCasting() || isChannelling()) {
 			activeSkill.interrupt(true);
 		}
-	}
-
-	void tryToResumeDeferredOrder() {
-
-		switch (deferredOrder) {
-		case ATTACKMOVE:
-			orderAttackMove(deferredOrderX, deferredOrderY);
-			break;
-		case MOVE:
-			orderMove(deferredOrderX, deferredOrderY);
-			break;
-		case ATTACKUNIT_HARD:
-			orderAttackUnit(deferredOrderTarget, true);
-			break;
-		case ATTACKUNIT_SOFT:
-			orderAttackUnit(deferredOrderTarget, false);
-			break;
-		case RETREAT:
-			orderMove(deferredOrderX, deferredOrderY); // a unit that is stunned should already not be attacking, thus a move order is sufficient
-			deferredOrder = Order.MOVE;
-			break;
-		case NONE:
-			break;
-		default:
-			throw new HoloAssertException("Unhandled order type");
-		}
-		deferredOrder = Order.NONE;
-		deferredOrderTarget = null;
-		deferredOrderX = 0;
-		deferredOrderY = 0;
-	}
-
-	/**
-	 * Caches the given order so it can try to resume when the stun expires
-	 * 
-	 * @param order
-	 * @param target
-	 *            Optional, if the order requires it
-	 * @param x
-	 *            Optional
-	 * @param y
-	 */
-	void tryToDeferOrder(Order order, Unit target, float x, float y) {
-
-		logger.debug("Deferring order: {} {} {} {}", order.toString(), target != null ? target.getName() : "null", x, y);
-
-		clearDeferredOrder();
-
-		deferredOrder = order;
-		switch (order) {
-		case ATTACKMOVE:
-			deferredOrderX = x;
-			deferredOrderY = y;
-			break;
-		case MOVE:
-			deferredOrderX = x;
-			deferredOrderY = y;
-			break;
-
-		case ATTACKUNIT_HARD:
-		case ATTACKUNIT_SOFT:
-			deferredOrderTarget = target;
-			break;
-
-		case RETREAT:
-			deferredOrderX = x;
-			deferredOrderY = y;
-			break;
-
-		case NONE:
-			break;
-		default:
-			throw new HoloAssertException("Unhandled order type");
-		}
-	}
-
-	/**
-	 * Caches the current order so it can try to resume when the stun expires
-	 */
-	void deferCurrentOrder() {
-
-		clearDeferredOrder();
-
-		switch (currentOrder) {
-		case ATTACKMOVE:
-			tryToDeferOrder(currentOrder, null, attackMoveDestX, attackMoveDestY);
-			break;
-		case MOVE:
-			tryToDeferOrder(currentOrder, null, motion.getDest().x, motion.getDest().y);
-			break;
-		case ATTACKUNIT_HARD:
-		case ATTACKUNIT_SOFT:
-			tryToDeferOrder(currentOrder, target, 0, 0);
-			break;
-		case RETREAT:
-			tryToDeferOrder(currentOrder, target, motion.getDest().x, motion.getDest().y);
-			break;
-		case NONE:
-			break;
-		default:
-			throw new HoloAssertException("Unhandled order type");
-		}
-
-	}
-
-	private void clearDeferredOrder() {
-		deferredOrder = Order.NONE;
-		deferredOrderTarget = null;
-		deferredOrderX = 0;
-		deferredOrderY = 0;
 	}
 
 	// Tick Logic
