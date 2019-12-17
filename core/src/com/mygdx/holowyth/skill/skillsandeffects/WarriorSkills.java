@@ -43,4 +43,21 @@ public class WarriorSkills {
 		}
 	}
 
+	public static class DeafeningCry extends NoneSkill {
+		public DeafeningCry() {
+			super();
+			name = "Deafening Cry";
+			casting.castTime = 60 * 0.9f;
+			casting.isInterruptedByDamageOrReel = false;
+			spCost = 12;
+			cooldown = 60 * 20;
+		}
+
+		@Override
+		public boolean pluginTargeting(Unit caster) {
+			setEffects(new WarriorEffects.DeafeningCryEffect(caster));
+			return true;
+		}
+	}
+
 }

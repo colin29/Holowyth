@@ -16,16 +16,12 @@
 
 	<!-- Particular classes which we want extra info from -->
 
-	<logger name="com.mygdx.holowyth.unit.UnitStats" level="DEBUG">
-	</logger>
-	<logger name="com.mygdx.holowyth.unit.UnitStun" level="DEBUG">
-	</logger>
+	<logger name="com.mygdx.holowyth.unit.UnitStats" level="DEBUG" />
+	<logger name="com.mygdx.holowyth.unit.UnitStun" level="DEBUG" />
 	
 	<logger name="com.mygdx.holowyth.unit.UnitOrderDeferring" level="INFO" />
 
-
-	<logger name="com.mygdx.holowyth.collision" level="INFO">
-	</logger>	
+	<logger name="com.mygdx.holowyth.collision" level="INFO"/>
 	
 
 

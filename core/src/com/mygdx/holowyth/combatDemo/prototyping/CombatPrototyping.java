@@ -133,7 +133,7 @@ public class CombatPrototyping {
 			return;
 		}
 
-		List<ActiveSkill> warriorSkills = Arrays.asList(new WarriorSkills.RageBlow(), new WarriorSkills.Bash());
+		List<ActiveSkill> warriorSkills = Arrays.asList(new WarriorSkills.RageBlow(), new WarriorSkills.Bash(), new WarriorSkills.DeafeningCry());
 
 		{
 			var u = players.get(0);

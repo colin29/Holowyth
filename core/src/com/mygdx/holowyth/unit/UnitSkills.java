@@ -33,19 +33,6 @@ public class UnitSkills {
 	 */
 	ActiveSkill[] slot = new ActiveSkill[11];
 	{
-
-		// slot[1] = new WarriorSkills.RageBlow();
-		// slot[2] = new RangerSkills.CrossSlash();
-
-		// slot[1] = new MageSkills.Fireball();
-		// slot[2] = new MageSkills.MagicMissile();
-		// slot[3] = new MageSkills.Thunderclap();
-		// slot[4] = new MageSkills.BlindingFlash();
-		// slot[5] = new MageSkills.Hydroblast();
-		// slot[6] = new Skills.StaticShock();
-		// slot[7] = new WarriorSkills.RageBlow();
-		// slot[8] = new MageSkills.ArcaneBolt();
-
 	}
 
 	/**
@@ -123,7 +110,11 @@ public class UnitSkills {
 			if (i + 1 > NUM_SKILL_SLOTS) {
 				return;
 			}
-			slot[i + 1] = skills.get(i);
+			try {
+				slot[i + 1] = (ActiveSkill) skills.get(i).clone();
+			} catch (CloneNotSupportedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
