@@ -24,6 +24,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -69,8 +70,13 @@ public class Controls extends InputProcessorAdapter {
 
 	private FunctionBindings functionBindings = new FunctionBindings();
 
+	/**
+	 * The current selection box coordinates, in window coordinates
+	 */
+	SelectionBox selectionBox = new SelectionBox();
+
 	private SelectedUnits selectedUnits = new SelectedUnits();
-	boolean leftMouseKeyDown = false;
+	boolean selectionBoxDragActive = false;
 
 	public enum Context {
 		NONE, ATTACK, RETREAT, SKILL_GROUND, SKILL_UNIT, SKILL_UNIT_GROUND_1, SKILL_UNIT_GROUND_2;
@@ -322,11 +328,11 @@ public class Controls extends InputProcessorAdapter {
 	}
 
 	@Override
-	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		leftMouseKeyDown = false;
+	public boolean touchDown(int touchX, int touchY, int pointer, int button) {
+		selectionBoxDragActive = false;
 
-		Vector3 vec = new Vector3(); // World coordinates of the click.
-		vec = camera.unproject(vec.set(screenX, screenY, 0));
+		Vector3 world = new Vector3(); // World coordinates of the click.
+		world = camera.unproject(world.set(touchX, touchY, 0));
 
 		// Handle Left Click
 		if (button == Input.Buttons.LEFT && pointer == 0) {
@@ -334,25 +340,25 @@ public class Controls extends InputProcessorAdapter {
 			switch (context) {
 
 			case ATTACK:
-				handleAttackCommand(vec.x, vec.y);
+				handleAttackCommand(world.x, world.y);
 				break;
 			case RETREAT:
-				handleRetreatCommand(vec.x, vec.y);
+				handleRetreatCommand(world.x, world.y);
 				break;
 			case SKILL_GROUND:
-				handleSkillGround(vec.x, vec.y);
+				handleSkillGround(world.x, world.y);
 				break;
 			case SKILL_UNIT:
-				handleSkillUnit(vec.x, vec.y);
+				handleSkillUnit(world.x, world.y);
 				break;
 			case SKILL_UNIT_GROUND_1:
-				handleSkillUnitGroundPart1(vec.x, vec.y);
+				handleSkillUnitGroundPart1(world.x, world.y);
 				break;
 			case SKILL_UNIT_GROUND_2:
-				handleSkillUnitGroundPart2(vec.x, vec.y);
+				handleSkillUnitGroundPart2(world.x, world.y);
 				break;
 			default:
-				handleLeftClick(vec.x, vec.y, screenX, screenY);
+				startSelectionBox(touchX, Gdx.graphics.getHeight() - touchY);
 			}
 			return true;
 		}
@@ -365,7 +371,7 @@ public class Controls extends InputProcessorAdapter {
 			if (context != Context.NONE) {
 				clearContext();
 			} else {
-				handleRightClick(vec.x, vec.y);
+				handleRightClick(world.x, world.y);
 			}
 
 			return true;
@@ -489,24 +495,29 @@ public class Controls extends InputProcessorAdapter {
 	}
 
 	@Override
-	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+	public boolean touchUp(int touchX, int touchY, int pointer, int button) {
 
 		if (button == Input.Buttons.LEFT && pointer == 0) {
-			if (leftMouseKeyDown) {
-				selectUnitsInSelectionBox(screenX, screenY);
+			if (selectionBoxDragActive) {
+				selectionBox.x2 = touchX;
+				selectionBox.y2 = Gdx.graphics.getHeight() - touchY;
+				selectUnitsInSelectionBox();
 			}
-			leftMouseKeyDown = false;
+			selectionBoxDragActive = false;
 		}
 		return false;
 	}
 
 	@Override
-	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		if (pointer == 0 && leftMouseKeyDown) {
-			Vector3 vec = new Vector3(); // obtain window coordinates of the click.
-			vec = fixedCam.unproject(vec.set(screenX, screenY, 0));
-			selectionX2 = vec.x;
-			selectionY2 = vec.y;
+	public boolean touchDragged(int touchX, int touchY, int pointer) {
+		if (pointer == 0 && selectionBoxDragActive) {
+			// Vector3 vec = new Vector3(); // obtain window coordinates of the click.
+			// vec = fixedCam.unproject(vec.set(screenX, screenY, 0));
+			// selectionX2 = vec.x;
+			// selectionY2 = vec.y;
+
+			selectionBox.x2 = touchX;
+			selectionBox.y2 = Gdx.graphics.getHeight() - touchY;
 		}
 		return false;
 
@@ -578,28 +589,14 @@ public class Controls extends InputProcessorAdapter {
 		}
 	}
 
-	/**
-	 * The current selection box coordinates, in window coordinates
-	 */
-	float selectionX1, selectionY1;
-	float selectionX2, selectionY2;
-
-	/**
-	 * Handle a left click following a default context
-	 */
-	private void handleLeftClick(float worldX, float worldY, float screenX, float screenY) {
-
-		leftMouseKeyDown = true;
-
+	private void startSelectionBox(float screenX, float screenY) {
 		// Set up a new selection box, initially zero-sized at the point of click
-		Vector3 vec = new Vector3();
-		vec = fixedCam.unproject(vec.set(screenX, screenY, 0));
+		selectionBox.x1 = screenX;
+		selectionBox.y1 = screenY;
+		selectionBox.x2 = screenX;
+		selectionBox.y2 = screenY;
 
-		selectionX1 = vec.x;
-		selectionY1 = vec.y;
-
-		selectionX2 = vec.x;
-		selectionY2 = vec.y;
+		selectionBoxDragActive = true;
 	}
 
 	/**
@@ -637,6 +634,8 @@ public class Controls extends InputProcessorAdapter {
 		}
 	}
 
+	private Vector3 temp = new Vector3();
+
 	/**
 	 * Selects all units inside the selection box, following these rules: <br>
 	 * If the group consists of a mixed group, only select the player units.
@@ -646,56 +645,45 @@ public class Controls extends InputProcessorAdapter {
 	 * @param finalX
 	 * @param finalY
 	 */
-	public void selectUnitsInSelectionBox(float mouseX, float mouseY) {
+	public void selectUnitsInSelectionBox() {
 
-		Vector3 vec = new Vector3();
-		// Set selectionX2, Y2
+		Vector2 world1 = screenToWorldCoordinates(selectionBox.x1, selectionBox.y1);
+		Vector2 world2 = screenToWorldCoordinates(selectionBox.x2, selectionBox.y2);
 
-		vec = fixedCam.unproject(vec.set(mouseX, mouseY, 0));
-		selectionX2 = vec.x;
-		selectionY2 = vec.y;
+		// Get bottom left and top right corner of the box
 
-		// Obtain world coordinates of the start and end of the selection box
-
-		Point world1, world2;
-
-		// get world cordinates
-
-		vec = fixedCam.project(vec.set(selectionX1, selectionY1, 0)); // convert first to screen coords, then to world
-		vec.y = Gdx.graphics.getHeight() - vec.y; // must reverse because project produces a bottom-left coordinated
-													// vector
-		vec = camera.unproject(vec);
-		world1 = new Point(vec.x, vec.y);
-
-		vec = fixedCam.project(vec.set(selectionX2, selectionY2, 0));
-		vec.y = Gdx.graphics.getHeight() - vec.y;
-		vec = camera.unproject(vec);
-		world2 = new Point(vec.x, vec.y);
-
-		float x = Math.min(world1.x, world2.x);
-		float y = Math.min(world1.y, world2.y);
+		float x1 = Math.min(world1.x, world2.x);
+		float y1 = Math.min(world1.y, world2.y);
 		float x2 = Math.max(world1.x, world2.x);
 		float y2 = Math.max(world1.y, world2.y);
 
-		// check if unit circles are inside or touching the selection box.
-
+		// Get all units that are touching the rectangular area
 		var newlySelected = new ArrayList<Unit>();
-
 		for (Unit u : units) {
-			if (u.x >= x - u.getRadius() && u.x <= x2 + u.getRadius() && u.y >= y - u.getRadius()
+			if (u.x >= x1 - u.getRadius() && u.x <= x2 + u.getRadius() && u.y >= y1 - u.getRadius()
 					&& u.y <= y2 + u.getRadius() && !u.stats.isDead()) {
 				newlySelected.add(u);
 			}
 		}
 
-		boolean containsPlayerUnits = newlySelected.stream().anyMatch((unit) -> unit.getSide() == Side.PLAYER);
-		if (containsPlayerUnits) {
-			newlySelected.removeIf((unit) -> unit.getSide() != Side.PLAYER);
-		}
+		ifMixedSelectionFilterOutNonPlayerUnits(newlySelected);
 
 		if (!newlySelected.isEmpty()) {
 			selectedUnits.clear();
 			selectedUnits.addAll(newlySelected);
+		}
+	}
+
+	private Vector2 screenToWorldCoordinates(float x, float y) {
+		temp.set(x, Gdx.graphics.getHeight() - y, 0); // convert to touch coordinates first
+		temp = camera.unproject(temp);
+		return new Vector2(temp.x, temp.y);
+	}
+
+	private void ifMixedSelectionFilterOutNonPlayerUnits(List<Unit> units) {
+		boolean containsPlayerUnits = units.stream().anyMatch((unit) -> unit.getSide() == Side.PLAYER);
+		if (containsPlayerUnits) {
+			units.removeIf((unit) -> unit.getSide() != Side.PLAYER);
 		}
 	}
 
@@ -720,11 +708,11 @@ public class Controls extends InputProcessorAdapter {
 	public void renderSelectionBox(Color color) {
 		Matrix4 old = shapeRenderer.getProjectionMatrix().cpy();
 		shapeRenderer.setProjectionMatrix(fixedCam.combined);
-		if (leftMouseKeyDown) {
+		if (selectionBoxDragActive) {
 			shapeRenderer.setColor(color);
 			shapeRenderer.begin(ShapeType.Line);
-			shapeRenderer.rect(Math.min(selectionX1, selectionX2), Math.min(selectionY1, selectionY2),
-					Math.abs(selectionX2 - selectionX1), Math.abs(selectionY2 - selectionY1));
+			shapeRenderer.rect(Math.min(selectionBox.x1, selectionBox.x2), Math.min(selectionBox.y1, selectionBox.y2),
+					Math.abs(selectionBox.x2 - selectionBox.x1), Math.abs(selectionBox.y2 - selectionBox.y1));
 			shapeRenderer.end();
 		}
 		shapeRenderer.setProjectionMatrix(old);
@@ -797,7 +785,7 @@ public class Controls extends InputProcessorAdapter {
 
 		@Override
 		/**
-		 * custom addAll method to reduce duplicate calls of selection being modified
+		 * custom implementation to reduce duplicate calls of selection being modified
 		 */
 		public boolean addAll(Collection<? extends Unit> units) {
 			if (selected.addAll(units)) {
@@ -864,6 +852,13 @@ public class Controls extends InputProcessorAdapter {
 	 */
 	public List<UnitInfo> getSelectedUnitReadOnly() {
 		return new ArrayList<>(selectedUnits);
+	}
+
+	private static class SelectionBox {
+		public float x1;
+		public float y1;
+		public float x2;
+		public float y2;
 	}
 
 }
