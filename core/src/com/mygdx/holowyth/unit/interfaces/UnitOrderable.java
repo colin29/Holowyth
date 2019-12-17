@@ -14,8 +14,6 @@ public interface UnitOrderable extends UnitInfo {
 
 	boolean orderAttackUnit(UnitOrderable unit, boolean isHardOrder);
 
-	boolean orderSwitchAttackUnit(UnitOrderable target, boolean isHardOrder);
-
 	void orderAttackMove(float x, float y);
 
 	void orderRetreat(float x, float y);

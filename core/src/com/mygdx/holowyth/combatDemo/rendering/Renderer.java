@@ -171,6 +171,7 @@ public class Renderer {
 		renderOutlineAroundKnockbackedUnits();
 		renderOutlineAroundReeledUnits();
 		renderOutlineAroundBlindedUnits();
+		renderOutlineAroundTauntedUnits();
 		renderOutlineAroundStunnedUnits();
 
 		// debug.renderUnitIdsOnUnits();
@@ -476,6 +477,12 @@ public class Renderer {
 	private void renderOutlineAroundBlindedUnits() {
 		renderThickOutlineIfTrueForAllUnits(Color.YELLOW, (UnitInfo u) -> {
 			return u.getStats().isBlinded();
+		});
+	}
+
+	private void renderOutlineAroundTauntedUnits() {
+		renderThickOutlineIfTrueForAllUnits(Color.PURPLE, (UnitInfo u) -> {
+			return u.getStats().isTaunted();
 		});
 	}
 

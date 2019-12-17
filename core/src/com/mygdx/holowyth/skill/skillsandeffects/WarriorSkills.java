@@ -43,6 +43,24 @@ public class WarriorSkills {
 		}
 	}
 
+	public static class Taunt extends NoneSkill {
+		public Taunt() {
+			super();
+			name = "Taunt";
+			casting.castTime = 0;
+			spCost = 5;
+			cooldown = 60 * 8;
+		}
+	
+		@Override
+		public boolean pluginTargeting(Unit caster) {
+			if (!caster.isAttacking())
+				return false;
+			setEffects(new WarriorEffects.TauntEffect(caster, caster.getAttacking()));
+			return true;
+		}
+	}
+
 	public static class DeafeningCry extends NoneSkill {
 		public DeafeningCry() {
 			super();

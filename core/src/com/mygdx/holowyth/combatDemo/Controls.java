@@ -568,11 +568,7 @@ public class Controls extends InputProcessorAdapter {
 
 		if (target != null) {
 			for (UnitOrderable u : selectedUnits) {
-				if (u.isAttacking()) {
-					u.orderSwitchAttackUnit(target, false);
-				} else {
-					u.orderAttackUnit(target, true);
-				}
+				u.orderAttackUnit(target, true);
 			}
 		} else { // if no unit is under the cursor, then treat as an attackMove
 			for (UnitOrderable u : selectedUnits) {

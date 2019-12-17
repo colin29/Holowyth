@@ -80,7 +80,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	// Orders
 
 	Order currentOrder = Order.NONE;
-	Unit target; // target for the current command.
+	Unit orderTarget; // target for the current command.
 	float attackMoveDestX;
 	float attackMoveDestY;
 
@@ -216,50 +216,66 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	@Override
 	public boolean orderAttackUnit(UnitOrderable unitOrd, boolean isHardOrder) {
+		return orderAttackUnit(unitOrd, isHardOrder, false);
+	}
+
+	/**
+	 * 
+	 * @param unitOrd
+	 * @param isHardOrder
+	 * @param isATauntedOrder
+	 *            Whether this order is a special internal order that should ignore taunt restriction
+	 * @return
+	 */
+	private boolean orderAttackUnit(UnitOrderable unitOrd, boolean isHardOrder, boolean isATauntedOrder) {
 		Unit unit = (Unit) unitOrd; // underlying objects must hold the same type
 
-		if (!isAttackOrderAllowed(unit)) {
+		if (unit == this) {
+			logger.warn("Unit can't be ordered to attack itself");
+			return false;
+		}
+		if (isATauntedOrder ? isAnyOrderAllowedIgnoringTaunt() : isAttackOrderAllowed(unit)) {
 			if (stats.isStunned()) {
 				orderDeferring.tryToDeferOrder(isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT, (Unit) unitOrd, 0, 0);
 			}
-			return false;
-		}
-		if (unit == this) {
-			System.out.println("Warning: invalid attack command (unit can't attack itself)");
-			return false;
-		}
-		clearOrder();
-		this.currentOrder = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
-		this.target = unit;
+			if (isAttacking())
+				return orderAttackUnitWhileAlreadyAttacking(unitOrd, isHardOrder);
 
-		this.motion.pathFindTowardsTarget();
-		return true;
+			clearOrder();
+			this.currentOrder = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
+			this.orderTarget = unit;
+
+			this.motion.pathFindTowardsTarget();
+
+			return true;
+		}
+		return false;
 	}
 
 	/**
 	 * Precondition: Unit is currently attacking a unit
+	 *
+	 * Is a helper method, does not check order validity, should call orderAttackUnit instead.
 	 * 
-	 * Units are allowed to switch and attack a new target if that unit is in melee range
+	 * Units can switch attacking targets if the new target is within melee range. If the unit is in range, switches targets immediately <br>
+	 * If out of range, does nothing (unit needs to manually retreat first)
 	 */
-	@Override
-	public boolean orderSwitchAttackUnit(UnitOrderable targetUnitOrd, boolean isHardOrder) {
-		Unit target = (Unit) targetUnitOrd;
+	private boolean orderAttackUnitWhileAlreadyAttacking(UnitOrderable unitOrd, boolean isHardOrder) {
+		Unit target = (Unit) unitOrd;
 
-		if (!isSwitchAttackOrderAllowed(target)) {
-			return false;
-		}
 		if (attacking == null) {
-			logger.warn("order SwitchAttack called but unit is not attacking");
+			logger.warn("order orderAttackUnitWhileAlreadyAttacking called but unit is not attacking");
 			return false;
 		}
 		if (target == this) {
-			logger.warn("Warning: invalid switch attack command (unit can't attack itself)");
+			logger.warn("Unit can't be ordered to attack itself)");
 			return false;
 		}
 
 		if (Point.calcDistance(getPos(), target.getPos()) <= radius + target.radius + Holo.defaultUnitSwitchEngageRange) {
+			clearOrder();
 			currentOrder = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
-			this.target = target;
+			orderTarget = target;
 			attacking = target;
 			return true;
 		}
@@ -360,11 +376,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	// @formatter:off
 		private boolean isAttackOrderAllowed(Unit target) {
 			return isGeneralOrderAllowed()
-					&& !isAttacking()
-					&& target.side != this.side;
-		}
-		private boolean isSwitchAttackOrderAllowed(Unit target) {
-			return isGeneralOrderAllowed()
 					&& target.side != this.side;
 		}
 
@@ -409,9 +420,13 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		 * @return
 		 */
 		private boolean isAnyOrderAllowed() {
+			return isAnyOrderAllowedIgnoringTaunt()
+				&& !stats.isTaunted();
+		}
+		private boolean isAnyOrderAllowedIgnoringTaunt() {
 			return !stats.isDead()
-			&& !motion.isBeingKnockedBack()
-			&& !stats.isStunned();
+					&& !motion.isBeingKnockedBack()
+					&& !stats.isStunned();
 		}
 		
 		
@@ -422,7 +437,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	void clearOrder() {
 		currentOrder = Order.NONE;
-		target = null;
+		orderTarget = null;
 
 		attackMoveDestX = 0;
 		attackMoveDestY = 0;
@@ -517,16 +532,24 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	/** Handles the complex logic revolving around switching orders and targets */
 	public void tickOrderLogic() {
 
-		if (this.side == Side.ENEMY && Holo.idleEnemyUnitsAggro) {
+		if (stats.isTaunted()) {
+			if (currentOrder == Order.NONE) {
+
+				if (isAnyOrderAllowedIgnoringTaunt())
+					orderAttackUnit((Unit) stats.getTauntAttackTarget(), true, true);
+			}
+		}
+
+		if (side == Side.ENEMY && Holo.idleEnemyUnitsAggro) {
 			ifIdleAggroOntoNearbyTargets();
 		}
 
-		if (target != null && target.stats.isDead()) {
+		if (orderTarget != null && orderTarget.stats.isDead()) {
 			if (currentOrder.isAttackUnit()) {
 				clearOrder();
 			}
 			if (isAttackMoveAndHasTarget()) {
-				target = null;
+				orderTarget = null;
 				repathToDestinationForAttackMove();
 			}
 		}
@@ -534,10 +557,10 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		if (currentOrder.isAttackUnit()) {
 			handleTargetLossAndSwitchingForAttackUnit();
 		} else if (currentOrder == Order.ATTACKMOVE) {
-			if (target == null) {
+			if (orderTarget == null) {
 				aggroOntoNearbyTargetsForAttackMove();
 			}
-			if (target != null) {
+			if (orderTarget != null) {
 				handleTargetLossAndSwitchingForAttackMove();
 			}
 		}
@@ -570,9 +593,9 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 				float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
 
 				if (Point.calcDistance(getPos(), closestEnemy.getPos()) <= aggroRange) {
-					target = (Unit) closestEnemy; // manually set target/path, since we want to keep the ATTACKMOVE order
+					orderTarget = (Unit) closestEnemy; // manually set target/path, since we want to keep the ATTACKMOVE order
 					if (!motion.pathFindTowardsTarget()) {
-						target = null; // keep walking normally if path to target not found
+						orderTarget = null; // keep walking normally if path to target not found
 					}
 				}
 			}
@@ -581,9 +604,9 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	private void startAttackingIfInRangeForAttackOrders() {
 		if (!isAttacking() && (currentOrder.isAttackUnit() || isAttackMoveAndHasTarget())) {
-			float distToTarget = Point.calcDistance(this.getPos(), target.getPos());
-			if (distToTarget <= this.radius + target.radius + Holo.defaultUnitEngageRange) {
-				startAttacking(target);
+			float distToTarget = Point.calcDistance(this.getPos(), orderTarget.getPos());
+			if (distToTarget <= getEngageRange()) {
+				startAttacking(orderTarget);
 			}
 		}
 	}
@@ -591,14 +614,22 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	private void stopAttackingIfEnemyIsOutOfRange() {
 		if (isAttacking()) {
 			float distToEnemy = Point.calcDistance(this.getPos(), attacking.getPos());
-			if (distToEnemy >= this.radius + attacking.radius + Holo.defaultUnitDisengageRange) {
+			if (distToEnemy >= getDisengageRange()) {
 				stopAttacking();
 			}
 		}
 	}
 
+	private float getEngageRange() {
+		return this.radius + orderTarget.radius + Holo.defaultUnitEngageRange;
+	}
+
+	private float getDisengageRange() {
+		return this.radius + attacking.radius + Holo.defaultUnitDisengageRange;
+	}
+
 	private boolean isAttackMoveAndHasTarget() {
-		return currentOrder == Order.ATTACKMOVE && target != null;
+		return currentOrder == Order.ATTACKMOVE && orderTarget != null;
 	}
 
 	/**
@@ -608,8 +639,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		if (currentOrder == Order.ATTACKUNIT_SOFT) {
 			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, world);
 			otherTargetsWithinAggroRange.removeIf((t) -> Point.calcDistance(getPos(), t.getPos()) >= Holo.defaultAggroRange);
-			otherTargetsWithinAggroRange.remove(target);
-			float distToTarget = Point.calcDistance(this.getPos(), target.getPos());
+			otherTargetsWithinAggroRange.remove(orderTarget);
+			float distToTarget = Point.calcDistance(this.getPos(), orderTarget.getPos());
 
 			float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
 			float chaseRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange : Holo.defaultUnitAttackChaseRange;
@@ -629,8 +660,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		if (currentOrder == Order.ATTACKMOVE) {
 			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, world);
 			otherTargetsWithinAggroRange.removeIf((t) -> Point.calcDistance(getPos(), t.getPos()) >= Holo.defaultAggroRange);
-			otherTargetsWithinAggroRange.remove(target);
-			float distToTarget = Point.calcDistance(this.getPos(), target.getPos());
+			otherTargetsWithinAggroRange.remove(orderTarget);
+			float distToTarget = Point.calcDistance(this.getPos(), orderTarget.getPos());
 
 			float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
 			float chaseRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange : Holo.defaultUnitAttackChaseRange;
@@ -638,11 +669,11 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 			if (distToTarget > aggroRange && !otherTargetsWithinAggroRange.isEmpty()) {
 				// Switch targets
 
-				Unit oldTarget = target;
+				Unit oldTarget = orderTarget;
 
-				target = (Unit) otherTargetsWithinAggroRange.peek();
+				orderTarget = (Unit) otherTargetsWithinAggroRange.peek();
 				if (!motion.pathFindTowardsTarget()) {
-					target = oldTarget;
+					orderTarget = oldTarget;
 					logger.debug("Was attack moving but no path could be found to the nearest unit, ignoring");
 				}
 
@@ -654,7 +685,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	private void repathToDestinationForAttackMove() {
-		target = null;
+		orderTarget = null;
 		if (!motion.pathFindTowardsPoint(attackMoveDestX, attackMoveDestY)) {
 			logger.debug("Was attack moving but no path could be found to destination.");
 			clearOrder();
@@ -702,7 +733,18 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		this.stats.attack(enemy.stats);
 	}
 
+	/**
+	 * Lowest level method for attacking. Fine to call while attacking, though will warn you if you are already attacking the same target.
+	 */
 	private void startAttacking(Unit target) {
+		if (isAttacking(target)) {
+			logger.warn("Unit is already attacking the target");
+			return;
+		}
+		if (isAttacking()) {
+			stopAttacking();
+		}
+
 		motion.stopCurrentMovement();
 		attacking = target;
 		unitsAttacking.get(attacking).add(this);
@@ -724,6 +766,19 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	void addAttackCooldownRemaining(float value) {
 		attackCooldownRemaining += value;
+	}
+
+	/**
+	 * Only use for special cases, like a taunt ability. Uses startAttacking().
+	 */
+	public void setAttacking(Unit unit) {
+		float distToEnemy = Point.calcDistance(this.getPos(), attacking.getPos());
+		if (distToEnemy >= getDisengageRange()) {
+			logger.info("Tried to set attacking, but unit out of range");
+			return;
+		}
+		if (attacking != unit)
+			startAttacking(unit);
 	}
 
 	// Debug
@@ -809,7 +864,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public UnitInfo getTarget() {
-		return target;
+		return orderTarget;
 	}
 
 	@Override

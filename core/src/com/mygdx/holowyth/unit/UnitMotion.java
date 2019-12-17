@@ -114,12 +114,12 @@ public class UnitMotion {
 	public boolean pathFindTowardsTarget() {
 		// find path as normal, except for pathing ignore the target's collision body
 		ArrayList<Unit> someUnits = new ArrayList<Unit>(units);
-		someUnits.remove(self.target);
-		if (self.target == null) {
+		someUnits.remove(self.orderTarget);
+		if (self.orderTarget == null) {
 			@SuppressWarnings("unused")
 			var x = 4;
 		}
-		Path newPath = pathing.findPathForUnit(self, self.target.x, self.target.y, someUnits);
+		Path newPath = pathing.findPathForUnit(self, self.orderTarget.x, self.orderTarget.y, someUnits);
 		if (newPath != null) {
 			this.setPath(newPath);
 			return true;
@@ -158,7 +158,7 @@ public class UnitMotion {
 	 */
 	private void handleRepathing() {
 		if ((self.currentOrder.isAttackUnit() && !self.isAttacking()) ||
-				(self.currentOrder == Order.ATTACKMOVE && self.target != null && !self.isAttacking())) {
+				(self.currentOrder == Order.ATTACKMOVE && self.orderTarget != null && !self.isAttacking())) {
 			framesUntilAttackRepath -= 1;
 			if (framesUntilAttackRepath <= 0) {
 				pathFindTowardsTarget();

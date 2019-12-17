@@ -45,6 +45,23 @@ public class WarriorEffects {
 		}
 	}
 
+	public static class TauntEffect extends CasterUnitEffect {
+
+		protected TauntEffect(Unit caster, Unit target) {
+			super(caster, target);
+		}
+
+		@Override
+		public void tick() {
+			target.setAttacking(caster);
+			target.orderAttackUnit(caster, true);
+			target.stats.applyTaunt(60 * 6, caster); // 60 * 2 sec
+			target.interruptHard();
+			markAsComplete();
+		}
+
+	}
+
 	public static class DeafeningCryEffect extends CasterEffect {
 
 		public DeafeningCryEffect(Unit caster) {

@@ -117,10 +117,10 @@ class UnitOrderDeferring {
 			break;
 		case ATTACKUNIT_HARD:
 		case ATTACKUNIT_SOFT:
-			tryToDeferOrder(self.currentOrder, self.target, 0, 0);
+			tryToDeferOrder(self.currentOrder, self.orderTarget, 0, 0);
 			break;
 		case RETREAT:
-			tryToDeferOrder(self.currentOrder, self.target, self.motion.getDest().x, self.motion.getDest().y);
+			tryToDeferOrder(self.currentOrder, self.orderTarget, self.motion.getDest().x, self.motion.getDest().y);
 			break;
 		case NONE:
 			break;

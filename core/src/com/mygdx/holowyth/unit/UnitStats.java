@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.UnitEquip.Slot;
+import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.unit.statuseffect.BasicAttackSlowEffect;
@@ -52,6 +53,10 @@ public class UnitStats implements UnitStatsInfo {
 
 	private final List<SlowEffect> slowEffects = new LinkedList<SlowEffect>();
 	private float blindDurationRemaining;
+
+	private float tauntDurationRemaining = 0;
+	private Unit tauntAttackTarget = null;
+
 	private final UnitStun stun;
 
 	// end test stats
@@ -92,6 +97,19 @@ public class UnitStats implements UnitStatsInfo {
 		slowEffects.removeIf((effect) -> effect.isExpired());
 
 		blindDurationRemaining = Math.max(0, blindDurationRemaining - 1);
+
+		boolean wasTaunted = isTaunted();
+		tauntDurationRemaining = Math.max(0, tauntDurationRemaining - 1);
+		if (tauntDurationRemaining == 0) {
+			tauntAttackTarget = null;
+			if (wasTaunted)
+				onTauntEnd();
+		}
+
+	}
+
+	private void onTauntEnd() {
+		self.clearOrder();
 	}
 
 	/**
@@ -841,6 +859,30 @@ public class UnitStats implements UnitStatsInfo {
 		} catch (CloneNotSupportedException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public void applyTaunt(int duration, Unit target) {
+		if (target == null) {
+			logger.warn("Can't apply taunt to a null target");
+			return;
+		}
+		tauntDurationRemaining = duration;
+		tauntAttackTarget = target;
+	}
+
+	@Override
+	public float getTauntDurationRemaining() {
+		return tauntDurationRemaining;
+	}
+
+	@Override
+	public boolean isTaunted() {
+		return tauntDurationRemaining > 0;
+	}
+
+	@Override
+	public UnitInfo getTauntAttackTarget() {
+		return tauntAttackTarget;
 	}
 
 }

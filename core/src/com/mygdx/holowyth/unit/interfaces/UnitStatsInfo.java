@@ -83,4 +83,10 @@ public interface UnitStatsInfo {
 	UnitStatValues getBaseStats();
 
 	float getDamage();
+
+	UnitInfo getTauntAttackTarget();
+
+	boolean isTaunted();
+
+	float getTauntDurationRemaining();
 }
