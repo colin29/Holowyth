@@ -7,6 +7,8 @@ allprojects {
     repositories {
         jcenter()
         maven { url "https://oss.sonatype.org/content/repositories/releases/"}
+        // maven { url "https://oss.sonatype.org/content/repositories/snapshots/"}
+
         maven { url 'https://jitpack.io' }
     }
 
@@ -16,8 +18,8 @@ allprojects {
         appName = "Holowyth"
         gdxVersion =  '1.9.10'
         box2DLightsVersion = '1.4'
-
         visuiVersion = '1.4.4'
+        gdxAIVersion = '1.8.2'
     }
 
     task listJars {
@@ -31,6 +33,7 @@ allprojects {
         }
     }        
 }
+
 
 }
 
@@ -52,6 +55,8 @@ project(':core'){
     compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
     compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
     compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+
+    compile "com.badlogicgames.gdx:gdx-ai:$gdxAIVersion"
     }
 }
 
@@ -65,3 +70,13 @@ project(':desktop'){
 }
 
 
+
+buildscript {
+    repositories {
+        maven { url "https://oss.sonatype.org/content/repositories/releases/"}
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/"}
+    }
+    dependencies  {
+        classpath "com.badlogicgames.gdx:gdx-ai:1.8.2"
+    }
+}

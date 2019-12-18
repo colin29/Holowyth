@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.unit.interfaces;
 
 import com.mygdx.holowyth.skill.ActiveSkill;
+import com.mygdx.holowyth.unit.Unit;
 
 public interface UnitOrderable extends UnitInfo {
 
@@ -26,5 +27,23 @@ public interface UnitOrderable extends UnitInfo {
 	void orderUseSkill(ActiveSkill skill);
 
 	boolean isCompletelyIdle();
+
+	boolean isAnyOrderAllowedIgnoringTaunt();
+
+	boolean isAnyOrderAllowed();
+
+	boolean isGeneralOrderAllowed();
+
+	boolean isUseSkillAllowed();
+
+	boolean isStopOrderAllowed();
+
+	boolean isRetreatOrderAllowed();
+
+	boolean isAttackMoveOrderAllowed();
+
+	boolean isMoveOrderAllowed();
+
+	boolean isAttackOrderAllowed(Unit target);
 
 }

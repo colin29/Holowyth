@@ -58,4 +58,6 @@ public interface UnitInfo {
 	float getAttackCooldown();
 
 	WorldInfo getWorld();
+
+	String getName();
 }

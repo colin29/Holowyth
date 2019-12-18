@@ -12,6 +12,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.ai.AIModule;
 import com.mygdx.holowyth.combatDemo.prototyping.CombatPrototyping;
 import com.mygdx.holowyth.combatDemo.rendering.Renderer;
 import com.mygdx.holowyth.combatDemo.ui.CombatDemoUI;
@@ -74,6 +75,8 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	private boolean mouseScrollEnabled = false;
 
+	private AIModule ai;
+
 	public CombatDemo(final Holowyth game) {
 		super(game);
 
@@ -128,6 +131,8 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		renderer.setClearColor(backgroundColor);
 
 		animations = new Animations();
+
+		ai = new AIModule();
 	}
 
 	@Override

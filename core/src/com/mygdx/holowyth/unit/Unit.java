@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.graphics.Color;
+import com.mygdx.holowyth.ai.UnitAI;
 import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.graphics.HoloGL;
@@ -63,6 +64,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public final UnitSkills skills;
 	public final UnitGraphics graphics;
 	public final UnitEquip equip;
+	public final UnitAI ai;
 	public final UnitOrderDeferring orderDeferring;
 
 	// World Fields
@@ -170,6 +172,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		skills = new UnitSkills(this);
 		equip = new UnitEquip(this);
 		orderDeferring = new UnitOrderDeferring(this);
+		ai = new UnitAI(this);
 
 		graphics = new UnitGraphics(this);
 
@@ -374,33 +377,39 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	// @formatter:off
-		private boolean isAttackOrderAllowed(Unit target) {
+		@Override
+		public boolean isAttackOrderAllowed(Unit target) {
 			return isGeneralOrderAllowed()
 					&& target.side != this.side;
 		}
 
-		private boolean isMoveOrderAllowed() {
+		@Override
+		public boolean isMoveOrderAllowed() {
 			return isGeneralOrderAllowed()
 					&& !isAttacking();
 		}
 
-		private boolean isAttackMoveOrderAllowed() {
+		@Override
+		public boolean isAttackMoveOrderAllowed() {
 			return isGeneralOrderAllowed()
 					&& !isAttacking();
 		}
-		private boolean isRetreatOrderAllowed() {
+		@Override
+		public boolean isRetreatOrderAllowed() {
 			return isAnyOrderAllowed()
 					&& isAttacking()
 					&& this.currentOrder != Order.RETREAT
 					&& retreatCooldownRemaining <= 0
 					&& !(isCasting() || isChannelling());
 		}
-		private boolean isStopOrderAllowed() {
+		@Override
+		public boolean isStopOrderAllowed() {
 			return isGeneralOrderAllowed();
 		}
 
 		
-		private boolean isUseSkillAllowed() {
+		@Override
+		public boolean isUseSkillAllowed() {
 			return isGeneralOrderAllowed()
 					&& !stats.isBlinded();
 		}
@@ -410,7 +419,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		 * Returns the conditions which are shared by most ordinary orders
 		 * @return
 		 */
-		private boolean isGeneralOrderAllowed() {
+		@Override
+		public boolean isGeneralOrderAllowed() {
 			return isAnyOrderAllowed()
 					&& !isBusyRetreating()
 					&& !(isCasting() || isChannelling());
@@ -419,11 +429,13 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		 * Returns the conditions which are shared by all orders
 		 * @return
 		 */
-		private boolean isAnyOrderAllowed() {
+		@Override
+		public boolean isAnyOrderAllowed() {
 			return isAnyOrderAllowedIgnoringTaunt()
 				&& !stats.isTaunted();
 		}
-		private boolean isAnyOrderAllowedIgnoringTaunt() {
+		@Override
+		public boolean isAnyOrderAllowedIgnoringTaunt() {
 			return !stats.isDead()
 					&& !motion.isBeingKnockedBack()
 					&& !stats.isStunned();
@@ -478,6 +490,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public void tickLogic() {
 		if (isDead())
 			return;
+
+		ai.tick();
 
 		motion.tick();
 		stats.tick();
@@ -538,10 +552,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 				if (isAnyOrderAllowedIgnoringTaunt())
 					orderAttackUnit((Unit) stats.getTauntAttackTarget(), true, true);
 			}
-		}
-
-		if (side == Side.ENEMY && Holo.idleEnemyUnitsAggro) {
-			ifIdleAggroOntoNearbyTargets();
 		}
 
 		if (orderTarget != null && orderTarget.stats.isDead()) {
@@ -984,6 +994,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		this.stats.setName(name);
 	}
 
+	@Override
 	public String getName() {
 		return stats.getName();
 	}
