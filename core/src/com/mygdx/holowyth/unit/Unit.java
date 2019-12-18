@@ -999,4 +999,9 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		return stats.getName();
 	}
 
+	@Override
+	public UnitAI getAI() {
+		return ai;
+	}
+
 }

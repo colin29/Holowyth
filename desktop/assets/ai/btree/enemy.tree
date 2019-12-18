@@ -1,0 +1,15 @@
+
+import waitForever:"com.mygdx.holowyth.ai.btree.util.WaitForever"
+import flee:"com.mygdx.holowyth.ai.btree.enemy.Flee"
+import stop:"com.mygdx.holowyth.ai.btree.util.Stop"
+import waitF:"com.mygdx.holowyth.ai.btree.util.Wait"
+
+
+# Tree definition
+
+root 
+	sequence
+		flee
+		waitF frames:30
+		stop
+		waitForever

@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.ai.btree.BehaviorTree;
+import com.badlogic.gdx.ai.btree.Task.Status;
 import com.badlogic.gdx.ai.btree.utils.BehaviorTreeLibraryManager;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
@@ -13,6 +14,7 @@ public class UnitAI {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	BehaviorTree<UnitOrderable> btree;
+	public String lastRanOrder = "";
 
 	private final UnitOrderable self;
 
@@ -20,8 +22,8 @@ public class UnitAI {
 		self = unit;
 
 		if (unit.getSide() == Side.ENEMY) {
+			setBTree("enemy");
 			logger.debug(self.getName() + " New btree:" + btree);
-			setToTestBTree();
 		}
 
 	}
@@ -30,14 +32,24 @@ public class UnitAI {
 		btree = BehaviorTreeLibraryManager.getInstance().getLibrary().createBehaviorTree(bTreeRef, self);
 	}
 
-	public void setToTestBTree() {
-		setBTree("test btree");
-	}
+	boolean done = false;
 
 	public void tick() {
-		if (btree != null) {
+		if (btree != null && !done) {
 			btree.step();
+			if (btree.getStatus() == Status.SUCCEEDED)
+				done = true;
 		}
+
+	}
+
+	/**
+	 * Only use for debug
+	 * 
+	 * @return
+	 */
+	public BehaviorTree<UnitOrderable> getBTree() {
+		return btree;
 	}
 
 }

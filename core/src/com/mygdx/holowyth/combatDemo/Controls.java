@@ -41,7 +41,6 @@ import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
-import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -168,19 +167,12 @@ public class Controls extends InputProcessorAdapter {
 				return "N/A";
 			}
 		});
-
-		debugValues.add("Num equip slots filled of one unit", () -> {
+		debugValues.add("Btree last task", () -> {
 			if (selectedUnits.size() == 1) {
 				Unit u = selectedUnits.first();
-				int count = 0;
-				for (Equip e : u.equip.getEquipSlots().values()) {
-					if (e != null) {
-						count += 1;
-					}
-				}
-				return count;
+				return u.ai.lastRanOrder;
 			} else {
-				return 0;
+				return "N/A";
 			}
 		});
 
@@ -469,8 +461,9 @@ public class Controls extends InputProcessorAdapter {
 
 		if (target != null) {
 			for (UnitOrderable u : selectedUnits) {
-				boolean valid = u.orderAttackUnit(target);
-				if (!valid) {
+				if (u.getSide() != target.getSide()) {
+					u.orderAttackUnit(target);
+				} else {
 					u.orderMove(x, y);
 				}
 			}

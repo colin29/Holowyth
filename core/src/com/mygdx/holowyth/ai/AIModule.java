@@ -1,10 +1,17 @@
 package com.mygdx.holowyth.ai;
 
+import java.io.Reader;
+
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.ai.GdxAI;
 import com.badlogic.gdx.ai.btree.BehaviorTree;
 import com.badlogic.gdx.ai.btree.Task;
 import com.badlogic.gdx.ai.btree.utils.BehaviorTreeLibrary;
 import com.badlogic.gdx.ai.btree.utils.BehaviorTreeLibraryManager;
-import com.mygdx.holowyth.ai.tasks.Flee;
+import com.badlogic.gdx.ai.btree.utils.BehaviorTreeParser;
+import com.badlogic.gdx.utils.StreamUtils;
+import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.ai.btree.enemy.Flee;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 
 /**
@@ -19,13 +26,29 @@ public class AIModule {
 	BehaviorTreeLibrary library = treeLibraryManager.getLibrary();
 
 	public AIModule() {
-		createTestBTree();
+		parseTestBTreeFromFile();
 	}
 
 	public void createTestBTree() {
 		Task<UnitOrderable> selector = new Flee();
 		BehaviorTree<UnitOrderable> tree = new BehaviorTree<UnitOrderable>(selector);
-		library.registerArchetypeTree("test btree", tree);
+		library.registerArchetypeTree("enemy", tree);
 	}
 
+	public void parseTestBTreeFromFile() {
+		Reader reader = null;
+		try {
+			reader = Gdx.files.internal(Holowyth.ASSETS_PATH + "ai/btree/enemy.tree").reader();
+			BehaviorTreeParser<UnitOrderable> parser = new BehaviorTreeParser<UnitOrderable>(BehaviorTreeParser.DEBUG_HIGH);
+			BehaviorTree<UnitOrderable> tree = parser.parse(reader, null);
+			library.registerArchetypeTree("enemy", tree);
+
+		} finally {
+			StreamUtils.closeQuietly(reader);
+		}
+	}
+
+	public void update(float delta) {
+		GdxAI.getTimepiece().update(delta);
+	}
 }

@@ -146,7 +146,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		combatDemoUI.onRender();
 
 		ifTimeElapsedTickWorld();
-
+		ai.update(delta);
 	}
 
 	/**
