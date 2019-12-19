@@ -230,6 +230,20 @@ public class HoloUI {
 		label.setStyle(style);
 	}
 
+	private static Color temp = new Color();
+
+	/**
+	 * Also override the alpha (does not change color passed in)
+	 */
+	public static Drawable getSolidBG(Color color, float alpha) {
+		Pixmap labelColor = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+		temp.set(color);
+		temp.a = alpha;
+		labelColor.setColor(temp);
+		labelColor.fill();
+		return new Image(new Texture(labelColor)).getDrawable();
+	}
+
 	/**
 	 * The returned drawable can be used to set a background for a widget, such as a table
 	 */

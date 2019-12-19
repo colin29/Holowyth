@@ -24,8 +24,6 @@ import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.unit.sprite.UnitGraphics;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
-import com.mygdx.holowyth.util.tools.debugstore.DebugValue;
-import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
 /**
  * Responsibilities:<br>
@@ -120,7 +118,15 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	public enum Side { // For now, can assume that not being on the same side means that two units are enemies. Neutrals and alliances, are a
 						// non-trivial task
-		PLAYER, ENEMY
+		PLAYER, ENEMY;
+
+		public boolean isEnemy() {
+			return this != PLAYER;
+		}
+
+		public boolean isPlayer() {
+			return this == PLAYER;
+		}
 	}
 
 	/**
@@ -174,14 +180,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		ai = new UnitAI(this);
 
 		graphics = new UnitGraphics(this);
-
-		if (this.side == Side.PLAYER) {
-			DebugValues debugValues = this.getWorldMutable().getDebugStore().registerComponent("Player unit");
-			debugValues.add(new DebugValue("sp", () -> stats.getSp() + "/" + stats.getMaxSp()));
-			debugValues.add(new DebugValue("skillCooldown", () -> skillCooldownRemaining));
-
-			debugValues.add("speed", () -> motion.getCurPlannedSpeed());
-		}
 	}
 
 	// Orders

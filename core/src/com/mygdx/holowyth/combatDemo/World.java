@@ -488,6 +488,10 @@ public class World implements WorldInfo {
 		return units.removeUnit(u);
 	}
 
+	public void clearAllUnits() {
+		units.clear();
+	}
+
 	/**
 	 * The list itself is read-only, though elements can be modified
 	 */

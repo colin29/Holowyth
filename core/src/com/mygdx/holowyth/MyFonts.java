@@ -18,6 +18,7 @@ public class MyFonts {
 	BitmapFont font_goth12;
 	BitmapFont font_goth24;
 	BitmapFont damageEffectFontRedForeground;
+	BitmapFont borderedLargeFont;
 
 	MyFonts() {
 	}
@@ -30,6 +31,7 @@ public class MyFonts {
 		debugFont = generateFont("fonts/OpenSans.ttf", Color.WHITE, 16);
 		borderedSmallFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 10, Color.BLACK, 0.8f);
 		borderedMediumFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 16, Color.BLACK, 1.5f);
+		borderedLargeFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 25, Color.BLACK, 1.5f);
 
 		damageEffectFont = generateFontWithBorder("fonts/OpenSans.ttf", Color.WHITE, 16, Color.BLACK, 1.5f);
 		damageEffectFontRedForeground = generateFontWithBorder("fonts/OpenSans.ttf", DARK_RED, 17, PALE_RED, 1.5f);
@@ -77,6 +79,10 @@ public class MyFonts {
 
 	public BitmapFont borderedSmallFont() {
 		return borderedMediumFont;
+	}
+
+	public BitmapFont borderedLargeFont() {
+		return borderedLargeFont;
 	}
 
 	public BitmapFont damageEffectRegular() {

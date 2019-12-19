@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.holowyth.Holowyth;
@@ -23,6 +24,8 @@ public abstract class HoloBaseScreen implements Screen {
 	protected Stage stage;
 	protected Table root;
 
+	protected Skin skin;
+
 	public final SpriteBatch batch;
 	public final ShapeRenderer shapeRenderer;
 	public final ShapeDrawerPlus shapeDrawer;
@@ -35,6 +38,7 @@ public abstract class HoloBaseScreen implements Screen {
 		shapeRenderer = game.shapeRenderer;
 		shapeDrawer = game.shapeDrawer;
 		assets = game.assets;
+		skin = game.skin;
 
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());

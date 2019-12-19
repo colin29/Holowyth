@@ -625,6 +625,10 @@ public class Controls extends InputProcessorAdapter {
 		}
 	}
 
+	public void clearSelectedUnits() {
+		selectedUnits.clear();
+	}
+
 	private Vector3 temp = new Vector3();
 
 	/**

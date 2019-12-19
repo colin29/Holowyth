@@ -21,7 +21,7 @@ public class MonsterStats {
 
 	public static final UnitStatValues goblin = new UnitStatValues() {
 		{
-			maxHp = 100;
+			maxHp = 5;
 			maxSp = 50;
 
 			damage = 6;

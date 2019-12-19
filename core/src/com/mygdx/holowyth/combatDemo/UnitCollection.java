@@ -52,6 +52,13 @@ public class UnitCollection {
 		return wasPresent;
 	}
 
+	public void clear() {
+		units.clear();
+		colBodies.clear();
+		unitToColBody.clear();
+		assertDataStructsAreEqualLength();
+	}
+
 	private void assertDataStructsAreEqualLength() {
 		HoloAssert.assertEquals(units.size(), colBodies.size());
 		HoloAssert.assertEquals(units.size(), unitToColBody.size());

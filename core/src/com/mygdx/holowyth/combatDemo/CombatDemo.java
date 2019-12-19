@@ -1,5 +1,10 @@
 package com.mygdx.holowyth.combatDemo;
 
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.run;
+import static com.badlogic.gdx.scenes.scene2d.actions.Actions.sequence;
+
+import org.apache.commons.collections4.IterableUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,8 +14,10 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Align;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.ai.AIModule;
 import com.mygdx.holowyth.combatDemo.prototyping.CombatPrototyping;
@@ -23,6 +30,7 @@ import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.template.DemoScreen;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
 import com.mygdx.holowyth.util.tools.Timer;
@@ -40,42 +48,42 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	// Rendering and pipeline variables
-	Renderer renderer;
+	// Game Modules
+	private PathingModule pathingModule;
+	private AIModule ai;
 
-	// UI
-	CombatDemoUI combatDemoUI;
+	private Controls controls;
+	private World world;
+	private CombatPrototyping testing;
 
-	// Scene2D
-	Skin skin;
+	// Graphical Modules
+	private Renderer renderer;
+	private Animations animations;
+	private CombatDemoUI combatDemoUI;
+	private EffectsHandler gfx; // keeps track of vfx effects
 
-	// Game Components
-	Controls unitControls;
-	PathingModule pathingModule;
-
-	// Game state
-	World world;
-
-	// Graphical Components
-	EffectsHandler gfx; // keeps track of vfx effects
-
-	// Input
-	private InputMultiplexer multiplexer = new InputMultiplexer();
-
-	// Frame rate control
-	Timer timer = new Timer();
-
-	Color backgroundColor = HoloGL.rgb(79, 121, 66); // HoloGL.rbg(255, 236, 179);
-
-	// For debugging and playtesting
-	DebugStore debugStore = new DebugStore();
+	// Debugging and Convenience
+	private DebugStore debugStore = new DebugStore();
 	private FunctionBindings functionBindings = new FunctionBindings();
 
-	private Animations animations;
+	private InputMultiplexer multiplexer = new InputMultiplexer();
+	/**
+	 * For running game at constant FPS
+	 */
+	private Timer timer = new Timer();
 
+	// ----- Variables ----- //
+	private Color backgroundColor = HoloGL.rgb(79, 121, 66); // HoloGL.rbg(255, 236, 179);
 	private boolean mouseScrollEnabled = false;
 
-	private AIModule ai;
+	private enum GameState {
+		PLAYING, VICTORY, DEFEAT;
+		public boolean isComplete() {
+			return this != PLAYING;
+		}
+	}
+
+	private GameState gameState = GameState.PLAYING;
 
 	public CombatDemo(final Holowyth game) {
 		super(game);
@@ -97,12 +105,12 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		Table debugInfo = combatDemoUI.getDebugInfo();
 		functionBindings.bindFunctionToKey(() -> debugInfo.setVisible(!debugInfo.isVisible()), Keys.GRAVE); // tilde key
 		functionBindings.bindFunctionToKey(() -> {
-			for (Unit unit : unitControls.getSelectedUnits()) {
+			for (Unit unit : controls.getSelectedUnits()) {
 				unit.stats.printInfo();
 			}
 		}, Keys.W); // print info on all selected units
 		functionBindings.bindFunctionToKey(() -> {
-			for (Unit unit : unitControls.getSelectedUnits()) {
+			for (Unit unit : controls.getSelectedUnits()) {
 				unit.stats.printInfo(true);
 			}
 		}, Keys.E); // print info+equipment
@@ -117,11 +125,18 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		functionBindings.bindFunctionToKey(() -> {
 			mouseScrollEnabled = !mouseScrollEnabled;
 			getGameLog().addMessage(mouseScrollEnabled ? "Mouse scroll enabled" : "Mouse scroll disabled");
-		}, Keys.T);
+		}, Keys.H);
 
 		functionBindings.bindFunctionToKey(() -> {
 			combatDemoUI.getStatsPanelUI().toggleDetailedView();
 		}, Keys.V);
+
+		functionBindings.bindFunctionToKey(() -> {
+			combatDemoUI.getStatsPanelUI().toggleDetailedView();
+		}, Keys.Y);
+
+		createVictoryPanel();
+		createDefeatPanel();
 	}
 
 	private void initializeAppLifetimeComponents() {
@@ -145,7 +160,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 		combatDemoUI.onRender();
 
-		ifTimeElapsedTickWorld();
+		ifTimeElapsedTickGame();
 		ai.update(delta);
 	}
 
@@ -202,12 +217,114 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	private boolean gamePaused = false;
 
-	private void ifTimeElapsedTickWorld() {
+	private void ifTimeElapsedTickGame() {
 		timer.start(1000 / Holo.GAME_FPS);
 		if (timer.taskReady() && !gamePaused) {
-			world.tick();
-			gfx.tick();
+			tickGame();
 		}
+	}
+
+	private void tickGame() {
+		world.tick();
+		gfx.tick();
+		handleGameOver();
+	}
+
+	private void handleGameOver() {
+		var units = world.getUnits();
+
+		if (gameState == GameState.PLAYING) {
+			if (!IterableUtils.matchesAny(units, u -> u.getSide().isPlayer())) {
+				onDefeat();
+			} else if (!IterableUtils.matchesAny(units, u -> u.getSide().isEnemy())) {
+				onVictory();
+			}
+		}
+
+	}
+
+	private void onVictory() {
+		gameState = GameState.VICTORY;
+		showVictoryPanel();
+	}
+
+	private void onDefeat() {
+		gameState = GameState.DEFEAT;
+		showDefeatPanel();
+	}
+
+	private final Table victoryPanel = new Table();
+	private final Table defeatPanel = new Table();
+
+	private void createVictoryPanel() {
+		var largeStyle = new LabelStyle(Holowyth.fonts.borderedLargeFont(), Color.WHITE);
+		var medStyle = new LabelStyle(Holowyth.fonts.borderedMediumFont(), Color.WHITE);
+
+		Table frame = new Table();
+		Label mainText = new Label("Victory!", largeStyle);
+		victoryPanel.add(mainText).size(275, 200);
+		victoryPanel.row();
+		victoryPanel.add(new Label("Press T to restart", medStyle));
+
+		victoryPanel.setBackground(HoloUI.getSolidBG(Color.DARK_GRAY, 0.9f));
+		// victoryPanel.setVisible(false);
+		mainText.setAlignment(Align.center);
+		victoryPanel.center();
+		frame.add(victoryPanel);
+		stage.addActor(frame);
+		frame.setFillParent(true);
+
+		victoryPanel.setVisible(false);
+	}
+
+	private void createDefeatPanel() {
+		var largeStyle = new LabelStyle(Holowyth.fonts.borderedLargeFont(), Color.WHITE);
+		var medStyle = new LabelStyle(Holowyth.fonts.borderedMediumFont(), Color.WHITE);
+
+		Table frame = new Table();
+		Label mainText = new Label("Defeat", largeStyle);
+		defeatPanel.add(mainText).size(275, 200);
+		defeatPanel.row();
+		defeatPanel.add(new Label("Press T to retry", medStyle));
+
+		defeatPanel.setBackground(HoloUI.getSolidBG(Color.DARK_GRAY, 0.9f));
+		// victoryPanel.setVisible(false);
+		mainText.setAlignment(Align.center);
+		defeatPanel.center();
+		frame.add(defeatPanel);
+		stage.addActor(frame);
+		frame.setFillParent(true);
+
+		defeatPanel.setVisible(false);
+	}
+
+	/**
+	 * Show victory panel after a short delay
+	 */
+	private void showVictoryPanel() {
+		victoryPanel.addAction(sequence(delay(2), run(() -> victoryPanel.setVisible(true))));
+	}
+
+	/**
+	 * Show victory panel after a short delay
+	 */
+	private void showDefeatPanel() {
+		defeatPanel.addAction(sequence(delay(2), run(() -> defeatPanel.setVisible(true))));
+	}
+
+	private void restartLevel() {
+
+		logger.debug("Restarted level!");
+
+		gameState = GameState.PLAYING;
+
+		victoryPanel.setVisible(false);
+		defeatPanel.setVisible(false);
+
+		world.clearAllUnits();
+		controls.clearSelectedUnits();
+
+		testing.setupPlannedScenario();
 	}
 
 	@Override
@@ -221,8 +338,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	@Override
 	public void dispose() {
 	}
-
-	private CombatPrototyping testing;
 
 	/**
 	 * Initializes neccesary game components. <br>
@@ -251,23 +366,23 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		world = new World(mapWidth, mapHeight, pathingModule, debugStore, gfx, animations);
 
 		// Init Unit controls
-		if (unitControls != null) {
-			multiplexer.removeProcessor(unitControls);
+		if (controls != null) {
+			multiplexer.removeProcessor(controls);
 		}
-		unitControls = new Controls(game, camera, fixedCam, world.getUnits(), debugStore, world, combatDemoUI.getGameLog());
-		multiplexer.addProcessor(unitControls);
+		controls = new Controls(game, camera, fixedCam, world.getUnits(), debugStore, world, combatDemoUI.getGameLog());
+		multiplexer.addProcessor(controls);
 
 		// Set Renderer to render world and other map-lifetime components
 		renderer.setWorld(world);
 		renderer.setTiledMap(map, mapWidth, mapHeight);
-		renderer.setUnitControls(unitControls);
+		renderer.setUnitControls(controls);
 		renderer.setEffectsHandler(gfx);
 
 		// UI
 		combatDemoUI.onMapStartup();
 
 		// Testing
-		testing = new CombatPrototyping(world, unitControls);
+		testing = new CombatPrototyping(world, controls);
 
 	}
 
@@ -282,6 +397,13 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	@Override
 	public boolean keyDown(int keycode) {
 		functionBindings.runBoundFunction(keycode);
+
+		if (keycode == Keys.T) {
+			if (gameState.isComplete()) {
+				restartLevel();
+			}
+		}
+
 		return false;
 	}
 
@@ -308,7 +430,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	}
 
 	public Controls getControls() {
-		return unitControls;
+		return controls;
 	}
 
 	private void pauseGame() {
