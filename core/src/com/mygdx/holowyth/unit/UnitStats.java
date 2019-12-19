@@ -590,7 +590,7 @@ public class UnitStats implements UnitStatsInfo {
 	 * Same as applySlow but uses a marker sub-class so that certain maneuvers can nullify this slow.
 	 */
 	public void applyBasicAttackSlow(float slowAmount, int duration) {
-		if (self.currentOrder != Order.RETREAT) { // units are unaffected by basic attack slow while retreating
+		if (self.order != Order.RETREAT) { // units are unaffected by basic attack slow while retreating
 			slowEffects.add(new BasicAttackSlowEffect(duration, slowAmount));
 		}
 	}
@@ -883,6 +883,20 @@ public class UnitStats implements UnitStatsInfo {
 	@Override
 	public UnitInfo getTauntAttackTarget() {
 		return tauntAttackTarget;
+	}
+
+	float getMultiTeamingAtkspdPenalty(Unit target) {
+		int n = Unit.unitsAttacking.get(target).size();
+	
+		if (n <= 1) {
+			return 1;
+		} else if (n == 2) {
+			return 0.9f;
+		} else if (n == 3) {
+			return 0.85f;
+		} else { // 4 or more
+			return 0.82f;
+		}
 	}
 
 }

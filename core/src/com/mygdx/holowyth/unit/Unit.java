@@ -18,7 +18,6 @@ import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitPF;
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.ActiveSkill.Status;
-import com.mygdx.holowyth.unit.behaviours.UnitUtil;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
@@ -81,7 +80,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	// Orders
 
-	Order currentOrder = Order.NONE;
+	Order order = Order.NONE;
 	Unit orderTarget; // target for the current command.
 	float attackMoveDestX;
 	float attackMoveDestY;
@@ -92,7 +91,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	/**
 	 * Maps from a unit to a list of units attacking that one unit. Other classes should use {@link #getAttackers()}
 	 */
-	private static Map<Unit, Set<Unit>> unitsAttacking = new HashMap<Unit, Set<Unit>>();
+	static final Map<Unit, Set<Unit>> unitsAttacking = new HashMap<Unit, Set<Unit>>();
 
 	/**
 	 * A unit's friendly/foe status.
@@ -197,7 +196,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		}
 		if (motion.pathFindTowardsPoint(x, y)) {
 			clearOrder();
-			currentOrder = Order.MOVE;
+			order = Order.MOVE;
 		}
 	}
 
@@ -245,7 +244,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 				return orderAttackUnitWhileAlreadyAttacking(unitOrd, isHardOrder);
 
 			clearOrder();
-			this.currentOrder = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
+			this.order = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
 			this.orderTarget = unit;
 
 			this.motion.pathFindTowardsTarget();
@@ -277,7 +276,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 		if (Point.calcDistance(getPos(), target.getPos()) <= radius + target.radius + Holo.defaultUnitSwitchEngageRange) {
 			clearOrder();
-			currentOrder = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
+			order = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
 			orderTarget = target;
 			attacking = target;
 			return true;
@@ -293,7 +292,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 				clearOrder();
 				attackMoveDestX = x;
 				attackMoveDestY = y;
-				this.currentOrder = Order.ATTACKMOVE;
+				this.order = Order.ATTACKMOVE;
 			}
 		} else if (stats.isStunned()) {
 			orderDeferring.tryToDeferOrder(Order.ATTACKMOVE, null, x, y);
@@ -315,7 +314,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		if (motion.pathFindTowardsPoint(x, y)) {
 			stopAttacking();
 			clearOrder();
-			this.currentOrder = Order.RETREAT;
+			this.order = Order.RETREAT;
 			stats.removeAllBasicAttackSlows();
 
 			var attackers = getAttackers();
@@ -380,7 +379,11 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		@Override
 		public boolean isAttackOrderAllowed(Unit target) {
 			return isGeneralOrderAllowed()
-					&& target.side != this.side;
+					&& isEnemy(target);
+		}
+		@Override
+		public boolean isAttackOrderAllowed() {
+			return isGeneralOrderAllowed();
 		}
 
 		@Override
@@ -398,7 +401,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		public boolean isRetreatOrderAllowed() {
 			return isAnyOrderAllowed()
 					&& isAttacking()
-					&& this.currentOrder != Order.RETREAT
+					&& this.order != Order.RETREAT
 					&& retreatCooldownRemaining <= 0
 					&& !(isCasting() || isChannelling());
 		}
@@ -448,7 +451,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 * Clears any current order on this unit. For internal use.
 	 */
 	void clearOrder() {
-		currentOrder = Order.NONE;
+		order = Order.NONE;
 		orderTarget = null;
 
 		attackMoveDestX = 0;
@@ -498,7 +501,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 		tickOrderLogic();
 
-		if (currentOrder == Order.RETREAT)
+		if (order == Order.RETREAT)
 			retreatDurationRemaining -= 1;
 
 		if (activeSkill != null)
@@ -547,7 +550,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public void tickOrderLogic() {
 
 		if (stats.isTaunted()) {
-			if (currentOrder == Order.NONE) {
+			if (order == Order.NONE) {
 
 				if (isAnyOrderAllowedIgnoringTaunt())
 					orderAttackUnit((Unit) stats.getTauntAttackTarget(), true, true);
@@ -555,7 +558,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		}
 
 		if (orderTarget != null && orderTarget.stats.isDead()) {
-			if (currentOrder.isAttackUnit()) {
+			if (order.isAttackUnit()) {
 				clearOrder();
 			}
 			if (isAttackMoveAndHasTarget()) {
@@ -564,9 +567,9 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 			}
 		}
 
-		if (currentOrder.isAttackUnit()) {
-			handleTargetLossAndSwitchingForAttackUnit();
-		} else if (currentOrder == Order.ATTACKMOVE) {
+		if (order.isAttackUnit()) {
+			handleTargetLossAndSwitchingForAttackUnitSoft();
+		} else if (order == Order.ATTACKMOVE) {
 			if (orderTarget == null) {
 				aggroOntoNearbyTargetsForAttackMove();
 			}
@@ -595,7 +598,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	private void aggroOntoNearbyTargetsForAttackMove() {
-		if (currentOrder == Order.ATTACKMOVE) {
+		if (order == Order.ATTACKMOVE) {
 			var closestTargets = UnitUtil.getTargetsSortedByDistance(this, world);
 			if (!closestTargets.isEmpty()) {
 				UnitOrderable closestEnemy = closestTargets.remove();
@@ -613,7 +616,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	private void startAttackingIfInRangeForAttackOrders() {
-		if (!isAttacking() && (currentOrder.isAttackUnit() || isAttackMoveAndHasTarget())) {
+		if (!isAttacking() && (order.isAttackUnit() || isAttackMoveAndHasTarget())) {
 			float distToTarget = Point.calcDistance(this.getPos(), orderTarget.getPos());
 			if (distToTarget <= getEngageRange()) {
 				startAttacking(orderTarget);
@@ -639,14 +642,14 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	private boolean isAttackMoveAndHasTarget() {
-		return currentOrder == Order.ATTACKMOVE && orderTarget != null;
+		return order == Order.ATTACKMOVE && orderTarget != null;
 	}
 
 	/**
 	 * Preconditions: Target must be defined
 	 */
-	private void handleTargetLossAndSwitchingForAttackUnit() {
-		if (currentOrder == Order.ATTACKUNIT_SOFT) {
+	private void handleTargetLossAndSwitchingForAttackUnitSoft() {
+		if (order == Order.ATTACKUNIT_SOFT) {
 			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, world);
 			otherTargetsWithinAggroRange.removeIf((t) -> Point.calcDistance(getPos(), t.getPos()) >= Holo.defaultAggroRange);
 			otherTargetsWithinAggroRange.remove(orderTarget);
@@ -667,7 +670,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 * Preconditions: Target must be defined
 	 */
 	private void handleTargetLossAndSwitchingForAttackMove() {
-		if (currentOrder == Order.ATTACKMOVE) {
+		if (order == Order.ATTACKMOVE) {
 			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, world);
 			otherTargetsWithinAggroRange.removeIf((t) -> Point.calcDistance(getPos(), t.getPos()) >= Holo.defaultAggroRange);
 			otherTargetsWithinAggroRange.remove(orderTarget);
@@ -702,20 +705,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		}
 	}
 
-	private float getMultiTeamingAtkspdPenalty(Unit target) {
-		int n = unitsAttacking.get(target).size();
-
-		if (n <= 1) {
-			return 1;
-		} else if (n == 2) {
-			return 0.9f;
-		} else if (n == 3) {
-			return 0.85f;
-		} else { // 4 or more
-			return 0.82f;
-		}
-	}
-
 	/**
 	 * Updates attacking units
 	 */
@@ -734,7 +723,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 			}
 			if (attackCooldownRemaining <= 0) {
 				this.attack(attacking);
-				attackCooldownRemaining = attackCooldown / getMultiTeamingAtkspdPenalty(attacking);
+				attackCooldownRemaining = attackCooldown / stats.getMultiTeamingAtkspdPenalty(attacking);
 			}
 		}
 	}
@@ -868,12 +857,12 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	@Override
-	public Order getCurrentOrder() {
-		return currentOrder;
+	public Order getOrder() {
+		return order;
 	}
 
 	@Override
-	public UnitInfo getTarget() {
+	public UnitInfo getOrderTarget() {
 		return orderTarget;
 	}
 
@@ -902,7 +891,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public boolean isBusyRetreating() {
-		return currentOrder == Order.RETREAT && retreatDurationRemaining > 0;
+		return order == Order.RETREAT && retreatDurationRemaining > 0;
 	}
 
 	@Override
@@ -962,7 +951,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	@Override
 	public boolean isCompletelyIdle() {
-		return currentOrder == Order.NONE && !isAttacking() && !isCastingOrChanneling();
+		return order == Order.NONE && !isAttacking() && !isCastingOrChanneling();
 	}
 
 	@Override
@@ -1002,6 +991,11 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	@Override
 	public UnitAI getAI() {
 		return ai;
+	}
+
+	@Override
+	public boolean isEnemy(UnitInfo unit) {
+		return getSide() != unit.getSide();
 	}
 
 }

@@ -9,14 +9,18 @@ import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
-public class Flee extends HoloLeafTask {
+/**
+ * Cannot fail, flees until succeeds
+ * 
+ * @author Colin Ta
+ *
+ */
+public class FleeUntilReachLocation extends HoloLeafTask {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public static Point fleePoint = new Point(500, 500); // flee point;
 	public static float fleePointRadius = 40f;
-
-	UnitOrderable self;
 
 	int framesElapsed = 0;
 
@@ -25,17 +29,13 @@ public class Flee extends HoloLeafTask {
 		markLastTaskRan();
 		self = getObject();
 
-		if (self.getCurrentOrder() != Order.MOVE && self.isMoveOrderAllowed()) {
+		if (self.isAttacking() && self.isRetreatOrderAllowed()) {
+			self.orderRetreat(fleePoint.x, fleePoint.y);
+		} else if (self.getOrder() != Order.MOVE && self.isMoveOrderAllowed()) {
 			self.orderMove(fleePoint.x, fleePoint.y);
-			logger.debug("Fleeing");
 		}
 
-		if (Point.calcDistance(self.getPos(), fleePoint) < fleePointRadius) {
-			return Status.SUCCEEDED;
-		} else {
-			return Status.RUNNING;
-		}
-
+		return (Point.calcDistance(self.getPos(), fleePoint) < fleePointRadius) ? Status.SUCCEEDED : Status.RUNNING;
 	}
 
 	@Override

@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.unit.behaviours;
+package com.mygdx.holowyth.unit;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;
@@ -24,7 +24,7 @@ public class UnitUtil {
 
 		PriorityQueue<UnitOrderable> closestTargets = new PriorityQueue<UnitOrderable>(closestUnitComp);
 		for (UnitOrderable target : world.getUnits()) {
-			if (!target.isDead() && target.getSide() != unit.getSide()) {
+			if (!target.isDead() && unit.isEnemy(target)) {
 				closestTargets.add(target);
 			}
 		}

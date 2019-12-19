@@ -157,8 +157,8 @@ public class UnitMotion {
 	 * But when the unit is chasing a moving target, it obviously needs to repath.
 	 */
 	private void handleRepathing() {
-		if ((self.currentOrder.isAttackUnit() && !self.isAttacking()) ||
-				(self.currentOrder == Order.ATTACKMOVE && self.orderTarget != null && !self.isAttacking())) {
+		if ((self.order.isAttackUnit() && !self.isAttacking()) ||
+				(self.order == Order.ATTACKMOVE && self.orderTarget != null && !self.isAttacking())) {
 			framesUntilAttackRepath -= 1;
 			if (framesUntilAttackRepath <= 0) {
 				pathFindTowardsTarget();
@@ -177,7 +177,7 @@ public class UnitMotion {
 			vy = 0;
 			return;
 		}
-		switch (self.currentOrder) {
+		switch (self.order) {
 		case NONE:
 			stopCurrentMovement();
 			break;
@@ -415,7 +415,7 @@ public class UnitMotion {
 	 */
 	public void onBlocked() {
 		System.out.println("onBlocked called");
-		switch (self.currentOrder) {
+		switch (self.order) {
 		case MOVE:
 			pathFindTowardsPoint(getDest().x, getDest().y);
 			break;

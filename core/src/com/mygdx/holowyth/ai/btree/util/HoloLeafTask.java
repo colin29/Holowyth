@@ -6,6 +6,8 @@ import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 
 public abstract class HoloLeafTask extends LeafTask<UnitOrderable> {
 
+	protected UnitOrderable self;
+
 	/**
 	 * Sets a string on the unit for debug purposes
 	 */

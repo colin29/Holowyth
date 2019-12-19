@@ -22,9 +22,9 @@ public interface UnitInfo {
 
 	public UnitStatsInfo getStats();
 
-	public Order getCurrentOrder();
+	public Order getOrder();
 
-	public UnitInfo getTarget();
+	public UnitInfo getOrderTarget();
 
 	public boolean isAttacking();
 
@@ -60,4 +60,8 @@ public interface UnitInfo {
 	WorldInfo getWorld();
 
 	String getName();
+
+	boolean isEnemy(UnitInfo unit);
+
+	boolean isAttackOrderAllowed();
 }

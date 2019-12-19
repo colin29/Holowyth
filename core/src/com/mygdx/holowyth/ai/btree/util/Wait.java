@@ -9,7 +9,7 @@ public class Wait extends HoloLeafTask {
 	private int framesElapsed = 0;
 
 	@TaskAttribute(required = true)
-	public int frames = 1;
+	public int frames = 0;
 
 	@Override
 	public Status execute() {

@@ -11,7 +11,7 @@ import com.badlogic.gdx.ai.btree.utils.BehaviorTreeLibraryManager;
 import com.badlogic.gdx.ai.btree.utils.BehaviorTreeParser;
 import com.badlogic.gdx.utils.StreamUtils;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.ai.btree.enemy.Flee;
+import com.mygdx.holowyth.ai.btree.enemy.FleeUntilReachLocation;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 
 /**
@@ -30,7 +30,7 @@ public class AIModule {
 	}
 
 	public void createTestBTree() {
-		Task<UnitOrderable> selector = new Flee();
+		Task<UnitOrderable> selector = new FleeUntilReachLocation();
 		BehaviorTree<UnitOrderable> tree = new BehaviorTree<UnitOrderable>(selector);
 		library.registerArchetypeTree("enemy", tree);
 	}

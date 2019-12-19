@@ -11,7 +11,10 @@ import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 
 public interface WorldInfo {
-	// contains information which units can query
+
+	/**
+	 * The list itself is read-only, though elements can be modified
+	 */
 	public List<Unit> getUnits();
 
 	public PathingModule getPathingModule();

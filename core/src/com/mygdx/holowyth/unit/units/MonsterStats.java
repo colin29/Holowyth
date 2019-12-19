@@ -2,7 +2,7 @@ package com.mygdx.holowyth.unit.units;
 
 import com.mygdx.holowyth.unit.UnitStatValues;
 
-public class Monsters {
+public class MonsterStats {
 
 	public static final UnitStatValues baseHuman = new UnitStatValues() {
 		{

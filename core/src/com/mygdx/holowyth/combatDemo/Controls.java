@@ -146,7 +146,7 @@ public class Controls extends InputProcessorAdapter {
 		debugValues.add("Current order of one unit", () -> {
 			if (selectedUnits.size() == 1) {
 				Unit u = selectedUnits.first();
-				return u.getCurrentOrder().toString();
+				return u.getOrder().toString();
 			} else {
 				return "N/A";
 			}
@@ -154,7 +154,7 @@ public class Controls extends InputProcessorAdapter {
 		debugValues.add("Target ID of one unit", () -> {
 			if (selectedUnits.size() == 1) {
 				Unit u = selectedUnits.first();
-				return u.getTarget() != null ? String.valueOf(u.getTarget().getID()) : "null";
+				return u.getOrderTarget() != null ? String.valueOf(u.getOrderTarget().getID()) : "null";
 			} else {
 				return "N/A";
 			}

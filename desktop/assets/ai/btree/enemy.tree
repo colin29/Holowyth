@@ -1,15 +1,30 @@
 
-import waitForever:"com.mygdx.holowyth.ai.btree.util.WaitForever"
-import flee:"com.mygdx.holowyth.ai.btree.enemy.Flee"
+
 import stop:"com.mygdx.holowyth.ai.btree.util.Stop"
 import waitF:"com.mygdx.holowyth.ai.btree.util.Wait"
+import waitForever:"com.mygdx.holowyth.ai.btree.util.WaitForever"
 
+
+import healthAbove:"com.mygdx.holowyth.ai.btree.guards.IsHealthAbove"
+
+import attack:"com.mygdx.holowyth.ai.btree.enemy.Attack"
+import fleeUntilReachLocation:"com.mygdx.holowyth.ai.btree.enemy.FleeUntilReachLocation"
 
 # Tree definition
 
-root 
+subtree name:"flee"
 	sequence
-		flee
+		fleeUntilReachLocation
 		waitF frames:30
 		stop
+
+
+root 
+	sequence
+		dynamicGuardSelector
+			(healthAbove value:0.3) attack
+			$flee
 		waitForever
+
+
+

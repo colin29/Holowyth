@@ -13,7 +13,7 @@ import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.sprite.AnimatedSprite;
 import com.mygdx.holowyth.unit.sprite.Animations;
-import com.mygdx.holowyth.unit.units.Monsters;
+import com.mygdx.holowyth.unit.units.MonsterStats;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
@@ -95,7 +95,7 @@ public class CombatPrototyping {
 		for (var p : scenario.playerSpawnLocs) {
 			var unit = new Unit(p.x, p.y, Unit.Side.PLAYER, world);
 			unit.setName("Player");
-			unit.stats.base.set(Monsters.baseHuman);
+			unit.stats.base.set(MonsterStats.baseHuman);
 			players.add(unit);
 			world.addUnit(unit);
 		}
@@ -106,7 +106,7 @@ public class CombatPrototyping {
 		for (var p : scenario.enemySpawnLocs) {
 			var unit = new Unit(p.x, p.y, Unit.Side.ENEMY, world);
 			unit.setName("Goblin");
-			unit.stats.base.set(Monsters.goblin);
+			unit.stats.base.set(MonsterStats.goblin);
 			unit.skills.slotSkills(Skills.warriorSkills);
 			world.addUnit(unit);
 		}
