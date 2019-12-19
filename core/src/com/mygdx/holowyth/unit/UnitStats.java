@@ -549,6 +549,15 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	@Override
+	public boolean isSlowedIgnoringBasicAttackSlow() {
+		for (var slowEffect : slowEffects) {
+			if (!(slowEffect instanceof BasicAttackSlowEffect))
+				return true;
+		}
+		return false;
+	}
+
+	@Override
 	public boolean isBlinded() {
 		return blindDurationRemaining > 0;
 	}

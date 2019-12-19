@@ -92,6 +92,8 @@ public class Renderer {
 
 	private TiledMapRenderer tiled;
 
+	private final int showMapPathingGraphKey = Keys.M;
+
 	/**
 	 * The game, worldCamera, and other screen-lifetime modules are passed in.
 	 * 
@@ -138,7 +140,7 @@ public class Renderer {
 		renderUnitHpSpBars();
 
 		// Debug pathing
-		if (Gdx.input.isKeyPressed(Keys.M)) {
+		if (Gdx.input.isKeyPressed(showMapPathingGraphKey)) {
 			pathingModule.renderGraph(true);
 			HoloGL.renderSegs(pathingModule.getObstacleExpandedSegs(), Color.PINK);
 			renderCircles(pathingModule.getObstaclePoints(), Holo.UNIT_RADIUS, Color.PINK);
@@ -192,7 +194,7 @@ public class Renderer {
 		// 1: Render Obstacle Lines
 
 		if (tiled.isMapLoaded()) {
-			renderMapObstacles();
+			renderMapObstaclesEdges();
 			// renderMapBoundaries();
 		}
 
@@ -326,13 +328,16 @@ public class Renderer {
 
 	}
 
-	private void renderMapObstacles() {
-		shapeRenderer.setProjectionMatrix(worldCamera.combined);
+	private void renderMapObstaclesEdges() {
+		if (Holo.debugRenderMapObstaclesEdges || Gdx.input.isKeyPressed(showMapPathingGraphKey)) {
+			shapeRenderer.setProjectionMatrix(worldCamera.combined);
+			HoloGL.renderSegs(pathingModule.getObstacleSegs(), Color.GRAY);
+			HoloGL.renderPoints(pathingModule.getObstaclePoints(), Color.GRAY);
 
-		HoloGL.renderPoints(pathingModule.getObstaclePoints(), Color.GRAY);
-		HoloGL.renderSegs(pathingModule.getObstacleSegs(), Color.GRAY);
+		}
 	}
 
+	@SuppressWarnings("unused")
 	private void renderMapBoundaries() {
 		shapeRenderer.setProjectionMatrix(worldCamera.combined);
 		HoloGL.renderMapBoundaries(mapWidth, mapHeight);
@@ -468,7 +473,7 @@ public class Renderer {
 
 	private void renderOutlineAroundSlowedUnits() {
 		renderThickOutlineIfTrueForAllUnits(Color.SKY, (UnitInfo u) -> {
-			return u.getStats().isSlowed();
+			return u.getStats().isSlowedIgnoringBasicAttackSlow();
 		});
 	}
 

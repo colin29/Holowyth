@@ -39,6 +39,9 @@ public class Holo {
 	// Play Mode (overrides debug settings to false)
 	public static boolean releaseMode = true;
 
+	// Debug Rendering
+	public static boolean debugRenderMapObstaclesEdges = true;
+
 	// Debug Cheats
 	public static boolean debugFastCastEnbabled = false;
 	public static boolean debugSkillCooldownDisabled = true;
@@ -80,6 +83,9 @@ public class Holo {
 			debugDisplayEnemyCastingProgress = false;
 
 			debugPanelShowAtStartup = false;
+
+			// Rendering
+			debugRenderMapObstaclesEdges = false;
 		}
 
 	}

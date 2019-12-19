@@ -117,7 +117,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		functionBindings.bindFunctionToKey(() -> {
 			mouseScrollEnabled = !mouseScrollEnabled;
 			getGameLog().addMessage(mouseScrollEnabled ? "Mouse scroll enabled" : "Mouse scroll disabled");
-		}, Keys.U);
+		}, Keys.T);
 
 		functionBindings.bindFunctionToKey(() -> {
 			combatDemoUI.getStatsPanelUI().toggleDetailedView();
@@ -154,9 +154,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	 */
 	private void handleMousePanning(float delta) {
 
-		if (!mouseScrollEnabled)
-			return;
-
 		final int mouseX = Gdx.input.getX();
 		final int mouseY = Gdx.input.getY();
 
@@ -166,14 +163,18 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		final float scrollMargin = 40f;
 		final float scrollSpeed = 300 * delta; // do X pixels per second
 
-		if (mouseY > screenHeight - scrollMargin)
+		if (mouseScrollEnabled && mouseY > screenHeight - scrollMargin ||
+				Gdx.input.isKeyPressed(Keys.DOWN))
 			camera.translate(0, -scrollSpeed + snapLeftoverY);
-		if (mouseY < scrollMargin)
+		if (mouseScrollEnabled && mouseY < scrollMargin ||
+				Gdx.input.isKeyPressed(Keys.UP))
 			camera.translate(0, scrollSpeed + snapLeftoverY);
 
-		if (mouseX > screenWidth - scrollMargin)
+		if (mouseScrollEnabled && mouseX > screenWidth - scrollMargin ||
+				Gdx.input.isKeyPressed(Keys.RIGHT))
 			camera.translate(scrollSpeed + snapLeftoverX, 0);
-		if (mouseX < scrollMargin)
+		if (mouseScrollEnabled && mouseX < scrollMargin ||
+				Gdx.input.isKeyPressed(Keys.LEFT))
 			camera.translate(-scrollSpeed + snapLeftoverX, 0);
 
 		snapLeftoverX = 0;

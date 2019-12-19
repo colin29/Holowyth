@@ -89,4 +89,6 @@ public interface UnitStatsInfo {
 	boolean isTaunted();
 
 	float getTauntDurationRemaining();
+
+	boolean isSlowedIgnoringBasicAttackSlow();
 }
