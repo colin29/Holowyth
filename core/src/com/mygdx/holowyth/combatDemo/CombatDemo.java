@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
@@ -134,9 +135,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		functionBindings.bindFunctionToKey(() -> {
 			combatDemoUI.getStatsPanelUI().toggleDetailedView();
 		}, Keys.Y);
-
-		createVictoryPanel();
-		createDefeatPanel();
 	}
 
 	private void initializeAppLifetimeComponents() {
@@ -255,6 +253,12 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	private final Table victoryPanel = new Table();
 	private final Table defeatPanel = new Table();
+	private final Table instructionsPanel = new Table();
+	{
+		createVictoryPanel();
+		createDefeatPanel();
+		createInstructionsPanel();
+	}
 
 	private void createVictoryPanel() {
 		var largeStyle = new LabelStyle(Holowyth.fonts.borderedLargeFont(), Color.WHITE);
@@ -298,6 +302,55 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		defeatPanel.setVisible(false);
 	}
 
+	private final String instructionsText = "Controls:\n" +
+			"Select Units: Left-Click or Left-click drag\n" +
+			"Confirm Order Location/Target: Left-click\n" +
+			"Order Move: Right-click\n" +
+			"Order Attack: A\n" +
+			"Order Retreat: R\n" +
+			"Order Stop: S\n" +
+			"\n" +
+			"Use Skills: 1-9, 0\n" +
+			"\n" +
+			"Pause Time: Space   (important!)\n" +
+			"Pan Camera: Arrow Keys\n" +
+			"\n" +
+			"Status effects:\n" +
+			"Stun: Major atk/def penalty, cannot take any action\n" +
+			"Reel: Moderate atk/def penalty, is slowed.\n" +
+			"Blind: Prevents units from casting skills, and also interrupts ranged skills.";
+
+	private void createInstructionsPanel() {
+		var medStyle = new LabelStyle(Holowyth.fonts.borderedMediumFont(), Color.WHITE);
+		var style = new LabelStyle(Holowyth.fonts.debugFont(), Color.WHITE);
+		var panel = instructionsPanel;
+
+		Table frame = new Table();
+
+		var l1 = new Label("Instructions  (Press Q to bring up at any time)", style);
+		panel.add(l1);
+		panel.row();
+		var l2 = new Label("", style);
+		panel.add(l2);
+		panel.row();
+
+		Label mainText = new Label(instructionsText, style);
+		mainText.setWrap(true);
+		panel.add(mainText).size(400, 400);
+
+		panel.setBackground(HoloUI.getSolidBG(Color.DARK_GRAY, 0.9f));
+		// victoryPanel.setVisible(false);
+		mainText.setAlignment(Align.left);
+		panel.center();
+
+		frame.add(panel);
+		stage.addActor(frame);
+		frame.setFillParent(true);
+
+		panel.pad(20);
+		panel.setVisible(false);
+	}
+
 	/**
 	 * Show victory panel after a short delay
 	 */
@@ -310,6 +363,16 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	 */
 	private void showDefeatPanel() {
 		defeatPanel.addAction(sequence(delay(2), run(() -> defeatPanel.setVisible(true))));
+	}
+
+	private void showInstructionsPanel() {
+		instructionsPanel.setVisible(true);
+		pauseGame();
+	}
+
+	private void hideInstructionsPanel() {
+		instructionsPanel.setVisible(false);
+		unpauseGame();
 	}
 
 	private void restartLevel() {
@@ -349,6 +412,8 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 	protected void mapStartup() {
 		initializeMapLifetimeComponents();
 		testing.setupPlannedScenario();
+
+		showInstructionsPanel();
 	}
 
 	private void initializeMapLifetimeComponents() {
@@ -403,6 +468,13 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 				restartLevel();
 			}
 		}
+		if (keycode == Keys.Q) {
+			if (instructionsPanel.isVisible()) {
+				hideInstructionsPanel();
+			} else {
+				showInstructionsPanel();
+			}
+		}
 
 		return false;
 	}
@@ -414,6 +486,10 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		if (button == Input.Buttons.RIGHT && pointer == 0) {
+			if (instructionsPanel.isVisible())
+				hideInstructionsPanel();
+		}
 		return false;
 	}
 
