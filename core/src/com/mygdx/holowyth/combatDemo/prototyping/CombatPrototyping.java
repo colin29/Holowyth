@@ -68,8 +68,8 @@ public class CombatPrototyping {
 		oneVsThreeFar.enemySpawnLocs.add(new Point(mainPoint.x + 40, mainPoint.y + 40));
 		oneVsThreeFar.enemySpawnLocs.add(new Point(mainPoint.x, mainPoint.y + 40));
 
-		threeVsThreeFar.playerSpawnLocs.add(new Point(200, 200));
 		threeVsThreeFar.playerSpawnLocs.add(new Point(200, 240));
+		threeVsThreeFar.playerSpawnLocs.add(new Point(200, 200));
 		threeVsThreeFar.playerSpawnLocs.add(new Point(200, 160));
 		threeVsThreeFar.enemySpawnLocs.add(new Point(mainPoint.x + 40, mainPoint.y));
 		threeVsThreeFar.enemySpawnLocs.add(new Point(mainPoint.x + 40, mainPoint.y + 40));
@@ -103,11 +103,13 @@ public class CombatPrototyping {
 		setPlayerUnitSprites(players);
 		setUpThreeUnitScenario(players);
 
+		Animations animations = world.getAnimations();
 		for (var p : scenario.enemySpawnLocs) {
 			var unit = new Unit(p.x, p.y, Unit.Side.ENEMY, world);
 			unit.setName("Goblin");
 			unit.stats.base.set(MonsterStats.goblin);
 			unit.skills.slotSkills(Skills.warriorSkills);
+			unit.graphics.setAnimatedSprite(animations.get("goblin1.png"));
 			world.addUnit(unit);
 		}
 	}
@@ -116,8 +118,9 @@ public class CombatPrototyping {
 		AnimatedSprite[] sprites = new AnimatedSprite[3];
 		Animations animations = world.getAnimations();
 
+		// default sprites
 		sprites[0] = animations.get("pipo-charachip001b.png");
-		sprites[1] = animations.get("pipo-charachip017c.png");
+		sprites[1] = animations.get("pipo-charachip001b.png");
 		sprites[2] = animations.get("pipo-charachip028d.png");
 
 		for (int i = 0; i < players.size(); i++) {
@@ -130,17 +133,23 @@ public class CombatPrototyping {
 		if (players.size() < 3) {
 			return;
 		}
+		Animations animations = world.getAnimations();
 
 		{
 			var u = players.get(0);
 			u.setName("Lecia");
+			u.graphics.setAnimatedSprite(animations.get("pipo-charachip030e.png"));
+
 			u.stats.self.skills.addSkill(PassiveSkills.basicCombatTraining);
 			u.skills.slotSkills(Skills.warriorSkills);
 			u.equip.equip(Equips.longSword.copy());
+			// "pipo-charachip024d"
 		}
 		{
 			var u = players.get(1);
 			u.setName("Elvin");
+			u.graphics.setAnimatedSprite(animations.get("pipo-charachip001b.png"));
+
 			u.skills.addSkill(PassiveSkills.basicCombatTraining);
 			u.skills.slotSkills(Skills.warriorSkills);
 			u.stats.getEquip().equip(Equips.longSword.copy());
@@ -148,6 +157,8 @@ public class CombatPrototyping {
 		{
 			var u = players.get(2);
 			u.setName("Sonia");
+			u.graphics.setAnimatedSprite(animations.get("pipo-charachip028d.png"));
+
 			u.skills.slotSkills(
 					Skills.mageSkills);
 			u.stats.getEquip().equip(Equips.staff.copy());

@@ -88,7 +88,6 @@ public class Renderer {
 
 	private PathfindingRenderer pathfinding;
 	private UnitMotionRenderer unitMotion;
-	private SandBoxRenderer sandbox;
 
 	private TiledMapRenderer tiled;
 
@@ -118,7 +117,6 @@ public class Renderer {
 		debug = new DebugRenderer(this);
 		pathfinding = new PathfindingRenderer(this, pathingModule);
 		unitMotion = new UnitMotionRenderer(this);
-		sandbox = new SandBoxRenderer(this);
 		tiled = new TiledMapRenderer(this);
 	}
 
@@ -299,22 +297,17 @@ public class Renderer {
 		// Render unit circles
 		for (Unit unit : world.getUnits()) {
 
-			shapeDrawer.setColor(Color.PURPLE);
-
-			if (unit.isAPlayerCharacter())
+			if (unit.graphics.getAnimatedSprite() != null)
 				continue;
-			if (unit.isAPlayerCharacter()) {
-				shapeDrawer.setColor(Color.PURPLE);
-			} else {
-				shapeDrawer.setColor(Color.YELLOW);
-			}
 
+			// Render a circle as a fallback
+			shapeDrawer.setColor(unit.isAPlayerCharacter() ? Color.PURPLE : Color.YELLOW);
 			shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
 			shapeDrawer.filledCircle(unit.x, unit.y, Holo.UNIT_RADIUS);
 
 		}
 		for (Unit unit : world.getUnits()) {
-			if (unit.isAPlayerCharacter())
+			if (unit.graphics.getAnimatedSprite() != null)
 				continue;
 			shapeDrawer.setColor(Color.BLACK);
 			shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);

@@ -104,4 +104,8 @@ public class UnitGraphics {
 		}
 	}
 
+	public AnimatedSprite getAnimatedSprite() {
+		return animatedSprite;
+	}
+
 }

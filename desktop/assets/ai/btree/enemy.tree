@@ -21,7 +21,6 @@ subtree name:"flee"
 
 root 
 	sequence
-		waitForever
 		dynamicGuardSelector
 			(healthAbove value:0.3) attack
 			$flee

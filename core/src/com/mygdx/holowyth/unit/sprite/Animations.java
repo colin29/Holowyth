@@ -60,7 +60,7 @@ public class Animations {
 	public AnimatedSprite get(String name) {
 		AnimatedSprite value = sprites.get(name);
 		if (value == null) {
-			throw new HoloResourceNotFoundException();
+			throw new HoloResourceNotFoundException("Resource '" + name + "' not found");
 		} else {
 			return value;
 		}
