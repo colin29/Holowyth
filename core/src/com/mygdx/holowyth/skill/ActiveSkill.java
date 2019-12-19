@@ -260,6 +260,7 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 		this.parent = parent;
 	}
 
+	@Override
 	public String getDescription() {
 		return "no description";
 	}

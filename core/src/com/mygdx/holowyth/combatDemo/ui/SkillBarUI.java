@@ -87,11 +87,10 @@ public class SkillBarUI implements ControlsListener {
 
 		skillBar.row().size(50).space(10);
 		skillBar.pad(20);
-
 		ActiveSkill[] skills = unit.getSkills().getSkillSlots();
 
 		for (int i = 1; i <= UnitSkills.NUM_SKILL_SLOTS; i++) {
-
+			final int slotNumber = i;
 			// Make button
 			ActiveSkill skill = skills[i];
 			var button = new SkillButton("(" + i + ")", skin, skill);
@@ -110,6 +109,12 @@ public class SkillBarUI implements ControlsListener {
 				button.setText(skillText);
 				button.getCell(button.getLabel()).minSize(0); // minSize(0) is a bug fix to make truncation work
 			}
+			button.addListener(new ClickListener() {
+				@Override
+				public void clicked(InputEvent event, float x, float y) {
+					controls.orderSelectedUnitToUseSkillInSlot(slotNumber);
+				}
+			});
 
 			// Make Hover Panel
 			final Table hoverPanel = makeHoverPanel(skill);
@@ -142,7 +147,7 @@ public class SkillBarUI implements ControlsListener {
 
 	private Table makeHoverPanel(ActiveSkill skill) {
 		var hoverPanel = new Table();
-		hoverPanel.defaults().width(200);
+		hoverPanel.defaults().width(240);
 
 		var headerRow = new Label(skill.name + "    " + skill.spCost + " sp", skin);
 		headerRow.setWrap(true);

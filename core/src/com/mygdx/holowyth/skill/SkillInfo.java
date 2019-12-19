@@ -9,6 +9,8 @@ public interface SkillInfo {
 	public Status getStatus();
 
 	public Targeting getTargeting();
-	
+
 	public CastingInfo getCasting();
+
+	String getDescription();
 }

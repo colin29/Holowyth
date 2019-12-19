@@ -14,15 +14,19 @@ public class WarriorEffects {
 			super(caster, target);
 		}
 
+		static float attackDamageMultiple = 3;
+		static float slowAmount = 0.6f;
+		static int slowDuration = 60 * 2;
+
 		@Override
 		public void tick() {
 			if (caster.stats.isAttackRollSuccessful(target.stats, 10)) {
-				target.stats.applyDamage(caster.stats.getDamage() * 3);
+				target.stats.applyDamage(caster.stats.getDamage() * attackDamageMultiple);
 			} else {
 				world.getGfx().makeBlockEffect(caster, target);
 			}
 
-			target.stats.doStunRollAgainst(15, 90);
+			target.stats.applySlow(slowAmount, slowDuration);
 			markAsComplete();
 		}
 	}
@@ -32,10 +36,12 @@ public class WarriorEffects {
 			super(caster, target);
 		}
 
+		static float attackDamageMultiple = 1;
+
 		@Override
 		public void tick() {
 			if (caster.stats.isAttackRollSuccessful(target.stats, 10)) {
-				target.stats.applyDamage(caster.stats.getDamage() * 1);
+				target.stats.applyDamage(caster.stats.getDamage() * attackDamageMultiple);
 			} else {
 				world.getGfx().makeBlockEffect(caster, target);
 			}
@@ -47,6 +53,8 @@ public class WarriorEffects {
 
 	public static class TauntEffect extends CasterUnitEffect {
 
+		static int tauntDuration = 60 * 4;
+
 		protected TauntEffect(Unit caster, Unit target) {
 			super(caster, target);
 		}
@@ -56,7 +64,7 @@ public class WarriorEffects {
 			target.interruptHard();
 			target.orderAttackUnit(caster, true);
 			target.setAttacking(caster);
-			target.stats.applyTaunt(60 * 6, caster); // 60 * 2 sec
+			target.stats.applyTaunt(tauntDuration, caster);
 			markAsComplete();
 		}
 
@@ -69,6 +77,7 @@ public class WarriorEffects {
 		}
 
 		static float aoeRadius = 80f;
+		static float reelDuration = 60 * 4;
 
 		@Override
 		public void tick() {
@@ -77,9 +86,9 @@ public class WarriorEffects {
 					continue;
 				if (Point.calcDistance(caster.getPos(), unit.getPos()) <= aoeRadius + unit.getRadius()) {
 					if (unit.getSide() != caster.getSide()) {
-						unit.stats.doReelRollAgainst(15, 60 * 4);
+						unit.stats.doReelRollAgainst(15, reelDuration);
 					} else {
-						unit.stats.doReelRollAgainst(15, 60 * 2);
+						unit.stats.doReelRollAgainst(5, reelDuration);
 					}
 				}
 			}

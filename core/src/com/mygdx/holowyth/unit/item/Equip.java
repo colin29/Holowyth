@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.unit.item;
 
-import static com.mygdx.holowyth.util.DataUtil.getAsPercentage;
+import static com.mygdx.holowyth.util.DataUtil.percentage;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -113,7 +113,7 @@ public class Equip extends Item {
 				float sbFloat = (Float) statBonus;
 				if (sbFloat != 0) {
 					String sign = sbFloat > 0 ? "+" : "-";
-					s += statBonusLabel + " " + sign + getAsPercentage(Math.abs(sbFloat)) + ", ";
+					s += statBonusLabel + " " + sign + percentage(Math.abs(sbFloat)) + ", ";
 				}
 			} else {
 				System.out.printf("Invalid data type %s for label %s%n", statBonus.getClass().getSimpleName(),

@@ -156,7 +156,7 @@ public class MageEffects {
 
 	static class FireBallEffect extends CasterUnitEffect {
 
-		int damage = 18;
+		static int damage = 18;
 
 		protected FireBallEffect(Unit caster, Unit target) {
 			super(caster, target);
@@ -241,6 +241,9 @@ public class MageEffects {
 		static float coneInnerLength = coneLength / 2; // there is an inner cone
 		float coneAngle; // angle that the skill was aimed at
 
+		static float slowAmount = 0.6f;
+		static int slowDuration = 60 * 4;
+
 		@Override
 		public void begin() {
 			coneAngle = Point.getAngleInDegrees(caster.getPos(), ground);
@@ -256,9 +259,8 @@ public class MageEffects {
 					if (isUnitWithinInnerRadius(u)) {
 						Vector2 knockbackVec = new Vector2(u.x, u.y).sub(caster.x, caster.y).setLength(0.8f);
 						u.stats.doKnockBackRollAgainst(20, 0, knockbackVec);
-						u.stats.applyMagicDamage(5);
 					}
-					u.stats.applySlow(0.6f, 60 * 4);
+					u.stats.applySlow(slowAmount, slowDuration);
 
 				}
 			}
@@ -396,6 +398,8 @@ public class MageEffects {
 
 		static float aoeRadius = 80f;
 
+		static float stunDuration = 60 * 1.5f;
+
 		protected ThunderclapEffect(Unit caster, float x, float y) {
 			super(caster, x, y);
 		}
@@ -405,9 +409,9 @@ public class MageEffects {
 			for (Unit unit : world.getUnits()) {
 				if (Point.calcDistance(ground, unit.getPos()) <= aoeRadius + unit.getRadius()) {
 					if (unit.getSide() != caster.getSide()) {
-						unit.stats.doStunRollAgainst(18, 60 * 1.5f);
+						unit.stats.doStunRollAgainst(18, stunDuration);
 					} else {
-						unit.stats.doStunRollAgainst(8, 60 * 1.5f);
+						unit.stats.doStunRollAgainst(8, stunDuration);
 					}
 				}
 			}
@@ -420,6 +424,7 @@ public class MageEffects {
 	static class BlindingFlashEffect extends CasterGroundEffect {
 
 		static float aoeRadius = 80f;
+		static float blindDuration = 60 * 4f;
 
 		protected BlindingFlashEffect(Unit caster, float x, float y) {
 			super(caster, x, y);
@@ -430,9 +435,9 @@ public class MageEffects {
 			for (Unit unit : world.getUnits()) {
 				if (Point.calcDistance(ground, unit.getPos()) <= aoeRadius + unit.getRadius()) {
 					if (unit.getSide() != caster.getSide()) {
-						unit.stats.applyBlind(60 * 4f);
+						unit.stats.applyBlind(blindDuration);
 					} else {
-						unit.stats.applyBlind(60 * 2f);
+						unit.stats.applyBlind(blindDuration / 2);
 					}
 				}
 			}

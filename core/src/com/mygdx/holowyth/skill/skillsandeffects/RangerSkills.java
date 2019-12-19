@@ -28,7 +28,7 @@ public class RangerSkills {
 		public String getDescription() {
 			return String.format(
 					"Perform two cross shaped slashes, dealing %sx2x2 damage. If the opponent blocks the attack, reel the opponent for up to 3 seconds.",
-					DataUtil.getFullyRoundedString(CrossSlashEffect.strikeDamage));
+					DataUtil.roundFully(CrossSlashEffect.strikeDamage));
 		}
 	}
 }

@@ -8,4 +8,5 @@ public class Skill {
 	public int stabBonus;
 
 	public int damBonus;
+
 }

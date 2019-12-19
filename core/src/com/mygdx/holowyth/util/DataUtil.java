@@ -42,14 +42,14 @@ public class DataUtil {
 		return df.format(value);
 	}
 
-	public static String getFullyRoundedString(float value) {
+	public static String roundFully(float value) {
 		if (isNotFinite(value))
 			return getNonFiniteString(value);
 		String str = String.valueOf(Math.round(value));
 		return str;
 	}
 
-	public static String getAsPercentage(float value) {
+	public static String percentage(float value) {
 		if (isNotFinite(value))
 			return getNonFiniteString(value);
 		return getRoundedString(value * 100) + "%";
@@ -68,5 +68,13 @@ public class DataUtil {
 		}
 		LoggerFactory.getLogger(DataUtil.class).warn("getNonFiniteString is returning null, improper use?");
 		return null;
+	}
+
+	public static String asSeconds(int frames) {
+		return round(((float) frames) / Holo.GAME_FPS, 1);
+	}
+
+	public static String asSeconds(float frames) {
+		return round(frames / Holo.GAME_FPS, 1);
 	}
 }

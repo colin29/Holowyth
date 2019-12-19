@@ -1,7 +1,12 @@
 package com.mygdx.holowyth.skill.skillsandeffects;
 
 import com.mygdx.holowyth.skill.skill.NoneSkill;
+import com.mygdx.holowyth.skill.skillsandeffects.WarriorEffects.BashEffect;
+import com.mygdx.holowyth.skill.skillsandeffects.WarriorEffects.DeafeningCryEffect;
+import com.mygdx.holowyth.skill.skillsandeffects.WarriorEffects.RageBlowEffect;
+import com.mygdx.holowyth.skill.skillsandeffects.WarriorEffects.TauntEffect;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.util.DataUtil;
 
 public class WarriorSkills {
 
@@ -19,9 +24,18 @@ public class WarriorSkills {
 		public boolean pluginTargeting(Unit caster) {
 			if (!caster.isAttacking())
 				return false;
-			setEffects(new WarriorEffects.RageBlowEffect(caster, caster.getAttacking()));
+			setEffects(new RageBlowEffect(caster, caster.getAttacking()));
 			return true;
 		}
+
+		@Override
+		public String getDescription() {
+			return String.format("Strikes the enemy, doing %s attack damage and slowing the enemy for %s for %s seconds",
+					DataUtil.percentage(RageBlowEffect.attackDamageMultiple),
+					DataUtil.percentage(RageBlowEffect.slowAmount),
+					DataUtil.asSeconds(RageBlowEffect.slowDuration));
+		}
+
 	}
 
 	public static class Bash extends NoneSkill {
@@ -38,9 +52,16 @@ public class WarriorSkills {
 		public boolean pluginTargeting(Unit caster) {
 			if (!caster.isAttacking())
 				return false;
-			setEffects(new WarriorEffects.BashEffect(caster, caster.getAttacking()));
+			setEffects(new BashEffect(caster, caster.getAttacking()));
 			return true;
 		}
+
+		@Override
+		public String getDescription() {
+			return String.format("Shoves the opponent, knocking them back. If attack roll suceeds, also does %s attack damage ",
+					DataUtil.percentage(BashEffect.attackDamageMultiple));
+		}
+
 	}
 
 	public static class Taunt extends NoneSkill {
@@ -56,9 +77,14 @@ public class WarriorSkills {
 		public boolean pluginTargeting(Unit caster) {
 			if (!caster.isAttacking())
 				return false;
-			System.out.println("Taunt plugged in: " + caster.getAttacking());
-			setEffects(new WarriorEffects.TauntEffect(caster, caster.getAttacking()));
+			setEffects(new TauntEffect(caster, caster.getAttacking()));
 			return true;
+		}
+
+		@Override
+		public String getDescription() {
+			return String.format("Taunts the enemy unit, forcing it to attack you for %s seconds.",
+					DataUtil.asSeconds(TauntEffect.tauntDuration));
 		}
 	}
 
@@ -74,8 +100,14 @@ public class WarriorSkills {
 
 		@Override
 		public boolean pluginTargeting(Unit caster) {
-			setEffects(new WarriorEffects.DeafeningCryEffect(caster));
+			setEffects(new DeafeningCryEffect(caster));
 			return true;
+		}
+
+		@Override
+		public String getDescription() {
+			return String.format("Let out a bellowing howl that reels nearby units for %s seconds (+10 to save for allies).",
+					DataUtil.asSeconds(DeafeningCryEffect.reelDuration));
 		}
 	}
 

@@ -116,9 +116,9 @@ public class EffectsHandler {
 	public void makeDamageEffect(float damage, UnitInfo unit, boolean useScatteringDamageEffect) {
 		PresetType damageEffectType = unit.isAPlayerCharacter() ? PresetType.PLAYER : PresetType.ENEMY;
 		if (useScatteringDamageEffect) {
-			damageEffects.add(new FastDamageEffect(DataUtil.getFullyRoundedString(damage), unit.getPos(), damageEffectType));
+			damageEffects.add(new FastDamageEffect(DataUtil.roundFully(damage), unit.getPos(), damageEffectType));
 		} else {
-			damageEffects.add(new DamageEffect(DataUtil.getFullyRoundedString(damage), unit.getPos(), damageEffectType));
+			damageEffects.add(new DamageEffect(DataUtil.roundFully(damage), unit.getPos(), damageEffectType));
 		}
 	}
 

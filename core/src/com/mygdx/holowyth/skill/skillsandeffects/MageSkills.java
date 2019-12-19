@@ -4,6 +4,7 @@ import com.mygdx.holowyth.combatDemo.rendering.SkillsAimingGraphic;
 import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.util.DataUtil;
 
 public class MageSkills {
 	public static class MagicMissile extends UnitSkill {
@@ -20,6 +21,12 @@ public class MageSkills {
 		public void pluginTargeting(Unit caster, Unit target) {
 			setEffects(new MageEffects.MagicMissileEffect(caster, target));
 		}
+
+		@Override
+		public String getDescription() {
+			return "Fires 3 missiles which knockback the enemy target. A basic mage skill.";
+		}
+
 	}
 
 	public static class ArcaneBolt extends UnitSkill {
@@ -30,11 +37,17 @@ public class MageSkills {
 			spCost = 22;
 			cooldown = 60 * 18;
 			addTag(Tag.RANGED_MAGIC);
+
 		}
 
 		@Override
 		public void pluginTargeting(Unit caster, Unit target) {
 			setEffects(new MageEffects.ArcaneBoltEffect(caster, target));
+		}
+
+		@Override
+		public String getDescription() {
+			return "Fires a powerful slow-moving missile that is capable of stunning even the hardiest of foes. A more advanced version of Magic Missile.";
 		}
 	}
 
@@ -52,6 +65,11 @@ public class MageSkills {
 		public void pluginTargeting(Unit caster, Unit target) {
 			setEffects(new MageEffects.WindBladesEffect(caster, target));
 		}
+
+		@Override
+		public String getDescription() {
+			return "Unleashes a swift barrage of wind scythes. Uses little mana, but is ineffective against armor.";
+		}
 	}
 
 	public static class Fireball extends UnitSkill {
@@ -67,6 +85,13 @@ public class MageSkills {
 		@Override
 		public void pluginTargeting(Unit caster, Unit target) {
 			setEffects(new MageEffects.FireBallEffect(caster, target));
+		}
+
+		@Override
+		public String getDescription() {
+			return String.format(
+					"Summons a fireball that explodes on impact, dealing %s damage to nearby enemies (half damage to allies).",
+					DataUtil.roundFully(MageEffects.FireBallEffect.damage));
 		}
 	}
 
@@ -89,6 +114,13 @@ public class MageSkills {
 		public void pluginTargeting(Unit caster, float x, float y) {
 			setEffects(new MageEffects.HydroblastEffect(caster, x, y));
 		}
+
+		@Override
+		public String getDescription() {
+			return String.format(
+					"Floods a cone-shaped area with water, slowing units by %s for %s seconds. Units caught in the inner area are knocked back slightly.",
+					DataUtil.percentage(MageEffects.HydroblastEffect.slowAmount), DataUtil.asSeconds(MageEffects.HydroblastEffect.slowDuration));
+		}
 	}
 
 	public static class Thunderclap extends GroundSkill {
@@ -108,6 +140,13 @@ public class MageSkills {
 		public void pluginTargeting(Unit caster, float x, float y) {
 			setEffects(new MageEffects.ThunderclapEffect(caster, x, y));
 		}
+
+		@Override
+		public String getDescription() {
+			return String.format(
+					"Summons a thunderclap, stunning all nearby units for %s seconds (+10 to save for allies).",
+					DataUtil.asSeconds(MageEffects.ThunderclapEffect.stunDuration));
+		}
 	}
 
 	public static class BlindingFlash extends GroundSkill {
@@ -125,6 +164,13 @@ public class MageSkills {
 		@Override
 		public void pluginTargeting(Unit caster, float x, float y) {
 			setEffects(new MageEffects.BlindingFlashEffect(caster, x, y));
+		}
+
+		@Override
+		public String getDescription() {
+			return String.format(
+					"Saturates the area in light, blinding all units for %s seconds (halved for allies).",
+					DataUtil.asSeconds(MageEffects.BlindingFlashEffect.blindDuration));
 		}
 	}
 

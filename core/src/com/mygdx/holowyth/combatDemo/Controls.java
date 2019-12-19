@@ -36,7 +36,6 @@ import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
 import com.mygdx.holowyth.skill.skill.UnitGroundSkill;
 import com.mygdx.holowyth.skill.skill.UnitSkill;
-import com.mygdx.holowyth.skill.skillsandeffects.Skills;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
@@ -138,7 +137,7 @@ public class Controls extends InputProcessorAdapter {
 		debugValues.add("Movement speed of one unit", () -> {
 			if (selectedUnits.size() == 1) {
 				Unit u = selectedUnits.first();
-				return DataUtil.getAsPercentage(u.stats.getMoveSpeedRatio());
+				return DataUtil.percentage(u.stats.getMoveSpeedRatio());
 			} else {
 				return "0";
 			}
@@ -191,9 +190,8 @@ public class Controls extends InputProcessorAdapter {
 		functionBindings.bindFunctionToKey(() -> orderSelectedUnitToUseSkillInSlot(10), Keys.NUM_0); // also bind the 0 key
 	}
 
-	float clickX, clickY; // Current click in world coordinates
+	private float clickX, clickY; // Current click in world coordinates
 
-	ActiveSkill skillToUse = new Skills.Explosion();
 	ActiveSkill curSkill = null;
 
 	private void setSPToMax() {
