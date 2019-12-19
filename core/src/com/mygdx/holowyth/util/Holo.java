@@ -48,6 +48,7 @@ public class Holo {
 	public static boolean debugHighHpUnits = false;
 	public static boolean debugNoManaCost = false;
 
+	public static boolean debugAllowSelectEnemyUnits = true;
 	public static boolean debugDisplayEnemyCastingProgress = true;
 
 	// Combat movement
@@ -80,6 +81,7 @@ public class Holo {
 			debugHighHpUnits = false;
 			debugNoManaCost = false;
 
+			debugAllowSelectEnemyUnits = false;
 			debugDisplayEnemyCastingProgress = false;
 
 			debugPanelShowAtStartup = false;

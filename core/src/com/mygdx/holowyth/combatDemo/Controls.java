@@ -57,6 +57,8 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
  */
 public class Controls extends InputProcessorAdapter {
 
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+
 	Holowyth game;
 
 	Camera camera;
@@ -100,8 +102,6 @@ public class Controls extends InputProcessorAdapter {
 	LabelStyle labelStyle;
 
 	private GameLog gameLog;
-
-	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public Controls(Holowyth game, Camera camera, Camera fixedCam, List<Unit> units, DebugStore debugStore,
 			World world, GameLog gameLog) {
@@ -377,8 +377,12 @@ public class Controls extends InputProcessorAdapter {
 		if (clickedUnit != null) {
 			UnitSkill skill = (UnitSkill) this.curSkill;
 			Unit caster = selectedUnits.iterator().next();
-			skill.pluginTargeting(caster, clickedUnit);
-			caster.orderUseSkill(skill);
+
+			if (skill.setTargeting(caster, clickedUnit)) {
+				caster.orderUseSkill(skill);
+			} else {
+				logger.info("Skill '{}' could not be used.", skill.name);
+			}
 			clearContext();
 		}
 	}
@@ -660,8 +664,11 @@ public class Controls extends InputProcessorAdapter {
 				newlySelected.add(u);
 			}
 		}
-
-		ifMixedSelectionFilterOutNonPlayerUnits(newlySelected);
+		if (Holo.debugAllowSelectEnemyUnits) {
+			ifMixedSelectionFilterOutNonPlayerUnits(newlySelected);
+		} else {
+			newlySelected.removeIf((u) -> u.getSide().isEnemy());
+		}
 
 		if (!newlySelected.isEmpty()) {
 			selectedUnits.clear();

@@ -18,7 +18,7 @@ public class MageSkills {
 		}
 
 		@Override
-		public void pluginTargeting(Unit caster, Unit target) {
+		protected void pluginTargeting(Unit caster, Unit target) {
 			setEffects(new MageEffects.MagicMissileEffect(caster, target));
 		}
 
@@ -41,7 +41,7 @@ public class MageSkills {
 		}
 
 		@Override
-		public void pluginTargeting(Unit caster, Unit target) {
+		protected void pluginTargeting(Unit caster, Unit target) {
 			setEffects(new MageEffects.ArcaneBoltEffect(caster, target));
 		}
 
@@ -62,7 +62,7 @@ public class MageSkills {
 		}
 
 		@Override
-		public void pluginTargeting(Unit caster, Unit target) {
+		protected void pluginTargeting(Unit caster, Unit target) {
 			setEffects(new MageEffects.WindBladesEffect(caster, target));
 		}
 
@@ -83,7 +83,7 @@ public class MageSkills {
 		}
 
 		@Override
-		public void pluginTargeting(Unit caster, Unit target) {
+		protected void pluginTargeting(Unit caster, Unit target) {
 			setEffects(new MageEffects.FireBallEffect(caster, target));
 		}
 

@@ -5,6 +5,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.skill.effect.CasterEffect;
 import com.mygdx.holowyth.skill.effect.Effect;
@@ -26,6 +29,8 @@ import com.mygdx.holowyth.util.exceptions.HoloException;
  *
  */
 public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo {
+
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public float cooldown; // in game frames
 
@@ -53,10 +58,14 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 	public boolean hasChannelingBehaviour = false;
 
 	public enum Tag {
-		MAGIC, RANGED_MAGIC, RANGED
+		MAGIC, RANGED_MAGIC, RANGED,
+		/**
+		 * Can be used on allies and only allies. Normal skills cannot be used on allies.
+		 */
+		ALLIED_TARGETING
 	}
 
-	private Set<Tag> tags = new LinkedHashSet<Tag>();
+	protected Set<Tag> tags = new LinkedHashSet<Tag>();
 
 	/**
 	 * Channeled *effects* is not implemented yet. Those effects need to be specially marked 'channeling', and when the skill channel is interrupted
