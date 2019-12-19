@@ -34,17 +34,10 @@ public class Holo {
 
 	public static final int CELL_SIZE = 15; // size in world units
 
-	public static float UNIT_RADIUS = 13;
+	public static float UNIT_RADIUS = 15; // 13
 
-	public static boolean largeSize = false; // use larger sized units and faster movement speed for easier debugging in
-												// some cases
-	static {
-		if (largeSize) {
-			defaultUnitMoveSpeed = 10f;
-			collisionClearanceDistance = defaultUnitMoveSpeed / 5;
-			UNIT_RADIUS = 20;
-		}
-	}
+	// Play Mode (overrides debug settings to false)
+	public static boolean releaseMode = true;
 
 	// Debug Cheats
 	public static boolean debugFastCastEnbabled = false;
@@ -77,7 +70,18 @@ public class Holo {
 	public static boolean continueShowingPathAfterArrival = true;
 	public static boolean debugPathfindingIgnoreUnits = false;
 
-	// Rendering Testing
-	public static boolean useTestSprites = false;
+	static {
+		if (releaseMode) {
+			debugFastCastEnbabled = false;
+			debugSkillCooldownDisabled = false;
+			debugHighHpUnits = false;
+			debugNoManaCost = false;
+
+			debugDisplayEnemyCastingProgress = false;
+
+			debugPanelShowAtStartup = false;
+		}
+
+	}
 
 }

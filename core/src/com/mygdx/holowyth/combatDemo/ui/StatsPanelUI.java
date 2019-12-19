@@ -44,7 +44,7 @@ public class StatsPanelUI implements ControlsListener {
 
 	private Table detailedPanel;
 
-	private boolean showDetailedPanel = true;
+	private boolean showDetailedPanel = false;
 
 	public StatsPanelUI(Stage stage, Skin skin) {
 		this.skin = skin;

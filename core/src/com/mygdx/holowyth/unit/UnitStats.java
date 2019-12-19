@@ -861,13 +861,13 @@ public class UnitStats implements UnitStatsInfo {
 		}
 	}
 
-	public void applyTaunt(int duration, Unit target) {
-		if (target == null) {
-			logger.warn("Can't apply taunt to a null target");
+	public void applyTaunt(int duration, Unit tauntSource) {
+		if (tauntSource == null) {
+			logger.warn("tauntSource is null");
 			return;
 		}
 		tauntDurationRemaining = duration;
-		tauntAttackTarget = target;
+		tauntAttackTarget = tauntSource;
 	}
 
 	@Override
@@ -887,7 +887,7 @@ public class UnitStats implements UnitStatsInfo {
 
 	float getMultiTeamingAtkspdPenalty(Unit target) {
 		int n = Unit.unitsAttacking.get(target).size();
-	
+
 		if (n <= 1) {
 			return 1;
 		} else if (n == 2) {

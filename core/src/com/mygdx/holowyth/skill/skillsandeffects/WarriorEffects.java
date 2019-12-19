@@ -53,10 +53,10 @@ public class WarriorEffects {
 
 		@Override
 		public void tick() {
-			target.setAttacking(caster);
-			target.orderAttackUnit(caster, true);
-			target.stats.applyTaunt(60 * 6, caster); // 60 * 2 sec
 			target.interruptHard();
+			target.orderAttackUnit(caster, true);
+			target.setAttacking(caster);
+			target.stats.applyTaunt(60 * 6, caster); // 60 * 2 sec
 			markAsComplete();
 		}
 

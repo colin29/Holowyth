@@ -618,7 +618,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	private void startAttackingIfInRangeForAttackOrders() {
 		if (!isAttacking() && (order.isAttackUnit() || isAttackMoveAndHasTarget())) {
 			float distToTarget = Point.calcDistance(this.getPos(), orderTarget.getPos());
-			if (distToTarget <= getEngageRange()) {
+			if (distToTarget <= getEngageRange(orderTarget)) {
 				startAttacking(orderTarget);
 			}
 		}
@@ -627,18 +627,18 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	private void stopAttackingIfEnemyIsOutOfRange() {
 		if (isAttacking()) {
 			float distToEnemy = Point.calcDistance(this.getPos(), attacking.getPos());
-			if (distToEnemy >= getDisengageRange()) {
+			if (distToEnemy >= getDisengageRange(attacking)) {
 				stopAttacking();
 			}
 		}
 	}
 
-	private float getEngageRange() {
-		return this.radius + orderTarget.radius + Holo.defaultUnitEngageRange;
+	private float getEngageRange(Unit unit) {
+		return this.radius + unit.radius + Holo.defaultUnitEngageRange;
 	}
 
-	private float getDisengageRange() {
-		return this.radius + attacking.radius + Holo.defaultUnitDisengageRange;
+	private float getDisengageRange(Unit unit) {
+		return this.radius + unit.radius + Holo.defaultUnitDisengageRange;
 	}
 
 	private boolean isAttackMoveAndHasTarget() {
@@ -723,6 +723,11 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 			}
 			if (attackCooldownRemaining <= 0) {
 				this.attack(attacking);
+
+				// Units automatically retaliate if they are idle
+				if (attacking.getOrder() == Order.NONE && !attacking.isAttacking() && attacking.isAttackOrderAllowed()) {
+					attacking.orderAttackUnit(this, false);
+				}
 				attackCooldownRemaining = attackCooldown / stats.getMultiTeamingAtkspdPenalty(attacking);
 			}
 		}
@@ -771,8 +776,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 * Only use for special cases, like a taunt ability. Uses startAttacking().
 	 */
 	public void setAttacking(Unit unit) {
-		float distToEnemy = Point.calcDistance(this.getPos(), attacking.getPos());
-		if (distToEnemy >= getDisengageRange()) {
+		float distToEnemy = Point.calcDistance(getPos(), unit.getPos());
+		if (distToEnemy >= getDisengageRange(unit)) {
 			logger.info("Tried to set attacking, but unit out of range");
 			return;
 		}

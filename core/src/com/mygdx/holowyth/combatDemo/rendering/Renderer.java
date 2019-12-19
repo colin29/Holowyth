@@ -147,7 +147,6 @@ public class Renderer {
 
 		// 2: Render unit paths
 		pathfinding.renderPaths(false);
-
 		unitMotion.renderUnitDestinations(Color.GREEN);
 
 		// 3: Render units and selection/status indicators
@@ -157,7 +156,6 @@ public class Renderer {
 		if (controls != null) {
 			controls.clearDeadUnitsFromSelection();
 			controls.renderCirclesOnSelectedUnits();
-			pathfinding.renderUnitExpandedHitBodies();
 		}
 
 		renderUnits(delta);
@@ -293,39 +291,39 @@ public class Renderer {
 	}
 
 	private void renderUnits(float delta) {
-		if (Holo.useTestSprites) {
-			sandbox.renderUnitsWithTestSprites();
-		} else {
 
-			batch.begin();
+		batch.begin();
 
-			// Render unit circles
-			for (Unit unit : world.getUnits()) {
+		// Render unit circles
+		for (Unit unit : world.getUnits()) {
 
+			shapeDrawer.setColor(Color.PURPLE);
+
+			if (unit.isAPlayerCharacter())
+				continue;
+			if (unit.isAPlayerCharacter()) {
 				shapeDrawer.setColor(Color.PURPLE);
-
-				if (unit.isAPlayerCharacter()) {
-					shapeDrawer.setColor(Color.PURPLE);
-				} else {
-					shapeDrawer.setColor(Color.YELLOW);
-				}
-
-				shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
-				shapeDrawer.filledCircle(unit.x, unit.y, Holo.UNIT_RADIUS);
-
+			} else {
+				shapeDrawer.setColor(Color.YELLOW);
 			}
-			for (Unit unit : world.getUnits()) {
-				shapeDrawer.setColor(Color.BLACK);
-				shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
-				shapeDrawer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
-			}
-			batch.end();
 
-			for (Unit unit : world.getUnits()) {
-				unit.graphics.updateAndRender(delta, batch);
-			}
+			shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
+			shapeDrawer.filledCircle(unit.x, unit.y, Holo.UNIT_RADIUS);
 
 		}
+		for (Unit unit : world.getUnits()) {
+			if (unit.isAPlayerCharacter())
+				continue;
+			shapeDrawer.setColor(Color.BLACK);
+			shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
+			shapeDrawer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
+		}
+		batch.end();
+
+		for (Unit unit : world.getUnits()) {
+			unit.graphics.updateAndRender(delta, batch);
+		}
+
 	}
 
 	private void renderMapObstacles() {

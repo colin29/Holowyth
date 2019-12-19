@@ -51,11 +51,12 @@ public class WarriorSkills {
 			spCost = 5;
 			cooldown = 60 * 8;
 		}
-	
+
 		@Override
 		public boolean pluginTargeting(Unit caster) {
 			if (!caster.isAttacking())
 				return false;
+			System.out.println("Taunt plugged in: " + caster.getAttacking());
 			setEffects(new WarriorEffects.TauntEffect(caster, caster.getAttacking()));
 			return true;
 		}
