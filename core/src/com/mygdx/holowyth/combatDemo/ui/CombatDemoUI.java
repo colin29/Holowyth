@@ -69,10 +69,12 @@ public class CombatDemoUI {
 	 * Adds a small coordinate text that displays the mouse cursor position in world coordinates
 	 */
 	private void createCoordinateText() {
-		coordText = new Label("(000, 000)\n", skin);
+		coordText = new Label("(000, 000)\n (0, 0)", skin);
 		coordText.setColor(Color.BLACK);
 		stage.addActor(coordText);
 		coordText.setPosition(Gdx.graphics.getWidth() - coordText.getWidth() - 4, 4);
+
+		coordText.setVisible(Holo.debugShowMouseLocationText);
 	}
 
 	public Label getCoordInfo() {

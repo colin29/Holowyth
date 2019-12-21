@@ -69,6 +69,7 @@ public class Holo {
 	// Debug display
 	public static boolean debugPanelShowAtStartup = true;
 	public static Color debugFontColor = Color.BLACK;
+	public static boolean debugShowMouseLocationText = true;
 
 	// Debug settings
 	public static boolean continueShowingPathAfterArrival = true;
@@ -85,9 +86,10 @@ public class Holo {
 			debugDisplayEnemyCastingProgress = false;
 
 			debugPanelShowAtStartup = false;
-
+			debugShowMouseLocationText = false;
 			// Rendering
 			debugRenderMapObstaclesEdges = false;
+
 		}
 
 	}
