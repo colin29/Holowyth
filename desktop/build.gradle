@@ -22,7 +22,7 @@ sourceSets {
         }
         resources {
             srcDirs = ['resources']
-            // exclude 'src/main/resources/assets/maps/Tilesets/townA.png'
+            exclude 'assets/maps/Tilesets/raw/**'
         }
     }
 }

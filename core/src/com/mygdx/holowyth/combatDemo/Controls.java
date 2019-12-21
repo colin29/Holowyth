@@ -720,6 +720,16 @@ public class Controls extends InputProcessorAdapter {
 		shapeRenderer.setProjectionMatrix(old);
 	}
 
+	public void renderUnitUnderCursor(Color allyColor, Color enemyColor) {
+		if (unitUnderCursor != null) {
+			Color color = unitUnderCursor.isAPlayerCharacter() ? allyColor : enemyColor;
+			shapeRenderer.setColor(color);
+			shapeRenderer.begin(ShapeType.Line);
+			shapeRenderer.circle(unitUnderCursor.x, unitUnderCursor.y, unitUnderCursor.getRadius() + 3);
+			shapeRenderer.end();
+		}
+	}
+
 	/**
 	 * Is guaranteed to be called when selectedUnits is modified Is called immediately after a modifiying action, if that action actually changed the
 	 * set.
@@ -861,6 +871,17 @@ public class Controls extends InputProcessorAdapter {
 		public float y1;
 		public float x2;
 		public float y2;
+	}
+
+	private Unit unitUnderCursor;
+
+	@Override
+	public boolean mouseMoved(int touchX, int touchY) {
+		Vector3 world = new Vector3(); // World coordinates of the click.
+		world = camera.unproject(world.set(touchX, touchY, 0));
+
+		unitUnderCursor = selectUnitAtClickedPoint(world.x, world.y);
+		return false;
 	}
 
 }

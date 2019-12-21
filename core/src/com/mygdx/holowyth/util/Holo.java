@@ -34,7 +34,7 @@ public class Holo {
 
 	public static final int CELL_SIZE = 15; // size in world units
 
-	public static float UNIT_RADIUS = 15; // 13
+	public static float UNIT_RADIUS = 17; // 13
 
 	// Play Mode (overrides debug settings to false)
 	public static boolean releaseMode = true;

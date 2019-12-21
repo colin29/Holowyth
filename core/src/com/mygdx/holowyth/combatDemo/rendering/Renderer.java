@@ -156,6 +156,7 @@ public class Renderer {
 		if (controls != null) {
 			controls.clearDeadUnitsFromSelection();
 			controls.renderCirclesOnSelectedUnits();
+
 		}
 
 		renderUnits(delta);
@@ -171,6 +172,10 @@ public class Renderer {
 		renderOutlineAroundBlindedUnits();
 		renderOutlineAroundTauntedUnits();
 		renderOutlineAroundStunnedUnits();
+
+		if (controls != null) {
+			controls.renderUnitUnderCursor(Color.GREEN, Color.RED);
+		}
 
 		// debug.renderUnitIdsOnUnits();
 
@@ -526,9 +531,9 @@ public class Renderer {
 	void renderThickOutlineIfTrueForAllUnits(Color color, Predicate<UnitInfo> predicate) {
 		world.doIfTrueForAllUnits(predicate, (UnitInfo u) -> {
 			shapeRenderer.setProjectionMatrix(worldCamera.combined);
-			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, color);
-			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 3.25f, color);
-			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 4, color);
+			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 0.5f, color);
+			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 1.25f, color);
+			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2, color);
 		});
 	}
 
