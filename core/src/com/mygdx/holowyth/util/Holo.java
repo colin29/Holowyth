@@ -11,8 +11,8 @@ import com.badlogic.gdx.graphics.Color;
 public class Holo {
 
 	// Paths
-	public static String simpleMapsDirectory = HoloIO.getCanonicalPathElseNull("./saveFiles/");
-	public static String mapsDirectory = HoloIO.getCanonicalPathElseNull("assets/maps/");
+	public static String simpleMapsDirectory = "saveFiles/";
+	public static String mapsDirectory = "assets/maps/";
 
 	// Demos
 	public static String initialSimpleMap = "/complexMap.map"; // "/blankMap.map"; // only for demos that use simple maps

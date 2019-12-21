@@ -66,6 +66,7 @@ public abstract class DemoScreen extends HoloBaseScreen implements InputProcesso
 	 * Gets a map from disk, then loads it.
 	 */
 	protected void loadMapFromDisk(String pathname) {
+		logger.debug("pathname: " + pathname);
 		TiledMap loadedMap = new MyAtlasTmxMapLoader().load(pathname);
 		logger.debug(pathname);
 		loadMap(loadedMap);

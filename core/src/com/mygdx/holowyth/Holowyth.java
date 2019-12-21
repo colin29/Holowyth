@@ -1,5 +1,8 @@
 package com.mygdx.holowyth;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
@@ -89,7 +92,26 @@ public class Holowyth extends Game {
 
 	@Override
 	public void render() {
-		super.render(); // Calls Game.render, which will render the screens
+		try {
+			super.render(); // Calls Game.render, which will render the screens
+		} catch (Exception e) {
+			writeException(e);
+			dispose();
+			System.exit(-1);
+		}
+	}
+
+	public static void writeException(Exception e) {
+		try (FileWriter fs = new FileWriter("exception.txt", true);
+				BufferedWriter out = new BufferedWriter(fs);
+				PrintWriter pw = new PrintWriter(out, true);) {
+			pw.append("------------\n");
+			e.printStackTrace(pw);
+			pw.append("\n\n\n");
+			pw.flush();
+		} catch (Exception ie) {
+			throw new RuntimeException("Could not write Exception to file", ie);
+		}
 	}
 
 	@Override

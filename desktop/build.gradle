@@ -3,8 +3,33 @@
 sourceCompatibility = 1.12
 sourceSets.main.java.srcDirs = [ "src/" ]
 
-project.ext.mainClassName = "com.mygdx.holowyth.desktop.DesktopLauncher"
 project.ext.assetsDir = new File("../core/assets");
 
 dependencies {
+	compile project(":core")
+        compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+        compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+
+        runtimeOnly files("resources")
+}
+
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+        resources {
+            srcDirs = ['resources']
+            // exclude 'src/main/resources/assets/maps/Tilesets/townA.png'
+        }
+    }
+}
+
+jar {
+  manifest {
+    attributes "Main-Class": "com.mygdx.holowyth.desktop.CombatLauncher"
+  }
+  from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }

@@ -1,15 +1,11 @@
 package com.mygdx.holowyth.unit.sprite;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
-import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 
 /**
@@ -24,37 +20,28 @@ public class Animations {
 
 	private final Map<String, AnimatedSprite> sprites = new LinkedHashMap<String, AnimatedSprite>();
 
-	private final String ANIMATIONS_DIR = Holowyth.ASSETS_PATH + "sprites/pipo/";
-
 	public Animations() {
 		loadAnimatedSprites();
 	}
 
 	private void loadAnimatedSprites() {
 
-		File dir = new File(ANIMATIONS_DIR);
+		loadAnimatedSprite("img/sprites/pipo/pipo-charachip001b.png");
+		loadAnimatedSprite("img/sprites/pipo/pipo-charachip017c.png");
+		loadAnimatedSprite("img/sprites/pipo/pipo-charachip028d.png");
+		loadAnimatedSprite("img/sprites/pipo/pipo-charachip030e.png");
 
-		// logger.debug("Loaded images in directory: " + StringUtils.removeStart(dir.getPath().replace("\\", "/"), Holowyth.ASSETS_PATH));
+		loadAnimatedSprite("img/sprites/pipo/goblin1.png");
 
-		File[] images = dir.listFiles(new FilenameFilter() {
-			@Override
-			public boolean accept(File dir, String filename) {
-				return filename.endsWith(".png");
-			}
-		});
+	}
 
-		for (File img : images) {
-			TextureParameter param = new TextureParameter();
-			param.genMipMaps = true;
+	private void loadAnimatedSprite(String path) {
+		AnimatedSprite sprite = new AnimatedSprite(path);
+		var parts = path.split("/");
+		String name = parts[parts.length - 1];
+		logger.debug("Added sprite with name {}", name);
+		sprites.put(name, sprite);
 
-			// String dirPath = StringUtils.removeStart(dir.getPath().replace("\\", "/"), Holowyth.ASSETS_PATH);
-
-			logger.debug("loaded: " + dir.getPath() + "/" + img.getName());
-
-			AnimatedSprite sprite = new AnimatedSprite(dir.getPath() + "/" + img.getName());
-			logger.debug("Added sprite with name {}", img.getName());
-			sprites.put(img.getName(), sprite);
-		}
 	}
 
 	public AnimatedSprite get(String name) {

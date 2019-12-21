@@ -297,11 +297,11 @@ public class Controls extends InputProcessorAdapter {
 		int offsetX = 0, offsetY = 0;
 
 		if (context == Context.ATTACK) {
-			cursorPath = "icons/cursors/AttackCursor.png";
+			cursorPath = "img/cursors/AttackCursor.png";
 		} else if (context.isUsingSkill()) {
-			cursorPath = "icons/cursors/MagicCursor.png";
+			cursorPath = "img/cursors/MagicCursor.png";
 		} else if (context == Context.RETREAT) {
-			cursorPath = "icons/cursors/RetreatCursor.png";
+			cursorPath = "img/cursors/RetreatCursor.png";
 			offsetX = 5;
 			offsetY = 5;
 		}
