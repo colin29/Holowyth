@@ -49,7 +49,7 @@ public class CombatPrototyping {
 		setup(scenario);
 	}
 
-	private final Point mainPoint = new Point(397, 266);
+	private final Point mainPoint = new Point(700, 450);// new Point(397, 266);
 
 	private void defineScenarios() {
 		duelingClose.playerSpawnLocs.add(new Point(mainPoint.x, mainPoint.y));
