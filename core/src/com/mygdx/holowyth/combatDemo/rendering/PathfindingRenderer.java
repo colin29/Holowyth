@@ -33,6 +33,8 @@ class PathfindingRenderer extends SubRenderer {
 			pathingModule.renderIntermediateAndFinalPaths(getWorld().getUnits());
 		} else {
 			for (Unit unit : getWorld().getUnits()) {
+				if (unit.getSide().isEnemy() && !Holo.debugRenderEnemyPath)
+					continue;
 				if (unit.motion.getPath() != null) {
 					renderPath(unit.motion.getPath(), Color.GRAY, false);
 				}

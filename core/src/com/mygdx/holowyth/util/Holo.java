@@ -72,6 +72,7 @@ public class Holo {
 	public static boolean debugShowMouseLocationText = true;
 
 	// Debug settings
+	public static boolean debugRenderEnemyPath = true;
 	public static boolean continueShowingPathAfterArrival = true;
 	public static boolean debugPathfindingIgnoreUnits = false;
 
@@ -84,6 +85,7 @@ public class Holo {
 
 			debugAllowSelectEnemyUnits = false;
 			debugDisplayEnemyCastingProgress = false;
+			debugRenderEnemyPath = false;
 
 			debugPanelShowAtStartup = false;
 			debugShowMouseLocationText = false;
