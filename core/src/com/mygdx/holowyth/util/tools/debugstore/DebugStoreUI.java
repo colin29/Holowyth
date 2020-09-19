@@ -102,7 +102,7 @@ public class DebugStoreUI {
 		return debugStore;
 	}
 
-	public Table getDebugInfo() {
+	public Table getDebugValuesTable() {
 		return debugInfo;
 	}
 

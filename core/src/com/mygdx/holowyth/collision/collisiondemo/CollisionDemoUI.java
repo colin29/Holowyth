@@ -64,7 +64,7 @@ public class CollisionDemoUI {
 
 		createCoordinateText();
 		debugStoreUI.populateDebugValueDisplay();
-		root.add(debugStoreUI.getDebugInfo());
+		root.add(debugStoreUI.getDebugValuesTable());
 	}
 
 	private void setupStage() {
@@ -134,7 +134,7 @@ public class CollisionDemoUI {
 	}
 
 	public Table getDebugInfo() {
-		return debugStoreUI.getDebugInfo();
+		return debugStoreUI.getDebugValuesTable();
 	}
 
 	private final InputProcessor inputProcessor = new InputProcessorAdapter() {

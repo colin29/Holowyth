@@ -738,7 +738,10 @@ public class Controls extends InputProcessorAdapter {
 		if (context == Context.SKILL_GROUND || context == Context.SKILL_UNIT) {
 			context = Context.NONE;
 		}
-		listeners.forEach((l) -> l.unitSelectionModified(Collections.unmodifiableList(getSelectedUnitReadOnly())));
+		logger.debug("Unit selection modified {}", selectedUnits.size());
+		
+		
+		listeners.forEach((l) -> l.unitSelectionModified(getSelectedUnitsSnapshot()));
 	}
 
 	private Set<ControlsListener> listeners = new LinkedHashSet<ControlsListener>();
@@ -766,7 +769,7 @@ public class Controls extends InputProcessorAdapter {
 	 * @author Colin Ta
 	 *
 	 */
-	public class SelectedUnits extends HashSet<Unit> {
+	public class SelectedUnits implements Set<Unit> {
 
 		private static final long serialVersionUID = 1L;
 		private final Set<Unit> selected = new HashSet<Unit>();
@@ -845,6 +848,42 @@ public class Controls extends InputProcessorAdapter {
 				selected.clear();
 			}
 		}
+		
+		@Override
+		public boolean isEmpty() {
+			return selected.isEmpty();
+		}
+
+		@Override
+		public boolean contains(Object o) {
+			return selected.contains(o);
+		}
+
+		@Override
+		public <T> T[] toArray(T[] a) {
+			return selected.toArray(a);
+			}
+		
+		@Override
+		public Object[] toArray() {
+			return selected.toArray();
+		}
+
+		@Override
+		public boolean containsAll(Collection<?> c) {
+			return selected.containsAll(c);
+		}
+
+		@Override
+		public boolean retainAll(Collection<?> c) {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean removeAll(Collection<?> c) {
+			throw new UnsupportedOperationException();
+		}
+
 	}
 
 	public Context getContext() {
@@ -862,8 +901,8 @@ public class Controls extends InputProcessorAdapter {
 	/**
 	 * @return A seperate copy
 	 */
-	public List<UnitInfo> getSelectedUnitReadOnly() {
-		return new ArrayList<>(selectedUnits);
+	public List<UnitInfo> getSelectedUnitsSnapshot() {
+		return new ArrayList<UnitInfo>(selectedUnits);
 	}
 
 	private static class SelectionBox {

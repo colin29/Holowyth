@@ -37,7 +37,7 @@ public class Holo {
 	public static float UNIT_RADIUS = 17; // 13
 
 	// Play Mode (overrides debug settings to false)
-	public static boolean releaseMode = true;
+	public static boolean releaseMode = false;
 
 	// Debug Rendering
 	public static boolean debugRenderMapObstaclesEdges = true;

@@ -248,11 +248,14 @@ public class SkillBarUI implements ControlsListener {
 		batch.end();
 		batch.setProjectionMatrix(cameras.worldCamera.combined);
 	}
-
+	
 	@Override
 	public void unitSelectionModified(List<UnitInfo> selectedUnits) {
+		logger.debug("Unit selection modified {}", selectedUnits.size());
+		
 		if (selectedUnits.size() == 1) {
 			activateSkillBar((Unit) selectedUnits.get(0));
+			logger.debug("Skill bar activated");
 		} else {
 			deactivateSkillBar();
 		}

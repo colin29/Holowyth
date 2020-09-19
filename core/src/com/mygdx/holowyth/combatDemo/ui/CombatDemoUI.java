@@ -1,5 +1,8 @@
 package com.mygdx.holowyth.combatDemo.ui;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Camera;
@@ -16,6 +19,8 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStoreUI;
 
 public class CombatDemoUI {
+	
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	// Sub-components
 	private DebugStoreUI debugStoreUI;
@@ -52,8 +57,7 @@ public class CombatDemoUI {
 	private void createUI() {
 		setupStage();
 		createCoordinateText();
-
-		root.add(debugStoreUI.getDebugInfo());
+		root.add(debugStoreUI.getDebugValuesTable());
 	}
 
 	private void setupStage() {
@@ -85,7 +89,7 @@ public class CombatDemoUI {
 	 * Purely exposed for testing purposes, do not use otherwise
 	 */
 	public Table getDebugInfo() {
-		return debugStoreUI.getDebugInfo();
+		return debugStoreUI.getDebugValuesTable();
 	}
 
 	public void onMapStartup() {
@@ -96,6 +100,7 @@ public class CombatDemoUI {
 	}
 
 	public void onMapShutdown() {
+		logger.debug("CombatDemoUI map shutdown");
 		skillBarUI.remove();
 		getStatsPanelUI().remove();
 	}

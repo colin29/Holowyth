@@ -52,7 +52,7 @@ public class LineCircleDemo extends HoloBaseScreen {
 
 		debugStoreUI.populateDebugValueDisplay();
 
-		root.add(debugStoreUI.getDebugInfo());
+		root.add(debugStoreUI.getDebugValuesTable());
 		root.pack();
 
 	}

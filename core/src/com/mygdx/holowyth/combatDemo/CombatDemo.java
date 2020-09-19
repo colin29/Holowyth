@@ -75,7 +75,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	// ----- Variables ----- //
 	private Color backgroundColor = HoloGL.rgb(79, 121, 66); // HoloGL.rbg(255, 236, 179);
-	private boolean mouseScrollEnabled = false;
+	private boolean mouseScrollEnabled = true;
 
 	private enum GameState {
 		PLAYING, VICTORY, DEFEAT;
@@ -131,21 +131,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		functionBindings.bindFunctionToKey(() -> {
 			combatDemoUI.getStatsPanelUI().toggleDetailedView();
 		}, Keys.V);
-
-		functionBindings.bindFunctionToKey(() -> {
-			combatDemoUI.getStatsPanelUI().toggleDetailedView();
-		}, Keys.Y);
-	}
-
-	private void initializeAppLifetimeComponents() {
-		pathingModule = new PathingModule(camera, shapeRenderer);
-
-		renderer = new Renderer(game, camera, stage, pathingModule);
-		renderer.setClearColor(backgroundColor);
-
-		animations = new Animations();
-
-		ai = new AIModule();
 	}
 
 	@Override
@@ -321,7 +306,6 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 			"Blind: Prevents units from casting skills, and also interrupts ranged skills.";
 
 	private void createInstructionsPanel() {
-		var medStyle = new LabelStyle(Holowyth.fonts.borderedMediumFont(), Color.WHITE);
 		var style = new LabelStyle(Holowyth.fonts.debugFont(), Color.WHITE);
 		var panel = instructionsPanel;
 
@@ -416,6 +400,23 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 		showInstructionsPanel();
 	}
 
+	@Override
+	protected void mapShutdown() {
+		System.out.println("mapShutdown called");
+		combatDemoUI.onMapShutdown();
+	}
+
+	private void initializeAppLifetimeComponents() {
+		pathingModule = new PathingModule(camera, shapeRenderer);
+	
+		renderer = new Renderer(game, camera, stage, pathingModule);
+		renderer.setClearColor(backgroundColor);
+	
+		animations = new Animations();
+	
+		ai = new AIModule();
+	}
+
 	private void initializeMapLifetimeComponents() {
 
 		final int mapWidth = (Integer) map.getProperties().get("widthPixels");
@@ -451,11 +452,7 @@ public class CombatDemo extends DemoScreen implements Screen, InputProcessor {
 
 	}
 
-	@Override
-	protected void mapShutdown() {
-		System.out.println("mapShutdown called");
-		combatDemoUI.onMapShutdown();
-	}
+	
 
 	/* Input methods */
 
