@@ -40,7 +40,7 @@ public class Holo {
 	public static boolean releaseMode = false;
 
 	// Debug Rendering
-	public static boolean debugRenderMapObstaclesEdges = true;
+	public static boolean debugRenderMapObstaclesEdges = false;
 
 	// Debug Cheats
 	public static boolean debugFastCastEnbabled = false;
@@ -48,7 +48,7 @@ public class Holo {
 	public static boolean debugHighHpUnits = false;
 	public static boolean debugNoManaCost = false;
 
-	public static boolean debugAllowSelectEnemyUnits = true;
+	public static boolean debugAllowSelectEnemyUnits = false;
 	public static boolean debugDisplayEnemyCastingProgress = true;
 
 	// Combat movement
@@ -72,8 +72,8 @@ public class Holo {
 	public static boolean debugShowMouseLocationText = true;
 
 	// Debug settings
-	public static boolean debugRenderEnemyPath = true;
-	public static boolean continueShowingPathAfterArrival = true;
+	public static boolean debugRenderEnemyPath = false;
+	public static boolean continueShowingPathAfterArrival = false;
 	public static boolean debugPathfindingIgnoreUnits = false;
 
 	static {

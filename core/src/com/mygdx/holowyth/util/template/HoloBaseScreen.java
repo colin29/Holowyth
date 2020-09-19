@@ -14,6 +14,10 @@ import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.graphics.Cameras;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 
+/**
+ * Holds cameras, rendering equipment and common scene2d fields.
+ *
+ */
 public abstract class HoloBaseScreen implements Screen {
 
 	protected final Holowyth game;

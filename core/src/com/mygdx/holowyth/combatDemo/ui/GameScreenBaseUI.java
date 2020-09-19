@@ -15,10 +15,11 @@ import com.mygdx.holowyth.combatDemo.CombatDemo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.util.template.GameScreenBase;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStoreUI;
 
-public class CombatDemoUI {
+public class GameScreenBaseUI {
 	
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -40,13 +41,13 @@ public class CombatDemoUI {
 
 	private GameLog gameLog;
 
-	private CombatDemo self;
+	private GameScreenBase self;
 
-	public CombatDemoUI(Stage stage, DebugStore debugStore, Skin skin, CombatDemo combatDemo) {
+	public GameScreenBaseUI(Stage stage, DebugStore debugStore, Skin skin, GameScreenBase self) {
 		this.skin = skin;
 		this.stage = stage;
 		this.debugStore = debugStore;
-		this.self = combatDemo;
+		this.self = self;
 
 		debugStoreUI = new DebugStoreUI(debugStore);
 		gameLog = new GameLog(stage);
@@ -65,8 +66,6 @@ public class CombatDemoUI {
 		stage.addActor(root);
 		root.top().left();
 		stage.addActor(root);
-
-		// root.debug();
 	}
 
 	/**
@@ -85,11 +84,12 @@ public class CombatDemoUI {
 		return coordText;
 	}
 
-	/**
-	 * Purely exposed for testing purposes, do not use otherwise
-	 */
-	public Table getDebugInfo() {
-		return debugStoreUI.getDebugValuesTable();
+
+	public void setVisibleDebugValues(boolean visible) {
+		debugStoreUI.getDebugValuesTable().setVisible(visible);
+	}
+	public boolean isDebugValuesVisible() {
+		return debugStoreUI.getDebugValuesTable().isVisible();
 	}
 
 	public void onMapStartup() {
@@ -100,12 +100,11 @@ public class CombatDemoUI {
 	}
 
 	public void onMapShutdown() {
-		logger.debug("CombatDemoUI map shutdown");
 		skillBarUI.remove();
 		getStatsPanelUI().remove();
 	}
 
-	public void onRender() {
+	public void render() {
 		stage.setDebugAll(Gdx.input.isKeyPressed(Keys.C));
 		debugStoreUI.updateDebugValueDisplay();
 

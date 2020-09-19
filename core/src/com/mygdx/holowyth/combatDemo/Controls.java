@@ -738,9 +738,6 @@ public class Controls extends InputProcessorAdapter {
 		if (context == Context.SKILL_GROUND || context == Context.SKILL_UNIT) {
 			context = Context.NONE;
 		}
-		logger.debug("Unit selection modified {}", selectedUnits.size());
-		
-		
 		listeners.forEach((l) -> l.unitSelectionModified(getSelectedUnitsSnapshot()));
 	}
 
@@ -771,7 +768,6 @@ public class Controls extends InputProcessorAdapter {
 	 */
 	public class SelectedUnits implements Set<Unit> {
 
-		private static final long serialVersionUID = 1L;
 		private final Set<Unit> selected = new HashSet<Unit>();
 
 		public Unit first() {

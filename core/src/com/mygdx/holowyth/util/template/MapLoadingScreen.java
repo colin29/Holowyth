@@ -21,7 +21,7 @@ import com.mygdx.holowyth.util.exceptions.HoloException;
 /**
  * Works with a TMX map
  * 
- * Provides the common base functionality of a demo to be able to have a currently loaded map, and to get maps from disk
+ * Provides the common base to be able to have a currently loaded map, and to get maps from disk
  * 
  * Also acts as an adapter to the Screen and InputProcessor classes, providing empty implementations for most of the methods. Override just what you
  * need.
@@ -30,16 +30,16 @@ import com.mygdx.holowyth.util.exceptions.HoloException;
  * @author Colin Ta
  *
  */
-public abstract class DemoScreen extends HoloBaseScreen implements InputProcessor {
+public abstract class MapLoadingScreen extends HoloBaseScreen implements InputProcessor {
 
-	Logger logger = LoggerFactory.getLogger(DemoScreen.class);
+	Logger logger = LoggerFactory.getLogger(MapLoadingScreen.class);
 
 	/**
 	 * The currently loaded map
 	 */
 	protected TiledMap map;
 
-	protected DemoScreen(Holowyth game) {
+	protected MapLoadingScreen(Holowyth game) {
 		super(game);
 	}
 
@@ -64,6 +64,9 @@ public abstract class DemoScreen extends HoloBaseScreen implements InputProcesso
 
 	/**
 	 * Gets a map from disk, then loads it.
+	 * 
+	 * Warning: do not call loadMap() from a sub-class's constructor, because these call mapStartup() which is overrided.
+	 * Though, if you call from a leaf class constructor, and mark mapStartup() as final it is okay.
 	 */
 	protected void loadMapFromDisk(String pathname) {
 		logger.debug("pathname: " + pathname);
