@@ -24,17 +24,24 @@ import com.mygdx.holowyth.util.Holo;
  */
 public class DebugStoreUI {
 
-	Table debugInfo = new Table();
+	Table debugTable = new Table();
 
 	ValueLabelMapping valueLabelMapping;
 
 	DebugStore debugStore;
 
+	/**
+	 * Creates the debugValues table, call getDebugValuesTable() to access
+	 * @param debugStore
+	 */
 	public DebugStoreUI(DebugStore debugStore) {
 		this.debugStore = debugStore;
-
 		createDebugInfoDisplay();
 	}
+	
+//	public static DebugStoreUI create(DebugStore debugStore) {
+//		return new DebugStoreUI(debugStore);
+//	}
 
 	/**
 	 * This may not work for loading a second map, atm. Nonetheless, this still needs to be called after debug values are added from all components --
@@ -47,19 +54,19 @@ public class DebugStoreUI {
 
 		for (Map.Entry<String, DebugValues> entry : debugStore.getStore().entrySet()) {
 			String componentName = entry.getKey();
-			debugInfo.add(new Label(componentName, debugStyle));
-			debugInfo.row();
+			debugTable.add(new Label(componentName, debugStyle));
+			debugTable.row();
 			ArrayList<DebugValue> listOfValues = entry.getValue();
 
 			for (DebugValue v : listOfValues) {
 				if (v.isASpacingEntry()) {
-					debugInfo.add(new Label("", debugStyle));
-					debugInfo.row();
+					debugTable.add(new Label("", debugStyle));
+					debugTable.row();
 				} else {
 					Label n = new Label(" -" + v.getName(), debugStyle);
 					Label l = new Label("", debugStyle);
-					debugInfo.add(n, l);
-					debugInfo.row();
+					debugTable.add(n, l);
+					debugTable.row();
 					valueLabelMapping.registerLabel(v, l);
 				}
 			}
@@ -103,17 +110,17 @@ public class DebugStoreUI {
 	}
 
 	public Table getDebugValuesTable() {
-		return debugInfo;
+		return debugTable;
 	}
 
 	public void createDebugInfoDisplay() {
-		debugInfo = new Table();
+		debugTable = new Table();
 
-		debugInfo.top().left();
-		debugInfo.pad(4);
+		debugTable.top().left();
+		debugTable.pad(4);
 
-		debugInfo.defaults().spaceRight(20).left();
-		debugInfo.setVisible(Holo.debugPanelShowAtStartup);
+		debugTable.defaults().spaceRight(20).left();
+		debugTable.setVisible(Holo.debugPanelShowAtStartup);
 	}
 
 }

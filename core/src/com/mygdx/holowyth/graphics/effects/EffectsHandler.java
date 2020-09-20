@@ -17,7 +17,7 @@ import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
 /**
- * Manages all effects for the game
+ * Manages all gfx effects for the game
  * 
  * @author Colin Ta
  *

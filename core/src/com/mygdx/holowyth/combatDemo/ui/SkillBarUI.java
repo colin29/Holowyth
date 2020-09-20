@@ -19,7 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mygdx.holowyth.combatDemo.Controls;
-import com.mygdx.holowyth.combatDemo.Controls.ControlsListener;
+import com.mygdx.holowyth.combatDemo.Controls.UnitSelectionListener;
 import com.mygdx.holowyth.graphics.Cameras;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.ActiveSkill;
@@ -37,7 +37,7 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
  *
  */
 
-public class SkillBarUI implements ControlsListener {
+public class SkillBarUI {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private Stage stage;
@@ -78,8 +78,6 @@ public class SkillBarUI implements ControlsListener {
 		root.bottom();
 
 		root.add(skillBar);
-
-		controls.addListener(this);
 	}
 
 	private void regenerateSkillBar() {
@@ -216,7 +214,6 @@ public class SkillBarUI implements ControlsListener {
 
 	public void remove() {
 		root.remove();
-		controls.removeListener(this);
 	}
 
 	public boolean isSkillBarActive() {
@@ -227,7 +224,10 @@ public class SkillBarUI implements ControlsListener {
 
 	private Color skillCoolDownOverlayColor = new Color(1, 1, 1, 0.25f);
 
-	public void render(Cameras cameras, SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
+	/**
+	 * SkillBar uses drawn shapes, thus the manual draw call
+	 */
+	public void draw(Cameras cameras, SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
 		batch.begin();
 		batch.setProjectionMatrix(cameras.fixedCamera.combined);
 
@@ -249,13 +249,12 @@ public class SkillBarUI implements ControlsListener {
 		batch.setProjectionMatrix(cameras.worldCamera.combined);
 	}
 	
-	@Override
-	public void unitSelectionModified(List<UnitInfo> selectedUnits) {
-		if (selectedUnits.size() == 1) {
-			activateSkillBar((Unit) selectedUnits.get(0));
-		} else {
+	public void setUnit(UnitInfo unit){
+		if(unit!=null) {
+			activateSkillBar((Unit) unit);
+		}else {
 			deactivateSkillBar();
 		}
 	}
-
+	
 }

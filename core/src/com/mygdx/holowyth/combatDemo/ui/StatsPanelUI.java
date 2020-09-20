@@ -9,7 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.mygdx.holowyth.combatDemo.Controls.ControlsListener;
+import com.mygdx.holowyth.combatDemo.Controls;
+import com.mygdx.holowyth.combatDemo.Controls.UnitSelectionListener;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
@@ -24,7 +25,7 @@ import com.mygdx.holowyth.util.HoloUI;
  * @author Colin Ta
  *
  */
-public class StatsPanelUI implements ControlsListener {
+public class StatsPanelUI {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -45,8 +46,9 @@ public class StatsPanelUI implements ControlsListener {
 	private Table detailedPanel;
 
 	private boolean showDetailedPanel = false;
+	private UnitStatsInfo curUnit;	
 
-	public StatsPanelUI(Stage stage, Skin skin) {
+	public StatsPanelUI(Stage stage, Skin skin) { 
 		this.skin = skin;
 		this.stage = stage;
 
@@ -63,7 +65,6 @@ public class StatsPanelUI implements ControlsListener {
 	}
 
 	private void create() {
-
 		createSimpleTable();
 		createDetailedTable();
 	}
@@ -132,87 +133,96 @@ public class StatsPanelUI implements ControlsListener {
 
 	}
 
-	@Override
-	public void unitSelectionModified(List<UnitInfo> selectedUnits) {
-		if (selectedUnits.size() == 1) {
-			setVisible(true);
-			update(selectedUnits.get(0).getStats());
-		} else {
-			setVisible(false);
-		}
-
-	}
-
 	private final int DAMAGE_ROUND_DIGITS = 1;
-
-	/**
-	 * Unit must not be null
-	 */
-	private void update(UnitStatsInfo unit) {
-
-		// logger.debug("update called:");
-		// ((UnitStats) unit).printInfo();
-
-		nameText.setText(unit.getName());
-
-		simpleStatText.damage.setText(DataUtil.round(unit.getDamage(), DAMAGE_ROUND_DIGITS));
-		simpleStatText.atk.setText(unit.getAtk());
-		simpleStatText.force.setText(unit.getForce());
-		simpleStatText.def.setText(unit.getDef());
-		simpleStatText.stab.setText(unit.getStab());
-
-		// Update detailed table
-		var base = unit.getBaseStats();
-		var skill = unit.getSkillBonuses();
-		var equip = unit.getEquipBonuses();
-
-		final String PLUS_TEXT = "+ ";
-		final String EQUALS_TEXT = "= ";
-
-		detailedNameText.setText(unit.getName());
-
-		baseStatText.damage.setText(DataUtil.round(base.damage, DAMAGE_ROUND_DIGITS));
-		baseStatText.atk.setText(base.atk);
-		baseStatText.force.setText(base.force);
-		baseStatText.def.setText(base.def);
-		baseStatText.stab.setText(base.stab);
-
-		skillBonusText.damage.setText(PLUS_TEXT + skill.damage);
-		skillBonusText.atk.setText(PLUS_TEXT + skill.atk);
-		skillBonusText.force.setText(PLUS_TEXT + skill.force);
-		skillBonusText.def.setText(PLUS_TEXT + skill.def);
-		skillBonusText.stab.setText(PLUS_TEXT + skill.stab);
-
-		equipBonusText.damage.setText(PLUS_TEXT + equip.damage);
-		equipBonusText.atk.setText(PLUS_TEXT + equip.atk);
-		equipBonusText.force.setText(PLUS_TEXT + equip.force);
-		equipBonusText.def.setText(PLUS_TEXT + equip.def);
-		equipBonusText.stab.setText(PLUS_TEXT + equip.stab);
-
-		finalStatText.damage.setText(EQUALS_TEXT + unit.getDamage());
-		finalStatText.atk.setText(EQUALS_TEXT + unit.getAtk());
-		finalStatText.force.setText(EQUALS_TEXT + unit.getForce());
-		finalStatText.def.setText(EQUALS_TEXT + unit.getDef());
-		finalStatText.stab.setText(EQUALS_TEXT + unit.getStab());
-
-		statPanel.pack();
-		detailedPanel.pack();
-	}
+	
 
 	private static class StatLabels {
-
+	
 		final Label damage;
 		final Label atk;
 		final Label force;
 		final Label def;
 		final Label stab;
-
+	
 		StatLabels(Skin skin) {
 			damage = new Label("", skin);
 			atk = new Label("", skin);
 			force = new Label("", skin);
 			def = new Label("", skin);
 			stab = new Label("", skin);
+		}
+	}
+
+	/**
+	 * Updates curUnit and the panel. Unit must not be null
+	 */
+	private void updatePanel(UnitStatsInfo unit) {
+	
+		curUnit = unit;
+	
+		nameText.setText(unit.getName());
+	
+		simpleStatText.damage.setText(DataUtil.round(unit.getDamage(), DAMAGE_ROUND_DIGITS));
+		simpleStatText.atk.setText(unit.getAtk());
+		simpleStatText.force.setText(unit.getForce());
+		simpleStatText.def.setText(unit.getDef());
+		simpleStatText.stab.setText(unit.getStab());
+	
+		// Update detailed table
+		var base = unit.getBaseStats();
+		var skill = unit.getSkillBonuses();
+		var equip = unit.getEquipBonuses();
+	
+		final String PLUS_TEXT = "+ ";
+		final String EQUALS_TEXT = "= ";
+	
+		detailedNameText.setText(unit.getName());
+	
+		baseStatText.damage.setText(DataUtil.round(base.damage, DAMAGE_ROUND_DIGITS));
+		baseStatText.atk.setText(base.atk);
+		baseStatText.force.setText(base.force);
+		baseStatText.def.setText(base.def);
+		baseStatText.stab.setText(base.stab);
+	
+		skillBonusText.damage.setText(PLUS_TEXT + skill.damage);
+		skillBonusText.atk.setText(PLUS_TEXT + skill.atk);
+		skillBonusText.force.setText(PLUS_TEXT + skill.force);
+		skillBonusText.def.setText(PLUS_TEXT + skill.def);
+		skillBonusText.stab.setText(PLUS_TEXT + skill.stab);
+	
+		equipBonusText.damage.setText(PLUS_TEXT + equip.damage);
+		equipBonusText.atk.setText(PLUS_TEXT + equip.atk);
+		equipBonusText.force.setText(PLUS_TEXT + equip.force);
+		equipBonusText.def.setText(PLUS_TEXT + equip.def);
+		equipBonusText.stab.setText(PLUS_TEXT + equip.stab);
+	
+		finalStatText.damage.setText(EQUALS_TEXT + unit.getDamage());
+		finalStatText.atk.setText(EQUALS_TEXT + unit.getAtk());
+		finalStatText.force.setText(EQUALS_TEXT + unit.getForce());
+		finalStatText.def.setText(EQUALS_TEXT + unit.getDef());
+		finalStatText.stab.setText(EQUALS_TEXT + unit.getStab());
+	
+		statPanel.pack();
+		detailedPanel.pack();
+	}
+
+
+	
+	public void setUnit(UnitInfo unit){
+		if(unit!=null) {
+			setVisible(true);
+			updatePanel(unit.getStats());
+		}else {
+			setVisible(false);
+		}
+	}
+	
+	/**
+	 * Draws information again with the current unit.
+	 */
+	public void update() {
+		if(curUnit!=null) {
+			updatePanel(curUnit);
 		}
 	}
 

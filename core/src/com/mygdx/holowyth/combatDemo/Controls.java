@@ -29,7 +29,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.combatDemo.ui.GameLog;
+import com.mygdx.holowyth.combatDemo.ui.GameLogDisplay;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.skill.GroundSkill;
@@ -101,10 +101,10 @@ public class Controls extends InputProcessorAdapter {
 	Skin skin;
 	LabelStyle labelStyle;
 
-	private GameLog gameLog;
+	private GameLogDisplay gameLog;
 
 	public Controls(Holowyth game, Camera camera, Camera fixedCam, List<Unit> units, DebugStore debugStore,
-			World world, GameLog gameLog) {
+			World world, GameLogDisplay gameLog) {
 		this.shapeRenderer = game.shapeRenderer;
 		this.camera = camera;
 		this.fixedCam = fixedCam;
@@ -741,18 +741,18 @@ public class Controls extends InputProcessorAdapter {
 		listeners.forEach((l) -> l.unitSelectionModified(getSelectedUnitsSnapshot()));
 	}
 
-	private Set<ControlsListener> listeners = new LinkedHashSet<ControlsListener>();
+	private Set<UnitSelectionListener> listeners = new LinkedHashSet<UnitSelectionListener>();
 
-	public void addListener(ControlsListener l) {
+	public void addListener(UnitSelectionListener l) {
 		listeners.add(l);
 		logger.debug("Added listener");
 	}
 
-	public void removeListener(ControlsListener l) {
+	public void removeListener(UnitSelectionListener l) {
 		listeners.remove(l);
 	}
 
-	public interface ControlsListener {
+	public interface UnitSelectionListener {
 		/**
 		 * @param list
 		 *            of units is unmodifiable

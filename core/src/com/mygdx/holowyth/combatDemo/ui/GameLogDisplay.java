@@ -9,7 +9,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.VerticalGroup;
 import com.mygdx.holowyth.Holowyth;
 
-public class GameLog {
+/**
+ * A UI component for displaying messages
+ * @author Colin
+ *
+ */
+public class GameLogDisplay {
 
 	private Table root = new Table(); // uses its seperate root
 
@@ -19,9 +24,9 @@ public class GameLog {
 	private static LabelStyle debugStyleError;
 
 	/**
-	 * Creates and adds its own table to stage
+	 * Creates and attaches table to stage
 	 */
-	GameLog(Stage stage) {
+	public GameLogDisplay(Stage stage) {
 		root.setFillParent(true);
 		stage.addActor(root);
 
@@ -34,8 +39,8 @@ public class GameLog {
 		logPanel.fill();
 
 		root.add(logPanel);
-
 	}
+	
 
 	public void addMessage(String str, boolean isErrorMessage) {
 		var msg = new GameLogMessage(str, isErrorMessage);
@@ -51,7 +56,7 @@ public class GameLog {
 		addMessage(str, false);
 	}
 
-	public static class GameLogMessage extends Label {
+	static class GameLogMessage extends Label {
 		static final float timeToDisplay = 2; // in seconds
 		float timeLeft = timeToDisplay;
 

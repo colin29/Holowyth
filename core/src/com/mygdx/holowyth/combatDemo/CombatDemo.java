@@ -24,7 +24,7 @@ import com.mygdx.holowyth.ai.AIModule;
 import com.mygdx.holowyth.combatDemo.prototyping.CombatPrototyping;
 import com.mygdx.holowyth.combatDemo.rendering.Renderer;
 import com.mygdx.holowyth.combatDemo.ui.GameScreenBaseUI;
-import com.mygdx.holowyth.combatDemo.ui.GameLog;
+import com.mygdx.holowyth.combatDemo.ui.GameLogDisplay;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
