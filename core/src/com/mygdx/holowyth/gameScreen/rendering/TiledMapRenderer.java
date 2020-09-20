@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.combatDemo.rendering;
+package com.mygdx.holowyth.gameScreen.rendering;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

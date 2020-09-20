@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.combatDemo.prototyping;
+package com.mygdx.holowyth.gameScreen.combatDemo.prototyping;
 
 import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.unit.item.Equip.EquipType;

@@ -3,7 +3,7 @@ package com.mygdx.holowyth.unit;
 import java.util.Comparator;
 import java.util.PriorityQueue;
 
-import com.mygdx.holowyth.combatDemo.WorldInfo;
+import com.mygdx.holowyth.gameScreen.WorldInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.dataobjects.Point;
 

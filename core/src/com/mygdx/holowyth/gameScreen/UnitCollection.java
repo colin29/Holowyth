@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.combatDemo;
+package com.mygdx.holowyth.gameScreen;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -3,7 +3,7 @@ package com.mygdx.holowyth.skill.skillsandeffects;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.holowyth.combatDemo.World;
+import com.mygdx.holowyth.gameScreen.World;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 

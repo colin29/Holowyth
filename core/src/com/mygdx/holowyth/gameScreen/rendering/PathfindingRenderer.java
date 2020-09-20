@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.combatDemo.rendering;
+package com.mygdx.holowyth.gameScreen.rendering;
 
 import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.graphics.HoloGL;

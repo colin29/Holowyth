@@ -10,7 +10,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.combatDemo.World;
+import com.mygdx.holowyth.gameScreen.World;
 import com.mygdx.holowyth.graphics.effects.DamageEffect.PresetType;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.DataUtil;

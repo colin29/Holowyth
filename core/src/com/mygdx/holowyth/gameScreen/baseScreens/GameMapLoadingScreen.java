@@ -1,12 +1,9 @@
-package com.mygdx.holowyth.tiled;
+package com.mygdx.holowyth.gameScreen.baseScreens;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.utils.Array;
@@ -14,45 +11,73 @@ import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.map.GameMap;
+import com.mygdx.holowyth.tiled.TiledMapLoader;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.exceptions.HoloException;
+import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;
 
 /**
- * A Screen that can load Tiled map (NOT a full GameMap!)
- * This is being transitioned out, it's just used for older demos.
- * 
- * Provides the common base to be able to have a currently loaded Tiled map, and to get maps from disk
+ * A Screen that can load a GameMap (which contains a tmx map and more)
  * 
  * @author Colin Ta
  *
  */
-public abstract class TiledMapLoadingScreen extends HoloBaseScreen  {
+public abstract class GameMapLoadingScreen extends HoloBaseScreen {
 
 	Logger logger = LoggerFactory.getLogger(TiledMapLoadingScreen.class);
 
 	/**
-	 * The currently loaded map
+	 * The currently loaded game map
 	 */
-	protected TiledMap map;
+	protected GameMap map;
 
-	protected TiledMapLoadingScreen(Holowyth game) {
+	private final TiledMapLoader tiledMapLoader;
+
+	protected GameMapLoadingScreen(Holowyth game) {
 		super(game);
+
+		tiledMapLoader = new TiledMapLoader(stage, game.fileChooser);
 	}
 
 	/**
-	 * Gets a map from disk, then loads it.
-	 * 
-	 * Warning: do not call loadMap() from a sub-class's constructor, because these call mapStartup() which is overrided.
-	 * Though, if you call from a leaf class constructor, and mark mapStartup() as final it is okay.
+	 * Loads a GameMap by name. (Some of the information is simply being stored in
+	 * the program atm, in a gameMap repository)
 	 */
-	protected void loadMapFromDisk(String pathname) {
-		TiledMap loadedMap = new MyAtlasTmxMapLoader().load(pathname);
-		logger.debug(pathname);
-		loadMap(loadedMap);
+	protected void loadGameMapByName(String mapName) {
+		
+		if(!game.mapRepo.hasMap("forest1"))
+			throw new HoloResourceNotFoundException();
+		
+		GameMap newMap = new GameMap(game.mapRepo.getMap("forest1"));
+		newMap.setTilemap(getTiledMapFromDisk(newMap.tilemapPath));
+
+		
+		loadMap(newMap);
+		return;
+		
+		}
+	
+	/**
+	 * Creates and loads a GameMap from a tiled map on disk. <br>
+	 * See {@link #makeGameMapFromTiledMapOnDisk(String)}
+	 */
+	protected void loadGameMapFromTiledMapOnDisk(String pathname) {
+		loadMap(makeGameMapFromTiledMapOnDisk(pathname));
+	}
+	/**
+	 * The GameMap only contains info from the Tiled Map. Other fields are left blank.
+	 */
+	private GameMap makeGameMapFromTiledMapOnDisk(String pathname) {
+		return new GameMap(getTiledMapFromDisk(pathname));
+	}
+	private TiledMap getTiledMapFromDisk(String pathname) {
+		return tiledMapLoader.getTiledMapFromTMXFile(pathname);
 	}
 
-	protected void loadMap(TiledMap newMap) {
+	protected void loadMap(GameMap newMap) {
 		if (this.map != null) {
 			mapShutdown();
 			this.map = null;
@@ -62,9 +87,16 @@ public abstract class TiledMapLoadingScreen extends HoloBaseScreen  {
 			logger.error("New map was null. New map not loaded");
 			return;
 		}
+		addCustomPropertiesToTiledMap(newMap.getTilemap());
 
+		this.map = newMap;
+		logger.info("Map loaded");
+		mapStartup();
+	}
+
+	private void addCustomPropertiesToTiledMap(TiledMap tiledMap) {
 		try {
-			MapProperties prop = newMap.getProperties();
+			MapProperties prop = tiledMap.getProperties();
 			int tileWidth = (Integer) prop.get("tilewidth");
 			int tileHeight = (Integer) prop.get("tileheight");
 
@@ -77,31 +109,27 @@ public abstract class TiledMapLoadingScreen extends HoloBaseScreen  {
 		} catch (NullPointerException e) {
 			throw new HoloException("Map load failed, missing properties", e);
 		}
-
-		this.map = newMap;
-		logger.info("Map loaded");
-		mapStartup();
 	}
 
 	@SuppressWarnings("unused")
 	private void openFileChooserToLoadMap() {
 		System.out.println("Opening Load Dialog");
 		stage.addActor(game.fileChooser);
-	
+
 		game.fileChooser.setMode(Mode.OPEN);
 		game.fileChooser.setSelectionMode(SelectionMode.FILES);
 		game.fileChooser.setListener(new FileChooserAdapter() {
 			@Override
 			public void selected(Array<FileHandle> file) {
 				logger.debug("Selected file: {}", file.get(0).file().getAbsolutePath());
-	
-				loadMapFromDisk(file.get(0).file().getPath()); // tmx map loader uses relative path
+
+				loadGameMapByName(file.get(0).file().getPath()); // tmx map loader uses relative path
 			}
 		});
-	
+
 		game.fileChooser.setDirectory(Holo.simpleMapsDirectory);
 	}
-	
+
 	protected abstract void mapStartup();
 
 	protected abstract void mapShutdown();

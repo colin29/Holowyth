@@ -1,10 +1,10 @@
-package com.mygdx.holowyth.combatDemo.rendering;
+package com.mygdx.holowyth.gameScreen.rendering;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.combatDemo.WorldInfo;
+import com.mygdx.holowyth.gameScreen.WorldInfo;
 
 /**
  * Contains no mutable state

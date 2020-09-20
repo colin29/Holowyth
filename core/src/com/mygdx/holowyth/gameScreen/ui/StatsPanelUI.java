@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.combatDemo.ui;
+package com.mygdx.holowyth.gameScreen.ui;
 
 import java.util.List;
 
@@ -9,8 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.mygdx.holowyth.combatDemo.Controls;
-import com.mygdx.holowyth.combatDemo.Controls.UnitSelectionListener;
+import com.mygdx.holowyth.gameScreen.Controls;
+import com.mygdx.holowyth.gameScreen.Controls.UnitSelectionListener;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;

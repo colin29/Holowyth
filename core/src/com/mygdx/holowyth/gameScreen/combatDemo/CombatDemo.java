@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.combatDemo;
+package com.mygdx.holowyth.gameScreen.combatDemo;
 
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.delay;
 import static com.badlogic.gdx.scenes.scene2d.actions.Actions.run;
@@ -21,15 +21,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.ai.AIModule;
-import com.mygdx.holowyth.combatDemo.prototyping.CombatPrototyping;
-import com.mygdx.holowyth.combatDemo.rendering.Renderer;
-import com.mygdx.holowyth.combatDemo.ui.GameBaseUI;
-import com.mygdx.holowyth.combatDemo.ui.GameLogDisplay;
 import com.mygdx.holowyth.gameScreen.GameScreenBase;
+import com.mygdx.holowyth.gameScreen.baseScreens.TiledMapLoadingScreen;
+import com.mygdx.holowyth.gameScreen.combatDemo.prototyping.CombatPrototyping;
+import com.mygdx.holowyth.gameScreen.rendering.Renderer;
+import com.mygdx.holowyth.gameScreen.ui.GameBaseUI;
+import com.mygdx.holowyth.gameScreen.ui.GameLogDisplay;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.tiled.TiledMapLoadingScreen;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.Holo;

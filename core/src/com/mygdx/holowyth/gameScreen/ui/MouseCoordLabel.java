@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.combatDemo.ui;
+package com.mygdx.holowyth.gameScreen.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Camera;

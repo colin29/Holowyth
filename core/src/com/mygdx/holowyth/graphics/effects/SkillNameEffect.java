@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.mygdx.holowyth.combatDemo.World;
+import com.mygdx.holowyth.gameScreen.World;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 

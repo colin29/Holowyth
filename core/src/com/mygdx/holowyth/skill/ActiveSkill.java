@@ -8,8 +8,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mygdx.holowyth.combatDemo.World;
-import com.mygdx.holowyth.combatDemo.WorldInfo;
+import com.mygdx.holowyth.gameScreen.World;
+import com.mygdx.holowyth.gameScreen.WorldInfo;
 import com.mygdx.holowyth.skill.effect.CasterEffect;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;

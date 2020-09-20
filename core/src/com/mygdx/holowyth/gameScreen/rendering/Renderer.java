@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.combatDemo.rendering;
+package com.mygdx.holowyth.gameScreen.rendering;
 
 import java.util.List;
 import java.util.function.Predicate;
@@ -22,9 +22,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.combatDemo.Controls;
-import com.mygdx.holowyth.combatDemo.Controls.Context;
-import com.mygdx.holowyth.combatDemo.WorldInfo;
+import com.mygdx.holowyth.gameScreen.Controls;
+import com.mygdx.holowyth.gameScreen.WorldInfo;
+import com.mygdx.holowyth.gameScreen.Controls.Context;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.HoloSprite;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
@@ -301,17 +301,16 @@ public class Renderer {
 
 		// Render unit circles as a fallback (if they don't have a sprite)
 		for (Unit unit : world.getUnits()) {
-
-//			if (unit.graphics.getAnimatedSprite() != null)
-//				continue;
+			if (unit.graphics.getAnimatedSprite() != null)
+				continue;
 			shapeDrawer.setColor(unit.isAPlayerCharacter() ? Color.PURPLE : Color.YELLOW);
 			shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
 			shapeDrawer.filledCircle(unit.x, unit.y, Holo.UNIT_RADIUS);
 
 		}
 		for (Unit unit : world.getUnits()) {
-//			if (unit.graphics.getAnimatedSprite() != null)
-//				continue;
+			if (unit.graphics.getAnimatedSprite() != null)
+				continue;
 			shapeDrawer.setColor(Color.BLACK);
 			shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
 			shapeDrawer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);

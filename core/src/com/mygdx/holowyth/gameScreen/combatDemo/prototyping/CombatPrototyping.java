@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.combatDemo.prototyping;
+package com.mygdx.holowyth.gameScreen.combatDemo.prototyping;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,8 +6,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mygdx.holowyth.combatDemo.Controls;
-import com.mygdx.holowyth.combatDemo.World;
+import com.mygdx.holowyth.gameScreen.Controls;
+import com.mygdx.holowyth.gameScreen.World;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.unit.Unit;

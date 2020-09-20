@@ -1,9 +1,9 @@
-package com.mygdx.holowyth.combatDemo.rendering;
+package com.mygdx.holowyth.gameScreen.rendering;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.combatDemo.WorldInfo;
+import com.mygdx.holowyth.gameScreen.WorldInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 

@@ -19,8 +19,9 @@ import com.mygdx.holowyth.util.exceptions.HoloException;
  * @author Colin
  *
  */
-public class UnitMarker implements Cloneable {
+public class UnitMarker {
 	
+	public boolean isTemplate = false;
 	public String name = "Unnamed Unit";
 	public final Point pos = new Point();
 	public Unit.Side side;
@@ -45,6 +46,17 @@ public class UnitMarker implements Cloneable {
 		animatedSpriteName = src.animatedSpriteName;
 	}
 	
+	/**
+	 * Identical to UnitMarker except it sets hint field isTemplate to true on construction
+	 * @author Colin
+	 *
+	 */
+	public static class TemplateUnitMarker extends UnitMarker{
+		public TemplateUnitMarker() {
+			super();
+			isTemplate = true;
+		}
+	}
 	
 	
 }

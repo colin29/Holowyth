@@ -3,8 +3,8 @@ package com.mygdx.holowyth.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.combatDemo.CombatDemo;
 import com.mygdx.holowyth.gameScreen.GameScreen;
+import com.mygdx.holowyth.gameScreen.combatDemo.CombatDemo;
 
 public class GameScreenLauncher {
 	public static void main(String[] arg) {

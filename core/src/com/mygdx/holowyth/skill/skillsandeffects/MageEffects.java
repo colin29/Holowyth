@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.holowyth.combatDemo.World;
+import com.mygdx.holowyth.gameScreen.World;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.effect.CasterGroundEffect;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
