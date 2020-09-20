@@ -141,6 +141,7 @@ public class CombatPrototyping {
 			u.graphics.setAnimatedSprite(animations.get("pipo-charachip030e.png"));
 
 			u.stats.self.skills.addSkill(PassiveSkills.basicCombatTraining);
+			u.skills.addSkills(Skills.warriorSkills);
 			u.skills.slotSkills(Skills.warriorSkills);
 			u.equip.equip(Equips.longSword.copy());
 		}
@@ -150,6 +151,7 @@ public class CombatPrototyping {
 			u.graphics.setAnimatedSprite(animations.get("pipo-charachip001b.png"));
 
 			u.skills.addSkill(PassiveSkills.basicCombatTraining);
+			u.skills.addSkills(Skills.warriorSkills);
 			u.skills.slotSkills(Skills.warriorSkills);
 			u.stats.getEquip().equip(Equips.longSword.copy());
 		}
@@ -158,6 +160,7 @@ public class CombatPrototyping {
 			u.setName("Sonia");
 			u.graphics.setAnimatedSprite(animations.get("pipo-charachip028d.png"));
 
+			u.skills.addSkills(Skills.mageSkills);
 			u.skills.slotSkills(
 					Skills.mageSkills);
 			u.stats.getEquip().equip(Equips.staff.copy());

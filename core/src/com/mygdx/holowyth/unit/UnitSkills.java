@@ -87,6 +87,11 @@ public class UnitSkills {
 		self.stats.recalculateStats();
 		return added;
 	}
+	public void addSkills(List<? extends Skill> skills) {
+		for(Skill s : skills) {
+			addSkill(s);
+		}
+	}
 
 	public boolean removeSkill(Skill s) {
 		return skills.remove(s);

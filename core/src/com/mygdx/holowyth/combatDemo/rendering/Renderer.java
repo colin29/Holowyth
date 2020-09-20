@@ -24,7 +24,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.combatDemo.Controls;
 import com.mygdx.holowyth.combatDemo.Controls.Context;
-import com.mygdx.holowyth.combatDemo.World;
+import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.HoloSprite;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
@@ -70,7 +70,7 @@ public class Renderer {
 	private PathingModule pathingModule;
 
 	// Map lifetime components
-	private World world;
+	private WorldInfo world;
 	private EffectsHandler gfx;
 
 	// Map info
@@ -299,21 +299,19 @@ public class Renderer {
 
 		batch.begin();
 
-		// Render unit circles
+		// Render unit circles as a fallback (if they don't have a sprite)
 		for (Unit unit : world.getUnits()) {
 
-			if (unit.graphics.getAnimatedSprite() != null)
-				continue;
-
-			// Render a circle as a fallback
+//			if (unit.graphics.getAnimatedSprite() != null)
+//				continue;
 			shapeDrawer.setColor(unit.isAPlayerCharacter() ? Color.PURPLE : Color.YELLOW);
 			shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
 			shapeDrawer.filledCircle(unit.x, unit.y, Holo.UNIT_RADIUS);
 
 		}
 		for (Unit unit : world.getUnits()) {
-			if (unit.graphics.getAnimatedSprite() != null)
-				continue;
+//			if (unit.graphics.getAnimatedSprite() != null)
+//				continue;
 			shapeDrawer.setColor(Color.BLACK);
 			shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
 			shapeDrawer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
@@ -508,11 +506,11 @@ public class Renderer {
 	/*
 	 * Sets the world that Renderer should render
 	 */
-	public void setWorld(World world) {
+	public void setWorld(WorldInfo world) {
 		this.world = world;
 	}
 
-	public World getWorld() {
+	public WorldInfo getWorld() {
 		return world;
 	}
 

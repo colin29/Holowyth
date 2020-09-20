@@ -14,16 +14,19 @@ import com.mygdx.holowyth.ai.UnitAI;
 import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.graphics.HoloGL;
+import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitPF;
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.ActiveSkill.Status;
+import com.mygdx.holowyth.tiled.GameMapLoadingScreen;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.unit.sprite.UnitGraphics;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.util.exceptions.HoloException;
 
 /**
  * Responsibilities:<br>
@@ -180,6 +183,22 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		ai = new UnitAI(this);
 
 		graphics = new UnitGraphics(this);
+	}
+	
+	/**
+	 * Create unit from marker
+	 */
+	public Unit(UnitMarker m, WorldInfo world) {
+		this(m.pos.x, m.pos.y, world, m.side, m.name);
+		
+		stats.base.set(m.baseStats);
+		
+		skills.addSkills(m.activeSkills);
+		skills.addSkills(m.passiveSkills);
+		skills.slotSkills(m.activeSkills);
+		
+		graphics.setAnimatedSprite(world.getAnimations().get(m.animatedSpriteName));
+		
 	}
 
 	// Orders

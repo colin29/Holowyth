@@ -50,8 +50,6 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 
 	// Graphical Modules
 	protected Renderer renderer;
-	protected Animations animations;
-	
 	protected EffectsHandler gfx;
 	
 	/**
@@ -262,8 +260,6 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 		renderer = new Renderer(game, camera, stage, pathingModule);
 		renderer.setClearColor(backgroundColor);
 
-		animations = new Animations();
-
 		ai = new AIModule();
 
 		ui = new GameBaseUI(stage, debugStore, skin, this);
@@ -281,7 +277,7 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 
 		gfx = new EffectsHandler(game.batch, camera, stage, skin, debugStore);
 
-		world = new World(mapWidth, mapHeight, pathingModule, debugStore, gfx, animations);
+		world = new World(mapWidth, mapHeight, pathingModule, debugStore, gfx, game.animations);
 
 		// Init Unit controls
 		controls = new Controls(game, camera, fixedCam, world.getUnits(), debugStore, world, ui.getGameLog());

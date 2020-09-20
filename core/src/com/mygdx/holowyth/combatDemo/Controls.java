@@ -65,7 +65,7 @@ public class Controls extends InputProcessorAdapter {
 	Camera fixedCam;
 	private ShapeRenderer shapeRenderer;
 
-	World world;
+	WorldInfo world;
 	List<Unit> units;
 
 	private FunctionBindings functionBindings = new FunctionBindings();
@@ -104,7 +104,7 @@ public class Controls extends InputProcessorAdapter {
 	private GameLogDisplay gameLog;
 
 	public Controls(Holowyth game, Camera camera, Camera fixedCam, List<Unit> units, DebugStore debugStore,
-			World world, GameLogDisplay gameLog) {
+			WorldInfo world, GameLogDisplay gameLog) {
 		this.shapeRenderer = game.shapeRenderer;
 		this.camera = camera;
 		this.fixedCam = fixedCam;

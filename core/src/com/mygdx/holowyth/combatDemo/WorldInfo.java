@@ -9,6 +9,7 @@ import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
+import com.mygdx.holowyth.unit.sprite.Animations;
 
 public interface WorldInfo {
 
@@ -36,4 +37,6 @@ public interface WorldInfo {
 	}
 
 	List<Effect> getEffects();
+
+	Animations getAnimations();
 }

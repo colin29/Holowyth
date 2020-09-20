@@ -44,6 +44,10 @@ public class Animations {
 
 	}
 
+	/**
+	 * Throws HoloResourceNotFoundException if sprite not found
+	 * @return
+	 */
 	public AnimatedSprite get(String name) {
 		AnimatedSprite value = sprites.get(name);
 		if (value == null) {

@@ -22,6 +22,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.mygdx.holowyth.editor.PolyMapEditor;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.map.GameMapRepo;
+import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 
 public class Holowyth extends Game {
@@ -34,7 +35,7 @@ public class Holowyth extends Game {
 	public ShapeRenderer shapeRenderer;
 
 	public static final String ASSETS_PATH = "assets/";
-	public final AssetManager assets;
+	public AssetManager assets;
 
 	/* Fonts */
 
@@ -49,6 +50,9 @@ public class Holowyth extends Game {
 	/* Game */
 	public final GameMapRepo mapRepo = new GameMapRepo(); 
 	
+	/* Sprite resources */
+	public Animations animations;
+	
 
 	Class<? extends Screen> screenClassToLoad;
 	public ShapeDrawerPlus shapeDrawer;
@@ -58,9 +62,7 @@ public class Holowyth extends Game {
 	}
 
 	public Holowyth(Class<? extends Screen> clazz) {
-
 		assets = new PrefixingAssetManager(ASSETS_PATH);
-
 		screenClassToLoad = clazz;
 	}
 
@@ -73,6 +75,8 @@ public class Holowyth extends Game {
 		initRendering();
 		initFileChoosers();
 		initFonts();
+		
+		animations = new Animations();
 
 		LoadingScreen loadingScreen = new LoadingScreen(this);
 		loadingScreen.queueAssets();

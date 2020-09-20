@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.combatDemo.World;
+import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
@@ -40,7 +40,7 @@ public abstract class ProjectileBase {
 
 	// Sides and Colliding
 	protected final Unit.Side side;
-	protected final World world;
+	protected final WorldInfo world;
 	private float collisionRadius = 0;
 
 	// Extra info for sub-classes

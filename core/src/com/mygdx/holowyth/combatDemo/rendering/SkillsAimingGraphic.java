@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.combatDemo.WorldInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
@@ -36,7 +35,7 @@ public class SkillsAimingGraphic {
 		 * @param coneInnerLength
 		 * @param world
 		 */
-		public HydroblastAimingGraphic(float coneLength, float coneInnerLength, float coneWidthDegrees, World world) {
+		public HydroblastAimingGraphic(float coneLength, float coneInnerLength, float coneWidthDegrees, WorldInfo world) {
 			super(world);
 
 			this.coneLength = coneLength;

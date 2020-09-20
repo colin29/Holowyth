@@ -13,7 +13,6 @@ public class UnitStatValues implements Cloneable {
 	public float percentArmor, armorNegate;
 
 	public UnitStatValues() {
-
 	}
 
 	public void set(UnitStatValues src) {

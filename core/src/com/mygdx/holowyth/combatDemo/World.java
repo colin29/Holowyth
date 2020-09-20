@@ -14,11 +14,13 @@ import com.mygdx.holowyth.collision.ObstaclePoint;
 import com.mygdx.holowyth.collision.ObstacleSeg;
 import com.mygdx.holowyth.collision.UnitAdapterCircleCB;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
+import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.UnitStats;
 import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloAssert;
@@ -87,6 +89,7 @@ public class World implements WorldInfo {
 				deadUnits.add(u);
 		}
 		for (var u : deadUnits) {
+			logger.debug("Removed dead unit '{}' ({})", u.getName(), u);
 			units.removeUnit(u);
 		}
 	}
@@ -477,6 +480,14 @@ public class World implements WorldInfo {
 		u.stats.prepareUnit();
 		units.addUnit(u);
 	}
+	
+	/**
+	 * Creates a new unit from a unitMarker and adds it to the world
+	 * @param u
+	 */
+	public void addUnit(UnitMarker unitMarker) {
+		addUnit(new Unit(unitMarker, this));
+	}
 
 	/**
 	 * Returns true if unit was present
@@ -519,6 +530,7 @@ public class World implements WorldInfo {
 		return effects;
 	}
 
+	@Override
 	public Animations getAnimations() {
 		return animations;
 	}

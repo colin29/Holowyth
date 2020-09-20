@@ -1,6 +1,11 @@
 package com.mygdx.holowyth.map;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**
@@ -9,6 +14,7 @@ import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
  *
  */
 public class GameMap {
+	
 	
 	/**
 	 * Whether this map is a template and meant to be copied first before using. 
@@ -23,14 +29,12 @@ public class GameMap {
 	public String tilemapPath;
 	/**
 	 * 
-	 * Carries tilemap and tile graphics, as well as collision info
-	 * 
+	 * Carries tilemap and tile graphics, as well as collision info <br>
 	 * Tilemap can only be null initially. Generally it's loaded/set by the tilemap loader.
 	 */
 	private TiledMap tilemap;
-	
-	
 	protected final MapOfMapLocations locations = new MapOfMapLocations();
+	protected final List<UnitMarker> unitMarkers = new ArrayList<UnitMarker>();
 	
 	public GameMap() {
 	}
@@ -39,6 +43,18 @@ public class GameMap {
 		if(tiledMap==null)
 			throw new HoloIllegalArgumentsException("tiled map can't be null");
 		this.tilemap = tiledMap;
+	}
+	/**
+	 * Copy constructor. Doesn't copy the tilemap, you must load it from disk again.
+	 */
+	public GameMap(GameMap src) {
+		tilemapPath = src.tilemapPath;
+		for(String s : src.locations.keySet()) {
+			locations.put(s, src.locations.get(s));
+		}
+		for(UnitMarker u: src.unitMarkers) {
+			unitMarkers.add(new UnitMarker(u));
+		}
 		
 	}
 	
@@ -57,6 +73,10 @@ public class GameMap {
 	}
 	public boolean isTilemapLoaded() {
 		return tilemap != null;
+	}
+	
+	public List<UnitMarker> getUnitMarkers() {
+		return Collections.unmodifiableList(unitMarkers);
 	}
 	
 

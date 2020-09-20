@@ -6,6 +6,10 @@ import java.util.Map;
 import com.mygdx.holowyth.map.gamemaps.Forest1;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
+/**
+ * Stores a bunch of 'template' maps. To use the maps you should copy construct a new instance to use.
+ *
+ */
 public class GameMapRepo {
 	
 	/**
@@ -19,7 +23,7 @@ public class GameMapRepo {
 	}
 	
 	/**
-	 * If location is not found, returns null
+	 * If map is not found, returns null
 	 * @return
 	 */
 	public GameMap getMap(String name){

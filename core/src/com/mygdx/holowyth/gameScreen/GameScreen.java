@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.Gdx;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.combatDemo.prototyping.Equips;
+import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.unit.Unit;
@@ -25,6 +26,14 @@ public class GameScreen extends GameScreenBase {
 		super(game);
 		loadGameMapByName("foo");
 		spawnPlayerAtDefaultLocation();
+		
+		placeUnitsAccordingToUnitMarkers();
+	}
+	
+	private void placeUnitsAccordingToUnitMarkers() {
+		for(UnitMarker m : map.getUnitMarkers()) {
+			world.addUnit(m);
+		}
 	}
 
 	private void spawnPlayerAtDefaultLocation() {
@@ -37,12 +46,12 @@ public class GameScreen extends GameScreenBase {
 	}
 
 	/**
-	 * Pos can't be null
+	 * @param pos can't be null
 	 */
 	private void spawnPlayerUnit(Point pos) {
 		var u = new Unit(pos.x, pos.y, Unit.Side.PLAYER, world);
 		u.setName("Lecia");
-		u.graphics.setAnimatedSprite(animations.get("pipo-charachip030e.png"));
+		u.graphics.setAnimatedSprite(game.animations.get("pipo-charachip030e.png"));
 
 		u.stats.base.set(MonsterStats.baseHuman);
 		u.stats.self.skills.addSkill(PassiveSkills.basicCombatTraining);
