@@ -19,7 +19,8 @@ import com.mygdx.holowyth.combatDemo.ui.GameLogDisplay;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.tiled.MapLoadingScreen;
+import com.mygdx.holowyth.tiled.GameMapLoadingScreen;
+import com.mygdx.holowyth.tiled.TiledMapLoadingScreen;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.Holo;
@@ -36,7 +37,7 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
  * @author Colin
  *
  */
-public abstract class GameScreenBase extends MapLoadingScreen {
+public abstract class GameScreenBase extends GameMapLoadingScreen {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -270,11 +271,11 @@ public abstract class GameScreenBase extends MapLoadingScreen {
 
 	private void initializeMapLifetimeComponents() {
 
-		final int mapWidth = (Integer) map.getProperties().get("widthPixels");
-		final int mapHeight = (Integer) map.getProperties().get("heightPixels");
+		final int mapWidth = (Integer) map.getTilemap().getProperties().get("widthPixels");
+		final int mapHeight = (Integer) map.getTilemap().getProperties().get("heightPixels");
 
 		// Init Pathing
-		pathingModule.initForTiledMap(map, mapWidth, mapHeight);
+		pathingModule.initForTiledMap(map.getTilemap(), mapWidth, mapHeight);
 
 		// Init World
 
@@ -287,7 +288,7 @@ public abstract class GameScreenBase extends MapLoadingScreen {
 		
 		// Set Renderer to render world and other map-lifetime components
 		renderer.setWorld(world);
-		renderer.setTiledMap(map, mapWidth, mapHeight);
+		renderer.setTiledMap(map.getTilemap(), mapWidth, mapHeight);
 		renderer.setUnitControls(controls);
 		renderer.setEffectsHandler(gfx);
 

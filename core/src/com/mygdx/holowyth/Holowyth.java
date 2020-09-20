@@ -21,6 +21,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.mygdx.holowyth.editor.PolyMapEditor;
 import com.mygdx.holowyth.graphics.HoloGL;
+import com.mygdx.holowyth.map.GameMapRepo;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 
 public class Holowyth extends Game {
@@ -42,8 +43,12 @@ public class Holowyth extends Game {
 	/* Skins */
 	public Skin skin;
 
-	// IO
+	/* IO */
 	public FileChooser fileChooser;
+	
+	/* Game */
+	public final GameMapRepo mapRepo = new GameMapRepo(); 
+	
 
 	Class<? extends Screen> screenClassToLoad;
 	public ShapeDrawerPlus shapeDrawer;

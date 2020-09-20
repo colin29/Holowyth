@@ -22,7 +22,7 @@ import com.mygdx.holowyth.util.Holo;
  */
 public class TiledMapLoader  {
 
-	Logger logger = LoggerFactory.getLogger(MapLoadingScreen.class);
+	Logger logger = LoggerFactory.getLogger(TiledMapLoadingScreen.class);
 
 	
 	private final Stage stage;
@@ -34,8 +34,7 @@ public class TiledMapLoader  {
 	}
 
 	public TiledMap getTiledMapFromTMXFile(String pathname) {
-		TiledMap loadedMap = new MyAtlasTmxMapLoader().load(pathname); 
-		return loadedMap;
+		return new MyAtlasTmxMapLoader().load(pathname);
 	}
 	@SuppressWarnings("unused")
 	private void getTiledMapFromTMXFileUsingFileChooser(Consumer<TiledMap> callback, Runnable onCanceled) {

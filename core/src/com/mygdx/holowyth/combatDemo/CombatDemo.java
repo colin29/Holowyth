@@ -29,7 +29,7 @@ import com.mygdx.holowyth.gameScreen.GameScreenBase;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.tiled.MapLoadingScreen;
+import com.mygdx.holowyth.tiled.TiledMapLoadingScreen;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.Holo;
@@ -66,7 +66,7 @@ public class CombatDemo extends GameScreenBase implements Screen, InputProcessor
 
 	public CombatDemo(final Holowyth game) {
 		super(game);
-		loadMapFromDisk(Holo.mapsDirectory + "/forest1.tmx");
+		loadGameMapByName("foo");
 	}
 
 	@Override
@@ -243,10 +243,7 @@ public class CombatDemo extends GameScreenBase implements Screen, InputProcessor
 
 	@Override
 	public void show() {
-		System.out.println("Showed Pathfinding Demo");
 		Gdx.input.setInputProcessor(multiplexer);
-
-		System.out.println("Gdx Version: " + com.badlogic.gdx.Version.VERSION);
 	}
 
 
@@ -259,7 +256,7 @@ public class CombatDemo extends GameScreenBase implements Screen, InputProcessor
 	}
 
 	@Override
-	protected void mapShutdown() {
+	protected final void mapShutdown() {
 		super.mapShutdown();
 	}
 

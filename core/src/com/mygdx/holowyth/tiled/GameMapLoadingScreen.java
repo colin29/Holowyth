@@ -3,10 +3,7 @@ package com.mygdx.holowyth.tiled;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.utils.Array;
@@ -16,7 +13,9 @@ import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.map.GameMap;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.exceptions.HoloException;
+import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;
 
 /**
@@ -27,7 +26,7 @@ import com.mygdx.holowyth.util.template.HoloBaseScreen;
  */
 public abstract class GameMapLoadingScreen extends HoloBaseScreen {
 
-	Logger logger = LoggerFactory.getLogger(MapLoadingScreen.class);
+	Logger logger = LoggerFactory.getLogger(TiledMapLoadingScreen.class);
 
 	/**
 	 * The currently loaded game map
@@ -46,27 +45,38 @@ public abstract class GameMapLoadingScreen extends HoloBaseScreen {
 	 * Loads a GameMap by name. (Some of the information is simply being stored in
 	 * the program atm, in a gameMap repository)
 	 */
-	protected void loadGameMap(String mapName) {
+	protected void loadGameMapByName(String mapName) {
 
-		// TODO: stub
-		// if map exists, construct gamemap and add data, then load it.
+		
+		
+		if(!game.mapRepo.hasMap("forest1"))
+			throw new HoloResourceNotFoundException();
+		
+		GameMap newMap = game.mapRepo.getMap("forest1");
+		newMap.setTilemap(getTiledMapFromDisk(newMap.tilemapPath));
 
-		final String pathName = ""; // stub: query from GameMapRepository
-		GameMap newMap = new GameMap(tiledMapLoader.getTiledMapFromTMXFile(pathName));
-		// add data
-
-		// otherwise throw exception
-
-		// actually load the map
+		// TODO: need to clone this map actually
+		
 		loadMap(newMap);
-	}
-
+		return;
+		
+		}
+	
 	/**
-	 * Creates a GameMap and loads it. The other fields besides gameMap.tiledMap are
-	 * empty.
+	 * Creates and loads a GameMap from a tiled map on disk. <br>
+	 * See {@link #makeGameMapFromTiledMapOnDisk(String)}
 	 */
-	protected void loadTiledMapAsGameMap(String pathname) {
-		loadMap(new GameMap(tiledMapLoader.getTiledMapFromTMXFile(pathname)));
+	protected void loadGameMapFromTiledMapOnDisk(String pathname) {
+		loadMap(makeGameMapFromTiledMapOnDisk(pathname));
+	}
+	/**
+	 * The GameMap only contains info from the Tiled Map. Other fields are left blank.
+	 */
+	private GameMap makeGameMapFromTiledMapOnDisk(String pathname) {
+		return new GameMap(getTiledMapFromDisk(pathname));
+	}
+	private TiledMap getTiledMapFromDisk(String pathname) {
+		return tiledMapLoader.getTiledMapFromTMXFile(pathname);
 	}
 
 	protected void loadMap(GameMap newMap) {
@@ -115,7 +125,7 @@ public abstract class GameMapLoadingScreen extends HoloBaseScreen {
 			public void selected(Array<FileHandle> file) {
 				logger.debug("Selected file: {}", file.get(0).file().getAbsolutePath());
 
-				loadGameMap(file.get(0).file().getPath()); // tmx map loader uses relative path
+				loadGameMapByName(file.get(0).file().getPath()); // tmx map loader uses relative path
 			}
 		});
 

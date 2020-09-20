@@ -19,23 +19,24 @@ import com.mygdx.holowyth.util.exceptions.HoloException;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;
 
 /**
- * A Screen that can load Tiled map (NOT a full GameMap)
+ * A Screen that can load Tiled map (NOT a full GameMap!)
+ * This is being transitioned out, it's just used for older demos.
  * 
  * Provides the common base to be able to have a currently loaded Tiled map, and to get maps from disk
  * 
  * @author Colin Ta
  *
  */
-public abstract class MapLoadingScreen extends HoloBaseScreen  {
+public abstract class TiledMapLoadingScreen extends HoloBaseScreen  {
 
-	Logger logger = LoggerFactory.getLogger(MapLoadingScreen.class);
+	Logger logger = LoggerFactory.getLogger(TiledMapLoadingScreen.class);
 
 	/**
 	 * The currently loaded map
 	 */
 	protected TiledMap map;
 
-	protected MapLoadingScreen(Holowyth game) {
+	protected TiledMapLoadingScreen(Holowyth game) {
 		super(game);
 	}
 

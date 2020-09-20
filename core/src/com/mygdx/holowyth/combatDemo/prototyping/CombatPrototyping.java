@@ -43,7 +43,7 @@ public class CombatPrototyping {
 	}
 
 	/**
-	 * Sets up the scenario preset
+	 * Sets up the preset scenario (ie. by creating the units and adding them to the world)
 	 */
 	public void setupPlannedScenario() {
 		setup(scenario);
@@ -143,7 +143,6 @@ public class CombatPrototyping {
 			u.stats.self.skills.addSkill(PassiveSkills.basicCombatTraining);
 			u.skills.slotSkills(Skills.warriorSkills);
 			u.equip.equip(Equips.longSword.copy());
-			// "pipo-charachip024d"
 		}
 		{
 			var u = players.get(1);

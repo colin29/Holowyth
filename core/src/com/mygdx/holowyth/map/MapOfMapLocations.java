@@ -6,7 +6,7 @@ import java.util.Map;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
-class MapOfMapLocations {
+public class MapOfMapLocations {
 	/**
 	 * Location name --> Location point
 	 * key/values are never null
@@ -15,26 +15,26 @@ class MapOfMapLocations {
 	
 	
 	/**
-	 * Can return null, that means location is not found 
+	 * If location is not found, returns null
 	 * @return
 	 */
-	public Point getLocation(String name){
+	public Point get(String name){
 		if(name==null) {
 			throw new HoloIllegalArgumentsException("can't query null name");
 		}
 		return locations.get(name);
 	}
-	public boolean hasLocation(String name) {
-		return getLocation(name)!=null;
+	public boolean has(String name) {
+		return get(name)!=null;
 	}
 	
-	public boolean putLocation(String name, Point location) {
+	public boolean put(String name, Point location) {
 		if(name==null)
 			throw new HoloIllegalArgumentsException("location name can't be null");
 		if(location==null)
 			throw new HoloIllegalArgumentsException("location coordinates can't be null");
 		
-		boolean oldLocExisted = hasLocation(name);
+		boolean oldLocExisted = has(name);
 		locations.put(name, location);
 		return oldLocExisted;
 	}
