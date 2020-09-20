@@ -46,6 +46,7 @@ public class BTreeDemo extends HoloBaseScreen {
 			tick();
 	}
 
+
 	public void tick() {
 		logger.debug("tick");
 		tree.step();

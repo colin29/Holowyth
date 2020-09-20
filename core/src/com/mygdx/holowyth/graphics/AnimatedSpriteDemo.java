@@ -110,4 +110,9 @@ public class AnimatedSpriteDemo extends SimpleMapDemoScreen {
 		}
 	}
 
+	@Override
+	public void show() {
+		Gdx.input.setInputProcessor(this);
+	}
+
 }

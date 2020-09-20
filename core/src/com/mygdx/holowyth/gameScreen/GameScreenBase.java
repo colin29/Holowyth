@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.util.template;
+package com.mygdx.holowyth.gameScreen;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,11 +14,12 @@ import com.mygdx.holowyth.combatDemo.Controls;
 import com.mygdx.holowyth.combatDemo.World;
 import com.mygdx.holowyth.combatDemo.prototyping.CombatPrototyping;
 import com.mygdx.holowyth.combatDemo.rendering.Renderer;
-import com.mygdx.holowyth.combatDemo.ui.GameScreenBaseUI;
+import com.mygdx.holowyth.combatDemo.ui.GameBaseUI;
 import com.mygdx.holowyth.combatDemo.ui.GameLogDisplay;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.tiled.MapLoadingScreen;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.Holo;
@@ -55,7 +56,7 @@ public abstract class GameScreenBase extends MapLoadingScreen {
 	/**
 	 * The base UI that appears while playing the game
 	 */
-	private GameScreenBaseUI ui;
+	private GameBaseUI ui;
 
 	// Debugging and Convenience
 	private final DebugStore debugStore = new DebugStore();
@@ -142,8 +143,6 @@ public abstract class GameScreenBase extends MapLoadingScreen {
 		stage.act();
 		handleMousePanning(delta);
 		renderer.render(delta);
-
-		updateTitleBarInformation();
 
 		ifTimeElapsedTickGame();
 		ai.update(delta);
@@ -266,7 +265,7 @@ public abstract class GameScreenBase extends MapLoadingScreen {
 
 		ai = new AIModule();
 
-		ui = new GameScreenBaseUI(stage, debugStore, skin, this);
+		ui = new GameBaseUI(stage, debugStore, skin, this);
 	}
 
 	private void initializeMapLifetimeComponents() {

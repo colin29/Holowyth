@@ -12,6 +12,10 @@ import com.badlogic.gdx.utils.SerializationException;
 import com.badlogic.gdx.utils.XmlReader.Element;
 
 public class MyAtlasTmxMapLoader extends AtlasTmxMapLoader {
+	
+	/**
+	 * I believe the purpose of this override and class is to fix a gid bug
+	 */
 	@Override
 	protected void loadTileSet(Element mapElement, FileHandle tmxFile, ImageResolver imageResolver) {
 		if (mapElement.getName().equals("tileset")) {

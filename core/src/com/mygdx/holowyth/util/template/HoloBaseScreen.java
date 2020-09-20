@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.util.template;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -16,9 +17,12 @@ import com.mygdx.holowyth.util.ShapeDrawerPlus;
 
 /**
  * Holds cameras, rendering equipment and common scene2d fields.
+ * 
+ * Also acts as an adapter to the Screen and InputProcessor classes, providing empty implementations for most of the methods. Override just what you
+ * need.
  *
  */
-public abstract class HoloBaseScreen implements Screen {
+public abstract class HoloBaseScreen implements Screen, InputProcessor {
 
 	protected final Holowyth game;
 	protected final OrthographicCamera camera; // Used for rendering world objects (that use world coordinates)
@@ -56,9 +60,13 @@ public abstract class HoloBaseScreen implements Screen {
 
 	@Override
 	public abstract void render(float delta);
-
+	
+	/**
+	 * If you are using an input multiplexer you should set inputProcessor to multiplexer instead and not call super.show()
+	 */
 	@Override
 	public void show() {
+		Gdx.input.setInputProcessor(this);
 	}
 
 	@Override
@@ -75,6 +83,7 @@ public abstract class HoloBaseScreen implements Screen {
 
 	@Override
 	public void hide() {
+		Gdx.input.setInputProcessor(null);
 	}
 
 	@Override
@@ -93,4 +102,45 @@ public abstract class HoloBaseScreen implements Screen {
 	public Cameras getCameras() {
 		return cameras;
 	}
+	
+	@Override
+	public boolean keyDown(int keycode) {
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
+		return false;
+	}
+
 }

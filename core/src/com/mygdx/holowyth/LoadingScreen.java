@@ -22,6 +22,7 @@ public class LoadingScreen extends HoloBaseScreen {
 
 	@Override
 	public void show() {
+		super.show();
 		System.out.println("LOADING");
 	}
 
