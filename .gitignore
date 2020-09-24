@@ -42,6 +42,15 @@ hs_err_pid*
 /core/build/
 /desktop/build/
 
+/lib/ProjectVisualNovel/build/
+/lib/ProjectVisualNovel/core/build/
+/lib/ProjectVisualNovel/desktop/build/
+
+
+/lib/ProjectVisualNovel/bin/
+/lib/ProjectVisualNovel/core/bin/
+/lib/ProjectVisualNovel/desktop/bin/
+
 # Ignore Gradle GUI config
 gradle-app.setting
 
