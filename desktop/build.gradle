@@ -3,15 +3,17 @@
 sourceCompatibility = 1.12
 sourceSets.main.java.srcDirs = [ "src/" ]
 
-project.ext.assetsDir = new File("../core/assets");
+// project.ext.assetsDir = new File("../core/assets");
 
 dependencies {
-	compile project(":core")
-        compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
-        compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
-        compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+	
+    compile "com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion"
+    compile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    compile "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
 
-        runtimeOnly files("resources")
+    compile project(":core")
+
+    runtimeOnly files("resources")
 }
 
 
@@ -21,7 +23,7 @@ sourceSets {
             srcDirs = ['src']
         }
         resources {
-            srcDirs = ['resources']
+            srcDirs = ['resources', '../lib/ProjectVisualNovel/desktop/assets']
             exclude 'assets/maps/Tilesets/raw/**'
         }
     }

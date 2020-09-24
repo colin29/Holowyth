@@ -20,6 +20,13 @@
 		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>assets</name>
+			<type>2</type>
+			<location>C:/Users/Colin/Desktop/Hub/Coding/Holowyth/lib/ProjectVisualNovel/desktop/assets</location>
+		</link>
+	</linkedResources>
 	<variableList>
 		<variable>
 			<name>copy_PARENT</name>

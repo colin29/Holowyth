@@ -9,7 +9,7 @@
 hs_err_pid*
 *.jar
 
-!libs/**/*.jar
+#!libs/**/*.jar
 
 
 ## Eclipse

@@ -137,12 +137,15 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 
 	@Override
 	public void render(float delta) {
-		stage.act();
+		stage.act(delta);
+		ai.update(delta);
+		ifTimeElapsedTickGame();
+		
+		
 		handleMousePanning(delta);
 		renderer.render(delta);
 
-		ifTimeElapsedTickGame();
-		ai.update(delta);
+		
 		
 		ui.render();
 	}

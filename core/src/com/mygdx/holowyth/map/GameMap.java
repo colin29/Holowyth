@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.mygdx.holowyth.map.triggers.Region;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
@@ -35,6 +36,8 @@ public class GameMap {
 	private TiledMap tilemap;
 	protected final MapOfMapLocations locations = new MapOfMapLocations();
 	protected final List<UnitMarker> unitMarkers = new ArrayList<UnitMarker>();
+	
+	protected final List<Region> regions = new ArrayList<Region>();
 	
 	public GameMap() {
 	}

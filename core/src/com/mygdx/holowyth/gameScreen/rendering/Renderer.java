@@ -209,7 +209,6 @@ public class Renderer {
 		gfx.renderBlockEffects(delta);
 
 		// UI
-		stage.act(delta);
 		stage.draw();
 
 	}

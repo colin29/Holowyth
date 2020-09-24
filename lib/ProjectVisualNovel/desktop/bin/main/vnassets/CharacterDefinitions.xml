@@ -1,0 +1,8 @@
+<!-- name here just means knownName. This can be changed in a conversation using the <name> command-->
+<characters xmlns="urn:resourceConfig">
+	<character id="Detective" name="Detective" sound="talksoundmale.wav"/>
+	<character id="Librarian" name="???" sound="talksoundmale.wav"/>
+
+	<character id="Lecia" name="Princess Lecia" sound="talksoundmale.wav"/>
+	<character id="n" name="" sound="none"/>
+</characters>
