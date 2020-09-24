@@ -15,17 +15,13 @@ import com.wizered67.game.gui.GUIManager;
 import com.wizered67.game.inputs.ControlInputAdapter;
 
 /**
- * Is not actually a screen
+ * To use, construct an instance, call startConversation and show()
  * 
  * Only one instance should be used as the underlying VN library uses static manager methods
  * 
  * @author Colin
  *
  */
-
-
-
-
 public class VNController {
 	
 	

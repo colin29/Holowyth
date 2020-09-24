@@ -111,7 +111,7 @@ public abstract class SimpleMapDemoScreen extends HoloBaseScreen implements Inpu
 
 	// Cursor Related
 	protected void renderCursor() {
-		batch.setProjectionMatrix(fixedCam.combined);
+		batch.setProjectionMatrix(fixedCamera.combined);
 		if (true) {
 			batch.begin();
 			Texture cursorImg = game.assets.get("icons/cursors/cursor.png", Texture.class);

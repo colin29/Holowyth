@@ -33,7 +33,8 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStoreUI;
  * Remove <br>
  * Exposes other functionality <br><br>
  * 
- * There are App-lifetime and Map-lifetime UI components <br><br>
+ * GameBaseUI itself is App-lifetime
+ * It contains App-lifetime and Map-lifetime UI components <br><br>
  * 
  * Update is carried out in a few different ways: <br>
  * - Register listener <br>
@@ -44,7 +45,7 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStoreUI;
  * @author Colin
  *
  */
-public class GameBaseUI extends InputProcessorAdapter {
+public class GameScreenBaseUI extends InputProcessorAdapter {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -73,10 +74,8 @@ public class GameBaseUI extends InputProcessorAdapter {
 	private Skin skin;
 
 	private GameScreenBase game;
-	
-	
 
-	public GameBaseUI(Stage stage, DebugStore debugStore, Skin skin, GameScreenBase self) {
+	public GameScreenBaseUI(Stage stage, DebugStore debugStore, Skin skin, GameScreenBase self) {
 		this.skin = skin;
 		this.stage = stage;
 		this.debugStore = debugStore;
@@ -127,7 +126,6 @@ public class GameBaseUI extends InputProcessorAdapter {
 	public void render() {
 		onRenderUpdate();
 		skillBarUI.draw(game.getCameras(), game.batch, game.shapeDrawer, game.assets);
-		
 	}
 	
 	private void onRenderUpdate() {

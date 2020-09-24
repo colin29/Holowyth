@@ -329,7 +329,9 @@ public class ConversationController implements Controllable {
         setChoiceShowing(false);
         currentBranch.clear();
         
-        convoExitListener.run();
+        if(convoExitListener!=null)
+        	convoExitListener.run();	
+        
     }
     /** Adds the ConversationCommands in COMMANDS to the
      * front of the queue of commands to be executed for this branch.

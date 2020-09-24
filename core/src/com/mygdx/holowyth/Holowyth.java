@@ -106,7 +106,7 @@ public class Holowyth extends Game {
 		} catch (Exception e) {
 			writeException(e);
 			dispose();
-			System.exit(-1);
+			throw e;
 		}
 	}
 

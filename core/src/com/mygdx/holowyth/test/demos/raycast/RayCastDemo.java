@@ -119,7 +119,7 @@ public class RayCastDemo extends SimpleMapDemoScreen {
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		if (pointer == 0) {
 			Vector3 vec = new Vector3(); // obtain window coordinates of the click.
-			vec = fixedCam.unproject(vec.set(screenX, screenY, 0));
+			vec = fixedCamera.unproject(vec.set(screenX, screenY, 0));
 
 			// If click is on a draggable point, select the first one
 
@@ -138,7 +138,7 @@ public class RayCastDemo extends SimpleMapDemoScreen {
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 		if (pointer == 0) {
 			Vector3 vec = new Vector3(); // obtain window coordinates of the click.
-			vec = fixedCam.unproject(vec.set(screenX, screenY, 0));
+			vec = fixedCamera.unproject(vec.set(screenX, screenY, 0));
 			if (draggedPoint != null) {
 				draggedPoint.dragged(vec.x, vec.y);
 			}

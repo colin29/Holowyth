@@ -12,42 +12,29 @@ import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
  */
 public class GameMapRepo {
 	
-	/**
-	 * Map name --> Location point
-	 * key/values are never null, enforced by this class
-	 */
-	private final Map<String, GameMap> maps = new LinkedHashMap<>();
+	
+	private final StringNonNullMap<GameMap> maps = new StringNonNullMap<GameMap>();
 
 	{
 		maps.put("forest1", new Forest1());
 	}
 	
-	/**
-	 * If map is not found, returns null
-	 * @return
-	 */
-	public GameMap getMap(String name){
-		if(name==null) {
-			throw new HoloIllegalArgumentsException("can't query null name");
-		}
-		return maps.get(name);
+	
+	public boolean putMap(String name, GameMap map) {
+		map.isTemplate = true;
+		return maps.put(name, map);
 	}
+
 	public boolean hasMap(String name) {
-		return getMap(name)!=null;
+		return maps.has(name);
 	}
 	
 	/**
-	 * Note: sets map.isTemplate = true;
+	 * If map is not found, returns null
 	 */
-	public boolean putMap(String name, GameMap map) {
-		if(name==null)
-			throw new HoloIllegalArgumentsException("map name can't be null");
-		if(map==null)
-			throw new HoloIllegalArgumentsException("map can't be null");
-		
-		boolean keyPreviouslyExisted = hasMap(name);
-		maps.put(name, map);
-		map.isTemplate = true;
-		return keyPreviouslyExisted;
+	public GameMap getNewMapInstance(String name) {
+		return maps.has(name) ? new GameMap(maps.get(name)) : null;
 	}
+
+	
 }

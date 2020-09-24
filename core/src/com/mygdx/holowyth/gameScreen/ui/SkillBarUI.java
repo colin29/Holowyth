@@ -224,9 +224,6 @@ public class SkillBarUI {
 
 	private Color skillCoolDownOverlayColor = new Color(1, 1, 1, 0.25f);
 
-	/**
-	 * SkillBar uses drawn shapes, thus the manual draw call
-	 */
 	public void draw(Cameras cameras, SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
 		batch.begin();
 		batch.setProjectionMatrix(cameras.fixedCamera.combined);

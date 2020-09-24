@@ -264,7 +264,7 @@ public abstract class SceneEntity implements Comparable<SceneEntity> {
             sprite.setSize(sprite.getRegionWidth(), sprite.getRegionHeight());
             sprite.setBounds(sprite.getX(), sprite.getY(), sprite.getWidth(), sprite.getHeight());
             //sprite.setBounds(position.x, position.y, currentSprite.getRegionWidth() * scale.x, currentSprite.getRegionHeight() * scale.y);
-            sprite.setOrigin(Math.abs(sprite.getWidth()) / 2, 0);
+            sprite.setOrigin(0, 0);
         }
     }
     /** Sets this SceneCharacter's current sprite to the TextureRegion TEXTURE. */

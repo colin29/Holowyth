@@ -26,7 +26,7 @@ public abstract class HoloBaseScreen implements Screen, InputProcessor {
 
 	protected final Holowyth game;
 	protected final OrthographicCamera camera; // Used for rendering world objects (that use world coordinates)
-	protected final OrthographicCamera fixedCam; // Used for rendering objects on the screen coordinate.
+	protected final OrthographicCamera fixedCamera; // Used for rendering objects on the screen coordinate.
 	private final Cameras cameras;
 
 	protected Stage stage;
@@ -50,10 +50,10 @@ public abstract class HoloBaseScreen implements Screen, InputProcessor {
 
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-		fixedCam = new OrthographicCamera();
-		fixedCam.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		fixedCamera = new OrthographicCamera();
+		fixedCamera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
-		cameras = new Cameras(camera, fixedCam);
+		cameras = new Cameras(camera, fixedCamera);
 
 		createStage();
 	}

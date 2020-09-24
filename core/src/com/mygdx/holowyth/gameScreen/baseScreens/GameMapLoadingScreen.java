@@ -47,17 +47,12 @@ public abstract class GameMapLoadingScreen extends HoloBaseScreen {
 	 * the program atm, in a gameMap repository)
 	 */
 	protected void loadGameMapByName(String mapName) {
-		
 		if(!game.mapRepo.hasMap("forest1"))
 			throw new HoloResourceNotFoundException();
+		GameMap newMap = game.mapRepo.getNewMapInstance("forest1");
 		
-		GameMap newMap = new GameMap(game.mapRepo.getMap("forest1"));
 		newMap.setTilemap(getTiledMapFromDisk(newMap.tilemapPath));
-
-		
 		loadMap(newMap);
-		return;
-		
 		}
 	
 	/**

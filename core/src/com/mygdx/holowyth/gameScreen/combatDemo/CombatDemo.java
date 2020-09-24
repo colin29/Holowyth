@@ -25,7 +25,7 @@ import com.mygdx.holowyth.gameScreen.GameScreenBase;
 import com.mygdx.holowyth.gameScreen.baseScreens.TiledMapLoadingScreen;
 import com.mygdx.holowyth.gameScreen.combatDemo.prototyping.CombatPrototyping;
 import com.mygdx.holowyth.gameScreen.rendering.Renderer;
-import com.mygdx.holowyth.gameScreen.ui.GameBaseUI;
+import com.mygdx.holowyth.gameScreen.ui.GameScreenBaseUI;
 import com.mygdx.holowyth.gameScreen.ui.GameLogDisplay;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
@@ -223,7 +223,7 @@ public class CombatDemo extends GameScreenBase implements Screen, InputProcessor
 
 	private void hideInstructionsPanel() {
 		instructionsPanel.setVisible(false);
-		unpauseGame();
+		resumeGame();
 	}
 
 	private void restartLevel() {

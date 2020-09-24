@@ -4,31 +4,59 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.gameScreen.combatDemo.prototyping.Equips;
 import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
+import com.mygdx.holowyth.test.vn.VNController;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.units.MonsterStats;
+import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
  * 
- * Populates the level from GameMap and manages UI for normal gameplay. (as opposed to a demo which
- * does its own thing)
+ * The standard game screen. Populates the level from GameMap and manages UI for normal gameplay (as
+ * opposed to a demo which does its own thing)
  *
  */
 public class GameScreen extends GameScreenBase {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	private VNController vn;
+
+	Texture lecia;
+	
 	public GameScreen(Holowyth game) {
 		super(game);
 		loadGameMapByName("foo");
 		spawnPlayerAtDefaultLocation();
 
 		placeUnitsAccordingToUnitMarkers();
+
+		assets.load("/../vnassets/textures/lecia.png", Texture.class);
+		assets.finishLoading();
+		
+		lecia = assets.get("/../vnassets/textures/lecia.png", Texture.class);
+		
+		
+		vn = new VNController(new Stage(), batch, fixedCamera, multiplexer); // have vn draw using its OWN stage
+		startConversation("myConv.conv", "default");
+	}
+	
+	private void startConversation(String convoName, String branch) {
+		pauseGame();
+		vn.setConvoExitListener(() -> {
+			vn.hide();
+			resumeGame();
+		});
+		vn.startConversation("myConv.conv", "default");
+		vn.show();
 	}
 
 	private void placeUnitsAccordingToUnitMarkers() {
@@ -62,6 +90,13 @@ public class GameScreen extends GameScreenBase {
 	}
 
 	@Override
+	public void render(float delta) {
+		super.render(delta);
+		if(vn!=null)
+			vn.updateAndRenderIfVisible(delta); // render vn ui on top
+	}
+
+	@Override
 	public void show() {
 		Gdx.input.setInputProcessor(multiplexer);
 	}
@@ -74,5 +109,11 @@ public class GameScreen extends GameScreenBase {
 	@Override
 	protected final void mapShutdown() {
 		super.mapShutdown();
+	}
+
+	@Override
+	public void resize(int width, int height) {
+		if(vn!=null)
+			vn.resize(width, height);
 	}
 }

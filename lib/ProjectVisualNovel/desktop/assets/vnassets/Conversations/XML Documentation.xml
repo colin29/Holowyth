@@ -19,7 +19,7 @@ CharacterNameCommand that sets character ID to have display name NEWNAME.
 <position id="character" position="string"/>
 CharacterPositionCommand that sets character ID to have the position mapped to POSITION.
 
-<visible id="character" visible="boolean" (optional)fade="float" (optional)wait="boolean"/>
+<visible id="character" visible="boolean" (optional)fadeTime="float" (optional)wait="boolean"/>
 CharacterVisibleCommand that sets character ID to have visibility VISIBLE. If FADE is specified it denotes
 over how many seconds the character's sprite should fade in or out. If WAIT is specified, it denotes whether
 to wait for the end of the fade before going to the next command. True by default.

@@ -14,7 +14,7 @@ import com.mygdx.holowyth.gameScreen.baseScreens.GameMapLoadingScreen;
 import com.mygdx.holowyth.gameScreen.baseScreens.TiledMapLoadingScreen;
 import com.mygdx.holowyth.gameScreen.combatDemo.prototyping.CombatPrototyping;
 import com.mygdx.holowyth.gameScreen.rendering.Renderer;
-import com.mygdx.holowyth.gameScreen.ui.GameBaseUI;
+import com.mygdx.holowyth.gameScreen.ui.GameScreenBaseUI;
 import com.mygdx.holowyth.gameScreen.ui.GameLogDisplay;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
@@ -53,7 +53,7 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 	/**
 	 * The base UI that appears while playing the game
 	 */
-	private GameBaseUI ui;
+	private GameScreenBaseUI ui;
 
 	// Debugging and Convenience
 	private final DebugStore debugStore = new DebugStore();
@@ -119,7 +119,7 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 	
 	private void toggleGamePaused() {
 		if (isGamePaused()) {
-			unpauseGame();
+			resumeGame();
 		} else {
 			pauseGame();
 		}
@@ -144,8 +144,6 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 		
 		handleMousePanning(delta);
 		renderer.render(delta);
-
-		
 		
 		ui.render();
 	}
@@ -213,6 +211,9 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 		return controls;
 	}
 
+	/**
+	 * Not to be confused with pause() which is a libgdx app method
+	 */
 	public void pauseGame() {
 		if (!gamePaused) {
 			gamePaused = true;
@@ -221,9 +222,10 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 	}
 
 	/**
+	 * Unpauses the game.
 	 * If game is already running, has no effect
 	 */
-	public void unpauseGame() {
+	public void resumeGame() {
 		if (gamePaused) {
 			gamePaused = false;
 			getGameLog().addMessage("Game Unpaused");
@@ -263,7 +265,7 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 
 		ai = new AIModule();
 
-		ui = new GameBaseUI(stage, debugStore, skin, this);
+		ui = new GameScreenBaseUI(stage, debugStore, skin, this);
 	}
 
 	private void initializeMapLifetimeComponents() {
@@ -271,29 +273,26 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 		final int mapWidth = (Integer) map.getTilemap().getProperties().get("widthPixels");
 		final int mapHeight = (Integer) map.getTilemap().getProperties().get("heightPixels");
 
-		// Init Pathing
 		pathingModule.initForTiledMap(map.getTilemap(), mapWidth, mapHeight);
-
-		// Init World
 
 		gfx = new EffectsHandler(game.batch, camera, stage, skin, debugStore);
 
 		world = new World(mapWidth, mapHeight, pathingModule, debugStore, gfx, game.animations);
 
-		// Init Unit controls
-		controls = new Controls(game, camera, fixedCam, world.getUnits(), debugStore, world, ui.getGameLog());
+		controls = new Controls(game, camera, fixedCamera, world.getUnits(), debugStore, world, ui.getGameLog());
 		
 		// Set Renderer to render world and other map-lifetime components
+		
 		renderer.setWorld(world);
-		renderer.setTiledMap(map.getTilemap(), mapWidth, mapHeight);
-		renderer.setUnitControls(controls);
 		renderer.setEffectsHandler(gfx);
+		renderer.setUnitControls(controls);
+		renderer.setTiledMap(map.getTilemap(), mapWidth, mapHeight);
+		
 
 	}
 	private void setupInputForMapLifeTimeComponents() {
-		if (controls != null) {
+		if (controls != null)
 			multiplexer.removeProcessor(controls);
-		}
 		multiplexer.addProcessor(controls);
 	}
 

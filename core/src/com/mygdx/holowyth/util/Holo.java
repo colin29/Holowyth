@@ -36,9 +36,6 @@ public class Holo {
 
 	public static float UNIT_RADIUS = 17; // 13
 
-	// Play Mode (overrides debug settings to false)
-	public static boolean releaseMode = false;
-
 	// Debug Rendering
 	public static boolean debugRenderMapObstaclesEdges = false;
 
@@ -76,6 +73,9 @@ public class Holo {
 	public static boolean continueShowingPathAfterArrival = false;
 	public static boolean debugPathfindingIgnoreUnits = false;
 
+	// Play Mode (overrides debug settings to false)
+	public static boolean releaseMode = true;
+	
 	static {
 		if (releaseMode) {
 			debugFastCastEnbabled = false;
