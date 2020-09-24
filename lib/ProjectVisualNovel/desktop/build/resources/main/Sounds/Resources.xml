@@ -1,5 +1,0 @@
-<resources xmlns="urn:resourceConfig">
-	<resource name="intense.wav" identifier="intense.wav"/>
-	<resource name="talksoundfemale.wav" identifier="talksoundfemale.wav"/>
-	<resource name="talksoundmale.wav" identifier="talksoundmale.wav"/>
-</resources>

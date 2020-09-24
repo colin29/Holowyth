@@ -10,7 +10,7 @@
 
 
 		<load>demonstration.conv</load>
-		<load>testbackground</load>
+		<load>demobackground</load>
 		<load>Edgeworth</load>
 		<load>icon</load>
 		<load>testicon2.png</load>

@@ -9,9 +9,9 @@
             delay <delay time="1" skippable="true"/>
             shake <screenshake time="0.5" xMagnitude="6" yMagnitude="6" interpolation="linear" wait="true"/>
         </assign>
-        <!-- Sets the background to the image in the Texture's directory with identifier 'testbackground.png'.
+        <!-- Sets the background to the image in the Texture's directory with identifier 'demobackground'.
          Backgrounds are just an image with the id 'bg' so they can be modified later. -->
-        <bg id="testbackground.png"/>
+        <bg id="demobackground"/>
 
         <!-- Initializes the Detective character's position and animation. Then, fades in over a 1 sec period
         with a linearly interpolated fade, waiting until it is done to move on. -->
@@ -59,7 +59,7 @@
         </image>
 
         <setScene name="otherScene"/>
-            <bg id="testbackground.png"/>
+            <bg id="demobackground"/>
             <visible id="Detective" visible="true"/>
             <position id="Detective" x="700" y="600"/>
             <animation id="Detective" animation="Edgeworth_Static"/>
