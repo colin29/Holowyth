@@ -15,7 +15,7 @@ public class TiledMapRenderer extends SubRenderer {
 
 	TiledMap map;
 
-	public TiledMapRenderer(Renderer renderer) {
+	public TiledMapRenderer(GameScreenBaseRenderer renderer) {
 		super(renderer);
 	}
 

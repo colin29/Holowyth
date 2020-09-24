@@ -3,7 +3,7 @@ package com.mygdx.holowyth.map;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.mygdx.holowyth.map.gamemaps.Forest1;
+import com.mygdx.holowyth.map.maps.Forest1;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**

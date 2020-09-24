@@ -28,6 +28,8 @@ import com.mygdx.holowyth.gameScreen.Controls.Context;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.HoloSprite;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
+import com.mygdx.holowyth.map.GameMap;
+import com.mygdx.holowyth.map.GameMapRenderer;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.ActiveSkill.Status;
 import com.mygdx.holowyth.skill.SkillInfo;
@@ -42,7 +44,7 @@ import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
- * Handles all of CombatDemo's rendering <br>
+ * Handles all of GameScreenBase's rendering <br>
  * 
  * Should carry very little state except for which modules to render and some rendering flags
  * 
@@ -51,7 +53,7 @@ import com.mygdx.holowyth.util.dataobjects.Point;
  * @author Colin Ta
  *
  */
-public class Renderer {
+public class GameScreenBaseRenderer {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -92,7 +94,14 @@ public class Renderer {
 	private TiledMapRenderer tiled;
 
 	private final int showMapPathingGraphKey = Keys.M;
+	private final int showMapRegionsKey = Keys.N;
 
+	
+	/**
+	 * Can be null
+	 */
+	private GameMap map;
+	
 	/**
 	 * The game, worldCamera, and other screen-lifetime modules are passed in.
 	 * 
@@ -102,7 +111,7 @@ public class Renderer {
 	 * @param pathingModule
 	 *            // May be null;
 	 */
-	public Renderer(Holowyth game, Camera worldCamera, Stage stage, PathingModule pathingModule) {
+	public GameScreenBaseRenderer(Holowyth game, Camera worldCamera, Stage stage, PathingModule pathingModule) {
 
 		batch = game.batch;
 		shapeRenderer = game.shapeRenderer;
@@ -137,13 +146,17 @@ public class Renderer {
 		tiled.renderMap();
 		renderUnitHpSpBars();
 
-		// Debug pathing
+		if(Gdx.input.isKeyPressed(showMapRegionsKey)) {
+			GameMapRenderer.renderMapRegions(game.fonts.debugFont(),map, shapeDrawer, batch);
+		}
+		
 		if (Gdx.input.isKeyPressed(showMapPathingGraphKey)) {
 			pathingModule.renderGraph(true);
 			HoloGL.renderSegs(pathingModule.getObstacleExpandedSegs(), Color.PINK);
 			renderCircles(pathingModule.getObstaclePoints(), Holo.UNIT_RADIUS, Color.PINK);
-
 		}
+		
+		
 
 		// 2: Render unit paths
 		pathfinding.renderPaths(false);
@@ -495,12 +508,13 @@ public class Renderer {
 		this.controls = unitControls;
 	}
 
-	public void setTiledMap(TiledMap tiledMap, int mapWidth, int mapHeight) {
-		tiled.setMap(tiledMap);
+	public void setMap(GameMap map, int mapWidth, int mapHeight) {
+		this.map = map;
 		this.mapWidth = mapWidth;
 		this.mapHeight = mapHeight;
+		tiled.setMap(map.getTilemap());
 	}
-
+	
 	/*
 	 * Sets the world that Renderer should render
 	 */

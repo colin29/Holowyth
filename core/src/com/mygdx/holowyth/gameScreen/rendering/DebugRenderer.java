@@ -7,7 +7,7 @@ import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 
 class DebugRenderer extends SubRenderer {
 
-	public DebugRenderer(Renderer renderer) {
+	public DebugRenderer(GameScreenBaseRenderer renderer) {
 		super(renderer);
 	}
 

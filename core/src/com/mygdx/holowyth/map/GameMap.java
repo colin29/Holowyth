@@ -2,10 +2,14 @@ package com.mygdx.holowyth.map;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.mygdx.holowyth.map.triggers.Region;
+import com.mygdx.holowyth.map.trigger.region.Region;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
@@ -36,8 +40,8 @@ public class GameMap {
 	private TiledMap tilemap;
 	protected final MapOfMapLocations locations = new MapOfMapLocations();
 	protected final List<UnitMarker> unitMarkers = new ArrayList<UnitMarker>();
+	protected final Set<Region> regions = new TreeSet<Region>(Comparator.comparing(Region::getName));
 	
-	protected final List<Region> regions = new ArrayList<Region>();
 	
 	public GameMap() {
 	}
@@ -57,6 +61,9 @@ public class GameMap {
 		}
 		for(UnitMarker u: src.unitMarkers) {
 			unitMarkers.add(new UnitMarker(u));
+		}
+		for(Region r: src.regions) {
+			regions.add(r.cloneObject());
 		}
 		
 	}
@@ -80,6 +87,13 @@ public class GameMap {
 	
 	public List<UnitMarker> getUnitMarkers() {
 		return Collections.unmodifiableList(unitMarkers);
+	}
+	
+	public boolean addRegion(Region r) {
+		return regions.add(r);
+	}
+	public Set<Region> getRegions(){
+		return Collections.unmodifiableSet(regions);
 	}
 	
 

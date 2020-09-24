@@ -216,11 +216,14 @@ public class HoloGL {
 	 * @return
 	 */
 	public static Color rgb(int r, int g, int b) {
-		return new Color((float) r / 256, (float) g / 256, (float) b / 256, 1);
+		return new Color((float) r / 255, (float) g / 255, (float) b / 255, 1);
 	}
 
+	/**
+	 * rgb span from 0-255, float from 0-1
+	 */
 	public static Color rgb(int r, int g, int b, float a) {
-		return new Color((float) r / 256, (float) g / 256, (float) b / 256, a);
+		return new Color((float) r / 255, (float) g / 255, (float) b / 255, a);
 	}
 
 	public static ShapeRenderer getShapeRenderer() {

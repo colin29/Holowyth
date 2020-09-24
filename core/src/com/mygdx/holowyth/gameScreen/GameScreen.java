@@ -12,11 +12,11 @@ import com.mygdx.holowyth.gameScreen.combatDemo.prototyping.Equips;
 import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
-import com.mygdx.holowyth.test.vn.VNController;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.units.MonsterStats;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.vn.VNController;
 
 /**
  * 
@@ -39,14 +39,11 @@ public class GameScreen extends GameScreenBase {
 
 		placeUnitsAccordingToUnitMarkers();
 
-		assets.load("/../vnassets/textures/lecia.png", Texture.class);
-		assets.finishLoading();
-		
-		lecia = assets.get("/../vnassets/textures/lecia.png", Texture.class);
+//		vn = new VNController(new Stage(), batch, fixedCamera, multiplexer); // have vn draw using its OWN stage
+//		startConversation("myConv.conv", "default");
 		
 		
-		vn = new VNController(new Stage(), batch, fixedCamera, multiplexer); // have vn draw using its OWN stage
-		startConversation("myConv.conv", "default");
+		
 	}
 	
 	private void startConversation(String convoName, String branch) {

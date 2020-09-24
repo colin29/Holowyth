@@ -10,10 +10,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.ai.AIModule;
-import com.mygdx.holowyth.gameScreen.baseScreens.GameMapLoadingScreen;
-import com.mygdx.holowyth.gameScreen.baseScreens.TiledMapLoadingScreen;
+import com.mygdx.holowyth.gameScreen.basescreens.GameMapLoadingScreen;
+import com.mygdx.holowyth.gameScreen.basescreens.TiledMapLoadingScreen;
 import com.mygdx.holowyth.gameScreen.combatDemo.prototyping.CombatPrototyping;
-import com.mygdx.holowyth.gameScreen.rendering.Renderer;
+import com.mygdx.holowyth.gameScreen.rendering.GameScreenBaseRenderer;
 import com.mygdx.holowyth.gameScreen.ui.GameScreenBaseUI;
 import com.mygdx.holowyth.gameScreen.ui.GameLogDisplay;
 import com.mygdx.holowyth.graphics.HoloGL;
@@ -47,7 +47,7 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 	protected World world;
 
 	// Graphical Modules
-	protected Renderer renderer;
+	protected GameScreenBaseRenderer renderer;
 	protected EffectsHandler gfx;
 	
 	/**
@@ -260,7 +260,7 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 	private void initializeAppLifetimeComponents() {
 		pathingModule = new PathingModule(camera, shapeRenderer);
 
-		renderer = new Renderer(game, camera, stage, pathingModule);
+		renderer = new GameScreenBaseRenderer(game, camera, stage, pathingModule);
 		renderer.setClearColor(backgroundColor);
 
 		ai = new AIModule();
@@ -286,7 +286,8 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 		renderer.setWorld(world);
 		renderer.setEffectsHandler(gfx);
 		renderer.setUnitControls(controls);
-		renderer.setTiledMap(map.getTilemap(), mapWidth, mapHeight);
+		
+		renderer.setMap(map, mapWidth, mapHeight);
 		
 
 	}

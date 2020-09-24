@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test.vn;
+package com.mygdx.holowyth.vn.demo;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;
+import com.mygdx.holowyth.vn.VNController;
 import com.wizered67.game.VNHubManager;
 import com.wizered67.game.conversations.Conversation;
 import com.wizered67.game.inputs.ControlInputAdapter;

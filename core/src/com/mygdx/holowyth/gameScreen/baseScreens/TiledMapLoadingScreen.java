@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.gameScreen.baseScreens;
+package com.mygdx.holowyth.gameScreen.basescreens;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

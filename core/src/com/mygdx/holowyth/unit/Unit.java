@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.ai.UnitAI;
 import com.mygdx.holowyth.gameScreen.World;
 import com.mygdx.holowyth.gameScreen.WorldInfo;
-import com.mygdx.holowyth.gameScreen.baseScreens.GameMapLoadingScreen;
+import com.mygdx.holowyth.gameScreen.basescreens.GameMapLoadingScreen;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.pathfinding.Path;

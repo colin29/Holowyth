@@ -10,7 +10,7 @@ import com.mygdx.holowyth.util.dataobjects.Point;
 
 class UnitMotionRenderer extends SubRenderer {
 
-	public UnitMotionRenderer(Renderer renderer) {
+	public UnitMotionRenderer(GameScreenBaseRenderer renderer) {
 		super(renderer);
 	}
 

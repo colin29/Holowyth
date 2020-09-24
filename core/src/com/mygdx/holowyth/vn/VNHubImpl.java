@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.test.vn;
+package com.mygdx.holowyth.vn;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;

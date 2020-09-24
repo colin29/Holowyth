@@ -15,9 +15,9 @@ public abstract class SubRenderer {
 	protected final Camera worldCamera;
 	protected final SpriteBatch batch;
 	protected final ShapeRenderer shapeRenderer;
-	protected final Renderer renderer;
+	protected final GameScreenBaseRenderer renderer;
 
-	public SubRenderer(Renderer renderer) {
+	public SubRenderer(GameScreenBaseRenderer renderer) {
 		this.renderer = renderer;
 
 		game = renderer.game;

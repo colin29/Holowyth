@@ -14,7 +14,7 @@ class PathfindingRenderer extends SubRenderer {
 	private PathingModule pathingModule;
 	private float pathThickness = 2f;
 
-	public PathfindingRenderer(Renderer renderer, PathingModule pathingModule) {
+	public PathfindingRenderer(GameScreenBaseRenderer renderer, PathingModule pathingModule) {
 		super(renderer);
 		this.pathingModule = pathingModule;
 	}

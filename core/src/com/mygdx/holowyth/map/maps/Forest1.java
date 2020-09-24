@@ -1,7 +1,8 @@
-package com.mygdx.holowyth.map.gamemaps;
+package com.mygdx.holowyth.map.maps;
 
 import com.mygdx.holowyth.map.GameMap;
 import com.mygdx.holowyth.map.UnitMarker;
+import com.mygdx.holowyth.map.trigger.region.RectRegion;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.units.MonsterStats;
@@ -29,6 +30,11 @@ public class Forest1 extends GameMap {
 			UnitMarker m = new UnitMarker(MonsterTemplates.goblin);
 			m.pos.set(400, 400);
 			unitMarkers.add(m);
+		}
+		{
+			var r =new RectRegion(200, 200, 300, 200);
+			r.setName("Region 1");
+			regions.add(r);
 		}
 
 	}
