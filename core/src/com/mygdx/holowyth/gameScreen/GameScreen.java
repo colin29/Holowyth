@@ -10,6 +10,9 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.gameScreen.combatDemo.prototyping.Equips;
 import com.mygdx.holowyth.map.UnitMarker;
+import com.mygdx.holowyth.map.trigger.Trigger;
+import com.mygdx.holowyth.map.trigger.TriggerEvent;
+import com.mygdx.holowyth.map.trigger.UnitEntersRegion;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.unit.Unit;
@@ -30,7 +33,8 @@ public class GameScreen extends GameScreenBase {
 
 	private VNController vn;
 
-	Texture lecia;
+
+
 	
 	public GameScreen(Holowyth game) {
 		super(game);
@@ -39,11 +43,22 @@ public class GameScreen extends GameScreenBase {
 
 		placeUnitsAccordingToUnitMarkers();
 
+		loadMapTriggers();
+		
 //		vn = new VNController(new Stage(), batch, fixedCamera, multiplexer); // have vn draw using its OWN stage
 //		startConversation("myConv.conv", "default");
 		
 		
 		
+		
+	}
+	/**
+	 * GameScreenBase does check triggers, but it doesn't load them from the map
+	 */
+	private void loadMapTriggers() {
+		for(Trigger t: map.getTriggers()) {
+			triggers.addTrigger(t);
+		}
 	}
 	
 	private void startConversation(String convoName, String branch) {
@@ -84,6 +99,11 @@ public class GameScreen extends GameScreenBase {
 		u.skills.slotSkills(Skills.warriorSkills);
 		u.equip.equip(Equips.longSword.copy());
 		world.addUnit(u);
+	}
+
+	@Override
+	protected void tickGame() {
+		super.tickGame();
 	}
 
 	@Override

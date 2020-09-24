@@ -1,5 +1,7 @@
 package com.mygdx.holowyth.map.trigger.region;
 
+import java.util.List;
+
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -28,6 +30,13 @@ public class RectRegion extends Region{
 	@Override
 	public boolean containsUnit(UnitInfo u) {
 		return region.contains(u.getX(), u.getY());
+	}
+	public boolean containsAnyUnit(List<? extends UnitInfo> units) {
+		for(UnitInfo u : units) {
+			if(containsUnit(u))
+				return true;
+		}
+		return false;
 	}
 	
 	public float getX() {

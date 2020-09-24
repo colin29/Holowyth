@@ -18,6 +18,7 @@ import com.mygdx.holowyth.gameScreen.ui.GameScreenBaseUI;
 import com.mygdx.holowyth.gameScreen.ui.GameLogDisplay;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
+import com.mygdx.holowyth.map.trigger.TriggersHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.sprite.Animations;
@@ -45,6 +46,7 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 
 	protected Controls controls;
 	protected World world;
+	protected TriggersHandler triggers;
 
 	// Graphical Modules
 	protected GameScreenBaseRenderer renderer;
@@ -195,6 +197,7 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 
 	private boolean gamePaused = false;
 
+
 	private void ifTimeElapsedTickGame() {
 		timer.start(1000 / Holo.GAME_FPS);
 		if (timer.taskReady() && !gamePaused) {
@@ -205,6 +208,7 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 	protected void tickGame() {
 		world.tick();
 		gfx.tick();
+		triggers.checkTriggers();
 	}
 
 	public Controls getControls() {
@@ -278,6 +282,7 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 		gfx = new EffectsHandler(game.batch, camera, stage, skin, debugStore);
 
 		world = new World(mapWidth, mapHeight, pathingModule, debugStore, gfx, game.animations);
+		triggers = new TriggersHandler(world);
 
 		controls = new Controls(game, camera, fixedCamera, world.getUnits(), debugStore, world, ui.getGameLog());
 		

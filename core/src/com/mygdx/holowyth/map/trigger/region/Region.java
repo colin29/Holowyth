@@ -1,5 +1,7 @@
 package com.mygdx.holowyth.map.trigger.region;
 
+import java.util.List;
+
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 
 /**
@@ -22,7 +24,9 @@ public abstract class Region {
 	/**
 	 * Returns true if a unit's position is inside the region.
 	 */
-	abstract boolean containsUnit(UnitInfo u);
+	public abstract boolean containsUnit(UnitInfo u);
+	public abstract boolean containsAnyUnit(List<? extends UnitInfo> units);
+	
 	
 	public String getName() {
 		return name;

@@ -1,5 +1,6 @@
 package com.mygdx.holowyth.map;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -17,7 +18,7 @@ import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 public class StringNonNullMap <V> {
 	private final Map<String, V> map = new LinkedHashMap<>();
 	/**
-	 * If entry doesn't exist, throws exception
+	 * If entry doesn't exist, returns null
 	 * @return
 	 */
 	public V get(String name){
@@ -43,5 +44,8 @@ public class StringNonNullMap <V> {
 	
 	public Set<String> keySet(){
 		return Collections.unmodifiableSet(map.keySet());
+	}
+	public Collection<V> values(){
+		return Collections.unmodifiableCollection(map.values());
 	}
 }

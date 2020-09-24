@@ -1,14 +1,21 @@
 package com.mygdx.holowyth.map;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.mygdx.holowyth.map.trigger.Trigger;
 import com.mygdx.holowyth.map.trigger.region.Region;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
@@ -20,6 +27,8 @@ import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
  */
 public class GameMap {
 	
+	
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	/**
 	 * Whether this map is a template and meant to be copied first before using. 
@@ -40,7 +49,8 @@ public class GameMap {
 	private TiledMap tilemap;
 	protected final MapOfMapLocations locations = new MapOfMapLocations();
 	protected final List<UnitMarker> unitMarkers = new ArrayList<UnitMarker>();
-	protected final Set<Region> regions = new TreeSet<Region>(Comparator.comparing(Region::getName));
+	protected final StringNonNullMap<Region> regions = new StringNonNullMap<Region>();
+	protected final List<Trigger> triggers = new ArrayList<>();
 	
 	
 	public GameMap() {
@@ -62,8 +72,11 @@ public class GameMap {
 		for(UnitMarker u: src.unitMarkers) {
 			unitMarkers.add(new UnitMarker(u));
 		}
-		for(Region r: src.regions) {
-			regions.add(r.cloneObject());
+		for(String name: src.regions.keySet()) {
+			regions.put(name, src.regions.get(name).cloneObject());
+		}
+		for(Trigger t: src.triggers) {
+			triggers.add(t.cloneObject());
 		}
 		
 	}
@@ -89,11 +102,26 @@ public class GameMap {
 		return Collections.unmodifiableList(unitMarkers);
 	}
 	
-	public boolean addRegion(Region r) {
-		return regions.add(r);
+	public void putRegion(Region r) {
+		if(regions.has(r.getName())) {
+			logger.info("Replaced old map region with same name");
+		}
+		regions.put(r.getName(), r);
 	}
-	public Set<Region> getRegions(){
-		return Collections.unmodifiableSet(regions);
+	public Region getRegion(String name) {
+		return regions.get(name);
+	}
+	public void addTrigger(Trigger t) {
+		triggers.add(t);
+	}
+	public boolean removeTrigger(Trigger t) {
+		return triggers.remove(t);
+	}
+	public Collection<Region> getRegions(){
+		return regions.values();
+	}
+	public List<Trigger> getTriggers(){
+		return Collections.unmodifiableList(triggers);
 	}
 	
 
