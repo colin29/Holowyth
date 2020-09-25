@@ -215,7 +215,7 @@ public class Controls extends InputProcessorAdapter {
 
 			Unit unit = selectedUnits.iterator().next();
 
-			curSkill = unit.skills.getSkillInSlot(slotNumber);
+			curSkill = unit.skills.copySkillInSlot(slotNumber);
 			if (curSkill == null) {
 				return;
 			}
@@ -633,6 +633,11 @@ public class Controls extends InputProcessorAdapter {
 		}
 	}
 
+	/** Has no effect if unit is not in selection */
+	public boolean removeUnitFromSelection(UnitInfo u) {
+		return selectedUnits.remove(u);
+	}
+	
 	public void clearSelectedUnits() {
 		selectedUnits.clear();
 	}

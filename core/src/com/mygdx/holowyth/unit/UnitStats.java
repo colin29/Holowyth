@@ -32,46 +32,43 @@ import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 public class UnitStats implements UnitStatsInfo {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
-
 	public static boolean logBasicAttackInfo = false;
 
+	// Combat parameters
+	private static float atkChanceFloor = 0.01f;
+	private static float atkChanceCeiling = 1f;
+
+	private static float defaultStunProration = 60; // means a duration of x gets prorated around a max of x+60 frames
+	private static float defaultReelProration = 120;
+	
+	// Unit-lifetime components
 	public final Unit self;
-
-	// App fields
-	EffectsHandler gfx;
-
-	// Sub-components:
 	private final UnitStatCalculator calc;
 
-	// Stats
+	// General
 	private String name = "DefaultName";
+	
+	// Stats
 	float hp;
 	float sp;
 	public int level;
-
+	/** A character's base stat values, before equipment and skill bonuses */
 	public final UnitStatValues base = new UnitStatValues();
+	/** Unused atm, UnitMotion just uses the default movespeed */
+	public float baseMoveSpeed = Holo.defaultUnitMoveSpeed;  // Is this actually unused?
 
+	
+	// Map-lifetime components
+	private EffectsHandler gfx;
+	private UnitStun stun; 
+	
+	// Status effects
 	private final List<SlowEffect> slowEffects = new LinkedList<SlowEffect>();
 	private float blindDurationRemaining;
 
 	private float tauntDurationRemaining = 0;
-	private Unit tauntAttackTarget = null;
-
-	private final UnitStun stun;
-
-	// end test stats
-
-	public enum UnitType { // Player-like characters have their derived stats calculated like players. Monsters do not.
-		PLAYER, MONSTER
-	}
-
-	public UnitType unitType;
-
-	/**
-	 * Unused atm, UnitMotion just uses the default movespeed
-	 */
-	public float baseMoveSpeed = Holo.defaultUnitMoveSpeed;
-
+	private Unit tauntedTowards = null;
+	
 	public UnitStats(Unit unit) {
 		this.self = unit;
 		this.gfx = unit.getWorld().getGfx();
@@ -85,6 +82,26 @@ public class UnitStats implements UnitStatsInfo {
 		if (name != null) {
 			this.name = name;
 		}
+	}
+	public void reinitializeForWorld() {
+		gfx = self.getWorld().getGfx();
+		stun = new UnitStun(self);
+	}
+	
+	public void clearMapLifetimeData() {
+		clearMapLifetimeComponents();
+		clearStatusEffectsData();
+	}
+	private void clearMapLifetimeComponents() {
+		gfx = null;
+		stun = null;
+	}
+	private void clearStatusEffectsData() {
+		slowEffects.clear();
+		blindDurationRemaining = 0;
+
+		tauntDurationRemaining = 0;
+		tauntedTowards = null;
 	}
 
 	public void tick() {
@@ -101,7 +118,7 @@ public class UnitStats implements UnitStatsInfo {
 		boolean wasTaunted = isTaunted();
 		tauntDurationRemaining = Math.max(0, tauntDurationRemaining - 1);
 		if (tauntDurationRemaining == 0) {
-			tauntAttackTarget = null;
+			tauntedTowards = null;
 			if (wasTaunted)
 				onTauntEnd();
 		}
@@ -183,9 +200,6 @@ public class UnitStats implements UnitStatsInfo {
 		}
 
 	}
-
-	private float atkChanceFloor = 0.01f;
-	private float atkChanceCeiling = 1f;
 
 	public boolean isAttackRollSuccessful(UnitStats enemy, int atkBonus) {
 		return isAttackRollSuccessful(enemy, atkBonus, true);
@@ -343,10 +357,6 @@ public class UnitStats implements UnitStatsInfo {
 	public void applyDamageIgnoringArmor(float damage) {
 		applyDamageIgnoringArmor(damage, false);
 	}
-
-	private float defaultStunProration = 60; // means a duration of x gets prorated around a max of x+60 frames
-	private float defaultReelProration = 120;
-	private float defaultKnockbackProration = 1; // means a knockback length of 1 gets prorated around a max of len+1
 
 	/**
 	 * Applies the damage, doesn't do any damage reduction
@@ -876,7 +886,7 @@ public class UnitStats implements UnitStatsInfo {
 			return;
 		}
 		tauntDurationRemaining = duration;
-		tauntAttackTarget = tauntSource;
+		tauntedTowards = tauntSource;
 	}
 
 	@Override
@@ -891,7 +901,7 @@ public class UnitStats implements UnitStatsInfo {
 
 	@Override
 	public UnitInfo getTauntAttackTarget() {
-		return tauntAttackTarget;
+		return tauntedTowards;
 	}
 
 	float getMultiTeamingAtkspdPenalty(Unit target) {
@@ -907,5 +917,6 @@ public class UnitStats implements UnitStatsInfo {
 			return 0.82f;
 		}
 	}
+
 
 }

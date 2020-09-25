@@ -60,16 +60,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	public float x, y;
-
-	// World Fields
-	private WorldInfo world;
-	List<Unit> units;
-
-	// Map life-time Components
-	public final UnitMotion motion;
-
-	// Unit life-time Components (persist at least partially through levels)
+	// Unit life-time Components
 	public final UnitStats stats;
 	public final UnitSkills skills;
 	public final UnitGraphics graphics;
@@ -83,48 +74,58 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	private static int curId = 0;
 	private final int id;
 
-	/**
-	 * A unit's friendly/foe status.
-	 */
+	// State
+	/** A unit's friendly/foe type. */
 	Side side;
 
-	// Ordering state
-	public final UnitOrderDeferring orderDeferring;
-	
+	/////////////// World specific state /////////////
+
+	// Map life-time Components (are discarded when a unit moves to a new map)
+	private UnitMotion motion;
+
+	// General
+	public float x, y;
+	private WorldInfo world;
+
+	// Ordering
+	UnitOrderDeferring orderDeferring;
+
 	Order order = Order.NONE;
 	/** Target for the current command */
 	Unit orderTarget;
 	float attackMoveDestX;
 	float attackMoveDestY;
 
-	// Combat state
+	// Attacking
 	/** The unit this unit is attacking. Attacking a unit <--> being engaged. */
 	private Unit attacking;
 
+	private float attackCooldown = 60;
+	private float attackCooldownRemaining = 0;
+
+	/** Time in frames. When a unit engages it cannot retreat for a certain amount of time. */
+	private float retreatCooldown = 0;
+	private float retreatCooldownRemaining = 0;
+
+	private float attackOfOpportunityCooldown = 120;
+	private float attackOfOpportunityCooldownRemaining = 0;
 
 	// Skills
+	/**
+	 * The skill the character is actively casting or channelling, else null. The Skill class will reset
+	 * this when the active portion has finished.
+	 */
+	private ActiveSkill activeSkill;
 	/**
 	 * Time in frames before the unit can use skills again
 	 */
 	private float skillCooldownRemaining;
 
-	/**
-	 * Time in frames. When a unit engages it cannot retreat for a certain amount of time.
-	 */
-	private float retreatCooldown = 0; // 480; // 8 seconds until can retreat
-	private float retreatCooldownRemaining = 0;
-
-	private float attackCooldown = 60;
-	private float attackCooldownRemaining = 0;
-
-	private float attackOfOpportunityCooldown = 120;
-	private float attackOfOpportunityCooldownRemaining = 0;
-
-	public enum Side { // For now, can assume that not being on the same side means that two units are enemies. Neutrals
-						// and alliances, are a
-						// non-trivial task
+	
+	/////////////// End of Fields /////////////
+	
+	public enum Side { // For now, just two enemy and player. Neutrals and alliances, are a non-trivial task
 		PLAYER, ENEMY;
-
 		public boolean isEnemy() {
 			return this != PLAYER;
 		}
@@ -154,12 +155,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		}
 	}
 
-	/**
-	 * The skill the character is actively casting or channelling, else null. The Skill class will reset
-	 * this when the active portion has finished.
-	 */
-	private ActiveSkill activeSkill;
-
 	public Unit(float x, float y, WorldInfo world, Side side, String name) {
 		this(x, y, side, world);
 		setName(name);
@@ -174,9 +169,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		this.y = y;
 		this.side = side;
 		this.world = world;
-
-		// get neccesary references
-		units = world.getUnits();
 
 		motion = new UnitMotion(this, world);
 		stats = new UnitStats(this);
@@ -204,19 +196,62 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	}
 
-	// Orders
+	/** Specifically for units that have been initialized and removed from a world once */
+	public void reinitializeForWorld(World world) {
+		this.world = world;
+		motion = new UnitMotion(this, world);
+		orderDeferring = new UnitOrderDeferring(this);
+		
+		stats.reinitializeForWorld();
+	}
 
 	/**
 	 * This method clears data that shouldn't persist from while changing maps. It is used when moving a
 	 * unit to a new map. Note: This just clears a unit's data. It doesn't remove the unit from the
-	 * world's collection (see: {@link World#removeAndDetachUnitFromWorld})
+	 * world's collection (Use: {@link World#removeAndDetachUnitFromWorld})
 	 */
 	public void clearMapLifeTimeData() {
-
+		notifyAppLifetimeComponentsToClearMapLifeTimeData();
+		clearMapLifeTimeComponents();
+		clearGeneralData();
+		clearOrderingData();
+		clearAttackingData();
+		clearSkillsData();
+	}
+	private void notifyAppLifetimeComponentsToClearMapLifeTimeData() {
+		stats.clearMapLifetimeData();
+		skills.clearMapLifetimeData();
+		graphics.clearMapLifetimeData();
+		equip.clearMapLifetimeData();
+		ai.clearMapLifetimeData();
 	}
 
-	public void clearOrderStateData() {
-
+	private void clearMapLifeTimeComponents() {
+		motion = null;
+		orderDeferring = null;
+	}
+	
+	private void clearGeneralData() {
+		x=0;
+		y=0;
+		world = null;
+	}
+	
+	private void clearOrderingData() {
+		order = Order.NONE;
+		orderTarget = null;
+		attackMoveDestX = 0; 
+		attackMoveDestY = 0;
+	}
+	private void clearAttackingData() {
+		attacking = null;
+		attackCooldownRemaining = 0;
+		retreatCooldownRemaining = 0;
+		attackOfOpportunityCooldownRemaining = 0;
+	}
+	private void clearSkillsData() {
+		activeSkill = null;
+		skillCooldownRemaining = 0;
 	}
 
 	@Override
@@ -227,7 +262,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 			}
 			return;
 		}
-		if (motion.pathFindTowardsPoint(x, y)) {
+		if (getMotion().pathFindTowardsPoint(x, y)) {
 			clearOrder();
 			order = Order.MOVE;
 		}
@@ -281,7 +316,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 			this.order = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
 			this.orderTarget = unit;
 
-			this.motion.pathFindTowardsTarget();
+			this.getMotion().pathFindTowardsTarget();
 
 			return true;
 		}
@@ -324,7 +359,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public void orderAttackMove(float x, float y) {
 		if (isAttackMoveOrderAllowed()) {
 
-			if (motion.pathFindTowardsPoint(x, y)) {
+			if (getMotion().pathFindTowardsPoint(x, y)) {
 				clearOrder();
 				attackMoveDestX = x;
 				attackMoveDestY = y;
@@ -347,7 +382,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	private void retreat(float x, float y) {
 		retreatDurationRemaining = retreatDuration;
-		if (motion.pathFindTowardsPoint(x, y)) {
+		if (getMotion().pathFindTowardsPoint(x, y)) {
 			stopAttacking();
 			clearOrder();
 			this.order = Order.RETREAT;
@@ -410,7 +445,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	public void stopUnit() {
 		clearOrder();
-		motion.stopCurrentMovement();
+		getMotion().stopCurrentMovement();
 	}
 
 	// @formatter:off
@@ -472,7 +507,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public boolean isAnyOrderAllowedIgnoringTaunt() {
-		return !stats.isDead() && !motion.isBeingKnockedBack() && !stats.isStunned();
+		return !stats.isDead() && !getMotion().isBeingKnockedBack() && !stats.isStunned();
 	}
 
 	// @formatter:on
@@ -527,7 +562,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 		ai.tick();
 
-		motion.tick();
+		getMotion().tick();
 		stats.tick();
 
 		tickOrderLogic();
@@ -639,7 +674,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 				if (Point.calcDistance(getPos(), closestEnemy.getPos()) <= aggroRange) {
 					orderTarget = (Unit) closestEnemy; // manually set target/path, since we want to keep the ATTACKMOVE
 														// order
-					if (!motion.pathFindTowardsTarget()) {
+					if (!getMotion().pathFindTowardsTarget()) {
 						orderTarget = null; // keep walking normally if path to target not found
 					}
 				}
@@ -721,7 +756,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 				Unit oldTarget = orderTarget;
 
 				orderTarget = (Unit) otherTargetsWithinAggroRange.peek();
-				if (!motion.pathFindTowardsTarget()) {
+				if (!getMotion().pathFindTowardsTarget()) {
 					orderTarget = oldTarget;
 					logger.debug("Was attack moving but no path could be found to the nearest unit, ignoring");
 				}
@@ -735,7 +770,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	private void repathToDestinationForAttackMove() {
 		orderTarget = null;
-		if (!motion.pathFindTowardsPoint(attackMoveDestX, attackMoveDestY)) {
+		if (!getMotion().pathFindTowardsPoint(attackMoveDestX, attackMoveDestY)) {
 			logger.debug("Was attack moving but no path could be found to destination.");
 			clearOrder();
 		}
@@ -788,7 +823,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 			stopAttacking();
 		}
 
-		motion.stopCurrentMovement();
+		getMotion().stopCurrentMovement();
 		attacking = target;
 		((World) world).onUnitStartsAttacking(this, attacking);
 
@@ -837,7 +872,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	void unitDies() {
-		motion.stopCurrentMovement();
+		getMotion().stopCurrentMovement();
 		this.clearOrder();
 
 		// Stop this (now-dead) unit from attacking
@@ -887,7 +922,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public Path getPath() {
-		return motion.getPath();
+		return getMotion().getPath();
 	}
 
 	@Override

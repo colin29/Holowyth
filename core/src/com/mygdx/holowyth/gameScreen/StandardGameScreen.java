@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -34,7 +35,7 @@ public class StandardGameScreen extends GameScreen {
 	private VNController vn;
 
 
-
+	private Unit lecia;
 	
 	public StandardGameScreen(Holowyth game) {
 		super(game);
@@ -43,8 +44,8 @@ public class StandardGameScreen extends GameScreen {
 //		vn = new VNController(new Stage(), batch, fixedCamera, multiplexer); // have vn draw using its OWN stage
 //		startConversation("myConv.conv", "default");
 		
-		
-		
+		functionBindings.bindFunctionToKey(this::addLeciaToWorld, Keys.Z);
+		functionBindings.bindFunctionToKey(this::removeLeciaFromWorld, Keys.X);
 		
 	}
 	/**
@@ -72,19 +73,20 @@ public class StandardGameScreen extends GameScreen {
 		}
 	}
 
-	private void spawnPlayerAtDefaultLocation() {
+	private Unit spawnPlayerAtDefaultLocation() {
 		Point pos = map.getLocations().get("default_spawn_location");
 		if (pos != null) {
-			spawnPlayerUnit(pos);
+			return spawnPlayerUnit(pos);
 		} else {
 			logger.error("Couldn't spawn player, map has no default_spawn_location");
+			return null;
 		}
 	}
 
 	/**
 	 * @param pos can't be null
 	 */
-	private void spawnPlayerUnit(Point pos) {
+	private Unit spawnPlayerUnit(Point pos) {
 		var u = new Unit(pos.x, pos.y, Unit.Side.PLAYER, world);
 		u.setName("Lecia");
 		u.graphics.setAnimatedSprite(game.animations.get("pipo-charachip030e.png"));
@@ -94,6 +96,30 @@ public class StandardGameScreen extends GameScreen {
 		u.skills.slotSkills(Skills.warriorSkills);
 		u.equip.equip(Equips.longSword.copy());
 		world.addUnit(u);
+		return u;
+	}
+	private void removeLeciaFromWorld() {
+		if(lecia.getWorld() == null) {
+			logger.warn("Remove: Lecia is not in a world");
+			return;
+		}
+		controls.removeUnitFromSelection(lecia);
+		world.removeAndDetachUnitFromWorld(lecia);
+	}
+	private void addLeciaToWorld() {
+		if(isMapLoaded()) {
+			if(lecia.getWorld() == null) {
+				Point pos = map.getLocations().get("default_spawn_location");
+				((Unit) lecia).x = pos.x+200;
+				((Unit) lecia).y = pos.y;
+				world.addPreExistingUnit(lecia);	
+			}else {
+				logger.warn("Add: Lecia already has a world");
+			}
+		}else {
+			logger.info("Map isn't loaded, can't add player to world");
+		}
+		
 	}
 
 	@Override
@@ -117,7 +143,11 @@ public class StandardGameScreen extends GameScreen {
 	public
 	final void mapStartup() {
 		super.mapStartup();
-		spawnPlayerAtDefaultLocation();
+		if(lecia==null) {
+			lecia = spawnPlayerAtDefaultLocation();	
+		}else {
+			// insert existing lecia into the world
+		}
 		placeUnitsAccordingToUnitMarkers();
 		loadMapTriggers();
 	}

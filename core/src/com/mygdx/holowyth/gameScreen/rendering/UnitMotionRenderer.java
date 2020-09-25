@@ -17,9 +17,9 @@ class UnitMotionRenderer extends SubRenderer {
 	@SuppressWarnings("unused")
 	void renderPlayerUnreachedWaypoints(Color color) {
 		for (Unit unit : getWorld().getUnits()) {
-			if (unit.isAPlayerCharacter() && unit.motion.getPath() != null) {
-				Path path = unit.motion.getPath();
-				for (int i = unit.motion.getWayPointIndex(); i < path.size(); i++) {
+			if (unit.isAPlayerCharacter() && unit.getMotion().getPath() != null) {
+				Path path = unit.getMotion().getPath();
+				for (int i = unit.getMotion().getWayPointIndex(); i < path.size(); i++) {
 					Point waypoint = path.get(i);
 					shapeRenderer.begin(ShapeType.Filled);
 					shapeRenderer.setColor(color);
@@ -47,9 +47,9 @@ class UnitMotionRenderer extends SubRenderer {
 	void renderUnitDestinations(Color color) {
 
 		for (Unit unit : getWorld().getUnits()) {
-			if (unit.isAPlayerCharacter() && unit.motion.getPath() != null) {
+			if (unit.isAPlayerCharacter() && unit.getMotion().getPath() != null) {
 
-				Path path = unit.motion.getPath();
+				Path path = unit.getMotion().getPath();
 				Point finalPoint = path.get(path.size() - 1);
 				shapeRenderer.begin(ShapeType.Filled);
 				shapeRenderer.setColor(color);

@@ -5,8 +5,7 @@ import com.mygdx.holowyth.unit.UnitEquip.Slot;
 import com.mygdx.holowyth.util.Holo;
 
 public class UnitStatCalculator {
-
-	final UnitStatValues my;
+	private final UnitStatValues my;
 	private final UnitStats self;
 
 	// After recalculateStats() is called, these will accurately reflect the combined skill and equip bonuses

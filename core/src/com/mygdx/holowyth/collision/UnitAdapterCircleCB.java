@@ -30,13 +30,13 @@ public class UnitAdapterCircleCB implements CircleCBInfo {
 	// If a unit isn't being knocked back, it still is treating as a colliding body, with its normal velocity.
 	@Override
 	public float getVx() {
-		return unit.motion.isBeingKnockedBack() ? unit.motion.getKnockbackVx() : unit.motion.getVx();
+		return unit.getMotion().isBeingKnockedBack() ? unit.getMotion().getKnockbackVx() : unit.getMotion().getVx();
 
 	}
 
 	@Override
 	public float getVy() {
-		return unit.motion.isBeingKnockedBack() ? unit.motion.getKnockbackVy() : unit.motion.getVy();
+		return unit.getMotion().isBeingKnockedBack() ? unit.getMotion().getKnockbackVy() : unit.getMotion().getVy();
 	}
 
 	@Override

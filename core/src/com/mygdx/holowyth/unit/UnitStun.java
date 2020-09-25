@@ -7,7 +7,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 
 /**
- * Handles logic for whether a unit is stunned or not
+ * Handles logic for whether a unit is stunned or not <br><br>
+ * 
+ * Has Map life-time.
  *
  */
 class UnitStun {
@@ -48,7 +50,7 @@ class UnitStun {
 	private void tickStun() {
 		stunDurationRemaining -= 1;
 		if (stunDurationRemaining <= 0 &&
-				!self.motion.isBeingKnockedBack()) { // if unit is still being knockbacked, wait until knockback ends before ending stun
+				!self.getMotion().isBeingKnockedBack()) { // if unit is still being knockbacked, wait until knockback ends before ending stun
 			endStun();
 		}
 	}
@@ -106,29 +108,29 @@ class UnitStun {
 	void applyKnockbackStun(float duration, Vector2 dv, float maxKnockBackVel, float maxStunDuration) {
 		applyStun(duration, maxStunDuration);
 
-		if (self.motion.isBeingKnockedBack()) {
+		if (self.getMotion().isBeingKnockedBack()) {
 			// Prorate dv based on current velocity: the higher velocity, the smaller dv's effect is
-			Vector2 curVel = self.motion.getKnockbackVelocity();
+			Vector2 curVel = self.getMotion().getKnockbackVelocity();
 			float factor = Math.max(0, 1 - curVel.len() / maxKnockBackVel);
 			Vector2 dVProrated = new Vector2(dv).scl(factor);
-			self.motion.applyKnockBackVelocity(dVProrated.x, dVProrated.y);
+			self.getMotion().applyKnockBackVelocity(dVProrated.x, dVProrated.y);
 
 			// logger.debug("Knockback info: Orig Vel {} maxKnockBackVel {} dv {} proratedDv {} finalVel {}", curVel.len(), maxKnockBackVel, dv.len(),
 			// dVProrated.len(), self.motion.getKnockbackVelocity().len());
 
 		} else {
-			self.motion.applyKnockBackVelocity(dv.x, dv.y);
+			self.getMotion().applyKnockBackVelocity(dv.x, dv.y);
 		}
 
 	}
 
 	void applyKnockbackStunWithoutVelProrate(float duration, float maxStunDuration, Vector2 dv) {
 		applyStun(duration, maxStunDuration);
-		self.motion.applyKnockBackVelocity(dv.x, dv.y);
+		self.getMotion().applyKnockBackVelocity(dv.x, dv.y);
 	}
 
 	boolean isUnitBeingKnockedBack() {
-		return self.motion.isBeingKnockedBack();
+		return self.getMotion().isBeingKnockedBack();
 	}
 
 	/**
@@ -188,7 +190,7 @@ class UnitStun {
 
 	private void beginStun(float duration) {
 		self.orderDeferring.deferCurrentOrder();
-		self.motion.stopCurrentMovement();
+		self.getMotion().stopCurrentMovement();
 		self.clearOrder();
 		self.stopAttacking();
 		self.interruptHard();

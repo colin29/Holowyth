@@ -19,11 +19,7 @@ public class UnitEquip {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private EquippedItemsMap equips = new EquippedItemsMap();
-
-	public UnitEquip(Unit self) {
-		this.self = self;
-	}
-
+	
 	public enum Slot {
 		HEAD, MAIN_HAND, OFF_HAND, TORSO, ACCESSORY1, ACCESSORY2;
 
@@ -45,6 +41,16 @@ public class UnitEquip {
 				throw new HoloAssertException("Unhandled Equip slot");
 			}
 		}
+	}
+
+
+	public UnitEquip(Unit self) {
+		this.self = self;
+	}
+	
+
+	public void clearMapLifetimeData() {
+		// None
 	}
 
 	/**

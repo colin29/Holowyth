@@ -137,15 +137,15 @@ public class World implements WorldInfo {
 
 			Unit debugUnit = Unit.getUnitByID(3);
 
-			if (thisUnit.motion.isBeingKnockedBack()) {
+			if (thisUnit.getMotion().isBeingKnockedBack()) {
 				// knocked back units do not have voluntary motion, skip
-				HoloAssert.assertEquals(thisUnit.motion.getVx(), 0);
-				HoloAssert.assertEquals(thisUnit.motion.getVy(), 0);
-				HoloAssert.assertIsNull(thisUnit.motion.getPath());
+				HoloAssert.assertEquals(thisUnit.getMotion().getVx(), 0);
+				HoloAssert.assertEquals(thisUnit.getMotion().getVy(), 0);
+				HoloAssert.assertIsNull(thisUnit.getMotion().getPath());
 				continue;
 			}
 
-			if (thisUnit.motion.getVx() == 0 && thisUnit.motion.getVy() == 0) {
+			if (thisUnit.getMotion().getVx() == 0 && thisUnit.getMotion().getVy() == 0) {
 				continue;
 			}
 
@@ -156,8 +156,8 @@ public class World implements WorldInfo {
 					colBodies.add(new CBInfo(u));
 			}
 
-			float destX = thisUnit.x + thisUnit.motion.getVx();
-			float destY = thisUnit.y + thisUnit.motion.getVy();
+			float destX = thisUnit.x + thisUnit.getMotion().getVx();
+			float destY = thisUnit.y + thisUnit.getMotion().getVy();
 
 			Segment motion = new Segment(thisUnit.x, thisUnit.y, destX, destY);
 
@@ -169,8 +169,8 @@ public class World implements WorldInfo {
 			}
 
 			if (collisions.isEmpty()) {
-				thisUnit.x += thisUnit.motion.getVx();
-				thisUnit.y += thisUnit.motion.getVy();
+				thisUnit.x += thisUnit.getMotion().getVx();
+				thisUnit.y += thisUnit.getMotion().getVy();
 			} else { // Push this unit outwards and try to keep going towards the waypoint
 
 				// The majority of the time a unit should only be colliding with one unit at a time since we are drawing
@@ -180,8 +180,8 @@ public class World implements WorldInfo {
 					System.out.println("Wierd case, unit colliding with more than 2 units");
 				}
 
-				float curDestx = thisUnit.x + thisUnit.motion.getVx();
-				float curDesty = thisUnit.y + thisUnit.motion.getVy();
+				float curDestx = thisUnit.x + thisUnit.getMotion().getVx();
+				float curDesty = thisUnit.y + thisUnit.getMotion().getVy();
 
 				// System.out.format("%s is colliding with %s bodies%n", u,
 				// collisions.size());
@@ -212,7 +212,7 @@ public class World implements WorldInfo {
 				/**
 				 * Determines how "impatient" the algorithm will be for signalling blocked for a slow-resolving or non-resolving push situation
 				 */
-				final float minProgress = 0.20f * thisUnit.motion.getVelocityMagnitude();
+				final float minProgress = 0.20f * thisUnit.getMotion().getVelocityMagnitude();
 
 				if (HoloPF.isSegmentPathable(thisUnit.x, thisUnit.y, curDestx, curDesty,
 						pathing.getObstacleExpandedSegs(), pathing.getObstaclePoints(), colBodies,
@@ -222,7 +222,7 @@ public class World implements WorldInfo {
 					thisUnit.x = curDestx;
 					thisUnit.y = curDesty;
 				} else {
-					thisUnit.motion.onBlocked(); // notify the unit that it is blocked
+					thisUnit.getMotion().onBlocked(); // notify the unit that it is blocked
 				}
 
 			}
@@ -237,14 +237,14 @@ public class World implements WorldInfo {
 	 */
 	private void moveKnockedBackedUnitsAndResolveCollisions() {
 		for (Unit thisUnit : units.getUnits()) {
-			if (thisUnit.motion.isBeingKnockedBack()) {
+			if (thisUnit.getMotion().isBeingKnockedBack()) {
 
 				final float x, y, vx, vy;
 
 				x = thisUnit.getX();
 				y = thisUnit.getY();
-				vx = thisUnit.motion.getKnockbackVx();
-				vy = thisUnit.motion.getKnockbackVy();
+				vx = thisUnit.getMotion().getKnockbackVx();
+				vy = thisUnit.getMotion().getKnockbackVy();
 
 				CircleCBInfo curBody = units.unitToColBody().get(thisUnit);
 
@@ -298,19 +298,19 @@ public class World implements WorldInfo {
 	}
 
 	private void applyFriction(Unit unit) {
-		if (unit.motion.isBeingKnockedBack()) {
+		if (unit.getMotion().isBeingKnockedBack()) {
 
-			Vector2 newVelocity = unit.motion.getKnockbackVelocity();
+			Vector2 newVelocity = unit.getMotion().getKnockbackVelocity();
 			newVelocity.setLength(Math.max(0, newVelocity.len() - knockBackUnitFriction));
-			unit.motion.setKnockbackVelocity(newVelocity);
+			unit.getMotion().setKnockbackVelocity(newVelocity);
 		}
 	}
 
 	private void endKnockbackForUnitsBelowVelocityThreshold() {
 		for (Unit unit : units.getUnits()) {
-			if (unit.motion.isBeingKnockedBack()) {
-				if (unit.motion.getKnockbackVelocity().len() < velocityThresholdToEndKnockback) {
-					unit.motion.endKnockback();
+			if (unit.getMotion().isBeingKnockedBack()) {
+				if (unit.getMotion().getKnockbackVelocity().len() < velocityThresholdToEndKnockback) {
+					unit.getMotion().endKnockback();
 				}
 			}
 		}
@@ -380,7 +380,7 @@ public class World implements WorldInfo {
 
 		switch (collisionType) {
 		case UNIT:
-			if (!otherUnit.motion.isBeingKnockedBack() && collisionMagnitudeOfUnit1 < 1) {
+			if (!otherUnit.getMotion().isBeingKnockedBack() && collisionMagnitudeOfUnit1 < 1) {
 				unitReboundsOffSecondUnit = true;
 			}
 			elasticity = unitReboundsOffSecondUnit ? knockBackCollisionElasticityReboundsOffUnit
@@ -468,7 +468,7 @@ public class World implements WorldInfo {
 	}
 
 	private float getCollisionClearanceDistance(Unit u) {
-		return Holo.collisionClearanceDistance * (u.motion.getVelocityMagnitude() / Holo.defaultUnitMoveSpeed);
+		return Holo.collisionClearanceDistance * (u.getMotion().getVelocityMagnitude() / Holo.defaultUnitMoveSpeed);
 	}
 
 	/**
@@ -487,13 +487,26 @@ public class World implements WorldInfo {
 	 * @param u
 	 */
 	public void addUnit(Unit u) {
+		addUnit(u, true);
+	}
+	/**
+	 * Add a unit that has been on another map already and we don't want to initiliaze hp/sp
+	 */
+	public void addPreExistingUnit(Unit u) {
+		if(addUnit(u, false)) {
+			u.reinitializeForWorld(this);
+		}
+	}
+	private boolean addUnit(Unit u, boolean shouldPrepareUnit) {
 		if (units.getUnits().contains(u)) {
 			logger.warn("Tried to add a unit that already exists, ignoring: {}", u.getName());
-			return;
+			return false;
 		}
-		u.stats.prepareUnit();
+		if(shouldPrepareUnit)
+			u.stats.prepareUnit();
 		units.addUnit(u);
 		unitsAttackingThis.put(u, new HashSet<Unit>());
+		return true;
 	}
 	
 	/**
@@ -508,7 +521,7 @@ public class World implements WorldInfo {
 	}
 	public void removeAndDetachUnitFromWorld(Unit u) {
 		if(u.getWorld() != this)
-			logger.warn("Unit's world {} doesn't match this {}", u.getWorld(), this);
+			logger.warn("Unit's world '{}' doesn't match this world '{}'", u.getWorld(), this);
 		unitsAttackingThis.remove(u);
 		units.removeUnit(u);
 		u.clearMapLifeTimeData();

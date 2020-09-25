@@ -14,6 +14,8 @@ public class UnitAI {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	BehaviorTree<UnitOrderable> btree;
+	
+	// Debug
 	public String lastRanOrder = "";
 
 	private final UnitOrderable self;
@@ -25,9 +27,12 @@ public class UnitAI {
 			setBTree("enemy");
 			logger.debug(self.getName() + " New btree:" + btree);
 		}
-
 	}
 
+	public void clearMapLifetimeData() {
+		// None. We'll keep b-tree for now and see what happens. Only enemies use AI, don't forsee moving enemies between maps atm.
+	}
+	
 	/**
 	 * Creates a copy of the given bTree and uses it.
 	 */

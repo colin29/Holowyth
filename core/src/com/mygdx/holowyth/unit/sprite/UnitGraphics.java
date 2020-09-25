@@ -38,6 +38,10 @@ public class UnitGraphics {
 		this.self = parent;
 	}
 
+	public void clearMapLifetimeData() {
+		stateTime = 0;
+	}
+	
 	public void updateAndRender(float delta, SpriteBatch batch) {
 		if (animatedSprite == null)
 			return;
@@ -53,9 +57,9 @@ public class UnitGraphics {
 
 	private void updateActiveAnimation(float delta) {
 
-		if (self.motion.isBeingKnockedBack())
+		if (self.getMotion().isBeingKnockedBack())
 			return;
-		if (self.motion.getVelocity().isZero() && !self.isAttacking())
+		if (self.getMotion().getVelocity().isZero() && !self.isAttacking())
 			return;
 
 		float angle = getUnitAngle();
@@ -72,7 +76,7 @@ public class UnitGraphics {
 			setActiveAnimation(animatedSprite.getDown());
 		}
 
-		if (activeAnimation == prevAnimation && !self.motion.isBeingKnockedBack() && !self.isAttacking()) {
+		if (activeAnimation == prevAnimation && !self.getMotion().isBeingKnockedBack() && !self.isAttacking()) {
 			stateTime += delta;
 		}
 		prevAnimation = activeAnimation;
@@ -84,7 +88,7 @@ public class UnitGraphics {
 			var enemy = self.getAttacking();
 			return Point.getAngleInDegrees(self.getPos(), enemy.getPos());
 		} else {
-			Vector2 vel = self.motion.getVelocityRegardlessOfMode();
+			Vector2 vel = self.getMotion().getVelocityRegardlessOfMode();
 			return vel.angle(); // angle between [0, 360)
 		}
 	}
@@ -107,5 +111,6 @@ public class UnitGraphics {
 	public AnimatedSprite getAnimatedSprite() {
 		return animatedSprite;
 	}
+
 
 }

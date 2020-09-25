@@ -15,24 +15,27 @@ import com.mygdx.holowyth.util.exceptions.HoloException;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 public class UnitSkills {
-
+	
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	public final Unit self;
 
-	Logger logger = LoggerFactory.getLogger(this.getClass());
+	// Parameters
+	public static final int NUM_SKILL_SLOTS = 10;
 
+	/** Skills the unit knows */
+	private Set<Skill> skills = new LinkedHashSet<Skill>();
+	/**
+	 *  Note: slot 0 cannot be used
+	 */
+	private ActiveSkill[] slot = new ActiveSkill[11];
+	
+	
 	public UnitSkills(Unit unit) {
 		self = unit;
 	}
-
-	public static final int NUM_SKILL_SLOTS = 10;
-
-	private Set<Skill> skills = new LinkedHashSet<Skill>();
-
-	/**
-	 * Slot 0 cannot be used
-	 */
-	ActiveSkill[] slot = new ActiveSkill[11];
-	{
+	public void clearMapLifetimeData() {
+		// None
 	}
 
 	/**
@@ -41,7 +44,7 @@ public class UnitSkills {
 	 * 
 	 * @return A cloned instance of the skill, or null if there was no skill in that slot
 	 */
-	public ActiveSkill getSkillInSlot(int slotNumber) {
+	public ActiveSkill copySkillInSlot(int slotNumber) {
 		if (slotNumber < 1 || slotNumber > 10) {
 			throw new HoloIllegalArgumentsException("slot number must be between 1 and 10");
 		}
@@ -126,5 +129,4 @@ public class UnitSkills {
 	public Set<Skill> getSkills() {
 		return Collections.unmodifiableSet(skills);
 	}
-
 }
