@@ -133,43 +133,86 @@ public class GameScreenBaseRenderer {
 	 * Methods call should not set projection matrixes (it is assumed to be the world matrix). If they do they should restore the old state
 	 */
 	public void render(float delta) {
+		clearScreenAndSetGLBlending();
+		worldCamera.update();
+		batch.setProjectionMatrix(worldCamera.combined);
+		
+		// Tiled map
+		tiled.renderMap();
+		
+		renderUnitHpSpBars(); // render unit bars low as to not obscure more important info
+
+		// Debug Map Visualizations
+		renderMapDebugVisualizationsIfKeysPressed();
+
+		// Unit paths
+		pathfinding.renderPaths(false);
+		unitMotion.renderUnitDestinations(Color.GREEN);
+
+		
+		// Units
+		renderUnitsAndOutlines(delta);
+		// debug.renderUnitIdsOnUnits();
+
+		// Skill Aiming Graphics
+		renderCastingCircleAimingHelperForGroundSkillThatDefineRadius();
+		renderCustomAimingHelperForGroundSkillThatDefine();
+		
+		// Misc. Combat Related
+		debug.renderUnitKnockbackVelocities();
+		renderUnitAttackingArrows();
+		renderCastingBars();
+
+		// Obstacle Edges
+		renderMapObstacleEdges();
+
+		// Effects
+		renderEffects();
+		gfx.renderDamageEffects();
+		gfx.renderBlockEffects(delta);
+
+		// UI
+		stage.draw();
+
+	}
+	
+	private void clearScreenAndSetGLBlending() {
 		Gdx.gl.glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT
 				| (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
-
-		worldCamera.update();
-
-		batch.setProjectionMatrix(worldCamera.combined);
-
-		tiled.renderMap();
-		renderUnitHpSpBars();
-
+	}
+	
+	private void renderMapDebugVisualizationsIfKeysPressed() {
 		if(Gdx.input.isKeyPressed(showMapRegionsKey)) {
 			GameMapRenderer.renderMapRegions(game.fonts.debugFont(),map, shapeDrawer, batch);
 		}
-		
 		if (Gdx.input.isKeyPressed(showMapPathingGraphKey)) {
 			pathingModule.renderGraph(true);
 			HoloGL.renderSegs(pathingModule.getObstacleExpandedSegs(), Color.PINK);
 			renderCircles(pathingModule.getObstaclePoints(), Holo.UNIT_RADIUS, Color.PINK);
 		}
-		
-		
-
-		// 2: Render unit paths
-		pathfinding.renderPaths(false);
-		unitMotion.renderUnitDestinations(Color.GREEN);
-
-		// 3: Render units and selection/status indicators
-
+	}
+	
+	private void renderMapObstacleEdges() {
+		if (tiled.isMapLoaded()) {
+			renderMapObstaclesEdges();
+			// renderMapBoundaries();
+		}
+	}
+	
+	private void renderUnitAttackingArrows() {
+		for (Unit u : world.getUnits()) {
+			u.renderAttackingArrow();
+		}
+	}
+	
+	private void renderUnitsAndOutlines(float delta) {
 		renderOutlineAroundSlowedUnits(); // lower priority indicators are drawn first
 
 		if (controls != null) {
-			controls.clearDeadUnitsFromSelection();
 			controls.renderCirclesOnSelectedUnits();
-
 		}
 
 		renderUnits(delta);
@@ -189,45 +232,13 @@ public class GameScreenBaseRenderer {
 		if (controls != null) {
 			controls.renderUnitUnderCursor(Color.GREEN, Color.RED);
 		}
-
-		// debug.renderUnitIdsOnUnits();
-
-		// Render Aiming graphics
-		renderCastingCircleIfSkill();
-		renderAimingHelperIfSkillHas();
-		// renderCircleIfAimingSkillGround();
-
-		// 3.5: Render arrows
-
-		debug.renderUnitKnockbackVelocities();
-
-		for (Unit u : world.getUnits()) {
-			u.renderAttackingArrow();
-		}
-
-		renderCastingBars();
-
-		// 1: Render Obstacle Lines
-
-		if (tiled.isMapLoaded()) {
-			renderMapObstaclesEdges();
-			// renderMapBoundaries();
-		}
-
-		// Render effects
-
-		renderEffects();
-
-		gfx.renderDamageEffects();
-		gfx.renderBlockEffects(delta);
-
-		// UI
-		stage.draw();
-
 	}
 
+	/**
+	 * Draws simple circle
+	 */
 	@SuppressWarnings("unused")
-	private void renderCircleIfAimingSkillGround() {
+	private void renderAimingCircleForSkillGround() {
 		if (controls.getContext() == Context.SKILL_GROUND) {
 			var curSkill = (GroundSkill) controls.getCurSkill();
 			var cursorPos = getWorldCoordinatesOfMouseCursor();
@@ -235,7 +246,7 @@ public class GameScreenBaseRenderer {
 		}
 	}
 
-	private void renderAimingHelperIfSkillHas() {
+	private void renderCustomAimingHelperForGroundSkillThatDefine() {
 
 		if (controls.getContext() == Context.SKILL_GROUND) {
 			var curSkill = (GroundSkill) controls.getCurSkill();
@@ -249,7 +260,7 @@ public class GameScreenBaseRenderer {
 
 	}
 
-	private void renderCastingCircleIfSkill() {
+	private void renderCastingCircleAimingHelperForGroundSkillThatDefineRadius() {
 		if (controls.getContext() == Context.SKILL_GROUND) {
 
 			var curSkill = (GroundSkill) controls.getCurSkill();

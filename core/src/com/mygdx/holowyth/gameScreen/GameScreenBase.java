@@ -209,6 +209,7 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 		world.tick();
 		gfx.tick();
 		triggers.checkTriggers();
+		controls.tick();
 	}
 
 	public Controls getControls() {

@@ -17,7 +17,7 @@ import com.mygdx.holowyth.util.dataobjects.Point;
  * @author Colin Ta
  *
  */
-public class SkillsAimingGraphic {
+public class SkillsAimingGraphics {
 
 	public static class HydroblastAimingGraphic extends AimingGraphic {
 

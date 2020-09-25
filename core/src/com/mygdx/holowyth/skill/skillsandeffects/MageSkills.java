@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.skill.skillsandeffects;
 
-import com.mygdx.holowyth.gameScreen.rendering.SkillsAimingGraphic;
+import com.mygdx.holowyth.gameScreen.rendering.SkillsAimingGraphics;
 import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
@@ -104,7 +104,7 @@ public class MageSkills {
 			cooldown = 60 * 16;
 			addTag(Tag.RANGED_MAGIC);
 
-			aimingGraphic = new SkillsAimingGraphic.HydroblastAimingGraphic(MageEffects.HydroblastEffect.coneLength,
+			aimingGraphic = new SkillsAimingGraphics.HydroblastAimingGraphic(MageEffects.HydroblastEffect.coneLength,
 					MageEffects.HydroblastEffect.coneInnerLength,
 					MageEffects.HydroblastEffect.coneWidthDegrees,
 					getWorld());

@@ -619,7 +619,11 @@ public class Controls extends InputProcessorAdapter {
 		}
 	}
 
-	public void clearDeadUnitsFromSelection() {
+	public void tick() {
+		clearDeadUnitsFromSelection();
+	}
+	
+	private void clearDeadUnitsFromSelection() {
 		Iterator<Unit> iter = selectedUnits.iterator();
 		while (iter.hasNext()) {
 			Unit unit = iter.next();
