@@ -8,7 +8,7 @@ import com.mygdx.holowyth.unit.Unit;
 
 class SandBoxRenderer extends SubRenderer {
 
-	public SandBoxRenderer(GameScreenBaseRenderer renderer) {
+	public SandBoxRenderer(GameScreenRenderer renderer) {
 		super(renderer);
 	}
 

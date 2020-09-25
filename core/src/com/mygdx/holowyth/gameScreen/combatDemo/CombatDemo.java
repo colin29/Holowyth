@@ -21,11 +21,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.ai.AIModule;
-import com.mygdx.holowyth.gameScreen.GameScreenBase;
+import com.mygdx.holowyth.gameScreen.GameScreen;
 import com.mygdx.holowyth.gameScreen.basescreens.TiledMapLoadingScreen;
 import com.mygdx.holowyth.gameScreen.combatDemo.prototyping.CombatPrototyping;
-import com.mygdx.holowyth.gameScreen.rendering.GameScreenBaseRenderer;
-import com.mygdx.holowyth.gameScreen.ui.GameScreenBaseUI;
+import com.mygdx.holowyth.gameScreen.rendering.GameScreenRenderer;
+import com.mygdx.holowyth.gameScreen.ui.GameScreenUI;
 import com.mygdx.holowyth.gameScreen.ui.GameLogDisplay;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
@@ -46,7 +46,7 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
  * @author Colin Ta
  *
  */
-public class CombatDemo extends GameScreenBase implements Screen, InputProcessor {
+public class CombatDemo extends GameScreen implements Screen, InputProcessor {
 
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());

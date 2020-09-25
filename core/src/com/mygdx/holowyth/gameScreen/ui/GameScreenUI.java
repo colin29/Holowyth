@@ -15,7 +15,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.mygdx.holowyth.gameScreen.GameScreenBase;
+import com.mygdx.holowyth.gameScreen.GameScreen;
 import com.mygdx.holowyth.gameScreen.Controls.UnitSelectionListener;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.Holo;
@@ -47,7 +47,7 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStoreUI;
  * @author Colin
  *
  */
-public class GameScreenBaseUI extends InputProcessorAdapter {
+public class GameScreenUI extends InputProcessorAdapter {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -75,9 +75,9 @@ public class GameScreenBaseUI extends InputProcessorAdapter {
 	private Table root = new Table();
 	private Skin skin;
 
-	private GameScreenBase game;
+	private GameScreen game;
 
-	public GameScreenBaseUI(Stage stage, DebugStore debugStore, Skin skin, GameScreenBase self) {
+	public GameScreenUI(Stage stage, DebugStore debugStore, Skin skin, GameScreen self) {
 		this.skin = skin;
 		this.stage = stage;
 		this.debugStore = debugStore;

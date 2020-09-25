@@ -53,7 +53,7 @@ import com.mygdx.holowyth.util.dataobjects.Point;
  * @author Colin Ta
  *
  */
-public class GameScreenBaseRenderer {
+public class GameScreenRenderer {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -103,7 +103,7 @@ public class GameScreenBaseRenderer {
 	 * @param stage
 	 * @param pathingModule // May be null;
 	 */
-	public GameScreenBaseRenderer(Holowyth game, Camera worldCamera, Stage stage, PathingModule pathingModule) {
+	public GameScreenRenderer(Holowyth game, Camera worldCamera, Stage stage, PathingModule pathingModule) {
 
 		batch = game.batch;
 		shapeRenderer = game.shapeRenderer;

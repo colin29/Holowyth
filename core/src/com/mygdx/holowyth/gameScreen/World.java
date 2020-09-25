@@ -1,7 +1,12 @@
 package com.mygdx.holowyth.gameScreen;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +34,12 @@ import com.mygdx.holowyth.util.exceptions.HoloOperationException;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
 /**
- * Has map lifetime
+ * 
+ * Processes everything happening within the game world. See {@link #tick()} <br><br>
+ * 
+ * Has map lifetime <br><br>
+ * 
+ * 
  * 
  * @author Colin Ta
  *
@@ -53,13 +63,13 @@ public class World implements WorldInfo {
 
 	private List<Effect> effects = new ArrayList<Effect>();
 
-	private final int mapWidth;
-	private final int mapHeight;
+	/**
+	 * Maps from a unit to units attacking that unit.
+	 * {@link #getUnitsAttackingThis()}
+	 */
+	private final Map<Unit, Set<Unit>> unitsAttackingThis = new HashMap<Unit, Set<Unit>>();
 
-	public World(int mapWidth, int mapHeight, PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects, Animations animations) {
-		this.mapWidth = mapWidth;
-		this.mapHeight = mapHeight;
-
+	public World(PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects, Animations animations) {
 		this.pathing = pathingModule;
 		this.gfx = effects;
 		this.animations = animations;
@@ -67,11 +77,8 @@ public class World implements WorldInfo {
 		this.debugStore = debugStore;
 	}
 
-	/**
-	 * Evaluates one frame of the game world
-	 */
+	/** Evaluates one frame of the game world */
 	public void tick() {
-
 		tickLogicForUnits();
 		moveNormallyMovingUnits();
 		moveKnockedBackedUnitsAndResolveCollisions();
@@ -156,7 +163,6 @@ public class World implements WorldInfo {
 
 			ArrayList<CBInfo> collisions = HoloPF.detectCollisionsFromUnitMoving(motion.x1, motion.y1, motion.x2, motion.y2,
 					colBodies, thisUnit.getRadius());
-			thisUnit.debugNumOfUnitsCollidingWith = collisions.size();
 			if (collisions.size() > 0) {
 				int x;
 				x = 3 + 4;
@@ -466,6 +472,14 @@ public class World implements WorldInfo {
 	}
 
 	/**
+	 * Creates a new unit from a unitMarker and adds it to the world
+	 * @param u
+	 */
+	public void addUnit(UnitMarker unitMarker) {
+		addUnit(new Unit(unitMarker, this));
+	}
+
+	/**
 	 * Adds and prepares the unit.
 	 * 
 	 * Should not add a unit that already exists in the world
@@ -479,16 +493,9 @@ public class World implements WorldInfo {
 		}
 		u.stats.prepareUnit();
 		units.addUnit(u);
+		unitsAttackingThis.put(u, new HashSet<Unit>());
 	}
 	
-	/**
-	 * Creates a new unit from a unitMarker and adds it to the world
-	 * @param u
-	 */
-	public void addUnit(UnitMarker unitMarker) {
-		addUnit(new Unit(unitMarker, this));
-	}
-
 	/**
 	 * Returns true if unit was present
 	 * 
@@ -496,7 +503,15 @@ public class World implements WorldInfo {
 	 * @return
 	 */
 	public boolean removeUnit(Unit u) {
+		unitsAttackingThis.remove(u);
 		return units.removeUnit(u);
+	}
+	public void removeAndDetachUnitFromWorld(Unit u) {
+		if(u.getWorld() != this)
+			logger.warn("Unit's world {} doesn't match this {}", u.getWorld(), this);
+		unitsAttackingThis.remove(u);
+		units.removeUnit(u);
+		u.clearMapLifeTimeData();
 	}
 
 	public void clearAllUnits() {
@@ -533,6 +548,17 @@ public class World implements WorldInfo {
 	@Override
 	public Animations getAnimations() {
 		return animations;
+	}
+	
+	@Override
+	public Set<Unit> getUnitsAttackingThis(Unit u) {
+		return Collections.unmodifiableSet(unitsAttackingThis.get(u));
+	}
+	public void onUnitStartsAttacking(Unit attacker, Unit target){
+		unitsAttackingThis.get(target).add(attacker);
+	}
+	public void onUnitStopsAttacking(Unit attacker, Unit target) {
+		unitsAttackingThis.get(target).remove(attacker);
 	}
 
 }

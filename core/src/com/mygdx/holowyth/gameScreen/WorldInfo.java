@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.gameScreen;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -39,4 +40,6 @@ public interface WorldInfo {
 	List<Effect> getEffects();
 
 	Animations getAnimations();
+
+	Set<Unit> getUnitsAttackingThis(Unit u);
 }

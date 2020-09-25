@@ -42,15 +42,19 @@ import com.mygdx.holowyth.util.exceptions.HoloException;
  */
 
 /**
- * There are four aspects that largely determine a unit's state. They can be independent, but often check each other for legality. <br>
- * For example, some skills might castable while attacking, and a unit could retain certain orders while attacking.
+ * There are four aspects that largely determine a unit's state. They can be independent, but often
+ * check each other for legality. <br>
+ * For example, some skills might castable while attacking, and a unit could retain certain orders
+ * while attacking.
  * 
  * <b>currentOrder</b> -- a unit with an order will continue trying to do something <br>
- * <b>attacking</b> -- a unit attacking is locked in combat and will regularly attack their target <br>
- * <b>activeSkill</b> -- a unit with an active ability is either casting or channelling that ability <br>
+ * <b>attacking</b> -- a unit attacking is locked in combat and will regularly attack their target
+ * <br>
+ * <b>activeSkill</b> -- a unit with an active ability is either casting or channelling that ability
+ * <br>
  * 
- * <b>motion.isBeingKnockedBack()</b> -- a unit being knocked back cannot be given new orders or perform any action (it may retain its old order,
- * depending on the type)
+ * <b>motion.isBeingKnockedBack()</b> -- a unit being knocked back cannot be given new orders or
+ * perform any action (it may retain its old order, depending on the type)
  */
 public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
@@ -58,53 +62,52 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	public float x, y;
 
-	// Components
+	// World Fields
+	private WorldInfo world;
+	List<Unit> units;
+
+	// Map life-time Components
 	public final UnitMotion motion;
+
+	// Unit life-time Components (persist at least partially through levels)
 	public final UnitStats stats;
 	public final UnitSkills skills;
 	public final UnitGraphics graphics;
 	public final UnitEquip equip;
 	public final UnitAI ai;
-	public final UnitOrderDeferring orderDeferring;
-
-	// World Fields
-	List<Unit> units;
 
 	// Collision Detection
 	private float radius = Holo.UNIT_RADIUS;
 
-	// Debug
+	// Id (for debug)
 	private static int curId = 0;
 	private final int id;
-
-	public int debugNumOfUnitsCollidingWith = 0;
-
-	// Orders
-
-	Order order = Order.NONE;
-	Unit orderTarget; // target for the current command.
-	float attackMoveDestX;
-	float attackMoveDestY;
-
-	// Combat
-	/** The unit this unit is attacking. Attacking a unit <--> being engaged. */
-	private Unit attacking;
-	/**
-	 * Maps from a unit to a list of units attacking that one unit. Other classes should use {@link #getAttackers()}
-	 */
-	static final Map<Unit, Set<Unit>> unitsAttacking = new HashMap<Unit, Set<Unit>>();
 
 	/**
 	 * A unit's friendly/foe status.
 	 */
 	Side side;
 
-	// Skills
+	// Ordering state
+	public final UnitOrderDeferring orderDeferring;
+	
+	Order order = Order.NONE;
+	/** Target for the current command */
+	Unit orderTarget;
+	float attackMoveDestX;
+	float attackMoveDestY;
 
+	// Combat state
+	/** The unit this unit is attacking. Attacking a unit <--> being engaged. */
+	private Unit attacking;
+
+
+	// Skills
 	/**
 	 * Time in frames before the unit can use skills again
 	 */
 	private float skillCooldownRemaining;
+
 	/**
 	 * Time in frames. When a unit engages it cannot retreat for a certain amount of time.
 	 */
@@ -117,9 +120,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	private float attackOfOpportunityCooldown = 120;
 	private float attackOfOpportunityCooldownRemaining = 0;
 
-	private WorldInfo world;
-
-	public enum Side { // For now, can assume that not being on the same side means that two units are enemies. Neutrals and alliances, are a
+	public enum Side { // For now, can assume that not being on the same side means that two units are enemies. Neutrals
+						// and alliances, are a
 						// non-trivial task
 		PLAYER, ENEMY;
 
@@ -133,15 +135,17 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * A unit's order represents whether it has any persistent order on it that would determine its behaviour. Note that a unit without a command
-	 * could still be casting or attacking.
+	 * A unit's order represents whether it has any persistent order on it that would determine its
+	 * behaviour. Note that a unit without a command could still be casting or attacking.
 	 * 
-	 * AttackUnit can be hard or soft. Hard will chase indefinitely, a soft attack order will stop chasing if the target goes out of range
+	 * AttackUnit can be hard or soft. Hard will chase indefinitely, a soft attack order will stop
+	 * chasing if the target goes out of range
 	 */
 	public enum Order {
 		MOVE, ATTACKUNIT_HARD, ATTACKUNIT_SOFT, NONE,
 		/**
-		 * If an attacking moving unit has no target it's moving towards its destination. If it does have a target it's chasing that unit.
+		 * If an attacking moving unit has no target it's moving towards its destination. If it does have a
+		 * target it's chasing that unit.
 		 */
 		ATTACKMOVE, RETREAT;
 
@@ -151,7 +155,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * The skill the character is actively casting or channelling, else null. The Skill class will reset this when the active portion has finished.
+	 * The skill the character is actively casting or channelling, else null. The Skill class will reset
+	 * this when the active portion has finished.
 	 */
 	private ActiveSkill activeSkill;
 
@@ -173,8 +178,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		// get neccesary references
 		units = world.getUnits();
 
-		Unit.unitsAttacking.put(this, new HashSet<Unit>());
-
 		motion = new UnitMotion(this, world);
 		stats = new UnitStats(this);
 		skills = new UnitSkills(this);
@@ -184,24 +187,37 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 		graphics = new UnitGraphics(this);
 	}
-	
+
 	/**
 	 * Create unit from marker
 	 */
 	public Unit(UnitMarker m, WorldInfo world) {
 		this(m.pos.x, m.pos.y, world, m.side, m.name);
-		
+
 		stats.base.set(m.baseStats);
-		
+
 		skills.addSkills(m.activeSkills);
 		skills.addSkills(m.passiveSkills);
 		skills.slotSkills(m.activeSkills);
-		
+
 		graphics.setAnimatedSprite(world.getAnimations().get(m.animatedSpriteName));
-		
+
 	}
 
 	// Orders
+
+	/**
+	 * This method clears data that shouldn't persist from while changing maps. It is used when moving a
+	 * unit to a new map. Note: This just clears a unit's data. It doesn't remove the unit from the
+	 * world's collection (see: {@link World#removeAndDetachUnitFromWorld})
+	 */
+	public void clearMapLifeTimeData() {
+
+	}
+
+	public void clearOrderStateData() {
+
+	}
 
 	@Override
 	public void orderMove(float x, float y) {
@@ -229,8 +245,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	/**
 	 * 
 	 * @param unitOrd
-	 * @param isHardOrder
-	 *            A hard attack order makes the unit chase forever, whereas with a soft order the unit will stop chasing if out of range
+	 * @param isHardOrder A hard attack order makes the unit chase forever, whereas with a soft order
+	 *                    the unit will stop chasing if out of range
 	 * @return
 	 */
 	@Override
@@ -242,8 +258,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 * 
 	 * @param unitOrd
 	 * @param isHardOrder
-	 * @param isATauntedOrder
-	 *            Whether this order is a special internal order that should ignore taunt restriction
+	 * @param isATauntedOrder Whether this order is a special internal order that should ignore taunt
+	 *                        restriction
 	 * @return
 	 */
 	private boolean orderAttackUnit(UnitOrderable unitOrd, boolean isHardOrder, boolean isATauntedOrder) {
@@ -255,7 +271,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		}
 		if (isATauntedOrder ? isAnyOrderAllowedIgnoringTaunt() : isAttackOrderAllowed(unit)) {
 			if (stats.isStunned()) {
-				orderDeferring.tryToDeferOrder(isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT, (Unit) unitOrd, 0, 0);
+				orderDeferring.tryToDeferOrder(isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT,
+						(Unit) unitOrd, 0, 0);
 			}
 			if (isAttacking())
 				return orderAttackUnitWhileAlreadyAttacking(unitOrd, isHardOrder);
@@ -276,7 +293,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 *
 	 * Is a helper method, does not check order validity, should call orderAttackUnit instead.
 	 * 
-	 * Units can switch attacking targets if the new target is within melee range. If the unit is in range, switches targets immediately <br>
+	 * Units can switch attacking targets if the new target is within melee range. If the unit is in
+	 * range, switches targets immediately <br>
 	 * If out of range, does nothing (unit needs to manually retreat first)
 	 */
 	private boolean orderAttackUnitWhileAlreadyAttacking(UnitOrderable unitOrd, boolean isHardOrder) {
@@ -291,7 +309,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 			return false;
 		}
 
-		if (Point.calcDistance(getPos(), target.getPos()) <= radius + target.radius + Holo.defaultUnitSwitchEngageRange) {
+		if (Point.calcDistance(getPos(), target.getPos()) <= radius + target.radius
+				+ Holo.defaultUnitSwitchEngageRange) {
 			clearOrder();
 			order = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
 			orderTarget = target;
@@ -334,7 +353,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 			this.order = Order.RETREAT;
 			stats.removeAllBasicAttackSlows();
 
-			var attackers = getAttackers();
+			var attackers = getUnitsAttackingThis();
 			for (Unit attacker : attackers) {
 				attacker.stats.attackOfOpportunity(this.stats);
 				attacker.attackOfOpportunityCooldownRemaining = attacker.attackOfOpportunityCooldown;
@@ -349,7 +368,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	int retreatDurationRemaining;
 
 	/**
-	 * A stop order stops a unit's motion and current order. You cannot use stop to cancel your own casting atm.
+	 * A stop order stops a unit's motion and current order. You cannot use stop to cancel your own
+	 * casting atm.
 	 */
 	@Override
 	public void orderStop() {
@@ -362,14 +382,14 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * @param skill
-	 *            The skill must have effects set already
+	 * @param skill The skill must have effects set already
 	 */
 	@Override
 	public void orderUseSkill(ActiveSkill skill) {
 
 		if (stats.isStunned()) {
-			orderDeferring.clearDeferredOrder(); // deferring a skill order is not supported but it will still clear an existing deferred order
+			orderDeferring.clearDeferredOrder(); // deferring a skill order is not supported but it will still clear an
+													// existing deferred order
 		}
 
 		if (!isUseSkillAllowed()) {
@@ -384,8 +404,9 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * Stops a unit's motion and halts any current orders. It does not disengage a unit that is attacking, though.. Unlike orderStop, is not affected
-	 * by order restrictions. As such, it should be for backend and not player use.
+	 * Stops a unit's motion and halts any current orders. It does not disengage a unit that is
+	 * attacking, though.. Unlike orderStop, is not affected by order restrictions. As such, it should
+	 * be for backend and not player use.
 	 */
 	public void stopUnit() {
 		clearOrder();
@@ -393,76 +414,68 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	// @formatter:off
-		@Override
-		public boolean isAttackOrderAllowed(Unit target) {
-			return isGeneralOrderAllowed()
-					&& isEnemy(target);
-		}
-		@Override
-		public boolean isAttackOrderAllowed() {
-			return isGeneralOrderAllowed();
-		}
+	@Override
+	public boolean isAttackOrderAllowed(Unit target) {
+		return isGeneralOrderAllowed() && isEnemy(target);
+	}
 
-		@Override
-		public boolean isMoveOrderAllowed() {
-			return isGeneralOrderAllowed()
-					&& !isAttacking();
-		}
+	@Override
+	public boolean isAttackOrderAllowed() {
+		return isGeneralOrderAllowed();
+	}
 
-		@Override
-		public boolean isAttackMoveOrderAllowed() {
-			return isGeneralOrderAllowed()
-					&& !isAttacking();
-		}
-		@Override
-		public boolean isRetreatOrderAllowed() {
-			return isAnyOrderAllowed()
-					&& isAttacking()
-					&& this.order != Order.RETREAT
-					&& retreatCooldownRemaining <= 0
-					&& !(isCasting() || isChannelling());
-		}
-		@Override
-		public boolean isStopOrderAllowed() {
-			return isGeneralOrderAllowed();
-		}
+	@Override
+	public boolean isMoveOrderAllowed() {
+		return isGeneralOrderAllowed() && !isAttacking();
+	}
 
-		
-		@Override
-		public boolean isUseSkillAllowed() {
-			return isGeneralOrderAllowed()
-					&& !stats.isBlinded();
-		}
-		
-		
-		/**
-		 * Returns the conditions which are shared by most ordinary orders
-		 * @return
-		 */
-		@Override
-		public boolean isGeneralOrderAllowed() {
-			return isAnyOrderAllowed()
-					&& !isBusyRetreating()
-					&& !(isCasting() || isChannelling());
-		}
-		/**
-		 * Returns the conditions which are shared by all orders
-		 * @return
-		 */
-		@Override
-		public boolean isAnyOrderAllowed() {
-			return isAnyOrderAllowedIgnoringTaunt()
-				&& !stats.isTaunted();
-		}
-		@Override
-		public boolean isAnyOrderAllowedIgnoringTaunt() {
-			return !stats.isDead()
-					&& !motion.isBeingKnockedBack()
-					&& !stats.isStunned();
-		}
-		
-		
-		// @formatter:on
+	@Override
+	public boolean isAttackMoveOrderAllowed() {
+		return isGeneralOrderAllowed() && !isAttacking();
+	}
+
+	@Override
+	public boolean isRetreatOrderAllowed() {
+		return isAnyOrderAllowed() && isAttacking() && this.order != Order.RETREAT && retreatCooldownRemaining <= 0
+				&& !(isCasting() || isChannelling());
+	}
+
+	@Override
+	public boolean isStopOrderAllowed() {
+		return isGeneralOrderAllowed();
+	}
+
+	@Override
+	public boolean isUseSkillAllowed() {
+		return isGeneralOrderAllowed() && !stats.isBlinded();
+	}
+
+	/**
+	 * Returns the conditions which are shared by most ordinary orders
+	 * 
+	 * @return
+	 */
+	@Override
+	public boolean isGeneralOrderAllowed() {
+		return isAnyOrderAllowed() && !isBusyRetreating() && !(isCasting() || isChannelling());
+	}
+
+	/**
+	 * Returns the conditions which are shared by all orders
+	 * 
+	 * @return
+	 */
+	@Override
+	public boolean isAnyOrderAllowed() {
+		return isAnyOrderAllowedIgnoringTaunt() && !stats.isTaunted();
+	}
+
+	@Override
+	public boolean isAnyOrderAllowedIgnoringTaunt() {
+		return !stats.isDead() && !motion.isBeingKnockedBack() && !stats.isStunned();
+	}
+
+	// @formatter:on
 
 	/**
 	 * Clears any current order on this unit. For internal use.
@@ -476,7 +489,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * Normal interrupts are caused by damage and reel. Some skills, particularly melee skills, are not interrupt by this.
+	 * Normal interrupts are caused by damage and reel. Some skills, particularly melee skills, are not
+	 * interrupt by this.
 	 */
 	public void interruptNormal() {
 		if (isCasting() || isChannelling()) {
@@ -623,7 +637,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 				float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
 
 				if (Point.calcDistance(getPos(), closestEnemy.getPos()) <= aggroRange) {
-					orderTarget = (Unit) closestEnemy; // manually set target/path, since we want to keep the ATTACKMOVE order
+					orderTarget = (Unit) closestEnemy; // manually set target/path, since we want to keep the ATTACKMOVE
+														// order
 					if (!motion.pathFindTowardsTarget()) {
 						orderTarget = null; // keep walking normally if path to target not found
 					}
@@ -668,12 +683,14 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	private void handleTargetLossAndSwitchingForAttackUnitSoft() {
 		if (order == Order.ATTACKUNIT_SOFT) {
 			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, world);
-			otherTargetsWithinAggroRange.removeIf((t) -> Point.calcDistance(getPos(), t.getPos()) >= Holo.defaultAggroRange);
+			otherTargetsWithinAggroRange
+					.removeIf((t) -> Point.calcDistance(getPos(), t.getPos()) >= Holo.defaultAggroRange);
 			otherTargetsWithinAggroRange.remove(orderTarget);
 			float distToTarget = Point.calcDistance(this.getPos(), orderTarget.getPos());
 
 			float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
-			float chaseRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange : Holo.defaultUnitAttackChaseRange;
+			float chaseRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange
+					: Holo.defaultUnitAttackChaseRange;
 
 			if (distToTarget > aggroRange && !otherTargetsWithinAggroRange.isEmpty()) {
 				orderAttackUnit(otherTargetsWithinAggroRange.peek(), false);
@@ -689,12 +706,14 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	private void handleTargetLossAndSwitchingForAttackMove() {
 		if (order == Order.ATTACKMOVE) {
 			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, world);
-			otherTargetsWithinAggroRange.removeIf((t) -> Point.calcDistance(getPos(), t.getPos()) >= Holo.defaultAggroRange);
+			otherTargetsWithinAggroRange
+					.removeIf((t) -> Point.calcDistance(getPos(), t.getPos()) >= Holo.defaultAggroRange);
 			otherTargetsWithinAggroRange.remove(orderTarget);
 			float distToTarget = Point.calcDistance(this.getPos(), orderTarget.getPos());
 
 			float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
-			float chaseRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange : Holo.defaultUnitAttackChaseRange;
+			float chaseRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange
+					: Holo.defaultUnitAttackChaseRange;
 
 			if (distToTarget > aggroRange && !otherTargetsWithinAggroRange.isEmpty()) {
 				// Switch targets
@@ -730,7 +749,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 			return;
 
 		if (!isCastingOrChanneling()) {
-			attackCooldownRemaining = Math.max(0, attackCooldownRemaining - 1); // cooldown ticks even when unit not attacking
+			attackCooldownRemaining = Math.max(0, attackCooldownRemaining - 1); // cooldown ticks even when unit not
+																				// attacking
 		}
 
 		if (isAttacking()) {
@@ -742,7 +762,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 				this.attack(attacking);
 
 				// Units automatically retaliate if they are idle
-				if (attacking.getOrder() == Order.NONE && !attacking.isAttacking() && attacking.isAttackOrderAllowed()) {
+				if (attacking.getOrder() == Order.NONE && !attacking.isAttacking()
+						&& attacking.isAttackOrderAllowed()) {
 					attacking.orderAttackUnit(this, false);
 				}
 				attackCooldownRemaining = attackCooldown / stats.getMultiTeamingAtkspdPenalty(attacking);
@@ -755,7 +776,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * Lowest level method for attacking. Fine to call while attacking, though will warn you if you are already attacking the same target.
+	 * Lowest level method for attacking. Fine to call while attacking, though will warn you if you are
+	 * already attacking the same target.
 	 */
 	private void startAttacking(Unit target) {
 		if (isAttacking(target)) {
@@ -768,7 +790,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 		motion.stopCurrentMovement();
 		attacking = target;
-		unitsAttacking.get(attacking).add(this);
+		((World) world).onUnitStartsAttacking(this, attacking);
 
 		// Attack cooldown may be artificially higher because of a recent stun/reel
 		attackCooldownRemaining = Math.max(attackCooldownRemaining, attackCooldown / 4);
@@ -780,7 +802,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	void stopAttacking() {
 		if (isAttacking()) {
-			unitsAttacking.get(attacking).remove(this);
+			((World) world).onUnitStopsAttacking(this, attacking);
 			attacking = null;
 		}
 	}
@@ -922,8 +944,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * Some classes only get a reference to WorldInfo because they are not intended to modify the world. This method can be used to explicitly get a
-	 * mutable World instance.
+	 * Some classes only get a reference to WorldInfo because they are not intended to modify the world.
+	 * This method can be used to explicitly get a mutable World instance.
 	 * 
 	 * @return
 	 */
@@ -931,8 +953,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		return (World) world;
 	}
 
-	public Set<Unit> getAttackers() {
-		return unitsAttacking.get(this);
+	public Set<Unit> getUnitsAttackingThis() {
+		return world.getUnitsAttackingThis(this);
 	}
 
 	@Override
@@ -964,8 +986,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public boolean isCastingOrChanneling() {
 		if (getActiveSkill() == null)
 			return false;
-		return (getActiveSkill().getStatus() == Status.CASTING
-				|| getActiveSkill().getStatus() == Status.CHANNELING);
+		return (getActiveSkill().getStatus() == Status.CASTING || getActiveSkill().getStatus() == Status.CHANNELING);
 	}
 
 	/**

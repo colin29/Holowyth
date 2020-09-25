@@ -225,7 +225,7 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	private int getMultiTeamingAtkBonus(UnitStats target) {
-		int numAttackers = target.self.getAttackers().size();
+		int numAttackers = target.self.getUnitsAttackingThis().size();
 
 		switch (numAttackers) {
 		case 1:
@@ -895,7 +895,7 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	float getMultiTeamingAtkspdPenalty(Unit target) {
-		int n = Unit.unitsAttacking.get(target).size();
+		int n = self.getUnitsAttackingThis().size();
 
 		if (n <= 1) {
 			return 1;
