@@ -28,6 +28,9 @@ public class UnitAI {
 
 	}
 
+	/**
+	 * Creates a copy of the given bTree and uses it.
+	 */
 	public void setBTree(String bTreeRef) {
 		btree = BehaviorTreeLibraryManager.getInstance().getLibrary().createBehaviorTree(bTreeRef, self);
 	}

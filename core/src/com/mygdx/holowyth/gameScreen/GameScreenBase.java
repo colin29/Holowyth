@@ -28,10 +28,11 @@ import com.mygdx.holowyth.util.tools.Timer;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
 /**
- * Offers the common functionality for playing one or more levels.
- * Has all the modules to run a game. Includes the normal game UI, sub-classes can add more.
+ * Offers the common functionality for playing one or more levels. Has all the modules to run a
+ * game. Includes the normal game UI, sub-classes can add more.
  * 
- * Has no mandatory concept of victory/defeat, and no interface. The calling screen just passes off control to GameScreen, and it does whatever it wants.
+ * Has no mandatory concept of victory/defeat, and no interface. The calling screen just passes off
+ * control to GameScreen, and it does whatever it wants.
  * 
  * @author Colin
  *
@@ -40,39 +41,33 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	// Game Modules
+	// App life-time components
 	protected PathingModule pathingModule;
-	protected AIModule ai;
-
-	protected Controls controls;
-	protected World world;
-	protected TriggersHandler triggers;
-
-	// Graphical Modules
 	protected GameScreenBaseRenderer renderer;
-	protected EffectsHandler gfx;
-	
-	/**
-	 * The base UI that appears while playing the game
-	 */
+	protected AIModule ai;
 	private GameScreenBaseUI ui;
 
-	// Debugging and Convenience
+	// Map life-time components
+	protected World world;
+	protected Controls controls;
+	protected EffectsHandler gfx;
+	protected TriggersHandler triggers;
+
+	// Debugging and Convenience (App-lifetime)
 	private final DebugStore debugStore = new DebugStore();
 	protected final FunctionBindings functionBindings = new FunctionBindings();
-	
+
 	/**
 	 * For running game at constant FPS
 	 */
 	private Timer timer = new Timer();
-	
-	
+
 	/**
-	 *  For camera panning
+	 * For camera panning
 	 */
 	private float snapLeftoverX;
 	private float snapLeftoverY;
-	
+
 	protected final InputMultiplexer multiplexer = new InputMultiplexer();
 
 	// Settings
@@ -82,7 +77,7 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 	protected GameScreenBase(Holowyth game) {
 		super(game);
 		skin = game.skin;
-		
+
 		initializeAppLifetimeComponents();
 		setupInputForThisAndAppLifetimeComponents();
 
@@ -90,13 +85,13 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 		addUIBindings();
 		addDebugBindings();
 	}
-	
+
 	private void setupInputForThisAndAppLifetimeComponents() {
 		multiplexer.addProcessor(ui);
 		multiplexer.addProcessor(stage);
 		multiplexer.addProcessor(this);
 	}
-	
+
 	/**
 	 * Keyboard bindings that relate to the game, that aren't implemented elsewhere
 	 */
@@ -104,21 +99,23 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 		functionBindings.bindFunctionToKey(this::toggleGamePaused, Keys.SPACE);
 		functionBindings.bindFunctionToKey(this::toggleMouseScroll, Keys.H);
 	}
-	
+
 	/**
 	 * Keyboard bindings that control the UI
 	 */
 	private void addUIBindings() {
 		functionBindings.bindFunctionToKey(ui::toggleStatsPanelDetailedView, Keys.V);
-		functionBindings.bindFunctionToKey(() -> ui.setVisibleDebugValues(!ui.isDebugValuesVisible()), Keys.GRAVE); // tilde key
+		functionBindings.bindFunctionToKey(() -> ui.setVisibleDebugValues(!ui.isDebugValuesVisible()), Keys.GRAVE); // tilde
+																													// key
 	}
+
 	/**
 	 * Keyboard bindings for logging info for debug purposes
 	 */
 	private void addDebugBindings() {
 		functionBindings.bindFunctionToKey(this::debugPrintSelectedUnitsInfo, Keys.W);
 	}
-	
+
 	private void toggleGamePaused() {
 		if (isGamePaused()) {
 			resumeGame();
@@ -131,7 +128,7 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 		mouseScrollEnabled = !mouseScrollEnabled;
 		getGameLog().addMessage(mouseScrollEnabled ? "Mouse scroll enabled" : "Mouse scroll disabled");
 	}
-	
+
 	private void debugPrintSelectedUnitsInfo() {
 		for (Unit unit : controls.getSelectedUnits())
 			unit.stats.printInfo();
@@ -142,11 +139,10 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 		stage.act(delta);
 		ai.update(delta);
 		ifTimeElapsedTickGame();
-		
-		
+
 		handleMousePanning(delta);
 		renderer.render(delta);
-		
+
 		ui.render();
 	}
 
@@ -181,8 +177,8 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 	}
 
 	/*
-	 * Accumulate the leftovers and apply them to later movement, in order to
-	 * prevent slow-down or inconsistencies due to repeated rounding.
+	 * Accumulate the leftovers and apply them to later movement, in order to prevent slow-down or
+	 * inconsistencies due to repeated rounding.
 	 */
 	private void snapCameraAndSaveRemainder() {
 
@@ -197,7 +193,6 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 
 	private boolean gamePaused = false;
 
-
 	private void ifTimeElapsedTickGame() {
 		timer.start(1000 / Holo.GAME_FPS);
 		if (timer.taskReady() && !gamePaused) {
@@ -206,10 +201,12 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 	}
 
 	protected void tickGame() {
-		world.tick();
-		gfx.tick();
-		triggers.checkTriggers();
-		controls.tick();
+		if(isMapLoaded()) {
+			world.tick();
+			controls.tick();	
+			gfx.tick();
+			triggers.checkTriggers();
+		}
 	}
 
 	public Controls getControls() {
@@ -227,8 +224,7 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 	}
 
 	/**
-	 * Unpauses the game.
-	 * If game is already running, has no effect
+	 * Unpauses the game. If game is already running, has no effect
 	 */
 	public void resumeGame() {
 		if (gamePaused) {
@@ -243,23 +239,49 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 
 	/**
 	 * Initializes neccesary game components. <br>
-	 * Creates map-lifetime components and sets up application-lifetime components.
-	 * <br>
+	 * Creates map-lifetime components and sets up application-lifetime components. <br>
 	 * The map in question is {@link #map} <br>
 	 * Call after loading a new map. The mirror function is mapShutdown.
 	 */
 	@Override
-	protected void mapStartup() {
-		initializeMapLifetimeComponents();
-		setupInputForMapLifeTimeComponents();
+	public void mapStartup() {
+		final int mapWidth = (Integer) map.getTilemap().getProperties().get("widthPixels");
+		final int mapHeight = (Integer) map.getTilemap().getProperties().get("heightPixels");
 		
-		ui.onMapStartup();
+		initializeMapLifetimeComponents(mapWidth, mapHeight);
+		addInputForMapLifeTimeComponents();
+		
+		setupAppLifetimeComponentsForNewMap(mapWidth, mapHeight);
+		logger.info("Map '{}' loaded", map.getName());
 	}
 
 	@Override
-	protected void mapShutdown() {
-		System.out.println("mapShutdown called");
-		ui.onMapShutdown();
+	public void mapShutdown() {
+		if(!isMapLoaded()) {
+			logger.info("mapShutdown: no map loaded");
+			return;
+		}
+		logger.info("Shutting down map '{}'", map.getName());
+
+		map = null;
+		
+		removeInputForMapLifeTimeComponents();
+		
+		// Set all map-lifetime components to null
+		world = null;
+		controls = null;
+		gfx = null;
+		triggers = null;
+
+		// Go through all life-time components and call onMapClose(). All App life-time components should
+		// include a method called onMapClose to blank their references.
+		
+		pathingModule.onMapClose();
+		renderer.onMapClose();
+		ai.onMapClose();
+		ui.onMapClose();
+
+		// Todo: might actually want to null fields
 	}
 
 	private void initializeAppLifetimeComponents() {
@@ -272,46 +294,40 @@ public abstract class GameScreenBase extends GameMapLoadingScreen {
 
 		ui = new GameScreenBaseUI(stage, debugStore, skin, this);
 	}
-
-	private void initializeMapLifetimeComponents() {
-
-		final int mapWidth = (Integer) map.getTilemap().getProperties().get("widthPixels");
-		final int mapHeight = (Integer) map.getTilemap().getProperties().get("heightPixels");
-
-		pathingModule.initForTiledMap(map.getTilemap(), mapWidth, mapHeight);
+	
+	private void initializeMapLifetimeComponents(final int mapWidth, final int mapHeight) {
 
 		gfx = new EffectsHandler(game.batch, camera, stage, skin, debugStore);
-
+		
 		world = new World(mapWidth, mapHeight, pathingModule, debugStore, gfx, game.animations);
-		triggers = new TriggersHandler(world);
-
 		controls = new Controls(game, camera, fixedCamera, world.getUnits(), debugStore, world, ui.getGameLog());
-		
-		// Set Renderer to render world and other map-lifetime components
-		
-		renderer.setWorld(world);
-		renderer.setEffectsHandler(gfx);
-		renderer.setUnitControls(controls);
+		triggers = new TriggersHandler(world);
+	}
+
+	private void setupAppLifetimeComponentsForNewMap(final int mapWidth, final int mapHeight) {
+		pathingModule.initForTiledMap(map.getTilemap(), mapWidth, mapHeight);
 		
 		renderer.setMap(map, mapWidth, mapHeight);
+		renderer.setMapLifeTimeComponentsRefs(world, controls, gfx);
 		
-
+		ui.onMapStartup();
 	}
-	private void setupInputForMapLifeTimeComponents() {
-		if (controls != null)
-			multiplexer.removeProcessor(controls);
+
+	private void addInputForMapLifeTimeComponents() {
 		multiplexer.addProcessor(controls);
+	}
+	private void removeInputForMapLifeTimeComponents() {
+		multiplexer.removeProcessor(controls);
 	}
 
 	public GameLogDisplay getGameLog() {
 		return ui.getGameLog();
 	}
-	
+
 	@Override
 	public boolean keyDown(int keycode) {
 		functionBindings.runBoundFunction(keycode);
 		return false;
 	}
-
 
 }

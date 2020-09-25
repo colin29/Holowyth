@@ -749,7 +749,6 @@ public class Controls extends InputProcessorAdapter {
 
 	public void addListener(UnitSelectionListener l) {
 		listeners.add(l);
-		logger.debug("Added listener");
 	}
 
 	public void removeListener(UnitSelectionListener l) {

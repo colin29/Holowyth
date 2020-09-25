@@ -22,6 +22,7 @@ public class Forest1 extends GameMap {
 	{
 		tilemapPath = Holo.mapsDirectory + "/forest1.tmx";
 		locations.put("default_spawn_location", new Point(100, 300));
+		setName("forest1");
 
 		{
 			UnitMarker m = new UnitMarker();

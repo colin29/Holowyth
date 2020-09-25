@@ -16,7 +16,8 @@ public class GameMapRepo {
 	private final StringNonNullMap<GameMap> maps = new StringNonNullMap<GameMap>();
 
 	{
-		maps.put("forest1", new Forest1());
+		GameMap m = new Forest1();
+		maps.put(m.getName(), m);
 	}
 	
 	

@@ -46,9 +46,9 @@ public abstract class GameMapLoadingScreen extends HoloBaseScreen {
 	 * Loads a GameMap by name. (Some of the information is simply being stored in
 	 * the program atm, in a gameMap repository)
 	 */
-	protected void loadGameMapByName(String mapName) {
-		if(!game.mapRepo.hasMap("forest1"))
-			throw new HoloResourceNotFoundException();
+	public void loadGameMapByName(String mapName) {
+		if(!game.mapRepo.hasMap(mapName))
+			throw new HoloResourceNotFoundException("Map '" + mapName + "' not found.");
 		GameMap newMap = game.mapRepo.getNewMapInstance("forest1");
 		
 		newMap.setTilemap(getTiledMapFromDisk(newMap.tilemapPath));
@@ -125,8 +125,12 @@ public abstract class GameMapLoadingScreen extends HoloBaseScreen {
 		game.fileChooser.setDirectory(Holo.simpleMapsDirectory);
 	}
 
-	protected abstract void mapStartup();
+	public abstract void mapStartup();
 
-	protected abstract void mapShutdown();
+	public abstract void mapShutdown();
+	
+	public boolean isMapLoaded() {
+		return map != null;
+	}
 
 }

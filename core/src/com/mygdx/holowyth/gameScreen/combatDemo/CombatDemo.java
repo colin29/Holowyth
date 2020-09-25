@@ -248,7 +248,8 @@ public class CombatDemo extends GameScreenBase implements Screen, InputProcessor
 
 
 	@Override
-	protected final void mapStartup() {
+	public
+	final void mapStartup() {
 		super.mapStartup();
 		testing = new CombatPrototyping(world, controls); // have to initialize here because world module only exists after gameScreen startsup the map.
 		testing.setupPlannedScenario();
@@ -256,7 +257,8 @@ public class CombatDemo extends GameScreenBase implements Screen, InputProcessor
 	}
 
 	@Override
-	protected final void mapShutdown() {
+	public
+	final void mapShutdown() {
 		super.mapShutdown();
 	}
 

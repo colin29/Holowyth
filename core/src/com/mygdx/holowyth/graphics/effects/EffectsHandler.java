@@ -17,7 +17,8 @@ import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
 /**
- * Manages all gfx effects for the game
+ * Manages all gfx effects displayed in-game
+ * Has map life-time
  * 
  * @author Colin Ta
  *

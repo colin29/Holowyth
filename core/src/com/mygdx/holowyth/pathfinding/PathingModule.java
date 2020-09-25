@@ -41,19 +41,19 @@ public class PathingModule {
 	OrthographicCamera camera;
 	ShapeRenderer shapeRenderer;
 
-	// private Field map;
 	private AStarSearch pathing;
 
 	private PathSmoother smoother = new PathSmoother();
 
+	// Map lifetime info
+	private int mapWidth; 
+	private int mapHeight;
+	
 	private final List<Point> obstaclePoints = new ArrayList<Point>();
 	private final List<OrientedSeg> obstacleSegs = new ArrayList<OrientedSeg>();
 	private final List<OrientedSeg> obstacleExpandedSegs = new ArrayList<OrientedSeg>();
 
-	private int mapWidth; // should only be changed when a new map is loaded
-	private int mapHeight;
-
-	// Debug
+	// Debug (map-lifetime)
 	HashMap<UnitPF, PathsInfo> intermediatePaths;
 
 	/**
@@ -165,6 +165,18 @@ public class PathingModule {
 
 		// Debug
 		intermediatePaths = new HashMap<UnitPF, PathsInfo>();
+	}
+
+	public void onMapClose() {
+		mapWidth = 0;
+		mapHeight = 0;
+		
+		obstaclePoints.clear();
+		obstacleSegs.clear();
+		obstacleExpandedSegs.clear();
+		
+		intermediatePaths.clear();
+		
 	}
 
 	private void initObstaclePoints(List<OrientedPoly> polys) {

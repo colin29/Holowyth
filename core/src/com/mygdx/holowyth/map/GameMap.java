@@ -30,6 +30,8 @@ public class GameMap {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
+	private String name = "Untitled Map";
+	
 	/**
 	 * Whether this map is a template and meant to be copied first before using. 
 	 * 
@@ -65,6 +67,7 @@ public class GameMap {
 	 * Copy constructor. Doesn't copy the tilemap, you must load it from disk again.
 	 */
 	public GameMap(GameMap src) {
+		name = src.name;
 		tilemapPath = src.tilemapPath;
 		for(String s : src.locations.keySet()) {
 			locations.put(s, src.locations.get(s));
@@ -98,6 +101,17 @@ public class GameMap {
 		return tilemap != null;
 	}
 	
+	public String getName() {
+		return name;
+	}
+	/**
+	 * Should not modify a map's name inside MapRepo, because map key should remain the same as name 
+	 * @param name
+	 */
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public List<UnitMarker> getUnitMarkers() {
 		return Collections.unmodifiableList(unitMarkers);
 	}

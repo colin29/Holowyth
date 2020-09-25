@@ -22,6 +22,7 @@ import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
  */
 public class AIModule {
 
+	// App-lifetime
 	BehaviorTreeLibraryManager treeLibraryManager = BehaviorTreeLibraryManager.getInstance();
 	BehaviorTreeLibrary library = treeLibraryManager.getLibrary();
 
@@ -50,5 +51,8 @@ public class AIModule {
 
 	public void update(float delta) {
 		GdxAI.getTimepiece().update(delta);
+	}
+
+	public void onMapClose() {
 	}
 }

@@ -38,12 +38,7 @@ public class GameScreen extends GameScreenBase {
 	
 	public GameScreen(Holowyth game) {
 		super(game);
-		loadGameMapByName("foo");
-		spawnPlayerAtDefaultLocation();
-
-		placeUnitsAccordingToUnitMarkers();
-
-		loadMapTriggers();
+		loadGameMapByName("forest1");
 		
 //		vn = new VNController(new Stage(), batch, fixedCamera, multiplexer); // have vn draw using its OWN stage
 //		startConversation("myConv.conv", "default");
@@ -119,12 +114,17 @@ public class GameScreen extends GameScreenBase {
 	}
 
 	@Override
-	protected final void mapStartup() {
+	public
+	final void mapStartup() {
 		super.mapStartup();
+		spawnPlayerAtDefaultLocation();
+		placeUnitsAccordingToUnitMarkers();
+		loadMapTriggers();
 	}
 
 	@Override
-	protected final void mapShutdown() {
+	public
+	final void mapShutdown() {
 		super.mapShutdown();
 	}
 

@@ -48,7 +48,7 @@ import com.mygdx.holowyth.util.dataobjects.Point;
  * 
  * Should carry very little state except for which modules to render and some rendering flags
  * 
- * Has Screen lifetime
+ * Has App lifetime
  * 
  * @author Colin Ta
  *
@@ -59,57 +59,49 @@ public class GameScreenBaseRenderer {
 
 	Holowyth game;
 
-	// Rendering pipeline
-
+	// Rendering resources (app-life time)
 	Camera worldCamera;
 	ShapeRenderer shapeRenderer;
 	SpriteBatch batch;
-
 	ShapeDrawerPlus shapeDrawer;
 
+	// Sub-components (app life-time)
+	private DebugRenderer debug;
+	private PathfindingRenderer pathfinding;
+	private UnitMotionRenderer unitMotion;
+	private TiledMapRenderer tiled;
+	
 	// Screen lifetime components
 	private Stage stage;
 	private PathingModule pathingModule;
-
-	// Map lifetime components
-	private WorldInfo world;
-	private EffectsHandler gfx;
-
-	// Map info
+	
+	// Map
+	private GameMap map;
+	
+	// Map Info
 	private int mapWidth;
 	private int mapHeight;
+	
+	// Map lifetime components
+	private WorldInfo world;
+	private Controls controls;
+	private EffectsHandler gfx;
+	
 
 	// Graphics options
-
 	private Color clearColor = Color.BLACK;
-
-	private Controls controls;
-
-	// Sub-components
-	DebugRenderer debug;
-
-	private PathfindingRenderer pathfinding;
-	private UnitMotionRenderer unitMotion;
-
-	private TiledMapRenderer tiled;
 
 	private final int showMapPathingGraphKey = Keys.M;
 	private final int showMapRegionsKey = Keys.N;
 
-	
-	/**
-	 * Can be null
-	 */
-	private GameMap map;
-	
+
 	/**
 	 * The game, worldCamera, and other screen-lifetime modules are passed in.
 	 * 
 	 * @param game
 	 * @param worldCamera
 	 * @param stage
-	 * @param pathingModule
-	 *            // May be null;
+	 * @param pathingModule // May be null;
 	 */
 	public GameScreenBaseRenderer(Holowyth game, Camera worldCamera, Stage stage, PathingModule pathingModule) {
 
@@ -130,52 +122,54 @@ public class GameScreenBaseRenderer {
 	}
 
 	/*
-	 * Methods call should not set projection matrixes (it is assumed to be the world matrix). If they do they should restore the old state
+	 * Sub-methods should not set projection matrixes (it is assumed to be the world matrix). If they do
+	 * they should restore the old state
 	 */
 	public void render(float delta) {
 		clearScreenAndSetGLBlending();
 		worldCamera.update();
 		batch.setProjectionMatrix(worldCamera.combined);
-		
-		// Tiled map
-		tiled.renderMap();
-		
-		renderUnitHpSpBars(); // render unit bars low as to not obscure more important info
 
-		// Debug Map Visualizations
-		renderMapDebugVisualizationsIfKeysPressed();
+		if (map != null) {
+			// Tiled map
+			tiled.renderMap();
 
-		// Unit paths
-		pathfinding.renderPaths(false);
-		unitMotion.renderUnitDestinations(Color.GREEN);
+			renderUnitHpSpBars(); // render unit bars low as to not obscure more important info
 
-		
-		// Units
-		renderUnitsAndOutlines(delta);
-		// debug.renderUnitIdsOnUnits();
+			// Debug Map Visualizations
+			renderMapDebugVisualizationsIfKeysPressed();
 
-		// Skill Aiming Graphics
-		renderCastingCircleAimingHelperForGroundSkillThatDefineRadius();
-		renderCustomAimingHelperForGroundSkillThatDefine();
-		
-		// Misc. Combat Related
-		debug.renderUnitKnockbackVelocities();
-		renderUnitAttackingArrows();
-		renderCastingBars();
+			// Unit paths
+			pathfinding.renderPaths(false);
+			unitMotion.renderUnitDestinations(Color.GREEN);
 
-		// Obstacle Edges
-		renderMapObstacleEdges();
+			// Units
+			renderUnitsAndOutlines(delta);
+			// debug.renderUnitIdsOnUnits();
 
-		// Effects
-		renderEffects();
-		gfx.renderDamageEffects();
-		gfx.renderBlockEffects(delta);
+			// Skill Aiming Graphics
+			renderCastingCircleAimingHelperForGroundSkillThatDefineRadius();
+			renderCustomAimingHelperForGroundSkillThatDefine();
+
+			// Misc. Combat Related
+			debug.renderUnitKnockbackVelocities();
+			renderUnitAttackingArrows();
+			renderCastingBars();
+
+			// Obstacle Edges
+			renderMapObstacleEdges();
+
+			// Effects
+			renderEffects();
+			gfx.renderDamageEffects();
+			gfx.renderBlockEffects(delta);
+		}
 
 		// UI
 		stage.draw();
 
 	}
-	
+
 	private void clearScreenAndSetGLBlending() {
 		Gdx.gl.glClearColor(clearColor.r, clearColor.g, clearColor.b, clearColor.a);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT
@@ -183,10 +177,10 @@ public class GameScreenBaseRenderer {
 		Gdx.gl.glEnable(GL20.GL_BLEND);
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 	}
-	
+
 	private void renderMapDebugVisualizationsIfKeysPressed() {
-		if(Gdx.input.isKeyPressed(showMapRegionsKey)) {
-			GameMapRenderer.renderMapRegions(game.fonts.debugFont(),map, shapeDrawer, batch);
+		if (Gdx.input.isKeyPressed(showMapRegionsKey)) {
+			GameMapRenderer.renderMapRegions(game.fonts.debugFont(), map, shapeDrawer, batch);
 		}
 		if (Gdx.input.isKeyPressed(showMapPathingGraphKey)) {
 			pathingModule.renderGraph(true);
@@ -194,20 +188,20 @@ public class GameScreenBaseRenderer {
 			renderCircles(pathingModule.getObstaclePoints(), Holo.UNIT_RADIUS, Color.PINK);
 		}
 	}
-	
+
 	private void renderMapObstacleEdges() {
 		if (tiled.isMapLoaded()) {
 			renderMapObstaclesEdges();
 			// renderMapBoundaries();
 		}
 	}
-	
+
 	private void renderUnitAttackingArrows() {
 		for (Unit u : world.getUnits()) {
 			u.renderAttackingArrow();
 		}
 	}
-	
+
 	private void renderUnitsAndOutlines(float delta) {
 		renderOutlineAroundSlowedUnits(); // lower priority indicators are drawn first
 
@@ -269,7 +263,8 @@ public class GameScreenBaseRenderer {
 			if (curSkill.defaultAimingHelperRadius == 0)
 				return;
 
-			TextureRegion magicCircle = new TextureRegion(game.assets.get("img/effects/magicCircle_blue.png", Texture.class));
+			TextureRegion magicCircle = new TextureRegion(
+					game.assets.get("img/effects/magicCircle_blue.png", Texture.class));
 			magicCircle.getTexture().setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Nearest);
 
 			// Sprite sprite = new Sprite(magicCircle);
@@ -288,8 +283,8 @@ public class GameScreenBaseRenderer {
 			float minAlphaPercentage = 50;
 
 			if (width > lowerWidthInterval) {
-				float alphaScalingPercentage = Math.min(minAlphaPercentage,
-						100 - (width - lowerWidthInterval) / (upperWidthInterval - lowerWidthInterval) * (100 - minAlphaPercentage));
+				float alphaScalingPercentage = Math.min(minAlphaPercentage, 100 - (width - lowerWidthInterval)
+						/ (upperWidthInterval - lowerWidthInterval) * (100 - minAlphaPercentage));
 				sprite.alphaScaling = alphaScalingPercentage / 100;
 			}
 
@@ -526,6 +521,12 @@ public class GameScreenBaseRenderer {
 		tiled.setMap(map.getTilemap());
 	}
 	
+	public void setMapLifeTimeComponentsRefs(WorldInfo world, Controls controls, EffectsHandler gfx) {
+		this.world = world;
+		this.controls = controls;
+		this.gfx = gfx;
+	}
+
 	/*
 	 * Sets the world that Renderer should render
 	 */
@@ -535,6 +536,17 @@ public class GameScreenBaseRenderer {
 
 	public WorldInfo getWorld() {
 		return world;
+	}
+
+	public void onMapClose() {
+		map = null;
+		
+		mapWidth = 0;
+		mapHeight = 0;
+		
+		world = null;
+		controls = null;
+		gfx = null;
 	}
 
 	public void setClearColor(Color color) {

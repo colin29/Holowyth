@@ -13,10 +13,13 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mygdx.holowyth.gameScreen.GameScreenBase;
 import com.mygdx.holowyth.gameScreen.Controls.UnitSelectionListener;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.template.adapters.InputProcessorAdapter;
@@ -25,23 +28,22 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStoreUI;
 
 
 /**
- * This overlying UI class facilitates several tasks for its componenets:
  * 
- * Setup (i.e create and add) <br>
+ * The base UI that appears while playing the game. <br>
+ * GameBaseUI itself is App-lifetime. It contains App-lifetime and Map-lifetime UI components <br><br>
+ * 
+ * This overlying UI class facilitates several tasks for its components: <br>
+ * 
+ * Setup (=create and add) <br>
  * Update <br>
  * Render <br>
  * Remove <br>
  * Exposes other functionality <br><br>
  * 
- * GameBaseUI itself is App-lifetime
- * It contains App-lifetime and Map-lifetime UI components <br><br>
- * 
- * Update is carried out in a few different ways: <br>
+ * UI elements are updated in a few different ways: <br>
  * - Register listener <br>
  * - Expose update method <br>
- * - Update on Render <br>
- * 
- * 
+ * - Update on render <br>
  * @author Colin
  *
  */
@@ -90,6 +92,17 @@ public class GameScreenBaseUI extends InputProcessorAdapter {
 		
 		mouseCoordLabel = new MouseCoordLabel(stage, skin);
 		gameLogDisplay = new GameLogDisplay(stage);
+		
+		
+		Table root2 = new Table().left().bottom();
+		root2.setFillParent(true);
+		stage.addActor(root2);
+		
+		root2.defaults().space(20);
+		HoloUI.textButton(root2, "Close map", skin, ()->{game.mapShutdown();});
+		HoloUI.textButton(root2, "Load map", skin, ()->{game.loadGameMapByName("forest1");});
+		
+		
 	}
 
 	private void prepStage() {
@@ -117,10 +130,11 @@ public class GameScreenBaseUI extends InputProcessorAdapter {
 		
 	}
 
-	public void onMapShutdown() {
+	public void onMapClose() {
 		skillBarUI.remove();
 		statsPanelUI.remove();
-		game.getControls().removeListener(unitSelectionListener);
+		
+		// Controls is a map life-time element anyways, so don't have to remove listener.
 	}
 
 	public void render() {
@@ -170,5 +184,7 @@ public class GameScreenBaseUI extends InputProcessorAdapter {
 		mouseCoordLabel.update(game.getCameras().worldCamera);
 		return false;
 	}
+
+
 
 }
