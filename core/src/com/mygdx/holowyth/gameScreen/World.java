@@ -521,7 +521,7 @@ public class World implements WorldInfo {
 	}
 	public void removeAndDetachUnitFromWorld(Unit u) {
 		if(u.getWorld() != this)
-			logger.warn("Unit's world '{}' doesn't match this world '{}'", u.getWorld(), this);
+			logger.warn("Unit's world '{}' doesn't match this world. Clearing anyways. '{}'", u.getWorld(), this);
 		unitsAttackingThis.remove(u);
 		units.removeUnit(u);
 		u.clearMapLifeTimeData();

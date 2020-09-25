@@ -99,12 +99,21 @@ public class StandardGameScreen extends GameScreen {
 		return u;
 	}
 	private void removeLeciaFromWorld() {
-		if(lecia.getWorld() == null) {
-			logger.warn("Remove: Lecia is not in a world");
-			return;
+
+		
+		if(!isMapLoaded()) { // in case map was closed beforehand, try removing using her world ref.
+			if(lecia.getWorld() != null) {
+				lecia.getWorldMutable().removeAndDetachUnitFromWorld(lecia);
+			}else {
+				logger.warn("Remove: Lecia is not in a world");
+				return;
+			}
+		}else {
+			controls.removeUnitFromSelection(lecia);
+			world.removeAndDetachUnitFromWorld(lecia);
 		}
-		controls.removeUnitFromSelection(lecia);
-		world.removeAndDetachUnitFromWorld(lecia);
+		
+		
 	}
 	private void addLeciaToWorld() {
 		if(isMapLoaded()) {

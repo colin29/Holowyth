@@ -3,6 +3,6 @@
 	<character id="Detective" name="Detective" sound="talksoundmale.wav"/>
 	<character id="Librarian" name="???" sound="talksoundmale.wav"/>
 
-	<character id="Lecia" name="Lecia" sound="talksoundfemale.wav"/>
+	<character id="Lecia" name="Lecia"/>
 	<character id="n" name="" sound="none"/>
 </characters>
