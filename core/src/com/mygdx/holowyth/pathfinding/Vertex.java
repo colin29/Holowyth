@@ -1,5 +1,7 @@
 package com.mygdx.holowyth.pathfinding;
 
+import com.mygdx.holowyth.util.dataobjects.Point;
+
 public class Vertex {
 	public boolean N, S, W, E; // marks whether edge to the to the adjacent vertex is path-able or not.
 	public boolean NW, NE, SW, SE;
@@ -39,5 +41,8 @@ public class Vertex {
 		this.SW = false;
 		this.SE = false;
 		this.reachable = false;
+	}
+	public Point getAsPoint(int CELL_SIZE) {
+		return new Point(ix * CELL_SIZE, iy * CELL_SIZE);
 	}
 }

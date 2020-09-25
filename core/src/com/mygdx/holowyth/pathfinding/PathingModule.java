@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -41,14 +43,14 @@ public class PathingModule {
 	OrthographicCamera camera;
 	ShapeRenderer shapeRenderer;
 
-	private AStarSearch pathing;
+	private AStarSearch astar;
 
 	private PathSmoother smoother = new PathSmoother();
 
 	// Map lifetime info
-	private int mapWidth; 
+	private int mapWidth;
 	private int mapHeight;
-	
+
 	private final List<Point> obstaclePoints = new ArrayList<Point>();
 	private final List<OrientedSeg> obstacleSegs = new ArrayList<OrientedSeg>();
 	private final List<OrientedSeg> obstacleExpandedSegs = new ArrayList<OrientedSeg>();
@@ -79,7 +81,7 @@ public class PathingModule {
 		initExpandedObstacleSegs(polys);
 		addCollisionForMapBoundary();
 
-		initForMapHelper();
+		initCommonItems();
 	}
 
 	/*
@@ -92,8 +94,18 @@ public class PathingModule {
 		readObstaclesFromTiledMap(map);
 		addCollisionForMapBoundary();
 
-		initForMapHelper();
+		initCommonItems();
 
+	}
+
+	/** Init items that don't vary based on map source */
+	private void initCommonItems() {
+		initGraphs();
+		floodFillGraph();
+
+		astar = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE, mapWidth, mapHeight);
+
+		intermediatePaths = new HashMap<UnitPF, PathsInfo>();
 	}
 
 	private void readObstaclesFromTiledMap(TiledMap map) {
@@ -114,7 +126,8 @@ public class PathingModule {
 			Vector2 end = new Vector2(vertices[0], vertices[1]);
 			Vector2 start = new Vector2();
 
-			// i represent the current line segment (for example with 6 floats, there are 3 points, and 2 total line segments)
+			// i represent the current line segment (for example with 6 floats, there are 3 points, and 2 total
+			// line segments)
 			for (int i = 1; i < vertices.length / 2; i += 1) {
 
 				start.set(end);
@@ -157,26 +170,16 @@ public class PathingModule {
 		}
 	}
 
-	private void initForMapHelper() {
-		initGraphs();
-		floodFillGraph();
-
-		pathing = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE, mapWidth, mapHeight);
-
-		// Debug
-		intermediatePaths = new HashMap<UnitPF, PathsInfo>();
-	}
-
 	public void onMapClose() {
 		mapWidth = 0;
 		mapHeight = 0;
-		
+
 		obstaclePoints.clear();
 		obstacleSegs.clear();
 		obstacleExpandedSegs.clear();
-		
+
 		intermediatePaths.clear();
-		
+
 	}
 
 	private void initObstaclePoints(List<OrientedPoly> polys) {
@@ -203,20 +206,20 @@ public class PathingModule {
 
 	// Unit pathfinding
 
-	public Path findPathForUnit(UnitPF unit, float dx, float dy, List<? extends UnitPF> units) {
+	public Path findPathForUnit(UnitPF unit, float dx, float dy, List<? extends UnitPF> allUnits) {
 
 		// For pathfinding, need to get expanded geometry of unit collision bodies as well
 
 		ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
 
-		for (UnitPF a : units) {
-			if (unit.equals(a)) { // don't consider the unit's own collision body
+		for (UnitPF u : allUnits) {
+			if (unit.equals(u)) { // don't consider the unit's own collision body
 				continue;
 			}
 
 			CBInfo c = new CBInfo();
-			c.x = a.getX();
-			c.y = a.getY();
+			c.x = u.getX();
+			c.y = u.getY();
 			c.unitRadius = Holo.UNIT_RADIUS;
 			colBodies.add(c);
 		}
@@ -241,17 +244,18 @@ public class PathingModule {
 		if (!Holo.debugPathfindingIgnoreUnits) {
 			setDynamicGraph(colBodies, unit);
 		}
-		Path newPath = pathing.doAStar(unit.getX(), unit.getY(), dx, dy, obstacleExpandedSegs, obstaclePoints, colBodies, dynamicGraph,
-				unit.getRadius()); // use the dynamic graph
+		Path newPath = astar.doAStar(unit.getX(), unit.getY(), dx, dy, obstacleExpandedSegs, obstaclePoints, colBodies,
+				dynamicGraph, unit.getRadius()); // use the dynamic graph
 
 		if (newPath != null) {
-			Path finalPath = smoother.smoothPath(newPath, obstacleExpandedSegs, obstaclePoints, colBodies, unit.getRadius());
+			Path finalPath = smoother.smoothPath(newPath, obstacleExpandedSegs, obstaclePoints, colBodies,
+					unit.getRadius());
 			// PathsInfo info = smoother.getPathInfo();
 			// intermediatePaths.put(unit, info);
 			return finalPath;
+		} else {
+			return null;
 		}
-
-		return newPath;
 	}
 
 	// Getters
@@ -270,6 +274,15 @@ public class PathingModule {
 		for (int y = 0; y < graphHeight; y++) {
 			for (int x = 0; x < graphWidth; x++) {
 				dynamicGraph[y][x] = new Vertex(x, y);
+			}
+		}
+		visited = new boolean[graphHeight][graphWidth];
+	}
+
+	private void clearVisited() {
+		for (int y = 0; y < graphHeight; y++) {
+			for (int x = 0; x < graphWidth; x++) {
+				visited[y][x] = false;
 			}
 		}
 	}
@@ -342,15 +355,23 @@ public class PathingModule {
 		// v.N = isPointWithinMap(ix+CELL_SIZE + );
 
 		float unitRadius = Holo.UNIT_RADIUS;
-		vertex.N = HoloPF.isSegmentPathableAgainstObstacles(x, y, x, y + CELL_SIZE, obstacleExpandedSegs, obstaclePoints, unitRadius);
-		vertex.S = HoloPF.isSegmentPathableAgainstObstacles(x, y, x, y - CELL_SIZE, obstacleExpandedSegs, obstaclePoints, unitRadius);
-		vertex.W = HoloPF.isSegmentPathableAgainstObstacles(x, y, x - CELL_SIZE, y, obstacleExpandedSegs, obstaclePoints, unitRadius);
-		vertex.E = HoloPF.isSegmentPathableAgainstObstacles(x, y, x + CELL_SIZE, y, obstacleExpandedSegs, obstaclePoints, unitRadius);
+		vertex.N = HoloPF.isSegmentPathableAgainstObstacles(x, y, x, y + CELL_SIZE, obstacleExpandedSegs,
+				obstaclePoints, unitRadius);
+		vertex.S = HoloPF.isSegmentPathableAgainstObstacles(x, y, x, y - CELL_SIZE, obstacleExpandedSegs,
+				obstaclePoints, unitRadius);
+		vertex.W = HoloPF.isSegmentPathableAgainstObstacles(x, y, x - CELL_SIZE, y, obstacleExpandedSegs,
+				obstaclePoints, unitRadius);
+		vertex.E = HoloPF.isSegmentPathableAgainstObstacles(x, y, x + CELL_SIZE, y, obstacleExpandedSegs,
+				obstaclePoints, unitRadius);
 
-		vertex.NW = HoloPF.isSegmentPathableAgainstObstacles(x, y, x - CELL_SIZE, y + CELL_SIZE, obstacleExpandedSegs, obstaclePoints, unitRadius);
-		vertex.NE = HoloPF.isSegmentPathableAgainstObstacles(x, y, x + CELL_SIZE, y + CELL_SIZE, obstacleExpandedSegs, obstaclePoints, unitRadius);
-		vertex.SW = HoloPF.isSegmentPathableAgainstObstacles(x, y, x - CELL_SIZE, y - CELL_SIZE, obstacleExpandedSegs, obstaclePoints, unitRadius);
-		vertex.SE = HoloPF.isSegmentPathableAgainstObstacles(x, y, x + CELL_SIZE, y - CELL_SIZE, obstacleExpandedSegs, obstaclePoints, unitRadius);
+		vertex.NW = HoloPF.isSegmentPathableAgainstObstacles(x, y, x - CELL_SIZE, y + CELL_SIZE, obstacleExpandedSegs,
+				obstaclePoints, unitRadius);
+		vertex.NE = HoloPF.isSegmentPathableAgainstObstacles(x, y, x + CELL_SIZE, y + CELL_SIZE, obstacleExpandedSegs,
+				obstaclePoints, unitRadius);
+		vertex.SW = HoloPF.isSegmentPathableAgainstObstacles(x, y, x - CELL_SIZE, y - CELL_SIZE, obstacleExpandedSegs,
+				obstaclePoints, unitRadius);
+		vertex.SE = HoloPF.isSegmentPathableAgainstObstacles(x, y, x + CELL_SIZE, y - CELL_SIZE, obstacleExpandedSegs,
+				obstaclePoints, unitRadius);
 
 		if (indexX == 0)
 			vertex.W = vertex.NW = vertex.SW = false;
@@ -368,12 +389,12 @@ public class PathingModule {
 	ArrayList<Vertex> blocked = new ArrayList<Vertex>();
 
 	/**
-	 * Modifies the graph by restricting vertices (and their edges) according to the additional colliding bodies given
+	 * Modifies the graph by restricting vertices (and their edges) according to the additional
+	 * colliding bodies given
 	 * 
-	 * @param infos
-	 *            List of the expanded polygons of units, excluding the pathing unit, with some extra information.
-	 * @param u
-	 *            The pathing unit
+	 * @param infos List of the expanded polygons of units, excluding the pathing unit, with some extra
+	 *              information.
+	 * @param u     The pathing unit
 	 */
 	private void setDynamicGraph(ArrayList<CBInfo> infos, UnitPF u) {
 
@@ -408,8 +429,7 @@ public class PathingModule {
 	/**
 	 * Given a vertex, restrict it's pathability based on the expanded collision circle of the unit
 	 * 
-	 * @param self
-	 *            Radius of the radius of the unit which is pathing. Used to get expanded geometry.
+	 * @param self Radius of the radius of the unit which is pathing. Used to get expanded geometry.
 	 */
 	private void restrictVertex(Vertex v, CBInfo cb, float unitRadius) {
 		float x = v.ix * CELL_SIZE;
@@ -431,7 +451,8 @@ public class PathingModule {
 
 		// If it's outside, we still have to check its edges to block the right ones.
 
-		// an edge is pathable if it's closest distance to the center of the circle is equal or greater to than the
+		// an edge is pathable if it's closest distance to the center of the circle is equal or greater to
+		// than the
 		// expanded radius
 
 		v.N = v.N && (Line2D.ptSegDistSq(x, y, x, y + CELL_SIZE, cb.x, cb.y) >= radSquared);
@@ -454,6 +475,120 @@ public class PathingModule {
 				dynamicGraph[y][x].set(graph[y][x]);
 			}
 		}
+	}
+
+	/**
+	 * 
+	 * Find pathable placements near a specified point Assumes all units have radius Holo.UNIT_RADIUS
+	 * 
+	 * @return A list of non-overlapping pathable points up to length numPlacements. If initial location
+	 *         is unpathable, returns empty list. If only a partial number of placements could be found,
+	 *         returns that partial list.
+	 */
+	public List<Point> findPathablePlacements(Point spawnPoint, int numPlacements) {
+		List<Point> placements = new ArrayList<>();
+
+		final Vertex closestVertex = HoloPF.findClosestReachableVertex(spawnPoint, graph, graphWidth, graphHeight);
+		if (closestVertex == null) {
+			return placements; // empty list
+		}
+		placements.add(closestVertex.getAsPoint(CELL_SIZE));
+
+		Point newPlacement = new Point();
+		clearVisited();
+		callMethodOnEveryNodeInFloodfillOrder(new Coord(closestVertex.ix, closestVertex.iy), (Coord c) -> {
+			if (placements.size() >= numPlacements)
+				return;
+			newPlacement.set(c.x * Holo.CELL_SIZE, c.y * Holo.CELL_SIZE);
+			addPlacementIfNotConflicting(newPlacement, placements);
+		}, () -> (placements.size() >= numPlacements));
+
+		return placements;
+	}
+	
+	private static void addPlacementIfNotConflicting(Point p, List<Point> placements) {
+		if(!placementConflicts(p, placements)){
+			placements.add(new Point(p));
+		}
+	}
+	private static boolean placementConflicts(Point placement, List<Point> prevPlacements) {
+		for(Point other : prevPlacements) {
+			if(Point.calcDistance(placement, other) < Holo.UNIT_RADIUS *2 + Holo.epsilon)
+				return true;
+		}
+		return false;
+	}
+
+	/** Method should not modifiy the coord */
+	private boolean[][] visited;
+
+	private void callMethodOnEveryNodeInFloodfillOrder(Coord startCoord, Consumer<Coord> method,
+			BooleanSupplier stopCondition) {
+		Queue<Coord> q = new Queue<Coord>();
+		q.ensureCapacity(graphWidth);
+
+		q.addLast(startCoord); // start flood fill from this position
+
+		// graph is already filled out, don't modify it
+
+		Coord cur;
+		Vertex vertex;
+		Vertex suc;
+		while (q.size > 0) {
+			if (stopCondition.getAsBoolean() == true) {
+				return;
+			}
+			cur = q.removeFirst();
+			visited[cur.y][cur.x] = true;
+			vertex = graph[cur.y][cur.x];
+
+			// call method as we pop vertex
+			method.accept(cur);
+
+			suc = graph[cur.y + 1][cur.x];
+			if (vertex.N && !visited[suc.iy][suc.ix]) {
+				addCoordToQueueAndMarkVisited(suc.ix, suc.iy, q);
+			}
+
+			suc = graph[cur.y - 1][cur.x];
+			if (vertex.S && !visited[suc.iy][suc.ix]) {
+				addCoordToQueueAndMarkVisited(suc.ix, suc.iy, q);
+			}
+
+			suc = graph[cur.y][cur.x - 1];
+			if (vertex.W && !visited[suc.iy][suc.ix]) {
+				addCoordToQueueAndMarkVisited(suc.ix, suc.iy, q);
+			}
+
+			suc = graph[cur.y][cur.x + 1];
+			if (vertex.E && !visited[suc.iy][suc.ix]) {
+				addCoordToQueueAndMarkVisited(suc.ix, suc.iy, q);
+			}
+
+			suc = graph[cur.y + 1][cur.x - 1];
+			if (vertex.NW && !visited[suc.iy][suc.ix]) {
+				addCoordToQueueAndMarkVisited(suc.ix, suc.iy, q);
+			}
+
+			suc = graph[cur.y + 1][cur.x + 1];
+			if (vertex.NE && !visited[suc.iy][suc.ix]) {
+				addCoordToQueueAndMarkVisited(suc.ix, suc.iy, q);
+			}
+
+			suc = graph[cur.y - 1][cur.x - 1];
+			if (vertex.SW && !visited[suc.iy][suc.ix]) {
+				addCoordToQueueAndMarkVisited(suc.ix, suc.iy, q);
+			}
+
+			suc = graph[cur.y - 1][cur.x + 1];
+			if (vertex.SE && !visited[suc.iy][suc.ix]) {
+				addCoordToQueueAndMarkVisited(suc.ix, suc.iy, q);
+			}
+		}
+	}
+	private void addCoordToQueueAndMarkVisited(int ix, int iy, Queue<Coord> q) {
+		q.addLast(new Coord(ix, iy));
+		visited[iy][ix] = true;
 	}
 
 	// Render functions

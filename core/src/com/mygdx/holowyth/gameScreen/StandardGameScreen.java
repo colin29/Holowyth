@@ -1,5 +1,8 @@
 package com.mygdx.holowyth.gameScreen;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +60,7 @@ public class StandardGameScreen extends GameScreen {
 		}
 	}
 	
+	@SuppressWarnings("unused")
 	private void startConversation(String convoName, String branch) {
 		pauseGame();
 		vn.setConvoExitListener(() -> {
@@ -81,6 +85,24 @@ public class StandardGameScreen extends GameScreen {
 			logger.error("Couldn't spawn player, map has no default_spawn_location");
 			return null;
 		}
+	}
+	
+	/**
+	 * @return a list of units that were actually spawned
+	 */
+	private List<Unit> spawnMultiplePlayerUnits(Point spawnPos, int numUnits) {
+		// fetch locations
+		final List<Point> unitPlacements = pathingModule.findPathablePlacements(spawnPos, numUnits);
+		if(unitPlacements.size() != numUnits) {
+			logger.warn("Expected {} placements, but got {} locations. Not all units may be placed.", numUnits, unitPlacements.size());
+		}
+
+		final List<Unit> units = new ArrayList<Unit>();
+		
+		for(int i=0;i<Math.min(numUnits, unitPlacements.size());i++) {
+			units.add(spawnPlayerUnit(unitPlacements.get(i)));
+		}
+		return units;
 	}
 
 	/**
@@ -152,8 +174,10 @@ public class StandardGameScreen extends GameScreen {
 	public
 	final void mapStartup() {
 		super.mapStartup();
+		spawnMultiplePlayerUnits(map.getLocation("default_spawn_location"), 6);
 		if(lecia==null) {
-			lecia = spawnPlayerAtDefaultLocation();	
+//			lecia = spawnPlayerAtDefaultLocation();
+	
 		}else {
 			// insert existing lecia into the world
 		}

@@ -270,7 +270,7 @@ public class AStarSearch {
 	 * @return -1 if the location cannot be found and search should be aborted. If if substituteLocationFound is set to true, the original location
 	 *         was invalid but a substitute has been found.
 	 */
-	private int findClosestPathableVertex(float goalX, float goalY, List<OrientedSeg> obstacleExpandedSegs, List<Point> obstaclePoints,
+	public int findClosestPathableVertex(float goalX, float goalY, List<OrientedSeg> obstacleExpandedSegs, List<Point> obstaclePoints,
 			List<CBInfo> unitCbs,
 			Vertex[][] graph, float unitRadius, boolean allowCorrection, Point correctedLocation) {
 		substituteLocationFound = false;

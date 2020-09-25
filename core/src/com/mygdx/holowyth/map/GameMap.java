@@ -87,6 +87,13 @@ public class GameMap {
 	public MapOfMapLocations getLocations() {
 		return locations;
 	}
+	
+	/**
+	 * @return The location as a new point, or null if the location not found.
+	 */
+	public Point getLocation(String name) {
+		return new Point(locations.get(name));
+	}
 
 	
 	public void setTilemap(TiledMap tilemap) {

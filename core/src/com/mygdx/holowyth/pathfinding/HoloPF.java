@@ -167,7 +167,7 @@ public class HoloPF {
 
 	/**
 	 * @param maxCellDistance
-	 *            how many cells away to draw from (e.g. distance 1 would consider 9 cells)
+	 *            how many cells away consider as candidate (e.g. distance 1 would consider 9 cells)
 	 * @return A list of the nearest reachable vertexes, sorted in order of distance. (Note: these are live graph references)
 	 * 
 	 * @reachable reachable is a vertex property in the graph saying that the vertex was explored during floodfill after handling map polygons. It
@@ -187,7 +187,7 @@ public class HoloPF {
 		for (int cx = ix - maxCellDistance; cx <= ix + maxCellDistance; cx++) { // cx "current x"
 			for (int cy = iy - maxCellDistance; cy <= iy + maxCellDistance; cy++) {
 				Vertex v = new Vertex(cx, cy);
-				if (isVertexInMap(v, graphWidth, graphHeight)) {
+				if (isVertexWithinMapBoundaries(v, graphWidth, graphHeight)) {
 					prospects.add(v);
 				}
 			}
@@ -203,14 +203,18 @@ public class HoloPF {
 
 		ArrayList<Vertex> vertexes = new ArrayList<Vertex>();
 		for (VertexDist vd : vds) {
-			vertexes.add(vd.vertex); // note these are live graph references
+			vertexes.add(vd.vertex); // note these are live graph nodes
 		}
 		return vertexes;
 	}
 
-	public static Vertex findClosestReachableVertex(Point p, Vertex[][] graph, int graphWidth, int graphHeight,
-			int maxCellDistance) {
-		ArrayList<Vertex> result = findNearbyReachableVertexes(p, graph, graphWidth, graphHeight, maxCellDistance);
+	/**
+	 *            
+	 * @param maxCellDistance how many cells away consider as candidate (e.g. distance 1 would consider 9 cells)
+	 * @return
+	 */
+	public static Vertex findClosestReachableVertex(Point p, Vertex[][] graph, int graphWidth, int graphHeight) {
+		ArrayList<Vertex> result = findNearbyReachableVertexes(p, graph, graphWidth, graphHeight, 1);
 		return result.size() > 0 ? result.get(0) : null;
 	}
 
@@ -225,7 +229,7 @@ public class HoloPF {
 	/**
 	 * @return true if the vertex is within the map's graph
 	 */
-	public static boolean isVertexInMap(Vertex v, int graphWidth, int graphHeight) {
+	public static boolean isVertexWithinMapBoundaries(Vertex v, int graphWidth, int graphHeight) {
 		if (v.ix < 0 || v.ix >= graphWidth)
 			return false;
 		if (v.iy < 0 || v.iy >= graphHeight)
@@ -243,7 +247,7 @@ public class HoloPF {
 
 	/**
 	 * 
-	 * Small data class for assisting with sorting vertexes via distance
+	 * Small data class that also stores distance for sorting purposes
 	 */
 	private static class VertexDist {
 		public Vertex vertex;

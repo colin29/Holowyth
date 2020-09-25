@@ -31,6 +31,7 @@ public class Holo {
 	public static float defaultUnitMoveSpeed = 0.8f; // world units per frame
 	public static float collisionClearanceDistance = defaultUnitMoveSpeed / 5; // extra distance "pushed out" by the
 																				// collision detection upon collision
+	public static float epsilon = 0.001f;
 
 	public static final int CELL_SIZE = 15; // size in world units
 
