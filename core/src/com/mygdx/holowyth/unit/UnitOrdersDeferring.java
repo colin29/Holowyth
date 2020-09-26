@@ -3,17 +3,18 @@ package com.mygdx.holowyth.unit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mygdx.holowyth.unit.Unit.Order;
+import com.mygdx.holowyth.unit.UnitOrders.Order;
 import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 
 /**
  * Allow a unit to store one order, which will be executed after the unit stops being stunned.
  */
-class UnitOrderDeferring {
+class UnitOrdersDeferring {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final Unit self;
+	private final UnitOrders orders;
 
 	/**
 	 * When a unit stops being stunned, the unit will try to adopt this order. Should not be null.
@@ -23,8 +24,9 @@ class UnitOrderDeferring {
 	private float deferredOrderX;
 	private float deferredOrderY;
 
-	UnitOrderDeferring(Unit unit) {
+	UnitOrdersDeferring(Unit unit) {
 		self = unit;
+		orders = unit.orders;
 	}
 
 	void tryToResumeDeferredOrder() {
@@ -108,19 +110,19 @@ class UnitOrderDeferring {
 
 		clearDeferredOrder();
 
-		switch (self.order) {
+		switch (self.getOrder()) {
 		case ATTACKMOVE:
-			tryToDeferOrder(self.order, null, self.attackMoveDestX, self.attackMoveDestY);
+			tryToDeferOrder(self.getOrder(), null, orders.getAttackMoveDestX(), orders.getAttackMoveDestY());
 			break;
 		case MOVE:
-			tryToDeferOrder(self.order, null, self.getMotion().getDest().x, self.getMotion().getDest().y);
+			tryToDeferOrder(self.getOrder(), null, self.motion.getDest().x, self.getMotion().getDest().y);
 			break;
 		case ATTACKUNIT_HARD:
 		case ATTACKUNIT_SOFT:
-			tryToDeferOrder(self.order, self.orderTarget, 0, 0);
+			tryToDeferOrder(self.getOrder(), self.getOrderTarget(), 0, 0);
 			break;
 		case RETREAT:
-			tryToDeferOrder(self.order, self.orderTarget, self.getMotion().getDest().x, self.getMotion().getDest().y);
+			tryToDeferOrder(self.getOrder(), self.getOrderTarget(), self.getMotion().getDest().x, self.getMotion().getDest().y);
 			break;
 		case NONE:
 			break;

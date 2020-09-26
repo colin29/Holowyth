@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.gameScreen.MapInstance;
-import com.mygdx.holowyth.unit.Unit.Order;
+import com.mygdx.holowyth.unit.UnitOrders.Order;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
@@ -87,7 +87,7 @@ class UnitCombat {
 		if (self.getMotion().pathFindTowardsPoint(x, y)) {
 			stopAttacking();
 			self.clearOrder();
-			self.order = Order.RETREAT;
+			self.orders.setOrder(Order.RETREAT);
 			self.stats.removeAllBasicAttackSlows();
 
 			var attackers = self.getUnitsAttackingThis();
@@ -99,7 +99,7 @@ class UnitCombat {
 	}
 	
 	private void tickRetreatDurationIfRetreating() {
-		if (self.order == Order.RETREAT)
+		if (self.orders.getOrder() == Order.RETREAT)
 			retreatDurationRemaining -= 1;
 	}
 	private void tickRetreatCooldown() {
@@ -119,6 +119,7 @@ class UnitCombat {
 	 * already attacking the same target.
 	 */
 	void startAttacking(Unit target) {
+		logger.debug("Unit {} started attacking {}", self.getName(), target.getName());
 		if (isAttacking(target)) {
 			logger.warn("Unit is already attacking the target");
 			return;
@@ -189,7 +190,7 @@ class UnitCombat {
 	 */
 	void setAttacking(Unit unit) {
 		float distToEnemy = Point.calcDistance(self.getPos(), unit.getPos());
-		if (distToEnemy >= self.getDisengageRange(unit)) {
+		if (distToEnemy >= self.orders.getDisengageRange(unit)) {
 			logger.info("Tried to set attacking, but unit out of range");
 			return;
 		}

@@ -2,9 +2,9 @@ package com.mygdx.holowyth.unit.interfaces;
 
 import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 import com.mygdx.holowyth.skill.SkillInfo;
-import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.UnitMotion;
+import com.mygdx.holowyth.unit.UnitOrders.Order;
 import com.mygdx.holowyth.unit.UnitSkills;
 import com.mygdx.holowyth.util.dataobjects.Point;
 

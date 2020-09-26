@@ -189,7 +189,7 @@ class UnitStun {
 	}
 
 	private void beginStun(float duration) {
-		self.ordersDeferring.deferCurrentOrder();
+		self.orders.deffering.deferCurrentOrder();
 		self.getMotion().stopCurrentMovement();
 		self.clearOrder();
 		self.combat.stopAttacking();
@@ -217,7 +217,7 @@ class UnitStun {
 		beginReel(Math.max(120, deferredReelAmount));
 		deferredReelAmount = 0;
 		logger.debug("{} stun ended", self.getName());
-		self.ordersDeferring.tryToResumeDeferredOrder(); // important to call this AFTER stun state de-set, ie. unit.isStunned() returns false.
+		self.orders.deffering.tryToResumeDeferredOrder(); // important to call this AFTER stun state de-set, ie. unit.isStunned() returns false.
 	}
 
 	private void endReeled() {

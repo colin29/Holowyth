@@ -12,7 +12,7 @@ import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.unit.Unit.Order;
+import com.mygdx.holowyth.unit.UnitOrders.Order;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
@@ -114,12 +114,9 @@ public class UnitMotion {
 	public boolean pathFindTowardsTarget() {
 		// find path as normal, except for pathing ignore the target's collision body
 		ArrayList<Unit> someUnits = new ArrayList<Unit>(units);
-		someUnits.remove(self.orderTarget);
-		if (self.orderTarget == null) {
-			@SuppressWarnings("unused")
-			var x = 4;
-		}
-		Path newPath = pathing.findPathForUnit(self, self.orderTarget.x, self.orderTarget.y, someUnits);
+		final Unit orderTarget = self.orders.getOrderTarget();
+		someUnits.remove(orderTarget);
+		Path newPath = pathing.findPathForUnit(self, orderTarget.x, orderTarget.y, someUnits);
 		if (newPath != null) {
 			this.setPath(newPath);
 			return true;
@@ -157,8 +154,8 @@ public class UnitMotion {
 	 * But when the unit is chasing a moving target, it obviously needs to repath.
 	 */
 	private void handleRepathing() {
-		if ((self.order.isAttackUnit() && !self.isAttacking()) ||
-				(self.order == Order.ATTACKMOVE && self.orderTarget != null && !self.isAttacking())) {
+		if ((self.getOrder().isAttackUnit() && !self.isAttacking()) ||
+				(self.getOrder() == Order.ATTACKMOVE && self.orders.getOrderTarget() != null && !self.isAttacking())) {
 			framesUntilAttackRepath -= 1;
 			if (framesUntilAttackRepath <= 0) {
 				pathFindTowardsTarget();
@@ -177,7 +174,7 @@ public class UnitMotion {
 			vy = 0;
 			return;
 		}
-		switch (self.order) {
+		switch (self.getOrder()) {
 		case NONE:
 			stopCurrentMovement();
 			break;
@@ -415,7 +412,7 @@ public class UnitMotion {
 	 */
 	public void onBlocked() {
 		System.out.println("onBlocked called");
-		switch (self.order) {
+		switch (self.getOrder()) {
 		case MOVE:
 			pathFindTowardsPoint(getDest().x, getDest().y);
 			break;

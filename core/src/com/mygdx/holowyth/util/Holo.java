@@ -75,7 +75,7 @@ public class Holo {
 	public static boolean debugPathfindingIgnoreUnits = false;
 
 	// Play Mode (overrides debug settings to false)
-	public static boolean releaseMode = true;
+	public static boolean releaseMode = false;
 	
 	static {
 		if (releaseMode) {

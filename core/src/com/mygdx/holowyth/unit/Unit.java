@@ -20,6 +20,7 @@ import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitPF;
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.ActiveSkill.Status;
+import com.mygdx.holowyth.unit.UnitOrders.Order;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
@@ -58,7 +59,12 @@ import com.mygdx.holowyth.util.exceptions.HoloException;
  */
 public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
+	
+	
 	Logger logger = LoggerFactory.getLogger(this.getClass());
+	
+	/** For debugging. Does not even require units be alive or in a MapInstance. */
+	private static Map<Integer, Unit> idToUnit = new HashMap<Integer, Unit>();
 
 	// Unit life-time Components
 	public final UnitStats stats;
@@ -81,29 +87,23 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	/////////////// World specific state /////////////
 
 	// Map life-time Components (are discarded when a unit moves to a new map)
-	private UnitMotion motion;
+	UnitMotion motion;
 	UnitCombat combat;
-	private UnitOrders orders;
+	UnitOrders orders;
 
 	// General
 	public float x, y;
 	private MapInstanceInfo mapInstance;
 
 	// Ordering
-	UnitOrderDeferring ordersDeferring;
-
-	Order order = Order.NONE;
-	/** Target for the current command */
-	Unit orderTarget;
-	float attackMoveDestX;
-	float attackMoveDestY;
+	
 
 	// Skills
 	/**
 	 * The skill the character is actively casting or channelling, else null. The Skill class will reset
 	 * this when the active portion has finished.
 	 */
-	private ActiveSkill activeSkill;
+	ActiveSkill activeSkill;
 	/**
 	 * Time in frames before the unit can use skills again
 	 */
@@ -123,25 +123,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		}
 	}
 
-	/**
-	 * A unit's order represents whether it has any persistent order on it that would determine its
-	 * behaviour. Note that a unit without a command could still be casting or attacking.
-	 * 
-	 * AttackUnit can be hard or soft. Hard will chase indefinitely, a soft attack order will stop
-	 * chasing if the target goes out of range
-	 */
-	public enum Order {
-		MOVE, ATTACKUNIT_HARD, ATTACKUNIT_SOFT, NONE,
-		/**
-		 * If an attacking moving unit has no target it's moving towards its destination. If it does have a
-		 * target it's chasing that unit.
-		 */
-		ATTACKMOVE, RETREAT;
-
-		public boolean isAttackUnit() {
-			return this == ATTACKUNIT_HARD || this == ATTACKUNIT_SOFT;
-		}
-	}
 
 	public Unit(float x, float y, MapInstanceInfo world, Side side, String name) {
 		this(x, y, side, world);
@@ -169,8 +150,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		motion = new UnitMotion(this, world);
 		combat = new UnitCombat(this);
 		orders =  new UnitOrders(this);
-		ordersDeferring = new UnitOrderDeferring(this);
-		
 
 		
 	}
@@ -195,8 +174,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public void reinitializeForWorld(MapInstance world) {
 		this.mapInstance = world;
 		motion = new UnitMotion(this, world);
-		ordersDeferring = new UnitOrderDeferring(this);
-		
+		combat = new UnitCombat(this);
+		orders = new UnitOrders(this);
 		stats.reinitializeForWorld();
 	}
 
@@ -209,7 +188,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		notifyAppLifetimeComponentsToClearMapLifeTimeData();
 		clearMapLifeTimeComponents();
 		clearGeneralData();
-		clearOrderingData();
 		clearSkillsData();
 	}
 	private void notifyAppLifetimeComponentsToClearMapLifeTimeData() {
@@ -224,7 +202,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		motion = null;
 		combat = null;
 		orders = null;
-		ordersDeferring = null;
 	}
 	
 	private void clearGeneralData() {
@@ -233,13 +210,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		mapInstance = null;
 	}
 	
-	private void clearOrderingData() {
-		order = Order.NONE;
-		orderTarget = null;
-		attackMoveDestX = 0; 
-		attackMoveDestY = 0;
-	}
-
 	private void clearSkillsData() {
 		activeSkill = null;
 		skillCooldownRemaining = 0;
@@ -247,16 +217,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public void orderMove(float x, float y) {
-		if (!isMoveOrderAllowed()) {
-			if (stats.isStunned()) {
-				ordersDeferring.tryToDeferOrder(Order.MOVE, null, x, y);
-			}
-			return;
-		}
-		if (getMotion().pathFindTowardsPoint(x, y)) {
-			clearOrder();
-			order = Order.MOVE;
-		}
+		orders.orderMove(x, y);
 	}
 
 	/**
@@ -265,7 +226,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	@Override
 	public boolean orderAttackUnit(UnitOrderable unitOrd) {
-		return orderAttackUnit(unitOrd, true);
+		return orders.orderAttackUnit(unitOrd);
 	}
 
 	/**
@@ -277,7 +238,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	@Override
 	public boolean orderAttackUnit(UnitOrderable unitOrd, boolean isHardOrder) {
-		return orderAttackUnit(unitOrd, isHardOrder, false);
+		return orders.orderAttackUnit(unitOrd, isHardOrder);
 	}
 
 	/**
@@ -289,92 +250,18 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 * @return
 	 */
 	private boolean orderAttackUnit(UnitOrderable unitOrd, boolean isHardOrder, boolean isATauntedOrder) {
-		Unit unit = (Unit) unitOrd; // underlying objects must hold the same type
-
-		if (unit == this) {
-			logger.warn("Unit can't be ordered to attack itself");
-			return false;
-		}
-		if (isATauntedOrder ? isAnyOrderAllowedIgnoringTaunt() : isAttackOrderAllowed(unit)) {
-			if (stats.isStunned()) {
-				ordersDeferring.tryToDeferOrder(isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT,
-						(Unit) unitOrd, 0, 0);
-			}
-			if (isAttacking())
-				return orderAttackUnitWhileAlreadyAttacking(unitOrd, isHardOrder);
-
-			clearOrder();
-			this.order = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
-			this.orderTarget = unit;
-
-			this.getMotion().pathFindTowardsTarget();
-
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Precondition: Unit is currently attacking a unit
-	 *
-	 * Is a helper method, does not check order validity, should call orderAttackUnit instead.
-	 * 
-	 * Units can switch attacking targets if the new target is within melee range. If the unit is in
-	 * range, switches targets immediately <br>
-	 * If out of range, does nothing (unit needs to manually retreat first)
-	 */
-	private boolean orderAttackUnitWhileAlreadyAttacking(UnitOrderable unitOrd, boolean isHardOrder) {
-		Unit target = (Unit) unitOrd;
-
-		if (combat.getAttacking() == null) {
-			logger.warn("order orderAttackUnitWhileAlreadyAttacking called but unit is not attacking");
-			return false;
-		}
-		if (target == this) {
-			logger.warn("Unit can't be ordered to attack itself)");
-			return false;
-		}
-
-		if (Point.calcDistance(getPos(), target.getPos()) <= radius + target.radius
-				+ Holo.defaultUnitSwitchEngageRange) {
-			clearOrder();
-			order = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
-			orderTarget = target;
-			combat.setAttacking(target);
-			return true;
-		}
-		return false;
+		return orders.orderAttackUnit(unitOrd, isHardOrder, isATauntedOrder);
 	}
 
 	@Override
 	public void orderAttackMove(float x, float y) {
-		if (isAttackMoveOrderAllowed()) {
-
-			if (getMotion().pathFindTowardsPoint(x, y)) {
-				clearOrder();
-				attackMoveDestX = x;
-				attackMoveDestY = y;
-				this.order = Order.ATTACKMOVE;
-			}
-		} else if (stats.isStunned()) {
-			ordersDeferring.tryToDeferOrder(Order.ATTACKMOVE, null, x, y);
-		}
-
+		orders.orderAttackMove(x, y);
 	}
 
 	@Override
 	public void orderRetreat(float x, float y) {
-		if (isRetreatOrderAllowed()) {
-			combat.retreat(x, y);
-		} else if (stats.isStunned()) {
-			ordersDeferring.tryToDeferOrder(Order.RETREAT, null, x, y);
-		}
+		orders.orderRetreat(x, y);
 	}
-
-
-
-	
-	
 
 	/**
 	 * A stop order stops a unit's motion and current order. You cannot use stop to cancel your own
@@ -382,81 +269,58 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	@Override
 	public void orderStop() {
-		if (!isStopOrderAllowed()) {
-			if (stats.isStunned())
-				ordersDeferring.clearDeferredOrder();
-			return;
-		}
-		stopUnit();
+		orders.orderStop();
 	}
 
 	/**
-	 * @param skill The skill must have effects set already
+	 * @see UnitOrders#orderUseSkill(ActiveSkill)
 	 */
 	@Override
 	public void orderUseSkill(ActiveSkill skill) {
-
-		if (stats.isStunned()) {
-			ordersDeferring.clearDeferredOrder(); // deferring a skill order is not supported but it will still clear an
-													// existing deferred order
-		}
-
-		if (!isUseSkillAllowed()) {
-			return;
-		}
-		if (!skill.hasEnoughSp(this)) {
-			return;
-		}
-
-		activeSkill = skill;
-		skill.begin(this);
+		orders.orderUseSkill(skill);
 	}
 
 	/**
-	 * Stops a unit's motion and halts any current orders. It does not disengage a unit that is
-	 * attacking, though.. Unlike orderStop, is not affected by order restrictions. As such, it should
-	 * be for backend and not player use.
+	 * @see UnitOrders#stopUnit()
 	 */
 	public void stopUnit() {
-		clearOrder();
-		getMotion().stopCurrentMovement();
+		orders.stopUnit();
 	}
 
 	// @formatter:off
 	@Override
 	public boolean isAttackOrderAllowed(Unit target) {
-		return isGeneralOrderAllowed() && isEnemy(target);
+		return orders.isAttackOrderAllowed(target);
 	}
 
 	@Override
 	public boolean isAttackOrderAllowed() {
-		return isGeneralOrderAllowed();
+		return orders.isAttackOrderAllowed();
 	}
 
 	@Override
 	public boolean isMoveOrderAllowed() {
-		return isGeneralOrderAllowed() && !isAttacking();
+		return orders.isMoveOrderAllowed();
 	}
 
 	@Override
 	public boolean isAttackMoveOrderAllowed() {
-		return isGeneralOrderAllowed() && !isAttacking();
+		return orders.isAttackMoveOrderAllowed();
 	}
 
 	@Override
 	public boolean isRetreatOrderAllowed() {
-		return isAnyOrderAllowed() && isAttacking() && this.order != Order.RETREAT && combat.getRetreatCooldownRemaining() <= 0
-				&& !(isCasting() || isChannelling());
+		return orders.isRetreatOrderAllowed();
 	}
 
 	@Override
 	public boolean isStopOrderAllowed() {
-		return isGeneralOrderAllowed();
+		return orders.isStopOrderAllowed();
 	}
 
 	@Override
 	public boolean isUseSkillAllowed() {
-		return isGeneralOrderAllowed() && !stats.isBlinded();
+		return orders.isUseSkillAllowed();
 	}
 
 	/**
@@ -466,7 +330,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	@Override
 	public boolean isGeneralOrderAllowed() {
-		return isAnyOrderAllowed() && !isBusyRetreating() && !(isCasting() || isChannelling());
+		return orders.isGeneralOrderAllowed();
 	}
 
 	/**
@@ -476,12 +340,12 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	@Override
 	public boolean isAnyOrderAllowed() {
-		return isAnyOrderAllowedIgnoringTaunt() && !stats.isTaunted();
+		return orders.isAnyOrderAllowed();
 	}
 
 	@Override
 	public boolean isAnyOrderAllowedIgnoringTaunt() {
-		return !stats.isDead() && !getMotion().isBeingKnockedBack() && !stats.isStunned();
+		return orders.isAnyOrderAllowedIgnoringTaunt();
 	}
 
 	// @formatter:on
@@ -490,11 +354,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 * Clears any current order on this unit. For internal use.
 	 */
 	void clearOrder() {
-		order = Order.NONE;
-		orderTarget = null;
-
-		attackMoveDestX = 0;
-		attackMoveDestY = 0;
+		orders.clearOrder();
 	}
 
 	/**
@@ -539,7 +399,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		getMotion().tick();
 		stats.tick();
 
-		tickOrderLogic();
+		orders.tick();
 
 		
 
@@ -569,180 +429,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		return (skillCooldownRemaining > 0);
 	}
 
-	/**
-	 * Does not even require units be alive or in units. For debugging purposes
-	 */
-	private static Map<Integer, Unit> idToUnit = new HashMap<Integer, Unit>();
 
-	/** Handles the complex logic revolving around switching orders and targets */
-	public void tickOrderLogic() {
-
-		if (stats.isTaunted()) {
-			if (order == Order.NONE) {
-
-				if (isAnyOrderAllowedIgnoringTaunt())
-					orderAttackUnit((Unit) stats.getTauntAttackTarget(), true, true);
-			}
-		}
-
-		if (orderTarget != null && orderTarget.stats.isDead()) {
-			if (order.isAttackUnit()) {
-				clearOrder();
-			}
-			if (isAttackMoveAndHasTarget()) {
-				orderTarget = null;
-				repathToDestinationForAttackMove();
-			}
-		}
-
-		if (order.isAttackUnit()) {
-			handleTargetLossAndSwitchingForAttackUnitSoft();
-		} else if (order == Order.ATTACKMOVE) {
-			if (orderTarget == null) {
-				aggroOntoNearbyTargetsForAttackMove();
-			}
-			if (orderTarget != null) {
-				handleTargetLossAndSwitchingForAttackMove();
-			}
-		}
-
-		startAttackingIfInRangeForAttackOrders();
-		stopAttackingIfEnemyIsOutOfRange();
-	}
-
-	
-	/**
-	 *  Probably will be used later by ai or player
-	 */
-	@SuppressWarnings("unused")
-	private void ifIdleAggroOntoNearbyTargets() {
-		if (isCompletelyIdle()) {
-			var closestTargets = UnitUtil.getTargetsSortedByDistance(this, mapInstance);
-			if (!closestTargets.isEmpty()) {
-				UnitOrderable closestEnemy = closestTargets.remove();
-
-				float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
-
-				if (Point.calcDistance(getPos(), closestEnemy.getPos()) <= aggroRange) {
-					orderAttackUnit(closestEnemy, false);
-				}
-			}
-		}
-	}
-
-	private void aggroOntoNearbyTargetsForAttackMove() {
-		if (order == Order.ATTACKMOVE) {
-			var closestTargets = UnitUtil.getTargetsSortedByDistance(this, mapInstance);
-			if (!closestTargets.isEmpty()) {
-				UnitOrderable closestEnemy = closestTargets.remove();
-
-				float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
-
-				if (Point.calcDistance(getPos(), closestEnemy.getPos()) <= aggroRange) {
-					orderTarget = (Unit) closestEnemy; // manually set target/path, since we want to keep the ATTACKMOVE
-														// order
-					if (!getMotion().pathFindTowardsTarget()) {
-						orderTarget = null; // keep walking normally if path to target not found
-					}
-				}
-			}
-		}
-	}
-
-	private void startAttackingIfInRangeForAttackOrders() {
-		if (!isAttacking() && (order.isAttackUnit() || isAttackMoveAndHasTarget())) {
-			float distToTarget = Point.calcDistance(this.getPos(), orderTarget.getPos());
-			if (distToTarget <= getEngageRange(orderTarget)) {
-				combat.startAttacking(orderTarget);
-			}
-		}
-	}
-	void stopAttackingIfEnemyIsOutOfRange() {
-		if (isAttacking()) {
-			float distToEnemy = Point.calcDistance(this.getPos(), combat.getAttacking().getPos());
-			if (distToEnemy >= getDisengageRange(combat.getAttacking())) {
-				combat.stopAttacking();
-			}
-		}
-	}
-
-	
-
-	float getEngageRange(Unit unit) {
-		return this.radius + unit.radius + Holo.defaultUnitEngageRange;
-	}
-
-	float getDisengageRange(Unit unit) {
-		return this.radius + unit.radius + Holo.defaultUnitDisengageRange;
-	}
-
-	private boolean isAttackMoveAndHasTarget() {
-		return order == Order.ATTACKMOVE && orderTarget != null;
-	}
-
-	/**
-	 * Preconditions: Target must be defined
-	 */
-	private void handleTargetLossAndSwitchingForAttackUnitSoft() {
-		if (order == Order.ATTACKUNIT_SOFT) {
-			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, mapInstance);
-			otherTargetsWithinAggroRange
-					.removeIf((t) -> Point.calcDistance(getPos(), t.getPos()) >= Holo.defaultAggroRange);
-			otherTargetsWithinAggroRange.remove(orderTarget);
-			float distToTarget = Point.calcDistance(this.getPos(), orderTarget.getPos());
-
-			float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
-			float chaseRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange
-					: Holo.defaultUnitAttackChaseRange;
-
-			if (distToTarget > aggroRange && !otherTargetsWithinAggroRange.isEmpty()) {
-				orderAttackUnit(otherTargetsWithinAggroRange.peek(), false);
-			} else if (distToTarget > chaseRange) {
-				clearOrder();
-			}
-		}
-	}
-
-	/**
-	 * Preconditions: Target must be defined
-	 */
-	private void handleTargetLossAndSwitchingForAttackMove() {
-		if (order == Order.ATTACKMOVE) {
-			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, mapInstance);
-			otherTargetsWithinAggroRange
-					.removeIf((t) -> Point.calcDistance(getPos(), t.getPos()) >= Holo.defaultAggroRange);
-			otherTargetsWithinAggroRange.remove(orderTarget);
-			float distToTarget = Point.calcDistance(this.getPos(), orderTarget.getPos());
-
-			float aggroRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
-			float chaseRange = getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange
-					: Holo.defaultUnitAttackChaseRange;
-
-			if (distToTarget > aggroRange && !otherTargetsWithinAggroRange.isEmpty()) {
-				// Switch targets
-
-				Unit oldTarget = orderTarget;
-
-				orderTarget = (Unit) otherTargetsWithinAggroRange.peek();
-				if (!getMotion().pathFindTowardsTarget()) {
-					orderTarget = oldTarget;
-					logger.debug("Was attack moving but no path could be found to the nearest unit, ignoring");
-				}
-
-			} else if (distToTarget > chaseRange) {
-				// Instead of clearing order, repath and resume moving towards the original destination
-				repathToDestinationForAttackMove();
-			}
-		}
-	}
-
-	private void repathToDestinationForAttackMove() {
-		orderTarget = null;
-		if (!getMotion().pathFindTowardsPoint(attackMoveDestX, attackMoveDestY)) {
-			logger.debug("Was attack moving but no path could be found to destination.");
-			clearOrder();
-		}
-	}
 
 	public void tickAttacking() {
 		combat.tick();
@@ -829,12 +516,12 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public Order getOrder() {
-		return order;
+		return orders.getOrder();
 	}
 
 	@Override
-	public UnitInfo getOrderTarget() {
-		return orderTarget;
+	public Unit getOrderTarget() {
+		return orders.getOrderTarget();
 	}
 
 	@Override
@@ -862,7 +549,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public boolean isBusyRetreating() {
-		return order == Order.RETREAT && combat.getRetreatDurationRemaining() > 0;
+		return orders.isBusyRetreating();
 	}
 
 	@Override
@@ -921,7 +608,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	@Override
 	public boolean isCompletelyIdle() {
-		return order == Order.NONE && !isAttacking() && !isCastingOrChanneling();
+		return orders.getOrder() == Order.NONE && !isAttacking() && !isCastingOrChanneling();
 	}
 
 	@Override

@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.ai.btree.Task;
 import com.mygdx.holowyth.ai.btree.util.HoloLeafTask;
-import com.mygdx.holowyth.unit.Unit.Order;
+import com.mygdx.holowyth.unit.UnitOrders.Order;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.dataobjects.Point;
 

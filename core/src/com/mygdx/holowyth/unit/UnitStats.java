@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
-import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.UnitEquip.Slot;
+import com.mygdx.holowyth.unit.UnitOrders.Order;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.unit.item.Equip;
@@ -609,7 +609,7 @@ public class UnitStats implements UnitStatsInfo {
 	 * Same as applySlow but uses a marker sub-class so that certain maneuvers can nullify this slow.
 	 */
 	public void applyBasicAttackSlow(float slowAmount, int duration) {
-		if (self.order != Order.RETREAT) { // units are unaffected by basic attack slow while retreating
+		if (self.getOrder() != Order.RETREAT) { // units are unaffected by basic attack slow while retreating
 			slowEffects.add(new BasicAttackSlowEffect(duration, slowAmount));
 		}
 	}
