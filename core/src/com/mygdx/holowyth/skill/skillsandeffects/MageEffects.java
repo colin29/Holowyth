@@ -29,6 +29,7 @@ import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class MageEffects {
 
+	@SuppressWarnings("unused")
 	private static Logger logger = LoggerFactory.getLogger(MageEffects.class);
 
 	static class MagicMissileEffect extends CasterUnitEffect {
@@ -82,7 +83,6 @@ public class MageEffects {
 
 		int damage = 24;
 		private static float missileVfxRadius = 6;
-		private static float explosionRadius = 30;
 
 		@Override
 		public void begin() {

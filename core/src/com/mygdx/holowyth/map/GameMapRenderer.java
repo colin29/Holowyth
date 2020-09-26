@@ -1,8 +1,5 @@
 package com.mygdx.holowyth.map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -18,8 +15,6 @@ import space.earlygrey.shapedrawer.ShapeDrawer;
  */
 public class GameMapRenderer {
 
-	private static Logger logger = LoggerFactory.getLogger(GameMapRenderer.class);
-	
 	/**
 	 * Batch should be set to using the world camera.
 	 */

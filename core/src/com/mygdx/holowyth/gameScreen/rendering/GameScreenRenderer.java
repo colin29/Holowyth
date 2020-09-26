@@ -17,7 +17,6 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -178,7 +177,7 @@ public class GameScreenRenderer {
 
 	private void renderMapDebugVisualizationsIfKeysPressed() {
 		if (Gdx.input.isKeyPressed(showMapRegionsKey)) {
-			GameMapRenderer.renderMapRegions(game.fonts.debugFont(), map, shapeDrawer, batch);
+			GameMapRenderer.renderMapRegions(Holowyth.fonts.debugFont(), map, shapeDrawer, batch);
 		}
 		if (Gdx.input.isKeyPressed(showMapPathingGraphKey)) {
 			pathingModule.renderGraph(true);

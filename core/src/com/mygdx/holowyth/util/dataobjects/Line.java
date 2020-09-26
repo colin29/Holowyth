@@ -1,8 +1,5 @@
 package com.mygdx.holowyth.util.dataobjects;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
@@ -11,8 +8,6 @@ import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
  *
  */
 public class Line {
-
-	private static Logger logger = LoggerFactory.getLogger(Line.class);
 
 	public final Point p;
 	private final Vector2 v;

@@ -2,7 +2,6 @@ package com.mygdx.holowyth.gameScreen;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -189,8 +188,6 @@ public class Controls extends InputProcessorAdapter {
 		}
 		functionBindings.bindFunctionToKey(() -> orderSelectedUnitToUseSkillInSlot(10), Keys.NUM_0); // also bind the 0 key
 	}
-
-	private float clickX, clickY; // Current click in world coordinates
 
 	ActiveSkill curSkill = null;
 

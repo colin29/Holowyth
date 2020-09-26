@@ -1,10 +1,6 @@
 package com.mygdx.holowyth.map;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import com.mygdx.holowyth.map.maps.Forest1;
-import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**
  * Stores a bunch of 'template' maps. To use the maps you should copy construct a new instance to use.

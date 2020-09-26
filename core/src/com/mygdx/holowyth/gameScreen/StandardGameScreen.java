@@ -8,20 +8,14 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.gameScreen.combatDemo.prototyping.Equips;
 import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.map.trigger.Trigger;
-import com.mygdx.holowyth.map.trigger.TriggerEvent;
-import com.mygdx.holowyth.map.trigger.UnitEntersRegion;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.units.MonsterStats;
-import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.vn.VNController;
 
@@ -77,6 +71,7 @@ public class StandardGameScreen extends GameScreen {
 		}
 	}
 
+	@SuppressWarnings("unused")
 	private Unit spawnPlayerAtDefaultLocation() {
 		Point pos = map.getLocations().get("default_spawn_location").pos;
 		if (pos != null) {

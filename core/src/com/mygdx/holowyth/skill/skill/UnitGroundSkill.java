@@ -1,7 +1,6 @@
 package com.mygdx.holowyth.skill.skill;
 
 import com.mygdx.holowyth.skill.ActiveSkill;
-import com.mygdx.holowyth.skill.ActiveSkill.Targeting;
 import com.mygdx.holowyth.unit.Unit;
 
 public abstract class UnitGroundSkill extends ActiveSkill {

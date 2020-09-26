@@ -25,7 +25,6 @@ import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.unit.UnitStats;
 import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloAssert;
@@ -137,8 +136,6 @@ public class MapInstance implements MapInstanceInfo {
 
 			// Validate the motion by checking against other colliding bodies.
 
-			Unit debugUnit = Unit.getUnitByID(3);
-
 			if (thisUnit.getMotion().isBeingKnockedBack()) {
 				// knocked back units do not have voluntary motion, skip
 				HoloAssert.assertEquals(thisUnit.getMotion().getVx(), 0);
@@ -165,11 +162,7 @@ public class MapInstance implements MapInstanceInfo {
 
 			ArrayList<CBInfo> collisions = HoloPF.detectCollisionsFromUnitMoving(motion.x1, motion.y1, motion.x2, motion.y2,
 					colBodies, thisUnit.getRadius());
-			if (collisions.size() > 0) {
-				int x;
-				x = 3 + 4;
-			}
-
+			
 			if (collisions.isEmpty()) {
 				thisUnit.x += thisUnit.getMotion().getVx();
 				thisUnit.y += thisUnit.getMotion().getVy();

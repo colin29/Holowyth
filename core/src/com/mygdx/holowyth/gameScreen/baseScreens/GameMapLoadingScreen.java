@@ -14,7 +14,6 @@ import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.map.GameMap;
 import com.mygdx.holowyth.tiled.TiledMapLoader;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.exceptions.HoloException;
 import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;

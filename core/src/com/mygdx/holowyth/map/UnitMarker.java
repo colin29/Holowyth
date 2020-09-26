@@ -7,9 +7,7 @@ import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.UnitStatValues;
-import com.mygdx.holowyth.unit.sprite.AnimatedSprite;
 import com.mygdx.holowyth.util.dataobjects.Point;
-import com.mygdx.holowyth.util.exceptions.HoloException;
 
 /**
  * Is a POJO object that contain the information enough to spawn an appropriate unit.

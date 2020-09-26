@@ -1,7 +1,5 @@
 package com.mygdx.holowyth.gameScreen.ui;
 
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,8 +7,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.mygdx.holowyth.gameScreen.Controls;
-import com.mygdx.holowyth.gameScreen.Controls.UnitSelectionListener;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;

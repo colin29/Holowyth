@@ -150,12 +150,12 @@ public class PathSmoother {
 
 			float len = seg.getLength();
 			while (len > minSubDivision) {
-				segLengths.add(new Float(len));
+				segLengths.add(Float.valueOf(len));
 				len *= ratio;
 			}
 			float lenNext = next.getLength();
 			while (lenNext > minSubDivision) {
-				nextLengths.add(new Float(lenNext));
+				nextLengths.add(Float.valueOf(lenNext));
 				lenNext *= ratio;
 			}
 

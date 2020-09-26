@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -20,23 +19,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.ai.AIModule;
 import com.mygdx.holowyth.gameScreen.GameScreen;
-import com.mygdx.holowyth.gameScreen.basescreens.TiledMapLoadingScreen;
 import com.mygdx.holowyth.gameScreen.combatDemo.prototyping.CombatPrototyping;
-import com.mygdx.holowyth.gameScreen.rendering.GameScreenRenderer;
-import com.mygdx.holowyth.gameScreen.ui.GameScreenUI;
-import com.mygdx.holowyth.gameScreen.ui.GameLogDisplay;
-import com.mygdx.holowyth.graphics.HoloGL;
-import com.mygdx.holowyth.graphics.effects.EffectsHandler;
-import com.mygdx.holowyth.pathfinding.PathingModule;
-import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.unit.sprite.Animations;
-import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloUI;
-import com.mygdx.holowyth.util.tools.FunctionBindings;
-import com.mygdx.holowyth.util.tools.Timer;
-import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
 /**
  * The main class that runs the game.
