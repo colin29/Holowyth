@@ -10,6 +10,7 @@ import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
  * Handles the unit's attacking and retreating logic
+ * Map life-time
  * @author Colin
  *
  */
@@ -86,7 +87,6 @@ class UnitCombat {
 		retreatDurationRemaining = retreatDuration;
 		if (self.getMotion().pathFindTowardsPoint(x, y)) {
 			stopAttacking();
-			self.clearOrder();
 			self.orders.setOrder(Order.RETREAT);
 			self.stats.removeAllBasicAttackSlows();
 

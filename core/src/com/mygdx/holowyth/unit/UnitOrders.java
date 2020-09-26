@@ -309,6 +309,10 @@ public class UnitOrders {
 
 	// @formatter:on
 
+	public boolean isBusyRetreating() {
+		return order == Order.RETREAT && self.combat.getRetreatDurationRemaining() > 0;
+	}
+
 	/**
 	 * Clears any current order on this unit. For internal use.
 	 */
@@ -359,7 +363,7 @@ public class UnitOrders {
 	}
 
 	private void startAttackingIfInRangeForAttackOrders() {
-		if (order.isAttackUnit() && (order.isAttackUnit() || isAttackMoveAndHasTarget())) {
+		if (!self.isAttacking() && (order.isAttackUnit() || isAttackMoveAndHasTarget())) {
 			float distToTarget = Point.calcDistance(self.getPos(), orderTarget.getPos());
 			if (distToTarget <= getEngageRange(orderTarget)) {
 				self.combat.startAttacking(orderTarget);
@@ -367,7 +371,7 @@ public class UnitOrders {
 		}
 	}
 
-	void stopAttackingIfEnemyIsOutOfRange() {
+	private void stopAttackingIfEnemyIsOutOfRange() {
 		if (self.isAttacking()) {
 			float distToEnemy = Point.calcDistance(self.getPos(), self.getAttacking().getPos());
 			if (distToEnemy >= getDisengageRange(self.getAttacking())) {
@@ -452,10 +456,6 @@ public class UnitOrders {
 		}
 	}
 	
-	public boolean isBusyRetreating() {
-		return order == Order.RETREAT && self.combat.getRetreatDurationRemaining() > 0;
-	}
-
 	Order getOrder() {
 		return order;
 	}
@@ -464,7 +464,13 @@ public class UnitOrders {
 		return orderTarget;
 	}
 
+	/**
+	 * Clears the previous order first, if existed.
+	 */
 	void setOrder(Order order) {
+		if(order!=null) {
+			clearOrder();
+		}
 		this.order = order;
 	}
 

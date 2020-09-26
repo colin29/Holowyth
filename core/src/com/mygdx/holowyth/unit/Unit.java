@@ -1,8 +1,6 @@
 package com.mygdx.holowyth.unit;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,7 +11,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.ai.UnitAI;
 import com.mygdx.holowyth.gameScreen.MapInstance;
 import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
-import com.mygdx.holowyth.gameScreen.basescreens.GameMapLoadingScreen;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.pathfinding.Path;
@@ -27,7 +24,6 @@ import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.unit.sprite.UnitGraphics;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
-import com.mygdx.holowyth.util.exceptions.HoloException;
 
 /**
  * Responsibilities:<br>
@@ -73,16 +69,13 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public final UnitEquip equip;
 	public final UnitAI ai;
 
-	// Collision Detection
-	private float radius = Holo.UNIT_RADIUS;
-
 	// Id (for debug)
 	private static int curId = 0;
 	private final int id;
 
-	// State
-	/** A unit's friendly/foe type. */
+	// Fields
 	Side side;
+	private float radius = Holo.UNIT_RADIUS;
 
 	/////////////// World specific state /////////////
 
@@ -91,13 +84,10 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	UnitCombat combat;
 	UnitOrders orders;
 
-	// General
-	public float x, y;
 	private MapInstanceInfo mapInstance;
-
-	// Ordering
+	public float x, y;
 	
-
+	
 	// Skills
 	/**
 	 * The skill the character is actively casting or channelling, else null. The Skill class will reset
@@ -239,18 +229,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	@Override
 	public boolean orderAttackUnit(UnitOrderable unitOrd, boolean isHardOrder) {
 		return orders.orderAttackUnit(unitOrd, isHardOrder);
-	}
-
-	/**
-	 * 
-	 * @param unitOrd
-	 * @param isHardOrder
-	 * @param isATauntedOrder Whether this order is a special internal order that should ignore taunt
-	 *                        restriction
-	 * @return
-	 */
-	private boolean orderAttackUnit(UnitOrderable unitOrd, boolean isHardOrder, boolean isATauntedOrder) {
-		return orders.orderAttackUnit(unitOrd, isHardOrder, isATauntedOrder);
 	}
 
 	@Override
