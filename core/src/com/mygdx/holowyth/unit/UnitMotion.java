@@ -446,7 +446,7 @@ public class UnitMotion {
 
 		stopCurrentMovement();
 		self.clearOrder();
-		self.stopAttacking();
+		self.combat.stopAttacking();
 		self.interruptHard();
 
 	}

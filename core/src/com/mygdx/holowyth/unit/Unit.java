@@ -82,33 +82,21 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	// Map life-time Components (are discarded when a unit moves to a new map)
 	private UnitMotion motion;
+	UnitCombat combat;
+	private UnitOrders orders;
 
 	// General
 	public float x, y;
 	private MapInstanceInfo mapInstance;
 
 	// Ordering
-	UnitOrderDeferring orderDeferring;
+	UnitOrderDeferring ordersDeferring;
 
 	Order order = Order.NONE;
 	/** Target for the current command */
 	Unit orderTarget;
 	float attackMoveDestX;
 	float attackMoveDestY;
-
-	// Attacking
-	/** The unit this unit is attacking. Attacking a unit <--> being engaged. */
-	private Unit attacking;
-
-	private float attackCooldown = 60;
-	private float attackCooldownRemaining = 0;
-
-	/** Time in frames. When a unit engages it cannot retreat for a certain amount of time. */
-	private float retreatCooldown = 0;
-	private float retreatCooldownRemaining = 0;
-
-	private float attackOfOpportunityCooldown = 120;
-	private float attackOfOpportunityCooldownRemaining = 0;
 
 	// Skills
 	/**
@@ -170,14 +158,21 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		this.side = side;
 		this.mapInstance = world;
 
-		motion = new UnitMotion(this, world);
+		// Init unit lifetime components before map-lifetime components, just so that the latter can acquire reference in constructor.
 		stats = new UnitStats(this);
 		skills = new UnitSkills(this);
 		equip = new UnitEquip(this);
-		orderDeferring = new UnitOrderDeferring(this);
 		ai = new UnitAI(this);
-
 		graphics = new UnitGraphics(this);
+		
+		// Init map lifetime components
+		motion = new UnitMotion(this, world);
+		combat = new UnitCombat(this);
+		orders =  new UnitOrders(this);
+		ordersDeferring = new UnitOrderDeferring(this);
+		
+
+		
 	}
 
 	/**
@@ -200,7 +195,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public void reinitializeForWorld(MapInstance world) {
 		this.mapInstance = world;
 		motion = new UnitMotion(this, world);
-		orderDeferring = new UnitOrderDeferring(this);
+		ordersDeferring = new UnitOrderDeferring(this);
 		
 		stats.reinitializeForWorld();
 	}
@@ -215,7 +210,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		clearMapLifeTimeComponents();
 		clearGeneralData();
 		clearOrderingData();
-		clearAttackingData();
 		clearSkillsData();
 	}
 	private void notifyAppLifetimeComponentsToClearMapLifeTimeData() {
@@ -228,7 +222,9 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	private void clearMapLifeTimeComponents() {
 		motion = null;
-		orderDeferring = null;
+		combat = null;
+		orders = null;
+		ordersDeferring = null;
 	}
 	
 	private void clearGeneralData() {
@@ -243,12 +239,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		attackMoveDestX = 0; 
 		attackMoveDestY = 0;
 	}
-	private void clearAttackingData() {
-		attacking = null;
-		attackCooldownRemaining = 0;
-		retreatCooldownRemaining = 0;
-		attackOfOpportunityCooldownRemaining = 0;
-	}
+
 	private void clearSkillsData() {
 		activeSkill = null;
 		skillCooldownRemaining = 0;
@@ -258,7 +249,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public void orderMove(float x, float y) {
 		if (!isMoveOrderAllowed()) {
 			if (stats.isStunned()) {
-				orderDeferring.tryToDeferOrder(Order.MOVE, null, x, y);
+				ordersDeferring.tryToDeferOrder(Order.MOVE, null, x, y);
 			}
 			return;
 		}
@@ -306,7 +297,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		}
 		if (isATauntedOrder ? isAnyOrderAllowedIgnoringTaunt() : isAttackOrderAllowed(unit)) {
 			if (stats.isStunned()) {
-				orderDeferring.tryToDeferOrder(isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT,
+				ordersDeferring.tryToDeferOrder(isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT,
 						(Unit) unitOrd, 0, 0);
 			}
 			if (isAttacking())
@@ -335,7 +326,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	private boolean orderAttackUnitWhileAlreadyAttacking(UnitOrderable unitOrd, boolean isHardOrder) {
 		Unit target = (Unit) unitOrd;
 
-		if (attacking == null) {
+		if (combat.getAttacking() == null) {
 			logger.warn("order orderAttackUnitWhileAlreadyAttacking called but unit is not attacking");
 			return false;
 		}
@@ -349,7 +340,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 			clearOrder();
 			order = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
 			orderTarget = target;
-			attacking = target;
+			combat.setAttacking(target);
 			return true;
 		}
 		return false;
@@ -366,7 +357,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 				this.order = Order.ATTACKMOVE;
 			}
 		} else if (stats.isStunned()) {
-			orderDeferring.tryToDeferOrder(Order.ATTACKMOVE, null, x, y);
+			ordersDeferring.tryToDeferOrder(Order.ATTACKMOVE, null, x, y);
 		}
 
 	}
@@ -374,33 +365,16 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	@Override
 	public void orderRetreat(float x, float y) {
 		if (isRetreatOrderAllowed()) {
-			retreat(x, y);
+			combat.retreat(x, y);
 		} else if (stats.isStunned()) {
-			orderDeferring.tryToDeferOrder(Order.RETREAT, null, x, y);
+			ordersDeferring.tryToDeferOrder(Order.RETREAT, null, x, y);
 		}
 	}
 
-	private void retreat(float x, float y) {
-		retreatDurationRemaining = retreatDuration;
-		if (getMotion().pathFindTowardsPoint(x, y)) {
-			stopAttacking();
-			clearOrder();
-			this.order = Order.RETREAT;
-			stats.removeAllBasicAttackSlows();
 
-			var attackers = getUnitsAttackingThis();
-			for (Unit attacker : attackers) {
-				attacker.stats.attackOfOpportunity(this.stats);
-				attacker.attackOfOpportunityCooldownRemaining = attacker.attackOfOpportunityCooldown;
-			}
-		}
-	}
 
-	static final int retreatDuration = 50;
-	/**
-	 * For a short time when a unit starts retreating they can't be given any other commands
-	 */
-	int retreatDurationRemaining;
+	
+	
 
 	/**
 	 * A stop order stops a unit's motion and current order. You cannot use stop to cancel your own
@@ -410,7 +384,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public void orderStop() {
 		if (!isStopOrderAllowed()) {
 			if (stats.isStunned())
-				orderDeferring.clearDeferredOrder();
+				ordersDeferring.clearDeferredOrder();
 			return;
 		}
 		stopUnit();
@@ -423,7 +397,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public void orderUseSkill(ActiveSkill skill) {
 
 		if (stats.isStunned()) {
-			orderDeferring.clearDeferredOrder(); // deferring a skill order is not supported but it will still clear an
+			ordersDeferring.clearDeferredOrder(); // deferring a skill order is not supported but it will still clear an
 													// existing deferred order
 		}
 
@@ -471,7 +445,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public boolean isRetreatOrderAllowed() {
-		return isAnyOrderAllowed() && isAttacking() && this.order != Order.RETREAT && retreatCooldownRemaining <= 0
+		return isAnyOrderAllowed() && isAttacking() && this.order != Order.RETREAT && combat.getRetreatCooldownRemaining() <= 0
 				&& !(isCasting() || isChannelling());
 	}
 
@@ -567,15 +541,13 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 		tickOrderLogic();
 
-		if (order == Order.RETREAT)
-			retreatDurationRemaining -= 1;
+		
 
 		if (activeSkill != null)
 			activeSkill.tick();
 
 		tickSkillCooldowns();
-		tickRetreatCooldown();
-		tickAttackOfOpportunityCooldown();
+		
 	}
 
 	private void tickSkillCooldowns() {
@@ -586,21 +558,11 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		skills.tickSkillCooldowns();
 	}
 
-	private void tickRetreatCooldown() {
-		if (retreatCooldownRemaining > 0) {
-			retreatCooldownRemaining -= 1;
-		}
-	}
 
-	private void tickAttackOfOpportunityCooldown() {
-		if (attackOfOpportunityCooldownRemaining > 0) {
-			attackOfOpportunityCooldownRemaining -= 1;
-		}
-	}
 
 	@Override
-	public float getRetreatCooldown() {
-		return retreatCooldownRemaining;
+	public float getRetreatCooldownRemaining() {
+		return combat.getRetreatCooldownRemaining();
 	}
 
 	public boolean areSkillsOnCooldown() {
@@ -648,6 +610,11 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		stopAttackingIfEnemyIsOutOfRange();
 	}
 
+	
+	/**
+	 *  Probably will be used later by ai or player
+	 */
+	@SuppressWarnings("unused")
 	private void ifIdleAggroOntoNearbyTargets() {
 		if (isCompletelyIdle()) {
 			var closestTargets = UnitUtil.getTargetsSortedByDistance(this, mapInstance);
@@ -686,25 +653,26 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		if (!isAttacking() && (order.isAttackUnit() || isAttackMoveAndHasTarget())) {
 			float distToTarget = Point.calcDistance(this.getPos(), orderTarget.getPos());
 			if (distToTarget <= getEngageRange(orderTarget)) {
-				startAttacking(orderTarget);
+				combat.startAttacking(orderTarget);
 			}
 		}
 	}
-
-	private void stopAttackingIfEnemyIsOutOfRange() {
+	void stopAttackingIfEnemyIsOutOfRange() {
 		if (isAttacking()) {
-			float distToEnemy = Point.calcDistance(this.getPos(), attacking.getPos());
-			if (distToEnemy >= getDisengageRange(attacking)) {
-				stopAttacking();
+			float distToEnemy = Point.calcDistance(this.getPos(), combat.getAttacking().getPos());
+			if (distToEnemy >= getDisengageRange(combat.getAttacking())) {
+				combat.stopAttacking();
 			}
 		}
 	}
 
-	private float getEngageRange(Unit unit) {
+	
+
+	float getEngageRange(Unit unit) {
 		return this.radius + unit.radius + Holo.defaultUnitEngageRange;
 	}
 
-	private float getDisengageRange(Unit unit) {
+	float getDisengageRange(Unit unit) {
 		return this.radius + unit.radius + Holo.defaultUnitDisengageRange;
 	}
 
@@ -776,88 +744,12 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		}
 	}
 
-	/**
-	 * Updates attacking units
-	 */
 	public void tickAttacking() {
-		if (isDead())
-			return;
-
-		if (!isCastingOrChanneling()) {
-			attackCooldownRemaining = Math.max(0, attackCooldownRemaining - 1); // cooldown ticks even when unit not
-																				// attacking
-		}
-
-		if (isAttacking()) {
-			if (attacking.stats.isDead()) {
-				stopAttacking();
-				return;
-			}
-			if (attackCooldownRemaining <= 0) {
-				this.attack(attacking);
-
-				// Units automatically retaliate if they are idle
-				if (attacking.getOrder() == Order.NONE && !attacking.isAttacking()
-						&& attacking.isAttackOrderAllowed()) {
-					attacking.orderAttackUnit(this, false);
-				}
-				attackCooldownRemaining = attackCooldown / stats.getMultiTeamingAtkspdPenalty(attacking);
-			}
-		}
+		combat.tick();
 	}
+	
 
-	private void attack(Unit enemy) {
-		this.stats.attack(enemy.stats);
-	}
 
-	/**
-	 * Lowest level method for attacking. Fine to call while attacking, though will warn you if you are
-	 * already attacking the same target.
-	 */
-	private void startAttacking(Unit target) {
-		if (isAttacking(target)) {
-			logger.warn("Unit is already attacking the target");
-			return;
-		}
-		if (isAttacking()) {
-			stopAttacking();
-		}
-
-		getMotion().stopCurrentMovement();
-		attacking = target;
-		((MapInstance) mapInstance).onUnitStartsAttacking(this, attacking);
-
-		// Attack cooldown may be artificially higher because of a recent stun/reel
-		attackCooldownRemaining = Math.max(attackCooldownRemaining, attackCooldown / 4);
-		retreatCooldownRemaining = retreatCooldown;
-	}
-
-	/**
-	 * Disengages a unit.
-	 */
-	void stopAttacking() {
-		if (isAttacking()) {
-			((MapInstance) mapInstance).onUnitStopsAttacking(this, attacking);
-			attacking = null;
-		}
-	}
-
-	void addAttackCooldownRemaining(float value) {
-		attackCooldownRemaining += value;
-	}
-
-	/**
-	 * Only use for special cases, like a taunt ability. Uses startAttacking().
-	 */
-	public void setAttacking(Unit unit) {
-		float distToEnemy = Point.calcDistance(getPos(), unit.getPos());
-		if (distToEnemy >= getDisengageRange(unit)) {
-			logger.info("Tried to set attacking, but unit out of range");
-			return;
-		}
-		if (attacking != unit)
-			startAttacking(unit);
-	}
 
 	// Debug
 	private static int getNextId() {
@@ -867,7 +759,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	// Debug Rendering
 	public void renderAttackingArrow() {
 		if (isAttacking()) {
-			HoloGL.renderArrow(this, attacking, Color.RED);
+			HoloGL.renderArrow(this, getAttacking(), Color.RED);
 		}
 	}
 
@@ -876,8 +768,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		this.clearOrder();
 
 		// Stop this (now-dead) unit from attacking
-		if (isAttacking()) {
-			stopAttacking();
+		if (combat.isAttacking()) {
+			combat.stopAttacking();
 		}
 		// Don't actually remove the unit here -- world will handle that
 	}
@@ -947,17 +839,17 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public boolean isAttacking() {
-		return attacking != null;
+		return combat.isAttacking();
 	}
 
 	@Override
 	public boolean isAttacking(UnitInfo target) {
-		return attacking == target;
+		return combat.isAttacking(target);
 	}
 
 	@Override
 	public Unit getAttacking() {
-		return attacking;
+		return combat.getAttacking();
 	}
 
 	public boolean isCasting() {
@@ -970,7 +862,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public boolean isBusyRetreating() {
-		return order == Order.RETREAT && retreatDurationRemaining > 0;
+		return order == Order.RETREAT && combat.getRetreatDurationRemaining() > 0;
 	}
 
 	@Override
@@ -1049,12 +941,12 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public float getAttackCooldown() {
-		return attackCooldown;
+		return combat.getAttackCooldown();
 	}
 
 	@Override
 	public float getAttackCooldownRemaining() {
-		return attackCooldownRemaining;
+		return combat.getAttackCooldownRemaining();
 	}
 
 	public void setName(String name) {
@@ -1074,6 +966,13 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	@Override
 	public boolean isEnemy(UnitInfo unit) {
 		return getSide() != unit.getSide();
+	}
+
+	/**
+	 * Only use for special cases, like a taunt ability. Uses startAttacking().
+	 */
+	public void setAttacking(Unit unit) {
+		combat.setAttacking(unit);
 	}
 
 }

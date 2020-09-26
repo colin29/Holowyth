@@ -47,7 +47,7 @@ public interface UnitInfo {
 
 	public int getID();
 
-	float getRetreatCooldown();
+	float getRetreatCooldownRemaining();
 
 	boolean isDead();
 

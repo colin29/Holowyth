@@ -478,11 +478,11 @@ public class Controls extends InputProcessorAdapter {
 	private void handleRetreatCommand(float x, float y) {
 		clearContext();
 		for (UnitOrderable u : selectedUnits) {
-			if (u.getRetreatCooldown() > 0) { // specifically catch this condition and notify the user
+			if (u.getRetreatCooldownRemaining() > 0) { // specifically catch this condition and notify the user
 				logger.info("Unit {} can't retreat for another {} seconds", u.getStats().getName(),
-						DataUtil.round(u.getRetreatCooldown() / 60, 1));
+						DataUtil.round(u.getRetreatCooldownRemaining() / 60, 1));
 				gameLog.addErrorMessage(String.format("Unit \"%s\" can't retreat for another %s seconds", u.getStats().getName(),
-						DataUtil.round(u.getRetreatCooldown() / 60, 1)));
+						DataUtil.round(u.getRetreatCooldownRemaining() / 60, 1)));
 			} else {
 				u.orderRetreat(x, y);
 			}

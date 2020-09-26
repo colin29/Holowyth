@@ -81,10 +81,10 @@ public class MapInstance implements MapInstanceInfo {
 
 	/** Evaluates one frame of the game world */
 	public void tick() {
-		tickLogicForUnits();
+		tickUnitsLogic();
 		moveNormallyMovingUnits();
 		moveKnockedBackedUnitsAndResolveCollisions();
-		tickAttacking();
+		tickUnitsAttacking();
 
 		tickEffects();
 
@@ -456,13 +456,13 @@ public class MapInstance implements MapInstanceInfo {
 		}
 	}
 
-	private void tickLogicForUnits() {
+	private void tickUnitsLogic() {
 		for (Unit u : units.getUnits()) {
 			u.tickLogic();
 		}
 	}
 
-	private void tickAttacking() {
+	private void tickUnitsAttacking() {
 		for (Unit u : units.getUnits()) {
 			u.tickAttacking();
 		}
