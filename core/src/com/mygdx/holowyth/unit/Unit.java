@@ -7,11 +7,9 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.ai.UnitAI;
 import com.mygdx.holowyth.gameScreen.MapInstance;
 import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
-import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitPF;
@@ -211,8 +209,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * @param unit
-	 * @return Whether the command was valid and accepted
+	 * @see UnitOrders#orderAttackUnit(UnitOrderable)
 	 */
 	@Override
 	public boolean orderAttackUnit(UnitOrderable unitOrd) {
@@ -220,11 +217,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * 
-	 * @param unitOrd
-	 * @param isHardOrder A hard attack order makes the unit chase forever, whereas with a soft order
-	 *                    the unit will stop chasing if out of range
-	 * @return
+	 * @see UnitOrders#orderAttackUnit(UnitOrderable, boolean)
 	 */
 	@Override
 	public boolean orderAttackUnit(UnitOrderable unitOrd, boolean isHardOrder) {
@@ -242,8 +235,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * A stop order stops a unit's motion and current order. You cannot use stop to cancel your own
-	 * casting atm.
+	 * @see UnitOrders#orderStop()
 	 */
 	@Override
 	public void orderStop() {
@@ -256,13 +248,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	@Override
 	public void orderUseSkill(ActiveSkill skill) {
 		orders.orderUseSkill(skill);
-	}
-
-	/**
-	 * @see UnitOrders#stopUnit()
-	 */
-	public void stopUnit() {
-		orders.stopUnit();
 	}
 
 	// @formatter:off
@@ -328,11 +313,167 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	// @formatter:on
 
+	@Override
+	public boolean isBusyRetreating() {
+		return orders.isBusyRetreating();
+	}
+
 	/**
-	 * Clears any current order on this unit. For internal use.
+	 * Not doing any action nor has any order assigned
 	 */
-	void clearOrder() {
-		orders.clearOrder();
+	@Override
+	public boolean isCompletelyIdle() {
+		return orders.getOrder() == Order.NONE && !isAttacking() && !isCastingOrChanneling();
+	}
+
+	@Override
+	public Order getOrder() {
+		return orders.getOrder();
+	}
+
+	@Override
+	public Unit getOrderTarget() {
+		return orders.getOrderTarget();
+	}
+
+	@Override
+	public float getRetreatCooldownRemaining() {
+		return combat.getRetreatCooldownRemaining();
+	}
+
+	@Override
+	public boolean isAttacking() {
+		return combat.isAttacking();
+	}
+
+	@Override
+	public boolean isAttacking(UnitInfo target) {
+		return combat.isAttacking(target);
+	}
+
+	@Override
+	public Unit getAttacking() {
+		return combat.getAttacking();
+	}
+
+	@Override
+	public float getAttackCooldown() {
+		return combat.getAttackCooldown();
+	}
+
+	@Override
+	public float getAttackCooldownRemaining() {
+		return combat.getAttackCooldownRemaining();
+	}
+
+	@Override
+	public ActiveSkill getActiveSkill() {
+		return activeSkill;
+	}
+
+	@Override
+	public boolean isCastingOrChanneling() {
+		if (getActiveSkill() == null)
+			return false;
+		return (getActiveSkill().getStatus() == Status.CASTING || getActiveSkill().getStatus() == Status.CHANNELING);
+	}
+
+	@Override
+	public Path getPath() {
+		return motion.getPath();
+	}
+
+	@Override
+	public float getRadius() {
+		return radius;
+	}
+
+	@Override
+	public Side getSide() {
+		return side;
+	}
+
+	@Override
+	public String getName() {
+		return stats.getName();
+	}
+
+	@Override
+	public boolean isAPlayerCharacter() {
+		return side == Side.PLAYER;
+	}
+
+	@Override
+	public boolean isEnemy(UnitInfo unit) {
+		return getSide() != unit.getSide();
+	}
+
+	@Override
+	public Point getPos() {
+		return new Point(this.x, this.y);
+	}
+
+	@Override
+	public float getX() {
+		return x;
+	}
+
+	@Override
+	public float getY() {
+		return y;
+	}
+
+	@Override
+	public int getID() {
+		return id;
+	}
+
+	@Override
+	public boolean isDead() {
+		return stats.isDead();
+	}
+
+	@Override
+	public UnitStatsInfo getStats() {
+		return stats;
+	}
+
+	@Override
+	public UnitSkills getSkills() {
+		return skills;
+	}
+
+	@Override
+	public UnitAI getAI() {
+		return ai;
+	}
+
+	@Override
+	public UnitMotion getMotion() {
+		return motion;
+	}
+
+	@Override
+	public MapInstanceInfo getMapInstance() {
+		return mapInstance;
+	}
+
+	/**
+	 * @see UnitOrders#stopUnit()
+	 */
+	public void stopUnit() {
+		orders.stopUnit();
+	}
+
+	
+
+	// Tick Logic
+	
+	/**
+	 * Only use for special cases, like a taunt ability. Uses startAttacking().
+	 */
+	public void setAttacking(Unit unit) {
+		combat.setAttacking(unit);
 	}
 
 	/**
@@ -362,159 +503,12 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		}
 	}
 
-	// Tick Logic
-
-	/**
-	 * Main function: Determine movement, tick status effects, tick basic cooldowns
-	 * 
-	 */
-	public void tickLogic() {
-		if (isDead())
-			return;
-
-		ai.tick();
-
-		getMotion().tick();
-		stats.tick();
-
-		orders.tick();
-
-		
-
-		if (activeSkill != null)
-			activeSkill.tick();
-
-		tickSkillCooldowns();
-		
+	public void setActiveSkill(ActiveSkill activeSkill) {
+		this.activeSkill = activeSkill;
 	}
 
-	private void tickSkillCooldowns() {
-		if (skillCooldownRemaining > 0) {
-			skillCooldownRemaining -= 1;
-		}
-		// tick individual skill Cooldowns too
-		skills.tickSkillCooldowns();
-	}
-
-
-
-	@Override
-	public float getRetreatCooldownRemaining() {
-		return combat.getRetreatCooldownRemaining();
-	}
-
-	public boolean areSkillsOnCooldown() {
-		return (skillCooldownRemaining > 0);
-	}
-
-
-
-	public void tickAttacking() {
-		combat.tick();
-	}
-	
-
-
-
-	// Debug
-	private static int getNextId() {
-		return curId++;
-	}
-
-	// Debug Rendering
-	public void renderAttackingArrow() {
-		if (isAttacking()) {
-			HoloGL.renderArrow(this, getAttacking(), Color.RED);
-		}
-	}
-
-	void unitDies() {
-		getMotion().stopCurrentMovement();
-		this.clearOrder();
-
-		// Stop this (now-dead) unit from attacking
-		if (combat.isAttacking()) {
-			combat.stopAttacking();
-		}
-		// Don't actually remove the unit here -- world will handle that
-	}
-
-	// For now we allow multiple player characters
-	@Override
-	public boolean isAPlayerCharacter() {
-		return side == Side.PLAYER;
-	}
-
-	@Override
-	public String toString() {
-		return String.format("Unit[ID: %s]", this.id);
-
-	}
-
-	// Convenience functions
-	public static float getDist(Unit u1, Unit u2) {
-		return Point.calcDistance(u1.getPos(), u2.getPos());
-	}
-
-	// Getters
-	@Override
-	public float getRadius() {
-		return radius;
-	}
-
-	@Override
-	public Point getPos() {
-		return new Point(this.x, this.y);
-	}
-
-	@Override
-	public float getX() {
-		return x;
-	}
-
-	@Override
-	public float getY() {
-		return y;
-	}
-
-	@Override
-	public Path getPath() {
-		return getMotion().getPath();
-	}
-
-	@Override
-	public Side getSide() {
-		return side;
-	}
-
-	@Override
-	public UnitStatsInfo getStats() {
-		return stats;
-	}
-
-	@Override
-	public Order getOrder() {
-		return orders.getOrder();
-	}
-
-	@Override
-	public Unit getOrderTarget() {
-		return orders.getOrderTarget();
-	}
-
-	@Override
-	public boolean isAttacking() {
-		return combat.isAttacking();
-	}
-
-	@Override
-	public boolean isAttacking(UnitInfo target) {
-		return combat.isAttacking(target);
-	}
-
-	@Override
-	public Unit getAttacking() {
-		return combat.getAttacking();
+	public void setName(String name) {
+		this.stats.setName(name);
 	}
 
 	public boolean isCasting() {
@@ -525,15 +519,15 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		return this.activeSkill != null && activeSkill.getStatus() == Status.CHANNELING;
 	}
 
-	@Override
-	public boolean isBusyRetreating() {
-		return orders.isBusyRetreating();
+	public boolean areSkillsOnCooldown() {
+		return (skillCooldownRemaining > 0);
 	}
 
-	@Override
-	public MapInstanceInfo getMapInstance() {
-		return mapInstance;
-	}
+	
+
+	
+
+	// Tick Logic
 
 	/**
 	 * Some classes only get a reference to WorldInfo because they are not intended to modify the world.
@@ -545,99 +539,87 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		return (MapInstance) mapInstance;
 	}
 
-	public Set<Unit> getUnitsAttackingThis() {
+	/**
+	 * Clears any current order on this unit. For internal use.
+	 */
+	void clearOrder() {
+		orders.clearOrder();
+	}
+
+	// Tick Logic
+	
+	void unitDies() {
+		motion.stopCurrentMovement();
+		this.clearOrder();
+	
+		// Stop this (now-dead) unit from attacking
+		if (combat.isAttacking()) {
+			combat.stopAttacking();
+		}
+		// Don't actually remove the unit here -- world will handle that
+	}
+
+	Set<Unit> getUnitsAttackingThis() {
 		return mapInstance.getUnitsAttackingThis(this);
 	}
 
+	// Tick Logic
+	
+	/**
+	 * Main function: Determine movement, tick status effects, tick basic cooldowns
+	 * 
+	 */
+	public void tick() {
+		if (isDead())
+			return;
+	
+		ai.tick();
+	
+		motion.tick();
+		stats.tick();
+	
+		orders.tick();
+	
+		if (activeSkill != null)
+			activeSkill.tick();
+	
+		tickSkillCooldowns();
+	}
+	/**
+	 * Called at a different timing than {@link unit#tick()}
+	 */
+	public void tickAttacking() {
+		combat.tick();
+	}
+
+	private void tickSkillCooldowns() {
+		if (skillCooldownRemaining > 0) {
+			skillCooldownRemaining -= 1;
+		}
+		// tick individual skill Cooldowns too
+		skills.tickSkillCooldowns();
+	}
+
 	@Override
-	public ActiveSkill getActiveSkill() {
-		return activeSkill;
+	public String toString() {
+		return String.format("Unit[ID: %s]", this.id);
+	
 	}
 
-	public void setActiveSkill(ActiveSkill activeSkill) {
-		this.activeSkill = activeSkill;
-	}
-
-	public void setSkillCooldown(float value) {
-		skillCooldownRemaining = value;
-	}
-
-	@Override
-	public int getID() {
-		return id;
+	////////// Debug Methods  ////////
+	private static int getNextId() {
+		return curId++;
 	}
 
 	/**
-	 * For debug purposes. Gets any created unit, regardless of whether is it in the world.
+	 * For debug purposes. Gets any created unit, regardless of whether is it a {@link MapInstance}
 	 */
 	public static Unit getUnitByID(int id) {
 		return idToUnit.get(id);
 	}
 
-	@Override
-	public boolean isCastingOrChanneling() {
-		if (getActiveSkill() == null)
-			return false;
-		return (getActiveSkill().getStatus() == Status.CASTING || getActiveSkill().getStatus() == Status.CHANNELING);
-	}
-
-	/**
-	 * Not doing any action nor has any order assigned
-	 */
-	@Override
-	public boolean isCompletelyIdle() {
-		return orders.getOrder() == Order.NONE && !isAttacking() && !isCastingOrChanneling();
-	}
-
-	@Override
-	public UnitMotion getMotion() {
-		return motion;
-	}
-
-	@Override
-	public boolean isDead() {
-		return stats.isDead();
-	}
-
-	@Override
-	public UnitSkills getSkills() {
-		return skills;
-	}
-
-	@Override
-	public float getAttackCooldown() {
-		return combat.getAttackCooldown();
-	}
-
-	@Override
-	public float getAttackCooldownRemaining() {
-		return combat.getAttackCooldownRemaining();
-	}
-
-	public void setName(String name) {
-		this.stats.setName(name);
-	}
-
-	@Override
-	public String getName() {
-		return stats.getName();
-	}
-
-	@Override
-	public UnitAI getAI() {
-		return ai;
-	}
-
-	@Override
-	public boolean isEnemy(UnitInfo unit) {
-		return getSide() != unit.getSide();
-	}
-
-	/**
-	 * Only use for special cases, like a taunt ability. Uses startAttacking().
-	 */
-	public void setAttacking(Unit unit) {
-		combat.setAttacking(unit);
+	public static float getDist(Unit u1, Unit u2) {
+		return Point.calcDistance(u1.getPos(), u2.getPos());
 	}
 
 }

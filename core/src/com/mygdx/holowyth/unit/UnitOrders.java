@@ -52,7 +52,7 @@ public class UnitOrders {
 	UnitOrders(Unit self) {
 		this.self = self;
 		stats = self.stats;
-		deffering = new UnitOrdersDeferring(self);
+		deffering = new UnitOrdersDeferring(self, this);
 	}
 
 	/** Handles the complex logic revolving around switching orders and targets */

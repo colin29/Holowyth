@@ -458,7 +458,7 @@ public class MapInstance implements MapInstanceInfo {
 
 	private void tickUnitsLogic() {
 		for (Unit u : units.getUnits()) {
-			u.tickLogic();
+			u.tick();
 		}
 	}
 

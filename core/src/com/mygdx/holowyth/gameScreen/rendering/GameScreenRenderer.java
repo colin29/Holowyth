@@ -70,30 +70,28 @@ public class GameScreenRenderer {
 	private PathfindingRenderer pathfinding;
 	private UnitMotionRenderer unitMotion;
 	private TiledMapRenderer tiled;
-	
+
 	// Screen lifetime components
 	private Stage stage;
 	private PathingModule pathingModule;
-	
+
 	// Map
 	private GameMap map;
-	
+
 	// Map Info
 	private int mapWidth;
 	private int mapHeight;
-	
+
 	// Map lifetime components
 	private MapInstanceInfo mapInstance;
 	private Controls controls;
 	private EffectsHandler gfx;
-	
 
 	// Graphics options
 	private Color clearColor = Color.BLACK;
 
 	private final int showMapPathingGraphKey = Keys.M;
 	private final int showMapRegionsKey = Keys.N;
-
 
 	/**
 	 * The game, worldCamera, and other screen-lifetime modules are passed in.
@@ -198,7 +196,9 @@ public class GameScreenRenderer {
 
 	private void renderUnitAttackingArrows() {
 		for (Unit u : mapInstance.getUnits()) {
-			u.renderAttackingArrow();
+			if (u.isAttacking()) {
+				HoloGL.renderArrow(u, u.getAttacking(), Color.RED);
+			}
 		}
 	}
 
@@ -520,7 +520,7 @@ public class GameScreenRenderer {
 		this.mapHeight = mapHeight;
 		tiled.setMap(map.getTilemap());
 	}
-	
+
 	public void setMapLifeTimeComponentsRefs(MapInstanceInfo world, Controls controls, EffectsHandler gfx) {
 		this.mapInstance = world;
 		this.controls = controls;
@@ -540,10 +540,10 @@ public class GameScreenRenderer {
 
 	public void onMapClose() {
 		map = null;
-		
+
 		mapWidth = 0;
 		mapHeight = 0;
-		
+
 		mapInstance = null;
 		controls = null;
 		gfx = null;

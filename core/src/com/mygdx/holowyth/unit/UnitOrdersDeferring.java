@@ -24,9 +24,9 @@ class UnitOrdersDeferring {
 	private float deferredOrderX;
 	private float deferredOrderY;
 
-	UnitOrdersDeferring(Unit unit) {
+	UnitOrdersDeferring(Unit unit, UnitOrders orders) {
 		self = unit;
-		orders = unit.orders;
+		this.orders = orders;
 	}
 
 	void tryToResumeDeferredOrder() {
