@@ -85,19 +85,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	private MapInstanceInfo mapInstance;
 	public float x, y;
 	
-	
-	// Skills
-	/**
-	 * The skill the character is actively casting or channelling, else null. The Skill class will reset
-	 * this when the active portion has finished.
-	 */
-	ActiveSkill activeSkill;
-	/**
-	 * Time in frames before the unit can use skills again
-	 */
-	private float skillCooldownRemaining;
-
-	
 	/////////////// End of Fields /////////////
 	
 	public enum Side { // For now, just two enemy and player. Neutrals and alliances, are a non-trivial task
@@ -176,7 +163,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		notifyAppLifetimeComponentsToClearMapLifeTimeData();
 		clearMapLifeTimeComponents();
 		clearGeneralData();
-		clearSkillsData();
 	}
 	private void notifyAppLifetimeComponentsToClearMapLifeTimeData() {
 		stats.clearMapLifetimeData();
@@ -196,11 +182,6 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		x=0;
 		y=0;
 		mapInstance = null;
-	}
-	
-	private void clearSkillsData() {
-		activeSkill = null;
-		skillCooldownRemaining = 0;
 	}
 
 	@Override
@@ -368,7 +349,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	@Override
 	public ActiveSkill getActiveSkill() {
-		return activeSkill;
+		return skills.getActiveSkill();
 	}
 
 	@Override
@@ -481,53 +462,27 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 * interrupt by this.
 	 */
 	public void interruptNormal() {
-		if (isCasting() || isChannelling()) {
-			activeSkill.interrupt(false);
-		}
+		skills.interruptNormal();
 	}
 
 	public void interruptRangedSkills() {
-		if (isCasting() || isChannelling()) {
-			if (activeSkill != null && activeSkill.isRangedPhysicalOrMagicSkill()) {
-				activeSkill.interrupt(false);
-			}
-		}
+		skills.interruptRangedSkills();
 	}
 
 	/**
 	 * Hard interrupts are caused by stun / knockback
 	 */
 	public void interruptHard() {
-		if (isCasting() || isChannelling()) {
-			activeSkill.interrupt(true);
-		}
+		skills.interruptHard();
 	}
 
 	public void setActiveSkill(ActiveSkill activeSkill) {
-		this.activeSkill = activeSkill;
+		skills.setActiveSkill(activeSkill);
 	}
 
 	public void setName(String name) {
 		this.stats.setName(name);
 	}
-
-	public boolean isCasting() {
-		return this.activeSkill != null && activeSkill.getStatus() == Status.CASTING;
-	}
-
-	public boolean isChannelling() {
-		return this.activeSkill != null && activeSkill.getStatus() == Status.CHANNELING;
-	}
-
-	public boolean areSkillsOnCooldown() {
-		return (skillCooldownRemaining > 0);
-	}
-
-	
-
-	
-
-	// Tick Logic
 
 	/**
 	 * Some classes only get a reference to WorldInfo because they are not intended to modify the world.
@@ -537,6 +492,18 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	public MapInstance getMapInstanceMutable() {
 		return (MapInstance) mapInstance;
+	}
+	
+	public boolean isCasting() {
+		return skills.isCasting();
+	}
+
+	public boolean isChannelling() {
+		return skills.isChannelling();
+	}
+
+	public boolean isSkillsOnCooldown() {
+		return skills.isSkillsOnCooldown();
 	}
 
 	/**
@@ -579,11 +546,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		stats.tick();
 	
 		orders.tick();
-	
-		if (activeSkill != null)
-			activeSkill.tick();
-	
-		tickSkillCooldowns();
+		skills.tick();
+
 	}
 	/**
 	 * Called at a different timing than {@link unit#tick()}
@@ -592,13 +556,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		combat.tick();
 	}
 
-	private void tickSkillCooldowns() {
-		if (skillCooldownRemaining > 0) {
-			skillCooldownRemaining -= 1;
-		}
-		// tick individual skill Cooldowns too
-		skills.tickSkillCooldowns();
-	}
+
 
 	@Override
 	public String toString() {

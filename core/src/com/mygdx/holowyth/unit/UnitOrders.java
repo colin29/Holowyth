@@ -241,7 +241,7 @@ public class UnitOrders {
 			return;
 		}
 
-		self.activeSkill = skill;
+		self.setActiveSkill(skill);
 		skill.begin(self);
 	}
 

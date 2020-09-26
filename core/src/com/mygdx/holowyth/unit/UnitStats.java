@@ -415,8 +415,8 @@ public class UnitStats implements UnitStatsInfo {
 
 		int attackerResult = force + attackerRoll - getStab();
 
-		logger.debug("{} roll made against {}. Attacker Result: {} ({} + ({}) - {})", isKnockback ? "knockback" : "stun",
-				getName(), attackerResult, force, attackerRoll, getStab());
+		logger.debug("{} roll made against {}. Attacker Result: {} + ({}) - {} = {}", isKnockback ? "knockback" : "stun",
+				getName(), force, attackerRoll, this.getStab(), attackerResult);
 
 		if (attackerResult >= 10) { // apply full effect
 			if (isKnockback) {

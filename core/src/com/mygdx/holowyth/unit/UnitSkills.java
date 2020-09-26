@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.skill.ActiveSkill.Status;
 import com.mygdx.holowyth.util.exceptions.HoloException;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
@@ -30,14 +31,66 @@ public class UnitSkills {
 	 */
 	private ActiveSkill[] slot = new ActiveSkill[11];
 	
+	/**
+	 * The skill the character is actively casting or channelling, else null. The Skill class will reset
+	 * this when the active portion has finished.
+	 */
+	ActiveSkill activeSkill;
+	/**
+	 * Time in frames before the unit can use skills again
+	 */
+	private float skillCooldownRemaining;
+
+	
 	
 	public UnitSkills(Unit unit) {
 		self = unit;
 	}
 	public void clearMapLifetimeData() {
-		// None
+		activeSkill = null;
+		skillCooldownRemaining = 0;
 	}
 
+	
+	void tick() {
+		if (skillCooldownRemaining > 0) {
+			skillCooldownRemaining -= 1;
+		}
+		
+		if (activeSkill != null)
+			activeSkill.tick();
+		
+		tickSkillCooldowns();
+	}
+	
+	
+	/**
+	 * Normal interrupts are caused by damage and reel. Some skills, particularly melee skills, are not
+	 * interrupt by this.
+	 */
+	public void interruptNormal() {
+		if (isCasting() || isChannelling()) {
+			activeSkill.interrupt(false);
+		}
+	}
+
+	public void interruptRangedSkills() {
+		if (isCasting() || isChannelling()) {
+			if (activeSkill != null && activeSkill.isRangedPhysicalOrMagicSkill()) {
+				activeSkill.interrupt(false);
+			}
+		}
+	}
+
+	/**
+	 * Hard interrupts are caused by stun / knockback
+	 */
+	public void interruptHard() {
+		if (isCasting() || isChannelling()) {
+			activeSkill.interrupt(true);
+		}
+	}
+	
 	/**
 	 * @param slotNumber
 	 *            between 1 and 10.
@@ -129,4 +182,30 @@ public class UnitSkills {
 	public Set<Skill> getSkills() {
 		return Collections.unmodifiableSet(skills);
 	}
+	ActiveSkill getActiveSkill() {
+		return activeSkill;
+	}
+	void setActiveSkill(ActiveSkill activeSkill) {
+		this.activeSkill = activeSkill;
+	}
+	float getSkillCooldownRemaining() {
+		return skillCooldownRemaining;
+	}
+	void setSkillCooldownRemaining(float skillCooldownRemaining) {
+		this.skillCooldownRemaining = skillCooldownRemaining;
+	}
+	
+	public boolean isCasting() {
+		return this.activeSkill != null && activeSkill.getStatus() == Status.CASTING;
+	}
+
+	public boolean isChannelling() {
+		return this.activeSkill != null && activeSkill.getStatus() == Status.CHANNELING;
+	}
+
+	public boolean isSkillsOnCooldown() {
+		return (skillCooldownRemaining > 0);
+	}
+
+
 }
