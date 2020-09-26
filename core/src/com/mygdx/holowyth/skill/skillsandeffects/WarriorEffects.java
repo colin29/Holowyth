@@ -23,7 +23,7 @@ public class WarriorEffects {
 			if (caster.stats.isAttackRollSuccessful(target.stats, 10)) {
 				target.stats.applyDamage(caster.stats.getDamage() * attackDamageMultiple);
 			} else {
-				world.getGfx().makeBlockEffect(caster, target);
+				mapInstance.getGfx().makeBlockEffect(caster, target);
 			}
 
 			target.stats.applySlow(slowAmount, slowDuration);
@@ -43,7 +43,7 @@ public class WarriorEffects {
 			if (caster.stats.isAttackRollSuccessful(target.stats, 10)) {
 				target.stats.applyDamage(caster.stats.getDamage() * attackDamageMultiple);
 			} else {
-				world.getGfx().makeBlockEffect(caster, target);
+				mapInstance.getGfx().makeBlockEffect(caster, target);
 			}
 			var knockbackVec = new Vector2(1, 0).setAngle(angleFromCasterToTarget()).setLength(1.5f);
 			target.stats.doKnockBackRollAgainst(15, 60 * 1, knockbackVec);
@@ -81,7 +81,7 @@ public class WarriorEffects {
 
 		@Override
 		public void tick() {
-			for (Unit unit : world.getUnits()) {
+			for (Unit unit : mapInstance.getUnits()) {
 				if (unit == caster)
 					continue;
 				if (Point.calcDistance(caster.getPos(), unit.getPos()) <= aoeRadius + unit.getRadius()) {
@@ -93,7 +93,7 @@ public class WarriorEffects {
 				}
 			}
 			markAsComplete();
-			world.addEffect(new Effects.CircleOutlineVfx(caster.x, caster.y, aoeRadius, Color.ORANGE, world));
+			mapInstance.addEffect(new Effects.CircleOutlineVfx(caster.x, caster.y, aoeRadius, Color.ORANGE, mapInstance));
 		}
 
 	}

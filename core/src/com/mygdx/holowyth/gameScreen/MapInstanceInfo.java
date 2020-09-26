@@ -12,7 +12,7 @@ import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.sprite.Animations;
 
-public interface WorldInfo {
+public interface MapInstanceInfo {
 
 	/**
 	 * The list itself is read-only, though elements can be modified

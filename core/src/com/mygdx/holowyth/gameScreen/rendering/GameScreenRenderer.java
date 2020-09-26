@@ -23,7 +23,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.gameScreen.Controls;
-import com.mygdx.holowyth.gameScreen.WorldInfo;
+import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 import com.mygdx.holowyth.gameScreen.Controls.Context;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.HoloSprite;
@@ -83,7 +83,7 @@ public class GameScreenRenderer {
 	private int mapHeight;
 	
 	// Map lifetime components
-	private WorldInfo world;
+	private MapInstanceInfo mapInstance;
 	private Controls controls;
 	private EffectsHandler gfx;
 	
@@ -197,7 +197,7 @@ public class GameScreenRenderer {
 	}
 
 	private void renderUnitAttackingArrows() {
-		for (Unit u : world.getUnits()) {
+		for (Unit u : mapInstance.getUnits()) {
 			u.renderAttackingArrow();
 		}
 	}
@@ -249,7 +249,7 @@ public class GameScreenRenderer {
 
 			var cursorPos = getWorldCoordinatesOfMouseCursor();
 			var unit = controls.getSelectedUnits().first();
-			curSkill.aimingGraphic.render(cursorPos, unit, world, batch, shapeDrawer, game.assets);
+			curSkill.aimingGraphic.render(cursorPos, unit, mapInstance, batch, shapeDrawer, game.assets);
 		}
 
 	}
@@ -308,7 +308,7 @@ public class GameScreenRenderer {
 	}
 
 	private void renderEffects() {
-		for (Effect effect : world.getEffects()) {
+		for (Effect effect : mapInstance.getEffects()) {
 			effect.render(batch, shapeDrawer, game.assets);
 		}
 	}
@@ -318,7 +318,7 @@ public class GameScreenRenderer {
 		batch.begin();
 
 		// Render unit circles as a fallback (if they don't have a sprite)
-		for (Unit unit : world.getUnits()) {
+		for (Unit unit : mapInstance.getUnits()) {
 			if (unit.graphics.getAnimatedSprite() != null)
 				continue;
 			shapeDrawer.setColor(unit.isAPlayerCharacter() ? Color.PURPLE : Color.YELLOW);
@@ -326,7 +326,7 @@ public class GameScreenRenderer {
 			shapeDrawer.filledCircle(unit.x, unit.y, Holo.UNIT_RADIUS);
 
 		}
-		for (Unit unit : world.getUnits()) {
+		for (Unit unit : mapInstance.getUnits()) {
 			if (unit.graphics.getAnimatedSprite() != null)
 				continue;
 			shapeDrawer.setColor(Color.BLACK);
@@ -335,7 +335,7 @@ public class GameScreenRenderer {
 		}
 		batch.end();
 
-		for (Unit unit : world.getUnits()) {
+		for (Unit unit : mapInstance.getUnits()) {
 			unit.graphics.updateAndRender(delta, batch);
 		}
 
@@ -364,7 +364,7 @@ public class GameScreenRenderer {
 
 		shapeRenderer.setProjectionMatrix(worldCamera.combined);
 
-		for (UnitInfo unit : world.getUnits()) {
+		for (UnitInfo unit : mapInstance.getUnits()) {
 
 			UnitStatsInfo unitStats = unit.getStats();
 			float virtualMaxHp = Holo.debugHighHpUnits ? unitStats.getMaxHp() / 10 : unitStats.getMaxHp();
@@ -418,7 +418,7 @@ public class GameScreenRenderer {
 
 	private void renderCastingBars() {
 
-		for (UnitInfo unit : world.getUnits()) {
+		for (UnitInfo unit : mapInstance.getUnits()) {
 
 			if (unit.getSide() != Side.PLAYER && !Holo.debugDisplayEnemyCastingProgress) {
 				continue;
@@ -521,8 +521,8 @@ public class GameScreenRenderer {
 		tiled.setMap(map.getTilemap());
 	}
 	
-	public void setMapLifeTimeComponentsRefs(WorldInfo world, Controls controls, EffectsHandler gfx) {
-		this.world = world;
+	public void setMapLifeTimeComponentsRefs(MapInstanceInfo world, Controls controls, EffectsHandler gfx) {
+		this.mapInstance = world;
 		this.controls = controls;
 		this.gfx = gfx;
 	}
@@ -530,12 +530,12 @@ public class GameScreenRenderer {
 	/*
 	 * Sets the world that Renderer should render
 	 */
-	public void setWorld(WorldInfo world) {
-		this.world = world;
+	public void setMapInstance(MapInstanceInfo world) {
+		this.mapInstance = world;
 	}
 
-	public WorldInfo getWorld() {
-		return world;
+	public MapInstanceInfo getMapInstance() {
+		return mapInstance;
 	}
 
 	public void onMapClose() {
@@ -544,7 +544,7 @@ public class GameScreenRenderer {
 		mapWidth = 0;
 		mapHeight = 0;
 		
-		world = null;
+		mapInstance = null;
 		controls = null;
 		gfx = null;
 	}
@@ -562,7 +562,7 @@ public class GameScreenRenderer {
 	}
 
 	void renderThickOutlineIfTrueForAllUnits(Color color, Predicate<UnitInfo> predicate) {
-		world.doIfTrueForAllUnits(predicate, (UnitInfo u) -> {
+		mapInstance.doIfTrueForAllUnits(predicate, (UnitInfo u) -> {
 			shapeRenderer.setProjectionMatrix(worldCamera.combined);
 			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 0.5f, color);
 			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 1.25f, color);
@@ -571,7 +571,7 @@ public class GameScreenRenderer {
 	}
 
 	void renderModerateOutlineIfTrueForAllUnits(Color color, Predicate<UnitInfo> predicate) {
-		world.doIfTrueForAllUnits(predicate, (UnitInfo u) -> {
+		mapInstance.doIfTrueForAllUnits(predicate, (UnitInfo u) -> {
 			shapeRenderer.setProjectionMatrix(worldCamera.combined);
 			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 2.5f, color);
 			HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + 3.0f, color);

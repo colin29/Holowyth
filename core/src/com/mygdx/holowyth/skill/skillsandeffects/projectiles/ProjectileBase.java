@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.gameScreen.WorldInfo;
+import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
@@ -40,7 +40,7 @@ public abstract class ProjectileBase {
 
 	// Sides and Colliding
 	protected final Unit.Side side;
-	protected final WorldInfo world;
+	protected final MapInstanceInfo mapInstance;
 	private float collisionRadius = 0;
 
 	// Extra info for sub-classes
@@ -56,7 +56,7 @@ public abstract class ProjectileBase {
 		this.side = caster.getSide();
 		this.caster = caster;
 
-		this.world = caster.getWorldMutable();
+		this.mapInstance = caster.getMapInstanceMutable();
 	}
 
 	/**
@@ -174,7 +174,7 @@ public abstract class ProjectileBase {
 	}
 
 	protected void detectCollisionWithObstacles() {
-		PathingModule pathing = world.getPathingModule();
+		PathingModule pathing = mapInstance.getPathingModule();
 		final var motion = new Segment(pos.x, pos.y, pos.x + getVx(), pos.y + getVy());
 		if (!HoloPF.isSegmentPathableAgainstObstaclesNonExpandedSeg(motion, pathing.getObstacleSegs(), pathing.getObstaclePoints(),
 				collisionRadius)) {
@@ -195,7 +195,7 @@ public abstract class ProjectileBase {
 	}
 
 	protected List<Unit> getCollisionTargets() {
-		var units = new ArrayList<Unit>(world.getUnits());
+		var units = new ArrayList<Unit>(mapInstance.getUnits());
 		var targets = new ArrayList<Unit>();
 		if (caster.getSide() == Side.PLAYER) {
 			CollectionUtils.select(units, (u) -> u.getSide() == Side.ENEMY, targets);

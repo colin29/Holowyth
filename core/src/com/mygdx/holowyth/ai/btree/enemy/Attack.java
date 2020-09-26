@@ -17,7 +17,7 @@ public class Attack extends HoloLeafTask {
 		markLastTaskRan();
 		self = getObject();
 
-		var targets = UnitUtil.getTargetsSortedByDistance(self, self.getWorld());
+		var targets = UnitUtil.getTargetsSortedByDistance(self, self.getMapInstance());
 		if (targets.size() > 0) {
 			if (self.isAttackOrderAllowed() && !self.getOrder().isAttackUnit()) {
 				self.orderAttackUnit(targets.peek());

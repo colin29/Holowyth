@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.mygdx.holowyth.gameScreen.World;
+import com.mygdx.holowyth.gameScreen.MapInstance;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 
@@ -17,7 +17,7 @@ public class SkillNameEffect extends Effect {
 
 	private Camera worldCamera;
 
-	public SkillNameEffect(String text, UnitInfo unit, Camera worldCamera, World world, Stage stage, Skin skin) {
+	public SkillNameEffect(String text, UnitInfo unit, Camera worldCamera, MapInstance world, Stage stage, Skin skin) {
 		super(world);
 		this.stage = stage;
 		this.skin = skin;

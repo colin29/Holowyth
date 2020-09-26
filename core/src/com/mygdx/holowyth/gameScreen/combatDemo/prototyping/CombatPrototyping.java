@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.gameScreen.Controls;
-import com.mygdx.holowyth.gameScreen.World;
+import com.mygdx.holowyth.gameScreen.MapInstance;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.unit.Unit;
@@ -26,7 +26,7 @@ public class CombatPrototyping {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private final World world;
+	private final MapInstance mapInstance;
 
 	final CombatScenario duelingClose = new CombatScenario();
 	final CombatScenario duelingFar = new CombatScenario();
@@ -37,8 +37,8 @@ public class CombatPrototyping {
 
 	public CombatScenario scenario = threeVsThreeFar;
 
-	public CombatPrototyping(World world, Controls controls) {
-		this.world = world;
+	public CombatPrototyping(MapInstance mapInstance, Controls controls) {
+		this.mapInstance = mapInstance;
 		defineScenarios();
 	}
 
@@ -93,30 +93,30 @@ public class CombatPrototyping {
 
 		List<Unit> players = new ArrayList<Unit>();
 		for (var p : scenario.playerSpawnLocs) {
-			var unit = new Unit(p.x, p.y, Unit.Side.PLAYER, world);
+			var unit = new Unit(p.x, p.y, Unit.Side.PLAYER, mapInstance);
 			unit.setName("Player");
 			unit.stats.base.set(MonsterStats.baseHuman);
 			players.add(unit);
-			world.addUnit(unit);
+			mapInstance.addUnit(unit);
 		}
 
 		setPlayerUnitSprites(players);
 		setUpThreeUnitScenario(players);
 
-		Animations animations = world.getAnimations();
+		Animations animations = mapInstance.getAnimations();
 		for (var p : scenario.enemySpawnLocs) {
-			var unit = new Unit(p.x, p.y, Unit.Side.ENEMY, world);
+			var unit = new Unit(p.x, p.y, Unit.Side.ENEMY, mapInstance);
 			unit.setName("Goblin");
 			unit.stats.base.set(MonsterStats.goblin);
 			unit.skills.slotSkills(Skills.warriorSkills);
 			unit.graphics.setAnimatedSprite(animations.get("goblin1.png"));
-			world.addUnit(unit);
+			mapInstance.addUnit(unit);
 		}
 	}
 
 	private void setPlayerUnitSprites(List<Unit> players) {
 		AnimatedSprite[] sprites = new AnimatedSprite[3];
-		Animations animations = world.getAnimations();
+		Animations animations = mapInstance.getAnimations();
 
 		// default sprites
 		sprites[0] = animations.get("pipo-charachip001b.png");
@@ -133,7 +133,7 @@ public class CombatPrototyping {
 		if (players.size() < 3) {
 			return;
 		}
-		Animations animations = world.getAnimations();
+		Animations animations = mapInstance.getAnimations();
 
 		{
 			var u = players.get(0);

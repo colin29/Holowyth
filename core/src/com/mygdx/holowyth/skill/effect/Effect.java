@@ -2,7 +2,7 @@ package com.mygdx.holowyth.skill.effect;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.holowyth.gameScreen.World;
+import com.mygdx.holowyth.gameScreen.MapInstance;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 
 public abstract class Effect {
@@ -13,10 +13,10 @@ public abstract class Effect {
 	private boolean markedAsComplete = false;
 	private String name = "Untitled Effect";
 
-	protected final World world;
+	protected final MapInstance mapInstance;
 
-	public Effect(World world) {
-		this.world = world;
+	public Effect(MapInstance world) {
+		this.mapInstance = world;
 	}
 
 	public String getName() {

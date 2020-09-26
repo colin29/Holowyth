@@ -16,7 +16,7 @@ class UnitMotionRenderer extends SubRenderer {
 
 	@SuppressWarnings("unused")
 	void renderPlayerUnreachedWaypoints(Color color) {
-		for (Unit unit : getWorld().getUnits()) {
+		for (Unit unit : getMapInstance().getUnits()) {
 			if (unit.isAPlayerCharacter() && unit.getMotion().getPath() != null) {
 				Path path = unit.getMotion().getPath();
 				for (int i = unit.getMotion().getWayPointIndex(); i < path.size(); i++) {
@@ -36,7 +36,7 @@ class UnitMotionRenderer extends SubRenderer {
 	}
 
 	void renderPlayerVelocityArrow() {
-		getWorld().doIfTrueForAllUnits(
+		getMapInstance().doIfTrueForAllUnits(
 				(UnitInfo u) -> (u.isAPlayerCharacter() && u.getMotion().getVelocityMagnitude() > 0.01f),
 				(UnitInfo u) -> {
 					float scale = 15;
@@ -46,7 +46,7 @@ class UnitMotionRenderer extends SubRenderer {
 
 	void renderUnitDestinations(Color color) {
 
-		for (Unit unit : getWorld().getUnits()) {
+		for (Unit unit : getMapInstance().getUnits()) {
 			if (unit.isAPlayerCharacter() && unit.getMotion().getPath() != null) {
 
 				Path path = unit.getMotion().getPath();

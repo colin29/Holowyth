@@ -6,7 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.holowyth.gameScreen.WorldInfo;
+import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -35,7 +35,7 @@ public class SkillsAimingGraphics {
 		 * @param coneInnerLength
 		 * @param world
 		 */
-		public HydroblastAimingGraphic(float coneLength, float coneInnerLength, float coneWidthDegrees, WorldInfo world) {
+		public HydroblastAimingGraphic(float coneLength, float coneInnerLength, float coneWidthDegrees, MapInstanceInfo world) {
 			super(world);
 
 			this.coneLength = coneLength;
@@ -45,7 +45,7 @@ public class SkillsAimingGraphics {
 		}
 
 		@Override
-		public void render(Vector2 cursorPos, UnitInfo caster, WorldInfo world, SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
+		public void render(Vector2 cursorPos, UnitInfo caster, MapInstanceInfo world, SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
 			shapeDrawer.setColor(Color.BLUE, 0.7f);
 
 			Point cursorPoint = new Point(cursorPos);

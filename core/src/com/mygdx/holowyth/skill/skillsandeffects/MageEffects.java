@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.holowyth.gameScreen.World;
+import com.mygdx.holowyth.gameScreen.MapInstance;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.effect.CasterGroundEffect;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
@@ -45,7 +45,7 @@ public class MageEffects {
 		public void begin() {
 			missiles = new ArrayList<MagicMissileBolt>();
 			for (int i = 0; i < 3; i++) {
-				missiles.add(new MagicMissileBolt(caster.x, caster.y + 18 * i, damage, target, caster, world.getUnits()));
+				missiles.add(new MagicMissileBolt(caster.x, caster.y + 18 * i, damage, target, caster, mapInstance.getUnits()));
 			}
 		}
 
@@ -176,7 +176,7 @@ public class MageEffects {
 		public void tick() {
 			projectile.tick();
 			if (projectile.isExpired() || projectile.isCollided()) {
-				world.addEffect(new FireBallVfx(projectile.getX(), projectile.getY(), explosionRadius, world));
+				mapInstance.addEffect(new FireBallVfx(projectile.getX(), projectile.getY(), explosionRadius, mapInstance));
 				markAsComplete();
 			}
 
@@ -200,7 +200,7 @@ public class MageEffects {
 		private float explosionRadius;
 		private int framesElapsed = 0;
 
-		FireBallVfx(float x, float y, float explosionRadius, World world) {
+		FireBallVfx(float x, float y, float explosionRadius, MapInstance world) {
 			super(world);
 			this.x = x;
 			this.y = y;
@@ -252,7 +252,7 @@ public class MageEffects {
 		@Override
 		public void tick() {
 
-			for (Unit u : world.getUnits()) {
+			for (Unit u : mapInstance.getUnits()) {
 				if (u == caster)
 					continue;
 				if (isUnitTouchingCone(u)) {
@@ -264,8 +264,8 @@ public class MageEffects {
 
 				}
 			}
-			world.addEffect(
-					new HydroBlastVfx(caster.x, caster.y, coneAngle, coneWidthDegrees, coneLength, coneInnerLength, world));
+			mapInstance.addEffect(
+					new HydroBlastVfx(caster.x, caster.y, coneAngle, coneWidthDegrees, coneLength, coneInnerLength, mapInstance));
 			markAsComplete();
 		}
 
@@ -327,7 +327,7 @@ public class MageEffects {
 		 * @param coneInnerLength
 		 * @param world
 		 */
-		HydroBlastVfx(float x, float y, float coneAngle, float coneWidthDegrees, float coneLength, float coneInnerLength, World world) {
+		HydroBlastVfx(float x, float y, float coneAngle, float coneWidthDegrees, float coneLength, float coneInnerLength, MapInstance world) {
 			super(world);
 			this.x = x;
 			this.y = y;
@@ -406,7 +406,7 @@ public class MageEffects {
 
 		@Override
 		public void tick() {
-			for (Unit unit : world.getUnits()) {
+			for (Unit unit : mapInstance.getUnits()) {
 				if (Point.calcDistance(ground, unit.getPos()) <= aoeRadius + unit.getRadius()) {
 					if (unit.getSide() != caster.getSide()) {
 						unit.stats.doStunRollAgainst(18, stunDuration);
@@ -416,7 +416,7 @@ public class MageEffects {
 				}
 			}
 			markAsComplete();
-			world.addEffect(new Effects.CircleOutlineVfx(ground.x, ground.y, aoeRadius, Color.ORANGE, world));
+			mapInstance.addEffect(new Effects.CircleOutlineVfx(ground.x, ground.y, aoeRadius, Color.ORANGE, mapInstance));
 		}
 
 	}
@@ -432,7 +432,7 @@ public class MageEffects {
 
 		@Override
 		public void tick() {
-			for (Unit unit : world.getUnits()) {
+			for (Unit unit : mapInstance.getUnits()) {
 				if (Point.calcDistance(ground, unit.getPos()) <= aoeRadius + unit.getRadius()) {
 					if (unit.getSide() != caster.getSide()) {
 						unit.stats.applyBlind(blindDuration);
@@ -442,7 +442,7 @@ public class MageEffects {
 				}
 			}
 			markAsComplete();
-			world.addEffect(new Effects.CircleOutlineVfx(ground.x, ground.y, aoeRadius, Color.YELLOW, world));
+			mapInstance.addEffect(new Effects.CircleOutlineVfx(ground.x, ground.y, aoeRadius, Color.YELLOW, mapInstance));
 		}
 
 	}

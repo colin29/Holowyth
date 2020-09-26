@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.gameScreen.WorldInfo;
+import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 
 /**
  * Contains no mutable state
@@ -28,7 +28,7 @@ public abstract class SubRenderer {
 
 	}
 
-	protected WorldInfo getWorld() {
-		return renderer.getWorld();
+	protected MapInstanceInfo getMapInstance() {
+		return renderer.getMapInstance();
 	}
 }

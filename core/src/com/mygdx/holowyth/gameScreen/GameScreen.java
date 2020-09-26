@@ -48,7 +48,7 @@ public abstract class GameScreen extends GameMapLoadingScreen {
 	private GameScreenUI ui;
 
 	// Map life-time components
-	protected World world;
+	protected MapInstance mapInstance;
 	protected Controls controls;
 	protected EffectsHandler gfx;
 	protected TriggersHandler triggers;
@@ -202,7 +202,7 @@ public abstract class GameScreen extends GameMapLoadingScreen {
 
 	protected void tickGame() {
 		if(isMapLoaded()) {
-			world.tick();
+			mapInstance.tick();
 			controls.tick();	
 			gfx.tick();
 			triggers.checkTriggers();
@@ -268,7 +268,7 @@ public abstract class GameScreen extends GameMapLoadingScreen {
 		removeInputForMapLifeTimeComponents();
 		
 		// Set all map-lifetime components to null
-		world = null;
+		mapInstance = null;
 		controls = null;
 		gfx = null;
 		triggers = null;
@@ -295,16 +295,16 @@ public abstract class GameScreen extends GameMapLoadingScreen {
 
 		gfx = new EffectsHandler(game.batch, camera, stage, skin, debugStore);
 		
-		world = new World(pathingModule, debugStore, gfx, game.animations);
-		controls = new Controls(game, camera, fixedCamera, world.getUnits(), debugStore, world, ui.getGameLog());
-		triggers = new TriggersHandler(world);
+		mapInstance = new MapInstance(pathingModule, debugStore, gfx, game.animations);
+		controls = new Controls(game, camera, fixedCamera, mapInstance.getUnits(), debugStore, mapInstance, ui.getGameLog());
+		triggers = new TriggersHandler(mapInstance);
 	}
 
 	private void setupAppLifetimeComponentsForNewMap(final int mapWidth, final int mapHeight) {
 		pathingModule.initForTiledMap(map.getTilemap(), mapWidth, mapHeight);
 		
 		renderer.setMap(map, mapWidth, mapHeight);
-		renderer.setMapLifeTimeComponentsRefs(world, controls, gfx);
+		renderer.setMapLifeTimeComponentsRefs(mapInstance, controls, gfx);
 		
 		ui.onMapStartup();
 	}

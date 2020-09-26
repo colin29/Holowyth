@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.unit.interfaces;
 
-import com.mygdx.holowyth.gameScreen.WorldInfo;
+import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 import com.mygdx.holowyth.skill.SkillInfo;
 import com.mygdx.holowyth.unit.Unit.Order;
 import com.mygdx.holowyth.unit.Unit.Side;
@@ -57,7 +57,7 @@ public interface UnitInfo {
 
 	float getAttackCooldown();
 
-	WorldInfo getWorld();
+	MapInstanceInfo getMapInstance();
 
 	String getName();
 

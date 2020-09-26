@@ -92,7 +92,7 @@ public class GameMap {
 	 * @return The location as a new point, or null if the location not found.
 	 */
 	public Point getLocation(String name) {
-		return new Point(locations.get(name));
+		return new Point(locations.get(name).pos);
 	}
 
 	

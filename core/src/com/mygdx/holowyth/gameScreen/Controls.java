@@ -65,7 +65,7 @@ public class Controls extends InputProcessorAdapter {
 	Camera fixedCam;
 	private ShapeRenderer shapeRenderer;
 
-	WorldInfo world;
+	MapInstanceInfo mapInstance;
 	List<Unit> units;
 
 	private FunctionBindings functionBindings = new FunctionBindings();
@@ -104,11 +104,11 @@ public class Controls extends InputProcessorAdapter {
 	private GameLogDisplay gameLog;
 
 	public Controls(Holowyth game, Camera camera, Camera fixedCam, List<Unit> units, DebugStore debugStore,
-			WorldInfo world, GameLogDisplay gameLog) {
+			MapInstanceInfo world, GameLogDisplay gameLog) {
 		this.shapeRenderer = game.shapeRenderer;
 		this.camera = camera;
 		this.fixedCam = fixedCam;
-		this.world = world;
+		this.mapInstance = world;
 		this.units = units;
 
 		this.font = Holowyth.fonts.debugFont();

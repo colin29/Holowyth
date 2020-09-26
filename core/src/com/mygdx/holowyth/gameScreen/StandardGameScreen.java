@@ -73,12 +73,12 @@ public class StandardGameScreen extends GameScreen {
 
 	private void placeUnitsAccordingToUnitMarkers() {
 		for (UnitMarker m : map.getUnitMarkers()) {
-			world.addUnit(m);
+			mapInstance.addUnit(m);
 		}
 	}
 
 	private Unit spawnPlayerAtDefaultLocation() {
-		Point pos = map.getLocations().get("default_spawn_location");
+		Point pos = map.getLocations().get("default_spawn_location").pos;
 		if (pos != null) {
 			return spawnPlayerUnit(pos);
 		} else {
@@ -109,7 +109,7 @@ public class StandardGameScreen extends GameScreen {
 	 * @param pos can't be null
 	 */
 	private Unit spawnPlayerUnit(Point pos) {
-		var u = new Unit(pos.x, pos.y, Unit.Side.PLAYER, world);
+		var u = new Unit(pos.x, pos.y, Unit.Side.PLAYER, mapInstance);
 		u.setName("Lecia");
 		u.graphics.setAnimatedSprite(game.animations.get("pipo-charachip030e.png"));
 
@@ -117,33 +117,31 @@ public class StandardGameScreen extends GameScreen {
 		u.stats.self.skills.addSkill(PassiveSkills.basicCombatTraining);
 		u.skills.slotSkills(Skills.warriorSkills);
 		u.equip.equip(Equips.longSword.copy());
-		world.addUnit(u);
+		mapInstance.addUnit(u);
 		return u;
 	}
 	private void removeLeciaFromWorld() {
-
-		
 		if(!isMapLoaded()) { // in case map was closed beforehand, try removing using her world ref.
-			if(lecia.getWorld() != null) {
-				lecia.getWorldMutable().removeAndDetachUnitFromWorld(lecia);
+			if(lecia.getMapInstance() != null) {
+				lecia.getMapInstanceMutable().removeAndDetachUnitFromWorld(lecia);
 			}else {
 				logger.warn("Remove: Lecia is not in a world");
 				return;
 			}
 		}else {
 			controls.removeUnitFromSelection(lecia);
-			world.removeAndDetachUnitFromWorld(lecia);
+			mapInstance.removeAndDetachUnitFromWorld(lecia);
 		}
 		
 		
 	}
 	private void addLeciaToWorld() {
 		if(isMapLoaded()) {
-			if(lecia.getWorld() == null) {
-				Point pos = map.getLocations().get("default_spawn_location");
+			if(lecia.getMapInstance() == null) {
+				Point pos = map.getLocations().get("default_spawn_location").pos;
 				((Unit) lecia).x = pos.x+200;
 				((Unit) lecia).y = pos.y;
-				world.addPreExistingUnit(lecia);	
+				mapInstance.addPreExistingUnit(lecia);	
 			}else {
 				logger.warn("Add: Lecia already has a world");
 			}

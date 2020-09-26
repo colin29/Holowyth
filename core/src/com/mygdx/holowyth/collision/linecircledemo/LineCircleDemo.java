@@ -32,23 +32,23 @@ public class LineCircleDemo extends HoloBaseScreen {
 	DebugStore debugStore = new DebugStore();
 	DebugStoreUI debugStoreUI = new DebugStoreUI(debugStore);
 
-	World world = new World(debugStore);
+	World mapInstance = new World(debugStore);
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	public LineCircleDemo(final Holowyth game) {
 		super(game);
 
-		renderer = new Renderer(game, camera, stage, world);
+		renderer = new Renderer(game, camera, stage, mapInstance);
 		renderer.setClearColor(backgroundColor);
 
 		multiplexer.addProcessor(myInputProcessor);
 
 		Circle keyCircle = new Circle(300, 500, CIRCLE_RADIUS);
-		world.getCircles().add(keyCircle);
-		world.setKeyCircle(keyCircle);
+		mapInstance.getCircles().add(keyCircle);
+		mapInstance.setKeyCircle(keyCircle);
 
-		world.setSegment(100, 400, 200, 200);
+		mapInstance.setSegment(100, 400, 200, 200);
 
 		debugStoreUI.populateDebugValueDisplay();
 
@@ -79,8 +79,8 @@ public class LineCircleDemo extends HoloBaseScreen {
 
 	private void setSegmentEndToMousePos() {
 		Point mousePos = MiscUtil.getCursorInWorldCoords(camera);
-		Segment current = world.getSegment();
-		world.setSegment(current.x1, current.y1, mousePos.x, mousePos.y);
+		Segment current = mapInstance.getSegment();
+		mapInstance.setSegment(current.x1, current.y1, mousePos.x, mousePos.y);
 	}
 
 }

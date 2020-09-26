@@ -81,7 +81,7 @@ public class CombatDemo extends GameScreen implements Screen, InputProcessor {
 	}
 
 	private void handleGameOver() {
-		var units = world.getUnits();
+		var units = mapInstance.getUnits();
 
 		if (gameState == GameState.PLAYING) {
 			if (!IterableUtils.matchesAny(units, u -> u.getSide().isPlayer())) {
@@ -235,7 +235,7 @@ public class CombatDemo extends GameScreen implements Screen, InputProcessor {
 		victoryPanel.setVisible(false);
 		defeatPanel.setVisible(false);
 
-		world.clearAllUnits();
+		mapInstance.clearAllUnits();
 		controls.clearSelectedUnits();
 
 		testing.setupPlannedScenario();
@@ -251,7 +251,7 @@ public class CombatDemo extends GameScreen implements Screen, InputProcessor {
 	public
 	final void mapStartup() {
 		super.mapStartup();
-		testing = new CombatPrototyping(world, controls); // have to initialize here because world module only exists after gameScreen startsup the map.
+		testing = new CombatPrototyping(mapInstance, controls); // have to initialize here because world module only exists after gameScreen startsup the map.
 		testing.setupPlannedScenario();
 		showInstructionsPanel();
 	}

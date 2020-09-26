@@ -3,7 +3,7 @@ package com.mygdx.holowyth.map.trigger;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mygdx.holowyth.gameScreen.World;
+import com.mygdx.holowyth.gameScreen.MapInstance;
 
 /**
  * Is a map-life time component
@@ -12,11 +12,11 @@ import com.mygdx.holowyth.gameScreen.World;
  */
 public class TriggersHandler {
 
-	private final World world;
+	private final MapInstance mapInstance;
 	private List<Trigger> triggers = new ArrayList<Trigger>();
 	
-	public TriggersHandler(World world) {
-		this.world = world;
+	public TriggersHandler(MapInstance mapInstance) {
+		this.mapInstance = mapInstance;
 	}
 	
 	public void addTrigger(Trigger t) {
@@ -25,7 +25,7 @@ public class TriggersHandler {
 	
 	public void checkTriggers(){
 		for(Trigger t: triggers) {
-			t.check(world);
+			t.check(mapInstance);
 		}
 		// TODO removed finished triggers
 	}

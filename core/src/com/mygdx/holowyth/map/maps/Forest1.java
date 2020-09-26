@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.map.GameMap;
+import com.mygdx.holowyth.map.Location;
 import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.map.trigger.Trigger;
 import com.mygdx.holowyth.map.trigger.UnitEntersRegion;
@@ -21,7 +22,7 @@ public class Forest1 extends GameMap {
 
 	{
 		tilemapPath = Holo.mapsDirectory + "/forest1.tmx";
-		locations.put("default_spawn_location", new Point(100, 300));
+		locations.add(new Location("default_spawn_location", 100, 300));
 		setName("forest1");
 
 		{

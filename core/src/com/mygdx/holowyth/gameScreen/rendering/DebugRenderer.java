@@ -12,7 +12,7 @@ class DebugRenderer extends SubRenderer {
 	}
 
 	void renderUnitKnockbackVelocities() {
-		getWorld().doIfTrueForAllUnits(
+		getMapInstance().doIfTrueForAllUnits(
 				(UnitInfo u) -> (u.getMotion().isBeingKnockedBack()
 						&& u.getMotion().getKnockbackVelocity().len() > 0.01f),
 				(UnitInfo u) -> {
@@ -27,7 +27,7 @@ class DebugRenderer extends SubRenderer {
 	void renderUnitIdsOnUnits() {
 		batch.begin();
 		Holowyth.fonts.borderedMediumFont().setColor(LIGHT_MINT);
-		getWorld().doForAllUnits((UnitInfo u) -> {
+		getMapInstance().doForAllUnits((UnitInfo u) -> {
 			Holowyth.fonts.borderedMediumFont().draw(batch, String.valueOf(u.getID()), u.getX(), u.getY());
 		});
 		batch.end();

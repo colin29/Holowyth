@@ -3,7 +3,7 @@ package com.mygdx.holowyth.skill.skillsandeffects;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.holowyth.gameScreen.World;
+import com.mygdx.holowyth.gameScreen.MapInstance;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 
@@ -19,7 +19,7 @@ public class Effects {
 
 		private Color color;
 
-		public CircleOutlineVfx(float x, float y, float aoeRadius, Color vfxColor, World world) {
+		public CircleOutlineVfx(float x, float y, float aoeRadius, Color vfxColor, MapInstance world) {
 			super(world);
 			this.aoeRadius = aoeRadius;
 

@@ -37,7 +37,7 @@ public class RangerEffects {
 			}
 
 			if (framesElapsed == 0 || framesElapsed == secondStrikeDelay) {
-				world.getGfx().makeBlockEffect(caster, target);
+				mapInstance.getGfx().makeBlockEffect(caster, target);
 			}
 
 			if (framesElapsed == secondStrikeDelay + delayBetweenStrikesInX) {

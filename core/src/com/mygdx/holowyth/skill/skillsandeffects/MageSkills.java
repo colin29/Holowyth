@@ -107,7 +107,7 @@ public class MageSkills {
 			aimingGraphic = new SkillsAimingGraphics.HydroblastAimingGraphic(MageEffects.HydroblastEffect.coneLength,
 					MageEffects.HydroblastEffect.coneInnerLength,
 					MageEffects.HydroblastEffect.coneWidthDegrees,
-					getWorld());
+					getMapInstance());
 		}
 
 		@Override

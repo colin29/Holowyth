@@ -2,7 +2,7 @@ package com.mygdx.holowyth.map.trigger;
 
 import java.util.function.Consumer;
 
-import com.mygdx.holowyth.gameScreen.World;
+import com.mygdx.holowyth.gameScreen.MapInstance;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**
@@ -12,7 +12,7 @@ import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 public class Trigger {
 
 	private TriggerEvent triggerEvent;
-	private Consumer<World> triggeredAction;
+	private Consumer<MapInstance> triggeredAction;
 
 	public Trigger() {
 	}
@@ -28,7 +28,7 @@ public class Trigger {
 	 * 
 	 * @return
 	 */
-	public boolean check(World world) {
+	public boolean check(MapInstance world) {
 		if (triggerEvent.check(world)) {
 			triggeredAction.accept(world);
 			return true;
@@ -44,7 +44,7 @@ public class Trigger {
 		return triggerEvent;
 	}
 
-	public Consumer<World> getTriggeredAction() {
+	public Consumer<MapInstance> getTriggeredAction() {
 		return triggeredAction;
 	}
 
@@ -54,7 +54,7 @@ public class Trigger {
 		this.triggerEvent = triggerEvent;
 	}
 
-	public void setTriggeredAction(Consumer<World> triggeredAction) {
+	public void setTriggeredAction(Consumer<MapInstance> triggeredAction) {
 		if (triggeredAction == null)
 			throw new HoloIllegalArgumentsException("triggered action can't be null");
 		this.triggeredAction = triggeredAction;

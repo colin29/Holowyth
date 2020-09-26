@@ -35,7 +35,9 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
 /**
  * 
- * Processes everything happening within the game world. See {@link #tick()} <br><br>
+ * Processes everything happening in a running game map.  <br><br>
+ * 
+ * Technically a running level also uses a {@link com.mygdx.holowyth.map.GameMap} whose data can be changed dynamically. 
  * 
  * Has map lifetime <br><br>
  * 
@@ -45,7 +47,7 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
  *
  */
 
-public class World implements WorldInfo {
+public class MapInstance implements MapInstanceInfo {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -69,7 +71,7 @@ public class World implements WorldInfo {
 	 */
 	private final Map<Unit, Set<Unit>> unitsAttackingThis = new HashMap<Unit, Set<Unit>>();
 
-	public World(PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects, Animations animations) {
+	public MapInstance(PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects, Animations animations) {
 		this.pathing = pathingModule;
 		this.gfx = effects;
 		this.animations = animations;
@@ -520,8 +522,8 @@ public class World implements WorldInfo {
 		return units.removeUnit(u);
 	}
 	public void removeAndDetachUnitFromWorld(Unit u) {
-		if(u.getWorld() != this)
-			logger.warn("Unit's world '{}' doesn't match this world. Clearing anyways. '{}'", u.getWorld(), this);
+		if(u.getMapInstance() != this)
+			logger.warn("Unit's map instance '{}' doesn't match this world. Clearing anyways. '{}'", u.getMapInstance(), this);
 		unitsAttackingThis.remove(u);
 		units.removeUnit(u);
 		u.clearMapLifeTimeData();

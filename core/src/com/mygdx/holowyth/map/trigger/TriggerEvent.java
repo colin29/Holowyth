@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.map.trigger;
 
-import com.mygdx.holowyth.gameScreen.WorldInfo;
+import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 
 public abstract class TriggerEvent {
 
@@ -9,7 +9,7 @@ public abstract class TriggerEvent {
 	 */
 	protected boolean triggered = false;
 	
-	public abstract boolean check(WorldInfo world);
+	public abstract boolean check(MapInstanceInfo world);
 
 	public abstract TriggerEvent cloneObject();
 

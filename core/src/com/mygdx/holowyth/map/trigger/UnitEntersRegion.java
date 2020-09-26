@@ -3,7 +3,7 @@ package com.mygdx.holowyth.map.trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mygdx.holowyth.gameScreen.WorldInfo;
+import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 import com.mygdx.holowyth.map.trigger.region.Region;
 
 public class UnitEntersRegion extends TriggerEvent{
@@ -24,7 +24,7 @@ public class UnitEntersRegion extends TriggerEvent{
 	 *  Returns true if this event is detected now.  <br>
 	 *  If event was detected now, event is considered triggered. Subsequent calls to check() will return false, unless the event is reset.
 	 */
-	public boolean check(WorldInfo world) {
+	public boolean check(MapInstanceInfo world) {
 		if(!triggered) {
 			if(region.containsAnyUnit(world.getUnits())) {
 //				logger.debug("UnitEnterRegions was triggered: {}", region.getName() );

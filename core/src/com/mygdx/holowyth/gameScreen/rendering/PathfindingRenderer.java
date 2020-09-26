@@ -20,7 +20,7 @@ class PathfindingRenderer extends SubRenderer {
 	}
 
 	void renderUnitExpandedHitBodies() {
-		getWorld().doForAllUnits(
+		getMapInstance().doForAllUnits(
 				(UnitInfo u) -> {
 					HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + Holo.UNIT_RADIUS, Color.GRAY);
 				});
@@ -30,9 +30,9 @@ class PathfindingRenderer extends SubRenderer {
 	@SuppressWarnings("unused")
 	void renderPaths(boolean renderIntermediatePaths) {
 		if (renderIntermediatePaths) {
-			pathingModule.renderIntermediateAndFinalPaths(getWorld().getUnits());
+			pathingModule.renderIntermediateAndFinalPaths(getMapInstance().getUnits());
 		} else {
-			for (Unit unit : getWorld().getUnits()) {
+			for (Unit unit : getMapInstance().getUnits()) {
 				if (unit.getSide().isEnemy() && !Holo.debugRenderEnemyPath)
 					continue;
 				if (unit.getMotion().getPath() != null) {
@@ -41,7 +41,7 @@ class PathfindingRenderer extends SubRenderer {
 			}
 		}
 
-		for (Unit u : getWorld().getUnits()) {
+		for (Unit u : getMapInstance().getUnits()) {
 			u.getMotion().renderNextWayPoint();
 		}
 

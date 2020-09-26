@@ -11,8 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.ai.UnitAI;
-import com.mygdx.holowyth.gameScreen.World;
-import com.mygdx.holowyth.gameScreen.WorldInfo;
+import com.mygdx.holowyth.gameScreen.MapInstance;
+import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 import com.mygdx.holowyth.gameScreen.basescreens.GameMapLoadingScreen;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.map.UnitMarker;
@@ -85,7 +85,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	// General
 	public float x, y;
-	private WorldInfo world;
+	private MapInstanceInfo mapInstance;
 
 	// Ordering
 	UnitOrderDeferring orderDeferring;
@@ -155,12 +155,12 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		}
 	}
 
-	public Unit(float x, float y, WorldInfo world, Side side, String name) {
+	public Unit(float x, float y, MapInstanceInfo world, Side side, String name) {
 		this(x, y, side, world);
 		setName(name);
 	}
 
-	public Unit(float x, float y, Side side, WorldInfo world) {
+	public Unit(float x, float y, Side side, MapInstanceInfo world) {
 		this.id = Unit.getNextId();
 		idToUnit.put(id, this);
 		logger.debug("Placed unit id [{}]: ", id);
@@ -168,7 +168,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 		this.x = x;
 		this.y = y;
 		this.side = side;
-		this.world = world;
+		this.mapInstance = world;
 
 		motion = new UnitMotion(this, world);
 		stats = new UnitStats(this);
@@ -183,7 +183,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	/**
 	 * Create unit from marker
 	 */
-	public Unit(UnitMarker m, WorldInfo world) {
+	public Unit(UnitMarker m, MapInstanceInfo world) {
 		this(m.pos.x, m.pos.y, world, m.side, m.name);
 
 		stats.base.set(m.baseStats);
@@ -197,8 +197,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	/** Specifically for units that have been initialized and removed from a world once */
-	public void reinitializeForWorld(World world) {
-		this.world = world;
+	public void reinitializeForWorld(MapInstance world) {
+		this.mapInstance = world;
 		motion = new UnitMotion(this, world);
 		orderDeferring = new UnitOrderDeferring(this);
 		
@@ -208,7 +208,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	/**
 	 * This method clears data that shouldn't persist from while changing maps. It is used when moving a
 	 * unit to a new map. Note: This just clears a unit's data. It doesn't remove the unit from the
-	 * world's collection (Use: {@link World#removeAndDetachUnitFromWorld})
+	 * world's collection (Use: {@link MapInstance#removeAndDetachUnitFromWorld})
 	 */
 	public void clearMapLifeTimeData() {
 		notifyAppLifetimeComponentsToClearMapLifeTimeData();
@@ -234,7 +234,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	private void clearGeneralData() {
 		x=0;
 		y=0;
-		world = null;
+		mapInstance = null;
 	}
 	
 	private void clearOrderingData() {
@@ -650,7 +650,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	private void ifIdleAggroOntoNearbyTargets() {
 		if (isCompletelyIdle()) {
-			var closestTargets = UnitUtil.getTargetsSortedByDistance(this, world);
+			var closestTargets = UnitUtil.getTargetsSortedByDistance(this, mapInstance);
 			if (!closestTargets.isEmpty()) {
 				UnitOrderable closestEnemy = closestTargets.remove();
 
@@ -665,7 +665,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 	private void aggroOntoNearbyTargetsForAttackMove() {
 		if (order == Order.ATTACKMOVE) {
-			var closestTargets = UnitUtil.getTargetsSortedByDistance(this, world);
+			var closestTargets = UnitUtil.getTargetsSortedByDistance(this, mapInstance);
 			if (!closestTargets.isEmpty()) {
 				UnitOrderable closestEnemy = closestTargets.remove();
 
@@ -717,7 +717,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	private void handleTargetLossAndSwitchingForAttackUnitSoft() {
 		if (order == Order.ATTACKUNIT_SOFT) {
-			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, world);
+			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, mapInstance);
 			otherTargetsWithinAggroRange
 					.removeIf((t) -> Point.calcDistance(getPos(), t.getPos()) >= Holo.defaultAggroRange);
 			otherTargetsWithinAggroRange.remove(orderTarget);
@@ -740,7 +740,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	private void handleTargetLossAndSwitchingForAttackMove() {
 		if (order == Order.ATTACKMOVE) {
-			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, world);
+			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(this, mapInstance);
 			otherTargetsWithinAggroRange
 					.removeIf((t) -> Point.calcDistance(getPos(), t.getPos()) >= Holo.defaultAggroRange);
 			otherTargetsWithinAggroRange.remove(orderTarget);
@@ -825,7 +825,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 
 		getMotion().stopCurrentMovement();
 		attacking = target;
-		((World) world).onUnitStartsAttacking(this, attacking);
+		((MapInstance) mapInstance).onUnitStartsAttacking(this, attacking);
 
 		// Attack cooldown may be artificially higher because of a recent stun/reel
 		attackCooldownRemaining = Math.max(attackCooldownRemaining, attackCooldown / 4);
@@ -837,7 +837,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 */
 	void stopAttacking() {
 		if (isAttacking()) {
-			((World) world).onUnitStopsAttacking(this, attacking);
+			((MapInstance) mapInstance).onUnitStopsAttacking(this, attacking);
 			attacking = null;
 		}
 	}
@@ -974,8 +974,8 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	@Override
-	public WorldInfo getWorld() {
-		return world;
+	public MapInstanceInfo getMapInstance() {
+		return mapInstance;
 	}
 
 	/**
@@ -984,12 +984,12 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	 * 
 	 * @return
 	 */
-	public World getWorldMutable() {
-		return (World) world;
+	public MapInstance getMapInstanceMutable() {
+		return (MapInstance) mapInstance;
 	}
 
 	public Set<Unit> getUnitsAttackingThis() {
-		return world.getUnitsAttackingThis(this);
+		return mapInstance.getUnitsAttackingThis(this);
 	}
 
 	@Override

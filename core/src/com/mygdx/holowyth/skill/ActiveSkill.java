@@ -8,8 +8,8 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mygdx.holowyth.gameScreen.World;
-import com.mygdx.holowyth.gameScreen.WorldInfo;
+import com.mygdx.holowyth.gameScreen.MapInstance;
+import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 import com.mygdx.holowyth.skill.effect.CasterEffect;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;
@@ -51,7 +51,7 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 	Unit caster;
 
 	// References
-	World world;
+	MapInstance mapInstance;
 
 	// Components
 	public Casting casting = new Casting(this); // default behaviour, can assign over this from a sub class.
@@ -112,7 +112,7 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 		}
 
 		this.caster = caster;
-		this.world = caster.getWorldMutable();
+		this.mapInstance = caster.getMapInstanceMutable();
 
 		status = Status.CASTING;
 
@@ -161,7 +161,7 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 
 				for (Effect effect : effects) {
 					effect.begin();
-					world.addEffect(effect);
+					mapInstance.addEffect(effect);
 				}
 				onFinishCasting();
 			}
@@ -279,8 +279,8 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 		return parent == null;
 	}
 
-	public WorldInfo getWorld() {
-		return world;
+	public MapInstanceInfo getMapInstance() {
+		return mapInstance;
 	}
 
 	public boolean isRangedPhysicalOrMagicSkill() {

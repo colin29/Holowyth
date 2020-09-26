@@ -71,7 +71,7 @@ public class UnitStats implements UnitStatsInfo {
 	
 	public UnitStats(Unit unit) {
 		this.self = unit;
-		this.gfx = unit.getWorld().getGfx();
+		this.gfx = unit.getMapInstance().getGfx();
 
 		stun = new UnitStun(unit);
 		calc = new UnitStatCalculator(this);
@@ -84,7 +84,7 @@ public class UnitStats implements UnitStatsInfo {
 		}
 	}
 	public void reinitializeForWorld() {
-		gfx = self.getWorld().getGfx();
+		gfx = self.getMapInstance().getGfx();
 		stun = new UnitStun(self);
 	}
 	

@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.gameScreen.WorldInfo;
+import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
@@ -87,7 +87,7 @@ public class UnitMotion {
 	 * @param self
 	 * @param world
 	 */
-	UnitMotion(Unit self, WorldInfo world) {
+	UnitMotion(Unit self, MapInstanceInfo world) {
 		this.self = self;
 		units = world.getUnits();
 		pathing = world.getPathingModule();

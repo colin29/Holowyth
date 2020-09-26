@@ -10,7 +10,7 @@ public abstract class CasterEffect extends Effect {
 	protected final Unit caster;
 
 	public CasterEffect(Unit caster) {
-		super(caster.getWorldMutable());
+		super(caster.getMapInstanceMutable());
 		this.caster = caster;
 	}
 

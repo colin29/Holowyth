@@ -17,7 +17,7 @@ class SandBoxRenderer extends SubRenderer {
 		TextureRegion witchTex = new TextureRegion(game.assets.get("img/witch.png", Texture.class));
 		witchTex.getTexture().setFilter(TextureFilter.MipMapLinearLinear, TextureFilter.Nearest);
 
-		for (Unit unit : getWorld().getUnits()) {
+		for (Unit unit : getMapInstance().getUnits()) {
 			if (unit.isAPlayerCharacter()) {
 				HoloSprite player = new HoloSprite(witchTex, unit.x, unit.y, 30, 0, 20);
 				player.draw(batch);
