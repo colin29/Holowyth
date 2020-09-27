@@ -44,7 +44,7 @@ class World {
 	/**
 	 * Is the angle in rads, from circle center to intersect point, 0 degrees is at (0,radius), spinning CCW
 	 */
-	private float angleOfCircleAtIntersect; //
+	private float angleOfCircleAtIntersect;
 
 	public World(DebugStore debugStore) {
 		DebugValues debugValues = debugStore.registerComponent("World");
@@ -66,7 +66,7 @@ class World {
 		if (circles.contains(circle)) {
 			keyCircle = circle;
 		} else {
-			LoggerFactory.getLogger(this.getClass()).warn("KeyCircle must be a circle contained in World, set ignored");
+			logger.warn("KeyCircle must be a circle contained in World, set ignored");
 		}
 	}
 
@@ -99,11 +99,6 @@ class World {
 		closestPoint.set(initial).add(initialToClosestPoint);
 
 		closestDistToCenter = (keyCircle.getCenter().sub(closestPoint)).len();
-
-		// if distance is greater than center, there is no collision
-		if (closestDistToCenter > keyCircle.getRadius()) {
-			logger.warn("No collision -- line does not intersect circle");
-		}
 
 		float radius = keyCircle.getRadius();
 		float lengthOfHalfChord = (float) Math.sqrt((radius * radius - closestDistToCenter * closestDistToCenter));

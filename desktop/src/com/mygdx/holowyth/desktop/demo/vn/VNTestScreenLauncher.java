@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.desktop;
+package com.mygdx.holowyth.desktop.demo.vn;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
