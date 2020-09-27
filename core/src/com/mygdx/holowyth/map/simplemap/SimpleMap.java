@@ -1,8 +1,7 @@
-package com.mygdx.holowyth.map;
+package com.mygdx.holowyth.map.simplemap;
 
 import java.io.Serializable;
 
-import com.mygdx.holowyth.polygon.Polygons;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**
@@ -10,7 +9,7 @@ import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
  * @author Colin
  *
  */
-public class Field implements Serializable {
+public class SimpleMap implements Serializable {
 
 
 	private static final long serialVersionUID = 2L;
@@ -24,19 +23,17 @@ public class Field implements Serializable {
 	
 	public transient boolean hasUnsavedChanges;
 
-	public Field() {
+	public SimpleMap() {
 		this(2000,1200);
 	}
 
-	public Field(int width, int height) {
+	public SimpleMap(int width, int height) {
 		
 		this.setDimensions(width, height);
 		
 		this.name = "";
 		this.width = width;
 		this.height = height;
-		
-		System.out.println("New map created");
 	}
 	
 	public void setDimensions(int width, int height) {

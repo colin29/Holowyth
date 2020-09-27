@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.desktop.selectLauncher;
+package com.mygdx.holowyth.desktop.select;
 
 import java.util.Map;
 import java.util.Map.Entry;

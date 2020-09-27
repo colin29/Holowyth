@@ -15,8 +15,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.polygon.Polygon;
-import com.mygdx.holowyth.polygon.Polygons;
+import com.mygdx.holowyth.map.obstacledata.Polygon;
+import com.mygdx.holowyth.map.simplemap.Polygons;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 
@@ -63,14 +63,13 @@ public class PolygonDemo implements Screen, InputProcessor {
 
 	private void renderPolygonDemo() {
 		shapeRenderer.setColor(0, 0, 0, 1);
-		
+
 		shapeRenderer.begin(ShapeType.Line);
 		for (Polygon p : polys) {
 			shapeRenderer.polygon(p.floats, 0, p.count);
 		}
 		shapeRenderer.end();
-		
-		
+
 		shapeRenderer.begin(ShapeType.Line);
 		for (Segment s : segs) { // draw in progress line-segments
 			shapeRenderer.line(s.x1, s.y1, s.x2, s.y2);
@@ -107,7 +106,7 @@ public class PolygonDemo implements Screen, InputProcessor {
 	int vertexCount = 0;
 
 	private void addVertex(float x, float y) {
-		
+
 		// If new vertex is close to the initial point, finish the polygon without adding anymore points
 		if (vertexCount >= 4) {
 			float ix = vertexes[0];
@@ -120,7 +119,7 @@ public class PolygonDemo implements Screen, InputProcessor {
 				return;
 			}
 		}
-		
+
 		vertexes[vertexCount] = x;
 		vertexes[vertexCount + 1] = y;
 		vertexCount += 2;

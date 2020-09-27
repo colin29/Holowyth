@@ -1,11 +1,12 @@
-package com.mygdx.holowyth.desktop.demoLauncher;
+package com.mygdx.holowyth.desktop.demo.pathing;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.test.ai.BTreeDemo;
+import com.mygdx.holowyth.collision.wallcollisiondemo.WallCollisionDemo;
+import com.mygdx.holowyth.pathfinding.demo.PathfindingDemo;
 
-public class BTreeDemoLauncher {
+public class PathfindingDemoLauncher {
 	public static void main(String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "Holowyth";
@@ -14,6 +15,6 @@ public class BTreeDemoLauncher {
 		config.samples = 5;
 		config.vSyncEnabled = false;
 		config.foregroundFPS = 0;
-		new LwjglApplication(new Holowyth(BTreeDemo.class), config);
+		new LwjglApplication(new Holowyth(PathfindingDemo.class), config);
 	}
 }

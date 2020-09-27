@@ -32,7 +32,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.graphics.HoloGL;
-import com.mygdx.holowyth.map.Field;
+import com.mygdx.holowyth.map.simplemap.SimpleMap;
 import com.mygdx.holowyth.pathfinding.CBInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
@@ -64,7 +64,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 	Skin skin = VisUI.getSkin();
 
 	// App Fields
-	Field map;
+	SimpleMap map;
 	PFUnitControls unitControls;
 	PathingModule pathingModule;
 
@@ -342,7 +342,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 	/**
 	 * Logically initializes a bunch of components necessary to run the map
 	 */
-	private void mapStartup(Field map) {
+	private void mapStartup(SimpleMap map) {
 		// Unit Controls
 		if (unitControls != null) {
 			multiplexer.removeProcessor(unitControls);
@@ -352,7 +352,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
 		// Pathfinding Graph
 
-		pathingModule.initForMap(map);
+		pathingModule.initForSimpleMap(map);
 		// Pathing
 
 		//// ---------Test Area---------////:
@@ -504,11 +504,11 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 	}
 
 	private void loadMapFromDisk(String pathname) {
-			Field loadedMap = HoloIO.getMapFromDisk(pathname);
+			SimpleMap loadedMap = HoloIO.getMapFromDisk(pathname);
 			loadMap(loadedMap);
 	}
 
-	private void loadMap(Field map) {
+	private void loadMap(SimpleMap map) {
 		System.out.println("New map loaded");
 		this.map = map;
 		map.hasUnsavedChanges = false;
@@ -523,7 +523,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		batch.setProjectionMatrix(fixedCam.combined);
 		if (true) {
 			batch.begin();
-			Texture cursorImg = game.assets.get("icons/cursors/cursor.png", Texture.class);
+			Texture cursorImg = game.assets.get("img/cursors/cursor.png", Texture.class);
 
 			batch.draw(cursorImg, Gdx.input.getX(),
 					Gdx.graphics.getHeight() - Gdx.input.getY() - cursorImg.getHeight());

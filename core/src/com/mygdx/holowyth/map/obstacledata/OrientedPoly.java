@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.util.dataobjects;
+package com.mygdx.holowyth.map.obstacledata;
 
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.mygdx.holowyth.polygon.Polygon;
 
 public class OrientedPoly {
 

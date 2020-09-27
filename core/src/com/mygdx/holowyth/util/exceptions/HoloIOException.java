@@ -7,4 +7,12 @@ public class HoloIOException extends HoloException {
 	public HoloIOException(String msg) {
 		super(msg);
 	}
+	public HoloIOException(Throwable cause) {
+		super(cause);
+	}
+
+	public HoloIOException(String message, Throwable cause) {
+		super(message, cause);
+	}
+
 }

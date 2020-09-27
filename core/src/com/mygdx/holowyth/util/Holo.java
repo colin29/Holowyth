@@ -11,7 +11,7 @@ import com.badlogic.gdx.graphics.Color;
 public class Holo {
 
 	// Paths
-	public static String simpleMapsDirectory = "saveFiles/";
+	public static String simpleMapsDirectory = "resources/assets/maps/old/";
 	public static String mapsDirectory = "assets/maps/";
 
 	// Demos

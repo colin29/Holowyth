@@ -18,12 +18,12 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Polyline;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Queue;
-import com.mygdx.holowyth.map.Field;
+import com.mygdx.holowyth.map.obstacledata.OrientedPoly;
+import com.mygdx.holowyth.map.obstacledata.OrientedSeg;
+import com.mygdx.holowyth.map.simplemap.SimpleMap;
 import com.mygdx.holowyth.pathfinding.PathSmoother.PathsInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Coord;
-import com.mygdx.holowyth.util.dataobjects.OrientedPoly;
-import com.mygdx.holowyth.util.dataobjects.OrientedSeg;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
@@ -72,7 +72,7 @@ public class PathingModule {
 	/*
 	 * Re-inits for the given map
 	 */
-	public void initForMap(Field map) {
+	public void initForSimpleMap(SimpleMap map) {
 		mapWidth = map.width();
 		mapHeight = map.height();
 

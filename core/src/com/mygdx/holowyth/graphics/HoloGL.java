@@ -6,9 +6,9 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.map.Field;
-import com.mygdx.holowyth.polygon.Polygon;
-import com.mygdx.holowyth.polygon.Polygons;
+import com.mygdx.holowyth.map.obstacledata.Polygon;
+import com.mygdx.holowyth.map.simplemap.Polygons;
+import com.mygdx.holowyth.map.simplemap.SimpleMap;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
@@ -118,7 +118,7 @@ public class HoloGL {
 		shapeRenderer.end();
 	}
 
-	public static void renderMapBoundaries(Field map) {
+	public static void renderMapBoundaries(SimpleMap map) {
 		renderMapBoundaries(map.width(), map.height());
 	}
 

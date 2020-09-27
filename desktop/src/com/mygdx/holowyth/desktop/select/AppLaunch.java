@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.desktop.selectLauncher;
+package com.mygdx.holowyth.desktop.select;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;

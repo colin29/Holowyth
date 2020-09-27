@@ -1,11 +1,11 @@
-package com.mygdx.holowyth.desktop.sandboxLauncher;
+package com.mygdx.holowyth.desktop.demo.collision;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.test.ui.ButtonsDemo;
+import com.mygdx.holowyth.collision.linecircledemo.LineCircleDemo;
 
-public class SandboxLauncher {
+public class LineCircleLauncher {
 	public static void main(String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "Holowyth";
@@ -14,6 +14,6 @@ public class SandboxLauncher {
 		config.samples = 5;
 		config.vSyncEnabled = false;
 		config.foregroundFPS = 0;
-		new LwjglApplication(new Holowyth(ButtonsDemo.class), config);
+		new LwjglApplication(new Holowyth(LineCircleDemo.class), config);
 	}
 }

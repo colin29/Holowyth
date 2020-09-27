@@ -1,11 +1,11 @@
-package com.mygdx.holowyth.desktop.demoLauncher;
+package com.mygdx.holowyth.desktop.demo.collision;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.tiled.TiledDemo;
+import com.mygdx.holowyth.collision.wallcollisiondemo.WallCollisionDemo;
 
-public class TiledDemoLauncher {
+public class WallDemoLauncher {
 	public static void main(String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "Holowyth";
@@ -14,6 +14,6 @@ public class TiledDemoLauncher {
 		config.samples = 5;
 		config.vSyncEnabled = false;
 		config.foregroundFPS = 0;
-		new LwjglApplication(new Holowyth(TiledDemo.class), config);
+		new LwjglApplication(new Holowyth(WallCollisionDemo.class), config);
 	}
 }

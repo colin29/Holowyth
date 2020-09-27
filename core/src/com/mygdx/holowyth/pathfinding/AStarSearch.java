@@ -7,7 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.PriorityQueue;
 
-import com.mygdx.holowyth.util.dataobjects.OrientedSeg;
+import com.mygdx.holowyth.map.obstacledata.OrientedSeg;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**

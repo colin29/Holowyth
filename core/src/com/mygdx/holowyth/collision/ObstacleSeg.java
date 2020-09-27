@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.collision;
 
-import com.mygdx.holowyth.util.dataobjects.OrientedSeg;
+import com.mygdx.holowyth.map.obstacledata.OrientedSeg;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 
 public class ObstacleSeg implements Collidable {

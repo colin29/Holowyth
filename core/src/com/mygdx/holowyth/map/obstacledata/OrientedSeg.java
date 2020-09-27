@@ -1,6 +1,7 @@
-package com.mygdx.holowyth.util.dataobjects;
+package com.mygdx.holowyth.map.obstacledata;
 
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.holowyth.util.dataobjects.Segment;
 
 public class OrientedSeg extends Segment {
 

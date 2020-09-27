@@ -10,8 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.util.dataobjects.OrientedPoly;
-import com.mygdx.holowyth.util.dataobjects.OrientedSeg;
+import com.mygdx.holowyth.map.obstacledata.OrientedPoly;
+import com.mygdx.holowyth.map.obstacledata.OrientedSeg;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.exceptions.HoloOperationException;

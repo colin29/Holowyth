@@ -7,7 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Paths;
 
-import com.mygdx.holowyth.map.Field;
+import com.mygdx.holowyth.map.simplemap.SimpleMap;
 import com.mygdx.holowyth.util.exceptions.HoloException;
 /**
  * Utility methods related to disk access and paths
@@ -17,14 +17,14 @@ import com.mygdx.holowyth.util.exceptions.HoloException;
  */
 public class HoloIO {
 
-	public static Field getMapFromDisk(String pathname) {
-		Field map;
+	public static SimpleMap getMapFromDisk(String pathname) {
+		SimpleMap map;
 		FileInputStream fileIn = null;
 		ObjectInputStream in = null;
 		try {
 			fileIn = new FileInputStream(pathname);
 			in = new ObjectInputStream(fileIn);
-			map = (Field) in.readObject();
+			map = (SimpleMap) in.readObject();
 			return map;
 
 		} catch (IOException e) {
@@ -42,7 +42,7 @@ public class HoloIO {
 
 	}
 
-	public static void saveMapToDisk(String pathname, Field map) {
+	public static void saveMapToDisk(String pathname, SimpleMap map) {
 		ObjectOutputStream oos = null;
 		FileOutputStream fout = null;
 		try {

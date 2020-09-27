@@ -9,7 +9,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.map.Field;
+import com.mygdx.holowyth.map.simplemap.SimpleMap;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.exceptions.HoloException;
@@ -33,7 +33,7 @@ public abstract class SimpleMapDemoScreen extends HoloBaseScreen implements Inpu
 	/**
 	 * The currently loaded map
 	 */
-	protected Field map;
+	protected SimpleMap map;
 
 	protected SimpleMapDemoScreen(Holowyth game) {
 		super(game);
@@ -62,11 +62,11 @@ public abstract class SimpleMapDemoScreen extends HoloBaseScreen implements Inpu
 	 * Gets a map from disk, then loads it.
 	 */
 	protected void loadMapFromDisk(String pathname) {
-		Field loadedMap = HoloIO.getMapFromDisk(pathname);
+		SimpleMap loadedMap = HoloIO.getMapFromDisk(pathname);
 		loadMap(loadedMap);
 	}
 
-	protected void loadMap(Field newMap) {
+	protected void loadMap(SimpleMap newMap) {
 
 		if (this.map != null) {
 			mapShutdown();
