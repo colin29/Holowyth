@@ -44,11 +44,11 @@ public class DebugStoreUI {
 //	}
 
 	/**
-	 * This may not work for loading a second map, atm. Nonetheless, this still needs to be called after debug values are added from all components --
-	 * at the end of component creation
+	 * Call after whatever components you want are registered. Additional calls regenerate the table.
 	 */
 	public void populateDebugValueDisplay() {
 		valueLabelMapping = new ValueLabelMapping();
+		debugTable.clear();
 
 		LabelStyle debugStyle = new LabelStyle(Holowyth.fonts.debugFont(), Color.BLACK);
 
