@@ -19,7 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
-import com.mygdx.holowyth.editor.PolyMapEditor;
+import com.mygdx.holowyth.gameScreen.combatDemo.CombatDemo;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.map.GameMapRepo;
 import com.mygdx.holowyth.unit.sprite.Animations;
@@ -58,7 +58,7 @@ public class Holowyth extends Game {
 	public ShapeDrawerPlus shapeDrawer;
 
 	public Holowyth() {
-		this(PolyMapEditor.class);
+		this(CombatDemo.class);
 	}
 
 	public Holowyth(Class<? extends Screen> clazz) {
@@ -78,8 +78,7 @@ public class Holowyth extends Game {
 		
 		animations = new Animations();
 
-		LoadingScreen loadingScreen = new LoadingScreen(this);
-		loadingScreen.queueAssets();
+		new LoadingScreen(this);
 		this.assets.finishLoading();
 
 		setScreenToClass(screenClassToLoad);
