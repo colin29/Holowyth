@@ -42,9 +42,6 @@ import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
-import com.mygdx.holowyth.util.exception.ErrorCode;
-import com.mygdx.holowyth.util.exception.HoloException;
-import com.mygdx.holowyth.util.tools.KeyTracker;
 import com.mygdx.holowyth.util.tools.Timer;
 
 public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
@@ -507,16 +504,8 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 	}
 
 	private void loadMapFromDisk(String pathname) {
-		try {
 			Field loadedMap = HoloIO.getMapFromDisk(pathname);
 			loadMap(loadedMap);
-		} catch (HoloException e) {
-			if (e.code == ErrorCode.IO_EXCEPTION) {
-				System.out.println("IO Error, map not loaded");
-				return;
-			}
-		}
-
 	}
 
 	private void loadMap(Field map) {
@@ -543,10 +532,6 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		}
 	}
 
-	// Input Related
-
-	final int[] TRACKED_KEYS = new int[] { Keys.LEFT, Keys.RIGHT, Keys.UP, Keys.DOWN };
-	KeyTracker keyTracker = new KeyTracker(TRACKED_KEYS, multiplexer);
 
 	/* ^^^^^^ End of User Methods ^^^^^^ */
 

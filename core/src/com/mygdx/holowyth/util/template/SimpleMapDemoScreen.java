@@ -12,16 +12,17 @@ import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.map.Field;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloIO;
-import com.mygdx.holowyth.util.exception.ErrorCode;
-import com.mygdx.holowyth.util.exception.HoloException;
+import com.mygdx.holowyth.util.exceptions.HoloException;
 
 /**
- * Works with the simple kind of map, which is used in older demos which have no need to load TMX map
+ * Works with the simple kind of map, which is used in older demos which have no need to load TMX
+ * map
  * 
- * Provides the common base functionality of a demo to be able to have a currently loaded map, and to get maps from disk
+ * Provides the common base functionality of a demo to be able to have a currently loaded map, and
+ * to get maps from disk
  * 
- * Also acts as an adapter to the Screen and InputProcessor classes, providing empty implementations for most of the methods. Override just what you
- * need.
+ * Also acts as an adapter to the Screen and InputProcessor classes, providing empty implementations
+ * for most of the methods. Override just what you need.
  * 
  * 
  * @author Colin Ta
@@ -61,16 +62,8 @@ public abstract class SimpleMapDemoScreen extends HoloBaseScreen implements Inpu
 	 * Gets a map from disk, then loads it.
 	 */
 	protected void loadMapFromDisk(String pathname) {
-		try {
-			Field loadedMap = HoloIO.getMapFromDisk(pathname);
-			loadMap(loadedMap);
-		} catch (HoloException e) {
-			if (e.code == ErrorCode.IO_EXCEPTION) {
-				System.out.println("IO Error, map not loaded");
-				return;
-			}
-		}
-
+		Field loadedMap = HoloIO.getMapFromDisk(pathname);
+		loadMap(loadedMap);
 	}
 
 	protected void loadMap(Field newMap) {

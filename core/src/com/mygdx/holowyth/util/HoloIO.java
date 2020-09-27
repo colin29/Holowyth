@@ -8,9 +8,7 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Paths;
 
 import com.mygdx.holowyth.map.Field;
-import com.mygdx.holowyth.util.exception.ErrorCode;
-import com.mygdx.holowyth.util.exception.HoloException;
-
+import com.mygdx.holowyth.util.exceptions.HoloException;
 /**
  * Utility methods related to disk access and paths
  * 
@@ -29,13 +27,10 @@ public class HoloIO {
 			map = (Field) in.readObject();
 			return map;
 
-		} catch (IOException i) {
-			i.printStackTrace();
-			throw new HoloException(ErrorCode.IO_EXCEPTION);
-		} catch (ClassNotFoundException c) {
-			System.out.println("Field class not found");
-			c.printStackTrace();
-			throw new HoloException(ErrorCode.IO_EXCEPTION);
+		} catch (IOException e) {
+			throw new HoloException("Couldn't read map from disk", e);
+		} catch (ClassNotFoundException e) {
+			throw new HoloException(e);
 		} finally {
 			try {
 				in.close();

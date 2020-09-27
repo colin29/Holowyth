@@ -10,6 +10,7 @@ public class UnitEntersRegion extends TriggerEvent{
 
 	private Region region;
 	
+	@SuppressWarnings("unused")
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	public UnitEntersRegion(Region region) {

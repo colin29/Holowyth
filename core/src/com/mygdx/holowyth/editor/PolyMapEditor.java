@@ -42,9 +42,8 @@ import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.dataobjects.Pair;
-import com.mygdx.holowyth.util.exception.ErrorCode;
-import com.mygdx.holowyth.util.exception.HoloException;
-import com.mygdx.holowyth.util.tools.KeyTracker;
+import com.mygdx.holowyth.util.exceptions.HoloException;
+import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 public class PolyMapEditor implements Screen, InputProcessor {
 
@@ -150,7 +149,6 @@ public class PolyMapEditor implements Screen, InputProcessor {
 		System.out.println("Screen showed");
 
 		multiplexer.clear();
-		multiplexer.addProcessor(keyTracker);
 		multiplexer.addProcessor(stage);
 		multiplexer.addProcessor(this);
 		Gdx.input.setInputProcessor(multiplexer);
@@ -320,18 +318,17 @@ public class PolyMapEditor implements Screen, InputProcessor {
 					info.setColor(Color.RED);
 					return;
 				}
-
+				Field newMap;
 				// Create the new map
 				try {
-					Field newMap = new Field(width, height);
-					newMap.name = nameField.getText();
-					PolyMapEditor.this.loadMap(newMap);
-				} catch (HoloException e) {
-					if (e.code == ErrorCode.INVALID_DIMENSIONS) {
-						info.setText("Invalid Map Dimensions");
-						info.setColor(Color.RED);
-					}
+					newMap = new Field(width, height);
+				} catch (HoloIllegalArgumentsException e) {
+					info.setText("Invalid Map Dimensions");
+					info.setColor(Color.RED);
+					return;
 				}
+				newMap.name = nameField.getText();
+				PolyMapEditor.this.loadMap(newMap);
 				dialog.remove();
 			}
 		});
@@ -390,16 +387,11 @@ public class PolyMapEditor implements Screen, InputProcessor {
 
 				try {
 					PolyMapEditor.this.map.setDimensions(width, height);
-				} catch (HoloException e) {
-					if (e.code == ErrorCode.INVALID_DIMENSIONS) {
-						info.setText("Invalid Map Dimensions");
-						info.setColor(Color.RED);
-						return;
-					} else {
-						throw (e);
-					}
+				} catch (HoloIllegalArgumentsException e) {
+					info.setText("Invalid Map Dimensions");
+					info.setColor(Color.RED);
+					return;
 				}
-
 				PolyMapEditor.this.map.name = nameField.getText();
 				map.hasUnsavedChanges = true;
 				dialog.remove();
@@ -456,16 +448,8 @@ public class PolyMapEditor implements Screen, InputProcessor {
 	// Saving and Loading Maps
 
 	private void loadMapFromDisk(String pathname) {
-		try {
-			Field loadedMap = HoloIO.getMapFromDisk(pathname);
-			loadMap(loadedMap);
-		} catch (HoloException e) {
-			if (e.code == ErrorCode.IO_EXCEPTION) {
-				System.out.println("IO Error, map not loaded");
-				return;
-			}
-		}
-
+		Field loadedMap = HoloIO.getMapFromDisk(pathname);
+		loadMap(loadedMap);
 	}
 
 	private void saveMapToDisk(String pathname) throws IOException {
@@ -474,7 +458,8 @@ public class PolyMapEditor implements Screen, InputProcessor {
 
 	// Cursor Related
 	/**
-	 * Manually renders a cursor sprite if the cursor grabbing is enabled (which hides the default cursor).
+	 * Manually renders a cursor sprite if the cursor grabbing is enabled (which hides the default
+	 * cursor).
 	 */
 	private void renderCursor() {
 		batch.setProjectionMatrix(fixedCam.combined);
@@ -544,25 +529,20 @@ public class PolyMapEditor implements Screen, InputProcessor {
 	private float keyboardScrollSpeed = 450;
 
 	private void handleKeyboardCameraScroll(float delta) {
-		if (keyTracker.isKeyDown(Keys.RIGHT)) {
+		if (Gdx.input.isButtonPressed(Keys.RIGHT)) {
 			camera.position.x += keyboardScrollSpeed * delta;
 		}
-		if (keyTracker.isKeyDown(Keys.LEFT)) {
+		if (Gdx.input.isButtonPressed(Keys.LEFT)) {
 			camera.position.x -= keyboardScrollSpeed * delta;
 		}
-		if (keyTracker.isKeyDown(Keys.UP)) {
+		if (Gdx.input.isButtonPressed(Keys.UP)) {
 			camera.position.y += keyboardScrollSpeed * delta;
 		}
-		if (keyTracker.isKeyDown(Keys.DOWN)) {
+		if (Gdx.input.isButtonPressed(Keys.DOWN)) {
 			camera.position.y -= keyboardScrollSpeed * delta;
 		}
 
 	}
-
-	// Input Related
-
-	final int[] TRACKED_KEYS = new int[] { Keys.LEFT, Keys.RIGHT, Keys.UP, Keys.DOWN };
-	KeyTracker keyTracker = new KeyTracker(TRACKED_KEYS, multiplexer);
 
 	// Misc. Functions
 

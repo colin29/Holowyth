@@ -14,7 +14,6 @@ import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.units.MonsterStats;
 import com.mygdx.holowyth.unit.units.MonsterTemplates;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class Forest1 extends GameMap {
 	

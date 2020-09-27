@@ -3,8 +3,7 @@ package com.mygdx.holowyth.map;
 import java.io.Serializable;
 
 import com.mygdx.holowyth.polygon.Polygons;
-import com.mygdx.holowyth.util.exception.ErrorCode;
-import com.mygdx.holowyth.util.exception.HoloException;
+import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**
  * The old map class. The practical counterpart is a TMX map
@@ -25,11 +24,11 @@ public class Field implements Serializable {
 	
 	public transient boolean hasUnsavedChanges;
 
-	public Field() throws HoloException {
+	public Field() {
 		this(2000,1200);
 	}
 
-	public Field(int width, int height) throws HoloException {
+	public Field(int width, int height) {
 		
 		this.setDimensions(width, height);
 		
@@ -40,9 +39,9 @@ public class Field implements Serializable {
 		System.out.println("New map created");
 	}
 	
-	public void setDimensions(int width, int height) throws HoloException{
+	public void setDimensions(int width, int height) {
 		if(width <= 0 ||  height <= 0){
-			throw new HoloException(ErrorCode.INVALID_DIMENSIONS);
+			throw new HoloIllegalArgumentsException("width and height must be positive, got: " + width + " " + height);
 		}
 		this.width = width;
 		this.height = height;
