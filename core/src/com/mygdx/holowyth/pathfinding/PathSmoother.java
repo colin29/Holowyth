@@ -29,7 +29,7 @@ public class PathSmoother {
 	 * @return A new path that is a smoothed version of the given path
 	 */
 	public Path smoothPath(Path origPath, List<OrientedSeg> obstacleExpandedSegs,
-			List<Point> obstaclePoints, ArrayList<CBInfo> cbs, float unitRadius) {
+			List<Point> obstaclePoints, ArrayList<UnitCB> cbs, float unitRadius) {
 
 		path0s = origPath.deepCopy();
 		path1s = null;
@@ -90,7 +90,7 @@ public class PathSmoother {
 	 * @return A new path that is a smoothed version of the given path
 	 */
 	private Path doSecondarySmoothing(Path origPath, List<OrientedSeg> obstacleExpandedSegs,
-			List<Point> obstaclePoints, ArrayList<CBInfo> cbs, float unitRadius) {
+			List<Point> obstaclePoints, ArrayList<UnitCB> cbs, float unitRadius) {
 
 		testCount = 0;
 

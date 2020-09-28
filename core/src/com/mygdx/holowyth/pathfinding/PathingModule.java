@@ -211,18 +211,13 @@ public class PathingModule {
 
 		// For pathfinding, need to get expanded geometry of unit collision bodies as well
 
-		ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
+		ArrayList<UnitCB> colBodies = new ArrayList<UnitCB>();
 
 		for (UnitPF u : allUnits) {
 			if (unit.equals(u)) { // don't consider the unit's own collision body
 				continue;
 			}
-
-			CBInfo c = new CBInfo();
-			c.x = u.getX();
-			c.y = u.getY();
-			c.unitRadius = Holo.UNIT_RADIUS;
-			colBodies.add(c);
+			colBodies.add(u);
 		}
 
 		// Generate dynamic graph;
@@ -397,15 +392,15 @@ public class PathingModule {
 	 *              information.
 	 * @param u     The radius of the pathing unit (has to match the radius of the base graph though)
 	 */
-	private void setDynamicGraph(List<CBInfo> infos, float unitRadius) {
+	private void setDynamicGraph(List<UnitCB> infos, float unitRadius) {
 
-		for (CBInfo cb : infos) {
+		for (UnitCB cb : infos) {
 			prospects = new ArrayList<Vertex>();
 			float x1, x2, y1, y2; // boundaries of the bounding box of the expanded colliding body
-			x1 = cb.x - cb.unitRadius - unitRadius;
-			x2 = cb.x + cb.unitRadius + unitRadius;
-			y1 = cb.y - cb.unitRadius - unitRadius;
-			y2 = cb.y + cb.unitRadius + unitRadius;
+			x1 = cb.getX() - cb.getRadius() - unitRadius;
+			x2 = cb.getX() + cb.getRadius() + unitRadius;
+			y1 = cb.getY() - cb.getRadius() - unitRadius;
+			y2 = cb.getY() + cb.getRadius() + unitRadius;
 
 			int upperIndexX = (int) Math.ceil(x2 / CELL_SIZE);
 			int upperIndexY = (int) Math.ceil(y2 / CELL_SIZE);
@@ -432,17 +427,17 @@ public class PathingModule {
 	 * 
 	 * @param self Radius of the radius of the unit which is pathing. Used to get expanded geometry.
 	 */
-	private void restrictVertex(Vertex v, CBInfo cb, float unitRadius) {
+	private void restrictVertex(Vertex v, UnitCB cb, float unitRadius) {
 		float x = v.ix * CELL_SIZE;
 		float y = v.iy * CELL_SIZE;
 
 		// if the vertex is inside the unit's expanded pathing body, we can immediately block it.
 
 		Point p1 = new Point(x, y);
-		Point p2 = new Point(cb.x, cb.y);
+		Point p2 = new Point(cb.getX(), cb.getY());
 		float dist = Point.dist(p1, p2);
 
-		float expandedRadius = cb.unitRadius + unitRadius;
+		float expandedRadius = cb.getRadius() + unitRadius;
 		float radSquared = expandedRadius * expandedRadius;
 
 		if (dist < expandedRadius) {
@@ -456,15 +451,15 @@ public class PathingModule {
 		// than the
 		// expanded radius
 
-		v.N = v.N && (Line2D.ptSegDistSq(x, y, x, y + CELL_SIZE, cb.x, cb.y) >= radSquared);
-		v.S = v.S && (Line2D.ptSegDistSq(x, y, x, y - CELL_SIZE, cb.x, cb.y) >= radSquared);
-		v.W = v.W && (Line2D.ptSegDistSq(x, y, x - CELL_SIZE, y, cb.x, cb.y) >= radSquared);
-		v.E = v.E && (Line2D.ptSegDistSq(x, y, x + CELL_SIZE, y, cb.x, cb.y) >= radSquared);
+		v.N = v.N && (Line2D.ptSegDistSq(x, y, x, y + CELL_SIZE, cb.getX(), cb.getY()) >= radSquared);
+		v.S = v.S && (Line2D.ptSegDistSq(x, y, x, y - CELL_SIZE, cb.getX(), cb.getY()) >= radSquared);
+		v.W = v.W && (Line2D.ptSegDistSq(x, y, x - CELL_SIZE, y, cb.getX(), cb.getY()) >= radSquared);
+		v.E = v.E && (Line2D.ptSegDistSq(x, y, x + CELL_SIZE, y, cb.getX(), cb.getY()) >= radSquared);
 
-		v.NW = v.NW && (Line2D.ptSegDistSq(x, y, x - CELL_SIZE, y + CELL_SIZE, cb.x, cb.y) >= radSquared);
-		v.NE = v.NE && (Line2D.ptSegDistSq(x, y, x + CELL_SIZE, y + CELL_SIZE, cb.x, cb.y) >= radSquared);
-		v.SW = v.SW && (Line2D.ptSegDistSq(x, y, x - CELL_SIZE, y - CELL_SIZE, cb.x, cb.y) >= radSquared);
-		v.SE = v.SE && (Line2D.ptSegDistSq(x, y, x + CELL_SIZE, y - CELL_SIZE, cb.x, cb.y) >= radSquared);
+		v.NW = v.NW && (Line2D.ptSegDistSq(x, y, x - CELL_SIZE, y + CELL_SIZE, cb.getX(), cb.getY()) >= radSquared);
+		v.NE = v.NE && (Line2D.ptSegDistSq(x, y, x + CELL_SIZE, y + CELL_SIZE, cb.getX(), cb.getY()) >= radSquared);
+		v.SW = v.SW && (Line2D.ptSegDistSq(x, y, x - CELL_SIZE, y - CELL_SIZE, cb.getX(), cb.getY()) >= radSquared);
+		v.SE = v.SE && (Line2D.ptSegDistSq(x, y, x + CELL_SIZE, y - CELL_SIZE, cb.getX(), cb.getY()) >= radSquared);
 	}
 
 	/**

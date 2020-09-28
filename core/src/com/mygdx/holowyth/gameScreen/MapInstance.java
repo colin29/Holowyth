@@ -20,7 +20,7 @@ import com.mygdx.holowyth.collision.ObstacleSeg;
 import com.mygdx.holowyth.collision.UnitAdapterCircleCB;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.map.UnitMarker;
-import com.mygdx.holowyth.pathfinding.CBInfo;
+import com.mygdx.holowyth.pathfinding.UnitCB;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.effect.Effect;
@@ -149,10 +149,10 @@ public class MapInstance implements MapInstanceInfo {
 			}
 
 			// Get all other colliding bodies
-			ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
+			ArrayList<UnitCB> colBodies = new ArrayList<UnitCB>();
 			for (Unit u : units.getUnits()) {
 				if (!thisUnit.equals(u))
-					colBodies.add(new CBInfo(u));
+					colBodies.add(u);
 			}
 
 			float destX = thisUnit.x + thisUnit.getMotion().getVx();
@@ -160,7 +160,7 @@ public class MapInstance implements MapInstanceInfo {
 
 			Segment motion = new Segment(thisUnit.x, thisUnit.y, destX, destY);
 
-			ArrayList<CBInfo> collisions = HoloPF.detectCollisionsFromUnitMoving(motion.x1, motion.y1, motion.x2, motion.y2,
+			ArrayList<UnitCB> collisions = HoloPF.detectCollisionsFromUnitMoving(motion.x1, motion.y1, motion.x2, motion.y2,
 					colBodies, thisUnit.getRadius());
 			
 			if (collisions.isEmpty()) {
@@ -181,22 +181,22 @@ public class MapInstance implements MapInstanceInfo {
 				// System.out.format("%s is colliding with %s bodies%n", u,
 				// collisions.size());
 
-				for (CBInfo cb : collisions) {
-					Vector2 dist = new Vector2(curDestx - cb.x, curDesty - cb.y);
+				for (UnitCB cb : collisions) {
+					Vector2 dist = new Vector2(curDestx - cb.getX(), curDesty - cb.getY());
 
 					// We do a "push out" for every unit. Subsequent push outs may lead to a suggested location that
 					// collides with an earlier unit, if so we reject the alternative location
-					if (dist.len() > cb.unitRadius + thisUnit.getRadius()) {
+					if (dist.len() > cb.getRadius() + thisUnit.getRadius()) {
 						continue;
 					}
 
 					// expand
 					Vector2 pushedOut = new Vector2(dist)
-							.setLength(cb.unitRadius + thisUnit.getRadius() + getCollisionClearanceDistance(thisUnit));
+							.setLength(cb.getRadius() + thisUnit.getRadius() + getCollisionClearanceDistance(thisUnit));
 					// TODO: handle edge case here dist is 0
 
-					curDestx = cb.x + pushedOut.x;
-					curDesty = cb.y + pushedOut.y;
+					curDestx = cb.getX() + pushedOut.x;
+					curDesty = cb.getY() + pushedOut.y;
 				}
 
 				// Take this motion if it's valid, otherwise don't move unit.

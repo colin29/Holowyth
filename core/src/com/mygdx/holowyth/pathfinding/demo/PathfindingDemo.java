@@ -33,7 +33,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.map.simplemap.SimpleMap;
-import com.mygdx.holowyth.pathfinding.CBInfo;
+import com.mygdx.holowyth.pathfinding.UnitCB;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
@@ -402,19 +402,15 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
 			Segment motion = new Segment(u.x, u.y, dx, dy);
 
-			ArrayList<CBInfo> colBodies = new ArrayList<CBInfo>();
-			for (PFDemoUnit a : units) {
-				if (u.equals(a)) { // don't consider the unit's own collision body
+			ArrayList<UnitCB> colBodies = new ArrayList<UnitCB>();
+			for (PFDemoUnit other : units) {
+				if (u.equals(other)) { // don't consider the unit's own collision body
 					continue;
 				}
 
-				CBInfo c = new CBInfo();
-				c.x = a.x;
-				c.y = a.y;
-				c.unitRadius = a.getRadius();
-				colBodies.add(c);
+				colBodies.add(other);
 			}
-			ArrayList<CBInfo> collisions = HoloPF.detectCollisionsFromUnitMoving(motion.x1, motion.y1, motion.x2, motion.y2,
+			ArrayList<UnitCB> collisions = HoloPF.detectCollisionsFromUnitMoving(motion.x1, motion.y1, motion.x2, motion.y2,
 					colBodies, u.getRadius());
 			if (collisions.isEmpty()) {
 				u.x += u.vx;
@@ -434,22 +430,22 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
 				System.out.format("%s is colliding with %s bodies%n", u, collisions.size());
 
-				for (CBInfo cb : collisions) {
-					Vector2 dist = new Vector2(curDestx - cb.x, curDesty - cb.y);
+				for (UnitCB cb : collisions) {
+					Vector2 dist = new Vector2(curDestx - cb.getX(), curDesty - cb.getY());
 
 					// At first, dist is smaller than the combined radius, but previous push outs might have changed
 					// this.
-					if (dist.len() > cb.unitRadius + u.getRadius()) {
+					if (dist.len() > cb.getRadius() + u.getRadius()) {
 						continue;
 					}
 
 					// expand
 					Vector2 pushedOut = new Vector2(dist)
-							.setLength(cb.unitRadius + u.getRadius() + Holo.collisionClearanceDistance);
+							.setLength(cb.getRadius() + u.getRadius() + Holo.collisionClearanceDistance);
 					// TODO: handle edge case here dist is 0
 
-					curDestx = cb.x + pushedOut.x;
-					curDesty = cb.y + pushedOut.y;
+					curDestx = cb.getX() + pushedOut.x;
+					curDesty = cb.getY() + pushedOut.y;
 				}
 
 				// Take this motion if it's valid, otherwise don't move unit.

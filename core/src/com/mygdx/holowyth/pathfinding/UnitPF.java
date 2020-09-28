@@ -6,7 +6,7 @@ package com.mygdx.holowyth.pathfinding;
  * @author Colin Ta
  *
  */
-public interface UnitPF {
+public interface UnitPF extends UnitCB{
 	public float getRadius();
 
 	public float getX();

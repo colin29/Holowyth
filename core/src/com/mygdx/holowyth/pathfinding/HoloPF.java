@@ -19,15 +19,15 @@ import com.mygdx.holowyth.util.dataobjects.Segment;
  */
 public class HoloPF {
 
-	public static ArrayList<CBInfo> detectCollisionsFromUnitMoving(float x, float y, float x2, float y2, ArrayList<CBInfo> cbs,
+	public static ArrayList<UnitCB> detectCollisionsFromUnitMoving(float x, float y, float x2, float y2, ArrayList<UnitCB> cbs,
 			float thisUnitRadius) {
 		@SuppressWarnings("unused")
 		boolean intersects = false;
-		ArrayList<CBInfo> collisions = new ArrayList<CBInfo>();
+		ArrayList<UnitCB> collisions = new ArrayList<UnitCB>();
 		// Check against unit circles
-		for (CBInfo cb : cbs) {
-			if (Line2D.ptSegDistSq(x, y, x2, y2, cb.x, cb.y) < (cb.unitRadius + thisUnitRadius)
-					* (cb.unitRadius + thisUnitRadius)) {
+		for (UnitCB cb : cbs) {
+			if (Line2D.ptSegDistSq(x, y, x2, y2, cb.getX(), cb.getY()) < (cb.getRadius() + thisUnitRadius)
+					* (cb.getRadius() + thisUnitRadius)) {
 				intersects = true;
 				collisions.add(cb);
 			}
@@ -41,7 +41,7 @@ public class HoloPF {
 	 * Checks pathability based on obstacles AND other units
 	 */
 	public static boolean isSegmentPathable(float x1, float y1, float x2, float y2, List<OrientedSeg> obstacleExpandedSegs,
-			List<Point> obstaclePoints, List<CBInfo> unitCBs,
+			List<Point> obstaclePoints, List<UnitCB> unitCBs,
 			float thisUnitRadius) {
 		tempSeg.set(x1, y1, x2, y2);
 		return isSegmentPathable(tempSeg, obstacleExpandedSegs, obstaclePoints, unitCBs, thisUnitRadius);
@@ -50,10 +50,10 @@ public class HoloPF {
 	/**
 	 * Checks pathability based on obstacles AND other units
 	 */
-	public static boolean isSegmentPathable(Segment motion, List<OrientedSeg> obstacleExpandedSegs, List<Point> obstaclePoints, List<CBInfo> unitCBs,
+	public static boolean isSegmentPathable(Segment motion, List<OrientedSeg> obstacleExpandedSegs, List<Point> obstaclePoints, List<UnitCB> unitCBs,
 			float thisUnitRadius) {
 		for (var other : unitCBs) {
-			if (Intersector.distanceSegmentPoint(motion.x1, motion.y1, motion.x2, motion.y2, other.x, other.y) <= thisUnitRadius + other.unitRadius) {
+			if (Intersector.distanceSegmentPoint(motion.x1, motion.y1, motion.x2, motion.y2, other.getX(), other.getY()) <= thisUnitRadius + other.getRadius()) {
 				return false;
 			}
 		}
