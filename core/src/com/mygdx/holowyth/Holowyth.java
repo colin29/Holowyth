@@ -21,7 +21,8 @@ import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.mygdx.holowyth.gameScreen.combatDemo.CombatDemo;
 import com.mygdx.holowyth.graphics.HoloGL;
-import com.mygdx.holowyth.map.GameMapRepo;
+import com.mygdx.holowyth.map.HolowythWorld;
+import com.mygdx.holowyth.map.World;
 import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 
@@ -48,7 +49,7 @@ public class Holowyth extends Game {
 	public FileChooser fileChooser;
 	
 	/* Game */
-	public final GameMapRepo mapRepo = new GameMapRepo(); 
+	public final World mapRepo = new HolowythWorld(); 
 	
 	/* Sprite resources */
 	public Animations animations;

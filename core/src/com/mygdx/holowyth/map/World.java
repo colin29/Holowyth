@@ -3,26 +3,17 @@ package com.mygdx.holowyth.map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mygdx.holowyth.map.maps.Forest1;
-import com.mygdx.holowyth.map.maps.Forest2;
-
 /**
- * Stores a bunch of 'template' maps. To use the maps you should copy construct a new instance to use.
- *
+ * A world is basically a namespace of maps. 
  */
-public class GameMapRepo {
+public class World {
 	
+	private String name = "Untitled World";
+	private String author = "unknown";
+
 	Logger logger = LoggerFactory.getLogger(this.getClass());
-	
-	
 	private final StringNonNullMap<GameMap> maps = new StringNonNullMap<GameMap>();
 
-	{
-		putMap(new Forest1());
-		putMap(new Forest2());
-	}
-	
-	
 	public boolean putMap(GameMap map) {
 		map.isTemplate = true;
 		if(maps.has(map.getName()))
@@ -33,7 +24,7 @@ public class GameMapRepo {
 	public boolean hasMap(String name) {
 		return maps.has(name);
 	}
-	
+
 	/**
 	 * If map is not found, returns null
 	 */
@@ -41,5 +32,20 @@ public class GameMapRepo {
 		return maps.has(name) ? new GameMap(maps.get(name)) : null;
 	}
 
-	
+	String getName() {
+		return name;
+	}
+
+	void setName(String name) {
+		this.name = name;
+	}
+
+	String getAuthor() {
+		return author;
+	}
+
+	void setAuthor(String author) {
+		this.author = author;
+	}
+
 }
