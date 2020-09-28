@@ -5,18 +5,19 @@ import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.pathfinding.PathingRenderer;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.Holo;
 
-class PathfindingRenderer extends SubRenderer {
+class GamePathingRenderer extends SubRenderer {
 
-	private PathingModule pathingModule;
+	private PathingRenderer basicRenderer;
 	private float pathThickness = 2f;
 
-	public PathfindingRenderer(GameScreenRenderer renderer, PathingModule pathingModule) {
+	public GamePathingRenderer(GameScreenRenderer renderer, PathingRenderer basicRenderer) {
 		super(renderer);
-		this.pathingModule = pathingModule;
+		this.basicRenderer = basicRenderer;
 	}
 
 	void renderUnitExpandedHitBodies() {
@@ -27,10 +28,9 @@ class PathfindingRenderer extends SubRenderer {
 
 	}
 
-	@SuppressWarnings("unused")
 	void renderPaths(boolean renderIntermediatePaths) {
 		if (renderIntermediatePaths) {
-			pathingModule.renderIntermediateAndFinalPaths(getMapInstance().getUnits());
+			basicRenderer.renderIntermediateAndFinalPaths(getMapInstance().getUnits());
 		} else {
 			for (Unit unit : getMapInstance().getUnits()) {
 				if (unit.getSide().isEnemy() && !Holo.debugRenderEnemyPath)

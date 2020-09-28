@@ -8,10 +8,6 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -40,10 +36,6 @@ import com.mygdx.holowyth.util.dataobjects.Point;
  */
 public class PathingModule {
 
-	// Rendering and pipeline variables
-	OrthographicCamera camera;
-	ShapeRenderer shapeRenderer;
-
 	private AStarSearch astar;
 
 	private PathSmoother smoother = new PathSmoother();
@@ -71,10 +63,7 @@ public class PathingModule {
 	 * @param camera
 	 * @param shapeRenderer
 	 */
-	public PathingModule(OrthographicCamera camera, ShapeRenderer shapeRenderer) {
-		this.camera = camera;
-		this.shapeRenderer = shapeRenderer;
-
+	public PathingModule() {
 	}
 
 	/*
@@ -608,33 +597,6 @@ public class PathingModule {
 		visited[iy][ix] = true;
 	}
 
-	// Render functions
-
-	
-
-
-	/**
-	 * Render intermediate paths for all units in the list
-	 */
-	public void renderIntermediateAndFinalPaths(List<? extends UnitPF> units) {
-		for (UnitPF unit : units) {
-			PathsInfo info = intermediatePaths.get(unit);
-			if (info != null && (unit.getPath() != null || Holo.continueShowingPathAfterArrival)) {
-				if (info.finalPath != null) {
-					renderPath(info.pathSmoothed0, Color.PINK, false);
-					renderPath(info.pathSmoothed1, Color.FIREBRICK, true);
-					renderPath(info.finalPath, Color.BLUE, false);
-				}
-			}
-		}
-	}
-
-
-
-	private void renderPath(Path path, Color color, boolean renderPoints) {
-		float pathThickness = 2f;
-		HoloPF.renderPath(path, color, renderPoints, pathThickness, shapeRenderer);
-	}
 
 	public List<Point> getObstaclePoints() {
 		return Collections.unmodifiableList(obstaclePoints);

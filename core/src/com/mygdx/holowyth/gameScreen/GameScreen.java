@@ -287,7 +287,7 @@ public abstract class GameScreen extends MapLoadingScreen {
 	}
 
 	private void initializeAppLifetimeComponents() {
-		pathingModule = new PathingModule(camera, shapeRenderer);
+		pathingModule = new PathingModule();
 
 		renderer = new GameScreenRenderer(game, camera, stage, pathingModule);
 		renderer.setClearColor(backgroundColor);

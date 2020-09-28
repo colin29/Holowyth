@@ -1,19 +1,22 @@
 package com.mygdx.holowyth.pathfinding;
 
+import java.util.List;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
+import com.mygdx.holowyth.pathfinding.PathSmoother.PathsInfo;
 import com.mygdx.holowyth.util.Holo;
 
 public class PathingRenderer {
 	
-	private final PathingModule pathing;
+	private final PathingModule model;
 	private final ShapeRenderer shapeRenderer;
 	
 	private final int CELL_SIZE = Holo.CELL_SIZE;
 	
-	public PathingRenderer(PathingModule pathing, ShapeRenderer shapeRenderer) {
-		this.pathing = pathing;
+	public PathingRenderer(PathingModule model, ShapeRenderer shapeRenderer) {
+		this.model = model;
 		this.shapeRenderer = shapeRenderer;
 	}
 
@@ -23,9 +26,9 @@ public class PathingRenderer {
 			// Draw Edges
 			shapeRenderer.setColor(Color.CORAL);
 			shapeRenderer.begin(ShapeType.Line);
-			for (int y = 0; y < pathing.graphHeight; y++) {
-				for (int x = 0; x < pathing.graphWidth; x++) {
-					Vertex v = pathing.graph[y][x];
+			for (int y = 0; y < model.graphHeight; y++) {
+				for (int x = 0; x < model.graphWidth; x++) {
+					Vertex v = model.graph[y][x];
 					if (v.N)
 						drawLine(x, y, x, y + 1);
 					if (v.S)
@@ -52,9 +55,9 @@ public class PathingRenderer {
 		shapeRenderer.setColor(Color.BLACK);
 		shapeRenderer.begin(ShapeType.Filled);
 
-		for (int y = 0; y < pathing.graphHeight; y++) {
-			for (int x = 0; x < pathing.graphWidth; x++) {
-				if (pathing.graph[y][x].reachable) {
+		for (int y = 0; y < model.graphHeight; y++) {
+			for (int x = 0; x < model.graphWidth; x++) {
+				if (model.graph[y][x].reachable) {
 					shapeRenderer.circle(x * CELL_SIZE, y * CELL_SIZE, 1f);
 				}
 
@@ -71,9 +74,9 @@ public class PathingRenderer {
 			// Draw Edges
 			shapeRenderer.setColor(Color.CORAL);
 			shapeRenderer.begin(ShapeType.Line);
-			for (int y = 0; y < pathing.graphHeight; y++) {
-				for (int x = 0; x < pathing.graphWidth; x++) {
-					Vertex v = pathing.dynamicGraph[y][x];
+			for (int y = 0; y < model.graphHeight; y++) {
+				for (int x = 0; x < model.graphWidth; x++) {
+					Vertex v = model.dynamicGraph[y][x];
 					if (v.N)
 						drawLine(x, y, x, y + 1);
 					if (v.S)
@@ -100,9 +103,9 @@ public class PathingRenderer {
 		shapeRenderer.setColor(Color.BLACK);
 		shapeRenderer.begin(ShapeType.Filled);
 
-		for (int y = 0; y < pathing.graphHeight; y++) {
-			for (int x = 0; x < pathing.graphWidth; x++) {
-				if (pathing.dynamicGraph[y][x].reachable) {
+		for (int y = 0; y < model.graphHeight; y++) {
+			for (int x = 0; x < model.graphWidth; x++) {
+				if (model.dynamicGraph[y][x].reachable) {
 					shapeRenderer.circle(x * CELL_SIZE, y * CELL_SIZE, 1f);
 				}
 
@@ -114,6 +117,28 @@ public class PathingRenderer {
 	
 	private void drawLine(int ix, int iy, int ix2, int iy2) {
 		shapeRenderer.line(ix * CELL_SIZE, iy * CELL_SIZE, 0, ix2 * CELL_SIZE, iy2 * CELL_SIZE, 0);
+	}
+	
+	/**
+	 * Render intermediate paths for all units in the list
+	 */
+	public void renderIntermediateAndFinalPaths(List<? extends UnitPF> units) {
+		for (UnitPF unit : units) {
+			PathsInfo info = model.intermediatePaths.get(unit);
+			if (info != null && (unit.getPath() != null || Holo.continueShowingPathAfterArrival)) {
+				if (info.finalPath != null) {
+					renderPath(info.pathSmoothed0, Color.PINK, false);
+					renderPath(info.pathSmoothed1, Color.FIREBRICK, true);
+					renderPath(info.finalPath, Color.BLUE, false);
+				}
+			}
+		}
+	}
+
+
+	private float pathThickness = 2f;
+	private void renderPath(Path path, Color color, boolean renderPoints) {
+		HoloPF.renderPath(path, color, renderPoints, pathThickness, shapeRenderer);
 	}
 	
 }

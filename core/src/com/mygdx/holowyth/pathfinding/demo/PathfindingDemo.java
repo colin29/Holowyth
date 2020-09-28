@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
@@ -91,7 +90,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		shapeRenderer = game.shapeRenderer;
 		batch = game.batch;
 
-		pathingModule = new PathingModule(camera, shapeRenderer);
+		pathingModule = new PathingModule();
 		pathingRenderer = new PathingRenderer(pathingModule, shapeRenderer);
 
 		createUI();
@@ -279,7 +278,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		// Render Path
 
 		if (renderIntermediatePaths) {
-			pathingModule.renderIntermediateAndFinalPaths(units);
+			pathingRenderer.renderIntermediateAndFinalPaths(units);
 		} else {
 			for (PFDemoUnit unit : units) {
 				if (unit.path != null) {

@@ -67,10 +67,10 @@ public class GameScreenRenderer {
 
 	// Sub-components (app life-time)
 	private DebugRenderer debug;
-	private PathfindingRenderer pathfinding;
+	private GamePathingRenderer gamePathing;
 	private UnitMotionRenderer unitMotion;
 	private TiledMapRenderer tiled;
-	private PathingRenderer pathingRenderer;
+	private PathingRenderer basicPathing;
 	
 	// Screen lifetime components
 	private Stage stage;
@@ -116,8 +116,8 @@ public class GameScreenRenderer {
 		this.pathingModule = pathingModule;
 
 		debug = new DebugRenderer(this);
-		pathfinding = new PathfindingRenderer(this, pathingModule);
-		pathingRenderer = new PathingRenderer(pathingModule, shapeRenderer);
+		basicPathing = new PathingRenderer(pathingModule, shapeRenderer);
+		gamePathing = new GamePathingRenderer(this, basicPathing);
 		unitMotion = new UnitMotionRenderer(this);
 		tiled = new TiledMapRenderer(this);
 	}
@@ -138,7 +138,7 @@ public class GameScreenRenderer {
 			renderUnitHpSpBars(); // render unit bars low as to not obscure more important info
 
 			// Unit paths
-			pathfinding.renderPaths(false);
+			gamePathing.renderPaths(false);
 			unitMotion.renderUnitDestinations(Color.GREEN);
 
 			// Units
@@ -196,7 +196,7 @@ public class GameScreenRenderer {
 		GameMapRenderer.renderEntrances(Holowyth.fonts.debugFont(), map, shapeDrawer, batch);
 		
 		if (Gdx.input.isKeyPressed(showMapPathingGraphKey)) {
-			pathingRenderer.renderGraph(true);
+			basicPathing.renderGraph(true);
 			HoloGL.renderSegs(pathingModule.getObstacleExpandedSegs(), Color.PINK);
 			renderCircles(pathingModule.getObstaclePoints(), Holo.UNIT_RADIUS, Color.PINK);
 		}
