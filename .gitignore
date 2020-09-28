@@ -2,7 +2,13 @@
 
 /desktop/exception.txt
 /desktop/resources/assets/maps/Tilesets/**/*.png
+/desktop/resources/assets/maps/Tilesets/temp/
+/desktop/resources/assets/maps/Tilesets/output/
 
+
+## Assets workflow
+/desktop/resources/assets/maps/**/*WorkingCopy.tmx
+*.tps
 
 ## Java
 *.class

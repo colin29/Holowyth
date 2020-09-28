@@ -57,7 +57,7 @@ public class TiledMapLoader  {
 			}
 		});
 	
-		fileChooser.setDirectory(Holo.simpleMapsDirectory);
+		fileChooser.setDirectory(Holo.mapsDirectory);
 	}
 	
 }

@@ -12,9 +12,9 @@ import com.badlogic.gdx.utils.SerializationException;
 import com.badlogic.gdx.utils.XmlReader.Element;
 
 public class MyAtlasTmxMapLoader extends AtlasTmxMapLoader {
-	
+
 	/**
-	 * I believe the purpose of this override and class is to fix a gid bug
+	 * Same as AtlasTmxMapLoader, but fixed to get the firstid attribute from the tileset element in the TMX file, not tsx file.
 	 */
 	@Override
 	protected void loadTileSet(Element mapElement, FileHandle tmxFile, ImageResolver imageResolver) {
@@ -51,7 +51,8 @@ public class MyAtlasTmxMapLoader extends AtlasTmxMapLoader {
 			}
 
 			String name = element.get("name", null);
-			int firstgid = mapElement.getIntAttribute("firstgid", 1);
+			// Get the firstid attribute from the tileset element in the TMX file, not tsx file.
+			int firstgid = mapElement.getIntAttribute("firstgid", 1); 
 			int tilewidth = element.getIntAttribute("tilewidth", 0);
 			int tileheight = element.getIntAttribute("tileheight", 0);
 			int spacing = element.getIntAttribute("spacing", 0);
@@ -79,8 +80,8 @@ public class MyAtlasTmxMapLoader extends AtlasTmxMapLoader {
 			// Tiles
 			Array<Element> tileElements = element.getChildrenByName("tile");
 
-			addStaticTiles(tmxFile, imageResolver, tileSet, element, tileElements, name, firstgid, tilewidth, tileheight, spacing,
-					margin, source, offsetX, offsetY, imageSource, imageWidth, imageHeight, image);
+			addStaticTiles(tmxFile, imageResolver, tileSet, element, tileElements, name, firstgid, tilewidth,
+					tileheight, spacing, margin, source, offsetX, offsetY, imageSource, imageWidth, imageHeight, image);
 
 			for (Element tileElement : tileElements) {
 				int localtid = tileElement.getIntAttribute("id", 0);
