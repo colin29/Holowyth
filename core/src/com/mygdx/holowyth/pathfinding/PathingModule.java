@@ -59,6 +59,13 @@ public class PathingModule {
 	// Debug (map-lifetime)
 	HashMap<UnitPF, PathsInfo> intermediatePaths;
 
+	// Graph construction
+	final int CELL_SIZE = Holo.CELL_SIZE;
+	Vertex[][] graph;
+	int graphWidth;
+	int graphHeight;
+	Vertex[][] dynamicGraph;
+
 	/**
 	 * @Lifetime can be from app start to app shutdown. Call initFormap() whenever a new map is loaded.
 	 * @param camera
@@ -199,11 +206,7 @@ public class PathingModule {
 		}
 	}
 
-	// Graph construction
-	private int CELL_SIZE = Holo.CELL_SIZE;
-	Vertex[][] graph;
-	int graphWidth, graphHeight;
-	Vertex[][] dynamicGraph;
+	
 
 	// Unit pathfinding
 
@@ -607,99 +610,8 @@ public class PathingModule {
 
 	// Render functions
 
-	public void renderGraph(boolean renderEdges) {
+	
 
-		if (renderEdges) {
-			// Draw Edges
-			shapeRenderer.setColor(Color.CORAL);
-			shapeRenderer.begin(ShapeType.Line);
-			for (int y = 0; y < graphHeight; y++) {
-				for (int x = 0; x < graphWidth; x++) {
-					Vertex v = graph[y][x];
-					if (v.N)
-						drawLine(x, y, x, y + 1);
-					if (v.S)
-						drawLine(x, y, x, y - 1);
-					if (v.W)
-						drawLine(x, y, x - 1, y);
-					if (v.E)
-						drawLine(x, y, x + 1, y);
-
-					if (v.NW)
-						drawLine(x, y, x - 1, y + 1);
-					if (v.NE)
-						drawLine(x, y, x + 1, y + 1);
-					if (v.SW)
-						drawLine(x, y, x - 1, y - 1);
-					if (v.SE)
-						drawLine(x, y, x + 1, y - 1);
-				}
-			}
-			shapeRenderer.end();
-		}
-
-		// Draw vertexes as points
-		shapeRenderer.setColor(Color.BLACK);
-		shapeRenderer.begin(ShapeType.Filled);
-
-		for (int y = 0; y < graphHeight; y++) {
-			for (int x = 0; x < graphWidth; x++) {
-				if (graph[y][x].reachable) {
-					shapeRenderer.circle(x * CELL_SIZE, y * CELL_SIZE, 1f);
-				}
-
-			}
-		}
-		shapeRenderer.end();
-
-	}
-
-	public void renderDynamicGraph(boolean renderEdges) {
-
-		if (renderEdges) {
-			// Draw Edges
-			shapeRenderer.setColor(Color.CORAL);
-			shapeRenderer.begin(ShapeType.Line);
-			for (int y = 0; y < graphHeight; y++) {
-				for (int x = 0; x < graphWidth; x++) {
-					Vertex v = dynamicGraph[y][x];
-					if (v.N)
-						drawLine(x, y, x, y + 1);
-					if (v.S)
-						drawLine(x, y, x, y - 1);
-					if (v.W)
-						drawLine(x, y, x - 1, y);
-					if (v.E)
-						drawLine(x, y, x + 1, y);
-
-					if (v.NW)
-						drawLine(x, y, x - 1, y + 1);
-					if (v.NE)
-						drawLine(x, y, x + 1, y + 1);
-					if (v.SW)
-						drawLine(x, y, x - 1, y - 1);
-					if (v.SE)
-						drawLine(x, y, x + 1, y - 1);
-				}
-			}
-			shapeRenderer.end();
-		}
-
-		// Draw vertexes as points
-		shapeRenderer.setColor(Color.BLACK);
-		shapeRenderer.begin(ShapeType.Filled);
-
-		for (int y = 0; y < graphHeight; y++) {
-			for (int x = 0; x < graphWidth; x++) {
-				if (dynamicGraph[y][x].reachable) {
-					shapeRenderer.circle(x * CELL_SIZE, y * CELL_SIZE, 1f);
-				}
-
-			}
-		}
-		shapeRenderer.end();
-
-	}
 
 	/**
 	 * Render intermediate paths for all units in the list
@@ -717,11 +629,7 @@ public class PathingModule {
 		}
 	}
 
-	// Getters
 
-	private void drawLine(int ix, int iy, int ix2, int iy2) {
-		shapeRenderer.line(ix * CELL_SIZE, iy * CELL_SIZE, 0, ix2 * CELL_SIZE, iy2 * CELL_SIZE, 0);
-	}
 
 	private void renderPath(Path path, Color color, boolean renderPoints) {
 		float pathThickness = 2f;

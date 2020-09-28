@@ -30,6 +30,7 @@ import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.map.GameMap;
 import com.mygdx.holowyth.map.GameMapRenderer;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.pathfinding.PathingRenderer;
 import com.mygdx.holowyth.skill.ActiveSkill.Status;
 import com.mygdx.holowyth.skill.SkillInfo;
 import com.mygdx.holowyth.skill.effect.Effect;
@@ -69,7 +70,8 @@ public class GameScreenRenderer {
 	private PathfindingRenderer pathfinding;
 	private UnitMotionRenderer unitMotion;
 	private TiledMapRenderer tiled;
-
+	private PathingRenderer pathingRenderer;
+	
 	// Screen lifetime components
 	private Stage stage;
 	private PathingModule pathingModule;
@@ -115,6 +117,7 @@ public class GameScreenRenderer {
 
 		debug = new DebugRenderer(this);
 		pathfinding = new PathfindingRenderer(this, pathingModule);
+		pathingRenderer = new PathingRenderer(pathingModule, shapeRenderer);
 		unitMotion = new UnitMotionRenderer(this);
 		tiled = new TiledMapRenderer(this);
 	}
@@ -193,7 +196,7 @@ public class GameScreenRenderer {
 		GameMapRenderer.renderEntrances(Holowyth.fonts.debugFont(), map, shapeDrawer, batch);
 		
 		if (Gdx.input.isKeyPressed(showMapPathingGraphKey)) {
-			pathingModule.renderGraph(true);
+			pathingRenderer.renderGraph(true);
 			HoloGL.renderSegs(pathingModule.getObstacleExpandedSegs(), Color.PINK);
 			renderCircles(pathingModule.getObstaclePoints(), Holo.UNIT_RADIUS, Color.PINK);
 		}

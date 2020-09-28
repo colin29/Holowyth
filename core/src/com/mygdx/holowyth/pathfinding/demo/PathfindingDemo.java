@@ -37,6 +37,7 @@ import com.mygdx.holowyth.pathfinding.UnitCB;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
+import com.mygdx.holowyth.pathfinding.PathingRenderer;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
@@ -67,13 +68,16 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 	SimpleMap map;
 	PFUnitControls unitControls;
 	PathingModule pathingModule;
-
+	private PathingRenderer pathingRenderer;
+	
 	// Appearance
 	Color defaultClearColor = HoloGL.rgb(255, 236, 179);
 	Color clearColor = defaultClearColor;
 
 	// Logic
 	Timer timer = new Timer();
+
+	
 
 	public PathfindingDemo(final Holowyth game) {
 		this.game = game;
@@ -88,6 +92,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		batch = game.batch;
 
 		pathingModule = new PathingModule(camera, shapeRenderer);
+		pathingRenderer = new PathingRenderer(pathingModule, shapeRenderer);
 
 		createUI();
 	}
@@ -101,7 +106,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 				| (Gdx.graphics.getBufferFormat().coverageSampling ? GL20.GL_COVERAGE_BUFFER_BIT_NV : 0));
 		camera.update();
 
-		pathingModule.renderGraph(false);
+		pathingRenderer.renderGraph(false);
 		// renderDynamicGraph(false);
 
 		if (this.map != null) {
