@@ -25,9 +25,9 @@ import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
  * Handles pathfinding for the app's needs <br>
- * Knows how to render certain information about itself
+ * Exposes extracted obstacle information about the loaded map
  * 
- * Also exposes extracted obstacle information about the loaded map
+ * Multiple unit sizes are NOT supported at the moment. Some methods assume that unit radius is {@link Holo#CELL_SIZE} <br><br>
  * 
  * Has application lifetime.
  * 
@@ -384,7 +384,7 @@ public class PathingModule {
 	 *              information.
 	 * @param u     The radius of the pathing unit (has to match the radius of the base graph though)
 	 */
-	private void setDynamicGraph(List<UnitPF> infos, float unitRadius) {
+	private void setDynamicGraph(List<? extends UnitPF> infos, float unitRadius) {
 
 		for (UnitPF cb : infos) {
 			prospects = new ArrayList<Vertex>();
@@ -475,25 +475,27 @@ public class PathingModule {
 	 *         is unpathable, returns empty list. If only a partial number of placements could be found,
 	 *         returns that partial list.
 	 */
-	public List<Point> findPathablePlacements(Point spawnPoint, int numPlacements, List<? extends UnitInfo> existingUnits) {
+	public List<Point> findPathablePlacements(Point spawnPoint, int numPlacements, List<? extends UnitPF> existingUnits) {
 		List<Point> placements = new ArrayList<>();
 
-//		revertDynamicGraph();
-//		setDynamicGraph(existingUnits, Holo.UNIT_RADIUS);
-//		
-		final Vertex closestVertex = HoloPF.findClosestReachableVertex(spawnPoint, graph, graphWidth, graphHeight);
-		if (closestVertex == null) {
+		revertDynamicGraph();
+		setDynamicGraph(existingUnits, Holo.UNIT_RADIUS);
+		
+		Vertex initialVertex;
+		final List<Vertex> validInitialVertexes = HoloPF.findNearbyReachableVertexes(spawnPoint, dynamicGraph, graphWidth, graphHeight, 2);
+		if(validInitialVertexes.isEmpty()) {
 			return placements; // empty list
+		}else {
+			initialVertex = validInitialVertexes.get(0);
 		}
-		placements.add(closestVertex.toPos(CELL_SIZE));
 
-		Point newPlacement = new Point();
+		Point temp = new Point();
 		clearVisited();
-		callMethodOnEveryNodeInFloodfillOrder(new Coord(closestVertex.ix, closestVertex.iy), (Coord c) -> {
+		callOnEveryNodeInFloodfillOrder(new Coord(initialVertex.ix, initialVertex.iy), (Coord c) -> {
 			if (placements.size() >= numPlacements)
 				return;
-			newPlacement.set(c.x * Holo.CELL_SIZE, c.y * Holo.CELL_SIZE);
-			addPlacementIfNotConflicting(newPlacement, placements, existingUnits);
+			temp.set(c.x * Holo.CELL_SIZE, c.y * Holo.CELL_SIZE);
+			addPlacementIfNotConflicting(temp, placements, existingUnits);
 		}, () -> (placements.size() >= numPlacements));
 
 		return placements;
@@ -502,7 +504,7 @@ public class PathingModule {
 	
 
 
-	private static void addPlacementIfNotConflicting(Point p, List<Point> placements, List<? extends UnitInfo> existingUnits) {
+	private static void addPlacementIfNotConflicting(Point p, List<Point> placements, List<? extends UnitPF> existingUnits) {
 		if (!placementConflicts(p, placements, existingUnits)) {
 			placements.add(new Point(p));
 		}
@@ -510,14 +512,17 @@ public class PathingModule {
 
 
 	private static boolean placementConflicts(Point placement, List<Point> prevPlacements,
-			List<? extends UnitInfo> existingUnits) {
+			List<? extends UnitPF> existingUnits) {
+		
 		for (Point other : prevPlacements) {
 			if (Point.dist(placement, other) < Holo.UNIT_RADIUS * 2 + Holo.epsilon)
 				return true;
 		}
 		if (existingUnits != null) {
-			for (UnitInfo other : existingUnits) {
-				if (Point.dist(placement, other.getPos()) < Holo.UNIT_RADIUS * 2 + Holo.epsilon)
+			final Point tempOther = new Point();
+			for (UnitPF other : existingUnits) {
+				tempOther.set(other.getX(), other.getY());
+				if (Point.dist(placement, tempOther) < Holo.UNIT_RADIUS * 2 + Holo.epsilon)
 					return true;
 			}
 		}
@@ -527,7 +532,7 @@ public class PathingModule {
 	/** Method should not modifiy the coord */
 	private boolean[][] visited;
 
-	private void callMethodOnEveryNodeInFloodfillOrder(Coord startCoord, Consumer<Coord> method,
+	private void callOnEveryNodeInFloodfillOrder(Coord startCoord, Consumer<Coord> method,
 			BooleanSupplier stopCondition) {
 		Queue<Coord> q = new Queue<Coord>();
 		q.ensureCapacity(graphWidth);

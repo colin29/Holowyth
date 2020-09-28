@@ -276,7 +276,7 @@ public class AStarSearch {
 		substituteLocationFound = false;
 		Point goalPoint = new Point(goalX, goalY);
 
-		ArrayList<Vertex> reachable = HoloPF.findNearbyReachableVertexes(goalPoint, graph, graphWidth, graphHeight, 2);
+		List<Vertex> reachable = HoloPF.findNearbyReachableVertexes(goalPoint, graph, graphWidth, graphHeight, 2);
 
 		int startIx = 0, startIy = 0;
 		boolean found = false;

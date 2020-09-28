@@ -174,7 +174,7 @@ public class HoloPF {
 	 *            doesn't guarantee pathability in the dynamic context because the floodfill isn't redone each time the dynamic graph is set (against
 	 *            unit bodies).
 	 */
-	public static ArrayList<Vertex> findNearbyReachableVertexes(Point p, Vertex[][] graph, int graphWidth,
+	public static List<Vertex> findNearbyReachableVertexes(Point p, Vertex[][] graph, int graphWidth,
 			int graphHeight, int maxCellDistance) {
 
 		int ix = (int) (p.x / Holo.CELL_SIZE);
@@ -214,7 +214,7 @@ public class HoloPF {
 	 * @return
 	 */
 	public static Vertex findClosestReachableVertex(Point p, Vertex[][] graph, int graphWidth, int graphHeight) {
-		ArrayList<Vertex> result = findNearbyReachableVertexes(p, graph, graphWidth, graphHeight, 1);
+		List<Vertex> result = findNearbyReachableVertexes(p, graph, graphWidth, graphHeight, 1);
 		return result.size() > 0 ? result.get(0) : null;
 	}
 

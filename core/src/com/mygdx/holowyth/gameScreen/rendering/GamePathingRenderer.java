@@ -25,7 +25,6 @@ class GamePathingRenderer extends SubRenderer {
 				(UnitInfo u) -> {
 					HoloGL.renderCircleOutline(u.getX(), u.getY(), u.getRadius() + Holo.UNIT_RADIUS, Color.GRAY);
 				});
-
 	}
 
 	void renderPaths(boolean renderIntermediatePaths) {
