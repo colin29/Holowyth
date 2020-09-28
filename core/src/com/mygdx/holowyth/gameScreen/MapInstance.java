@@ -20,7 +20,7 @@ import com.mygdx.holowyth.collision.ObstacleSeg;
 import com.mygdx.holowyth.collision.UnitAdapterCircleCB;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.map.UnitMarker;
-import com.mygdx.holowyth.pathfinding.UnitCB;
+import com.mygdx.holowyth.pathfinding.UnitPF;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.effect.Effect;
@@ -149,7 +149,7 @@ public class MapInstance implements MapInstanceInfo {
 			}
 
 			// Get all other colliding bodies
-			ArrayList<UnitCB> colBodies = new ArrayList<UnitCB>();
+			ArrayList<UnitPF> colBodies = new ArrayList<UnitPF>();
 			for (Unit u : units.getUnits()) {
 				if (!thisUnit.equals(u))
 					colBodies.add(u);
@@ -160,7 +160,7 @@ public class MapInstance implements MapInstanceInfo {
 
 			Segment motion = new Segment(thisUnit.x, thisUnit.y, destX, destY);
 
-			ArrayList<UnitCB> collisions = HoloPF.detectCollisionsFromUnitMoving(motion.x1, motion.y1, motion.x2, motion.y2,
+			ArrayList<UnitPF> collisions = HoloPF.detectCollisionsFromUnitMoving(motion.x1, motion.y1, motion.x2, motion.y2,
 					colBodies, thisUnit.getRadius());
 			
 			if (collisions.isEmpty()) {
@@ -181,7 +181,7 @@ public class MapInstance implements MapInstanceInfo {
 				// System.out.format("%s is colliding with %s bodies%n", u,
 				// collisions.size());
 
-				for (UnitCB cb : collisions) {
+				for (UnitPF cb : collisions) {
 					Vector2 dist = new Vector2(curDestx - cb.getX(), curDesty - cb.getY());
 
 					// We do a "push out" for every unit. Subsequent push outs may lead to a suggested location that

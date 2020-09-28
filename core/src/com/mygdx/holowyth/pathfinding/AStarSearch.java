@@ -83,7 +83,7 @@ public class AStarSearch {
 	 * @return
 	 */
 	public Path doAStar(float sx, float sy, float dx, float dy, List<OrientedSeg> obstacleExpandedSegs,
-			List<Point> obstaclePoints, List<UnitCB> unitCBs, Vertex[][] graph, float unitRadius) {
+			List<Point> obstaclePoints, List<UnitPF> unitCBs, Vertex[][] graph, float unitRadius) {
 
 		startX = sx;
 		startY = sy;
@@ -271,7 +271,7 @@ public class AStarSearch {
 	 *         was invalid but a substitute has been found.
 	 */
 	public int findClosestPathableVertex(float goalX, float goalY, List<OrientedSeg> obstacleExpandedSegs, List<Point> obstaclePoints,
-			List<UnitCB> unitCbs,
+			List<UnitPF> unitCbs,
 			Vertex[][] graph, float unitRadius, boolean allowCorrection, Point correctedLocation) {
 		substituteLocationFound = false;
 		Point goalPoint = new Point(goalX, goalY);

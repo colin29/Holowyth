@@ -19,13 +19,13 @@ import com.mygdx.holowyth.util.dataobjects.Segment;
  */
 public class HoloPF {
 
-	public static ArrayList<UnitCB> detectCollisionsFromUnitMoving(float x, float y, float x2, float y2, ArrayList<UnitCB> cbs,
+	public static ArrayList<UnitPF> detectCollisionsFromUnitMoving(float x, float y, float x2, float y2, ArrayList<UnitPF> cbs,
 			float thisUnitRadius) {
 		@SuppressWarnings("unused")
 		boolean intersects = false;
-		ArrayList<UnitCB> collisions = new ArrayList<UnitCB>();
+		ArrayList<UnitPF> collisions = new ArrayList<UnitPF>();
 		// Check against unit circles
-		for (UnitCB cb : cbs) {
+		for (UnitPF cb : cbs) {
 			if (Line2D.ptSegDistSq(x, y, x2, y2, cb.getX(), cb.getY()) < (cb.getRadius() + thisUnitRadius)
 					* (cb.getRadius() + thisUnitRadius)) {
 				intersects = true;
@@ -41,7 +41,7 @@ public class HoloPF {
 	 * Checks pathability based on obstacles AND other units
 	 */
 	public static boolean isSegmentPathable(float x1, float y1, float x2, float y2, List<OrientedSeg> obstacleExpandedSegs,
-			List<Point> obstaclePoints, List<UnitCB> unitCBs,
+			List<Point> obstaclePoints, List<UnitPF> unitCBs,
 			float thisUnitRadius) {
 		tempSeg.set(x1, y1, x2, y2);
 		return isSegmentPathable(tempSeg, obstacleExpandedSegs, obstaclePoints, unitCBs, thisUnitRadius);
@@ -50,7 +50,7 @@ public class HoloPF {
 	/**
 	 * Checks pathability based on obstacles AND other units
 	 */
-	public static boolean isSegmentPathable(Segment motion, List<OrientedSeg> obstacleExpandedSegs, List<Point> obstaclePoints, List<UnitCB> unitCBs,
+	public static boolean isSegmentPathable(Segment motion, List<OrientedSeg> obstacleExpandedSegs, List<Point> obstaclePoints, List<UnitPF> unitCBs,
 			float thisUnitRadius) {
 		for (var other : unitCBs) {
 			if (Intersector.distanceSegmentPoint(motion.x1, motion.y1, motion.x2, motion.y2, other.getX(), other.getY()) <= thisUnitRadius + other.getRadius()) {

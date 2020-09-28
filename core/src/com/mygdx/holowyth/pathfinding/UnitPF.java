@@ -1,17 +1,17 @@
 package com.mygdx.holowyth.pathfinding;
 
+
 /**
- * Interface of the implementation neccesary to use a class as a unit for the pathfinding module
- * 
- * @author Colin Ta
- *
+ * Gives info about a unit's (circular) collision body.
  */
-public interface UnitPF extends UnitCB{
-	public float getRadius();
+public interface UnitPF {
 
 	public float getX();
 
 	public float getY();
 
-	public Path getPath();
+	public float getRadius();
+
+
+
 }

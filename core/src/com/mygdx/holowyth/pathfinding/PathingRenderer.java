@@ -122,8 +122,8 @@ public class PathingRenderer {
 	/**
 	 * Render intermediate paths for all units in the list
 	 */
-	public void renderIntermediateAndFinalPaths(List<? extends UnitPF> units) {
-		for (UnitPF unit : units) {
+	public void renderIntermediateAndFinalPaths(List<? extends UnitPFWithPath> units) {
+		for (UnitPFWithPath unit : units) {
 			PathsInfo info = model.intermediatePaths.get(unit);
 			if (info != null && (unit.getPath() != null || Holo.continueShowingPathAfterArrival)) {
 				if (info.finalPath != null) {

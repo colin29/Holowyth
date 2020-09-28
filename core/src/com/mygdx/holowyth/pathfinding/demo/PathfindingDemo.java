@@ -32,7 +32,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.map.simplemap.SimpleMap;
-import com.mygdx.holowyth.pathfinding.UnitCB;
+import com.mygdx.holowyth.pathfinding.UnitPF;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;
@@ -406,7 +406,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
 			Segment motion = new Segment(u.x, u.y, dx, dy);
 
-			ArrayList<UnitCB> colBodies = new ArrayList<UnitCB>();
+			ArrayList<UnitPF> colBodies = new ArrayList<UnitPF>();
 			for (PFDemoUnit other : units) {
 				if (u.equals(other)) { // don't consider the unit's own collision body
 					continue;
@@ -414,7 +414,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
 				colBodies.add(other);
 			}
-			ArrayList<UnitCB> collisions = HoloPF.detectCollisionsFromUnitMoving(motion.x1, motion.y1, motion.x2, motion.y2,
+			ArrayList<UnitPF> collisions = HoloPF.detectCollisionsFromUnitMoving(motion.x1, motion.y1, motion.x2, motion.y2,
 					colBodies, u.getRadius());
 			if (collisions.isEmpty()) {
 				u.x += u.vx;
@@ -434,7 +434,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
 				System.out.format("%s is colliding with %s bodies%n", u, collisions.size());
 
-				for (UnitCB cb : collisions) {
+				for (UnitPF cb : collisions) {
 					Vector2 dist = new Vector2(curDestx - cb.getX(), curDesty - cb.getY());
 
 					// At first, dist is smaller than the combined radius, but previous push outs might have changed

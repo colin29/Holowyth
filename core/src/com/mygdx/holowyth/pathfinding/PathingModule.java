@@ -203,7 +203,7 @@ public class PathingModule {
 
 		// For pathfinding, need to get expanded geometry of unit collision bodies as well
 
-		ArrayList<UnitCB> colBodies = new ArrayList<UnitCB>();
+		ArrayList<UnitPF> colBodies = new ArrayList<UnitPF>();
 
 		for (UnitPF u : allUnits) {
 			if (unit.equals(u)) { // don't consider the unit's own collision body
@@ -384,9 +384,9 @@ public class PathingModule {
 	 *              information.
 	 * @param u     The radius of the pathing unit (has to match the radius of the base graph though)
 	 */
-	private void setDynamicGraph(List<UnitCB> infos, float unitRadius) {
+	private void setDynamicGraph(List<UnitPF> infos, float unitRadius) {
 
-		for (UnitCB cb : infos) {
+		for (UnitPF cb : infos) {
 			prospects = new ArrayList<Vertex>();
 			float x1, x2, y1, y2; // boundaries of the bounding box of the expanded colliding body
 			x1 = cb.getX() - cb.getRadius() - unitRadius;
@@ -419,7 +419,7 @@ public class PathingModule {
 	 * 
 	 * @param self Radius of the radius of the unit which is pathing. Used to get expanded geometry.
 	 */
-	private void restrictVertex(Vertex v, UnitCB cb, float unitRadius) {
+	private void restrictVertex(Vertex v, UnitPF cb, float unitRadius) {
 		float x = v.ix * CELL_SIZE;
 		float y = v.iy * CELL_SIZE;
 

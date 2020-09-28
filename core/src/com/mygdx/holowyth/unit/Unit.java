@@ -12,7 +12,7 @@ import com.mygdx.holowyth.gameScreen.MapInstance;
 import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.pathfinding.Path;
-import com.mygdx.holowyth.pathfinding.UnitPF;
+import com.mygdx.holowyth.pathfinding.UnitPFWithPath;
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.ActiveSkill.Status;
 import com.mygdx.holowyth.unit.UnitOrders.Order;
@@ -51,7 +51,7 @@ import com.mygdx.holowyth.util.dataobjects.Point;
  * <b>motion.isBeingKnockedBack()</b> -- a unit being knocked back cannot be given new orders or
  * perform any action (it may retain its old order, depending on the type)
  */
-public class Unit implements UnitPF, UnitInfo, UnitOrderable {
+public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 
 	
 	
