@@ -355,7 +355,7 @@ public class PFDemoUnit implements UnitPF {
 			Point a, b;
 			a = this.getPos();
 			b = target.getPos();
-			float dist = Point.calcDistance(a, b);
+			float dist = Point.dist(a, b);
 			if (dist <= this.radius + target.radius + Holo.defaultUnitEngageRange) {
 				startAttacking(target);
 			} else if (dist >= this.radius + target.radius + Holo.defaultUnitDisengageRange) {

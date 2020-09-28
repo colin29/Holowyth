@@ -17,4 +17,20 @@ public class Location {
 		pos.y = y;
 	}
 	
+	public Location(Location src) {
+		pos.set(src.pos.x,  src.pos.y);
+		name = src.name;
+	}
+	
+	public Location cloneObject() {
+		return new Location(this);
+	}
+	
+	public float getX() {
+		return this.pos.x;
+	}
+	public float getY() {
+		return this.pos.y;
+	}
+	
 }

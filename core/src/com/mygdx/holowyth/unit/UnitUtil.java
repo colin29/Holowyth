@@ -14,8 +14,8 @@ public class UnitUtil {
 	 */
 	public static PriorityQueue<UnitOrderable> getTargetsSortedByDistance(UnitOrderable unit, MapInstanceInfo world) {
 		Comparator<UnitOrderable> closestUnitComp = (UnitOrderable u1, UnitOrderable u2) -> {
-			if (Point.calcDistanceSqr(unit.getPos(), u1.getPos())
-					- Point.calcDistanceSqr(unit.getPos(), u2.getPos()) < 0) {
+			if (Point.distSqr(unit.getPos(), u1.getPos())
+					- Point.distSqr(unit.getPos(), u2.getPos()) < 0) {
 				return -1;
 			} else {
 				return 1;

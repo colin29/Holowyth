@@ -355,7 +355,7 @@ public class CollisionSimulation {
 	private boolean isAreaClear(Point point, float radius) {
 
 		for (CircleObject o : circleObjects) {
-			if (Point.calcDistance(point, o.getPos()) <= radius + o.getRadius()) {
+			if (Point.dist(point, o.getPos()) <= radius + o.getRadius()) {
 				return false;
 			}
 		}

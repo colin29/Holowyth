@@ -54,7 +54,7 @@ public abstract class GameScreen extends MapLoadingScreen {
 	protected TriggersHandler triggers;
 
 	// Debugging and Convenience (App-lifetime)
-	private final DebugStore debugStore = new DebugStore();
+	protected final DebugStore debugStore = new DebugStore();
 	protected final FunctionBindings functionBindings = new FunctionBindings();
 	
 	/**

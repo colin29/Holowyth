@@ -10,6 +10,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.gameScreen.combatDemo.prototyping.Equips;
+import com.mygdx.holowyth.map.Entrance;
+import com.mygdx.holowyth.map.Location;
 import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.map.trigger.Trigger;
 import com.mygdx.holowyth.skill.skill.Skills;
@@ -17,7 +19,9 @@ import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.units.MonsterStats;
+import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 import com.mygdx.holowyth.vn.VNController;
 
 /**
@@ -36,17 +40,19 @@ public class StandardGameScreen extends GameScreen {
 
 	public StandardGameScreen(Holowyth game) {
 		super(game);
-		loadGameMapByName("forest1");
-
 //		vn = new VNController(new Stage(), batch, fixedCamera, multiplexer); // have vn draw using its OWN stage
 //		startConversation("myConv.conv", "default");
 
 		functionBindings.bindFunctionToKey(this::addLeciaToMapInstance, Keys.Z);
 		functionBindings.bindFunctionToKey(this::removeLeciaFromMapInstance, Keys.X);
-		functionBindings.bindFunctionToKey(()->{
-			goToMap("forest2", "entrance_1");	
+		functionBindings.bindFunctionToKey(() -> {
+			goToMap("forest2", "entrance_1");
 		}, Keys.G);
-
+		
+		DebugValues debugValues = debugStore.registerComponent(this.getClass().getSimpleName());
+		debugValues.add("Map name", ()->map.getName());
+		
+		loadGameMapByName("forest1");
 	}
 
 	/**
@@ -85,6 +91,7 @@ public class StandardGameScreen extends GameScreen {
 			return null;
 		}
 	}
+
 	public void goToMap(String mapName, String locationName) {
 		if (isMapLoaded()) {
 			for (UnitInfo unit : playerUnits) {
@@ -93,20 +100,25 @@ public class StandardGameScreen extends GameScreen {
 		}
 		loadGameMapByName(mapName);
 		// map refers to new map now
-		placeUnits(map.getLocation(locationName), playerUnits);
+		Location arrivalLoc = map.getLocation(locationName);
+		placeUnits(arrivalLoc.pos, playerUnits);
+		// Center camera
+		camera.position.set(arrivalLoc.getX(), arrivalLoc.getY(), 0);
+		if(arrivalLoc instanceof Entrance)
+			((Entrance) arrivalLoc).disableTemporarily();
 	}
 
-	private List<Unit> placeUnits(Point spawnPos, List<Unit> units){
+	private List<Unit> placeUnits(Point spawnPos, List<Unit> units) {
 		final List<Point> placements = pathingModule.findPathablePlacements(spawnPos, units.size());
-		if(placements.size()<units.size())
+		if (placements.size() < units.size())
 			logger.warn("Tried to place {} units but only room for {} could be found", units.size(), placements.size());
-		for(int i=0; i<placements.size();i++) {
+		for (int i = 0; i < placements.size(); i++) {
 			Unit u = units.get(i);
-			Point placement = placements.get(i); 
+			Point placement = placements.get(i);
 			u.setPos(placement.x, placement.y);
 			mapInstance.addPreExistingUnit(units.get(i));
 		}
-		
+
 		return null;
 	}
 
@@ -176,9 +188,27 @@ public class StandardGameScreen extends GameScreen {
 
 	}
 
+	private void tickEntrances() {
+		for (Entrance entrance : map.getEntrances()) {
+			entrance.tick();	
+		}
+	}
+	private void transportPlayerUnitsIfStandingOnEntrance() {
+		for (Entrance entrance : map.getEntrances()) {
+			if (entrance.isBeingTriggered(playerUnits)) {
+				if (entrance.hasDestination()) {
+					goToMap(entrance.destMap, entrance.destLoc);
+					return;
+				}
+			}
+		}
+	}
+
 	@Override
 	protected void tickGame() {
 		super.tickGame();
+		tickEntrances();
+		transportPlayerUnitsIfStandingOnEntrance();
 	}
 
 	@Override
@@ -199,7 +229,7 @@ public class StandardGameScreen extends GameScreen {
 	public final void mapStartup() {
 		super.mapStartup();
 		if (!spawnedYet) {
-			playerUnits.addAll(testSpawnMultipleLecias(map.getLocation("default_spawn_location"), 4));
+			playerUnits.addAll(testSpawnMultipleLecias(map.getLocation("default_spawn_location").pos, 4));
 			spawnedYet = true;
 		}
 		if (lecia == null) {

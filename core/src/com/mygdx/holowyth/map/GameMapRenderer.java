@@ -38,6 +38,17 @@ public class GameMapRenderer {
 		batch.end();
 	}
 	
+	public static void renderEntrances(BitmapFont font,GameMap map, ShapeDrawer shapeDrawer, SpriteBatch batch){
+		batch.begin();
+		for(Location loc : map.getEntrances()) {
+			shapeDrawer.setColor(locDisplayColor);
+			shapeDrawer.circle(loc.pos.x, loc.pos.y, 15);
+				
+			font.draw(batch, loc.name, loc.pos.x, loc.pos.y+font.getCapHeight());
+		}
+		batch.end();
+	}
+	
 	public static void renderLocations(BitmapFont font,GameMap map, ShapeDrawer shapeDrawer, SpriteBatch batch){
 		batch.begin();
 		for(Location loc : map.getLocations().values()) {
@@ -47,8 +58,6 @@ public class GameMapRenderer {
 				
 			font.draw(batch, loc.name, loc.pos.x, loc.pos.y+font.getCapHeight());
 		}
-		
-		
 		batch.end();
 	}
 }

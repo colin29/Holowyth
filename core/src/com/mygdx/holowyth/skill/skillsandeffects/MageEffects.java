@@ -291,14 +291,14 @@ public class MageEffects {
 
 			var unitPos = unit.getPos();
 
-			boolean unitInRange = Point.calcDistance(caster.getPos(), unitPos) <= coneLength + unit.getRadius();
+			boolean unitInRange = Point.dist(caster.getPos(), unitPos) <= coneLength + unit.getRadius();
 			return !leftLine.doesPointLieOnTheLeft(unitPos) &&
 					rightLine.doesPointLieOnTheLeft(unitPos) &&
 					unitInRange;
 		}
 
 		private boolean isUnitWithinInnerRadius(Unit unit) {
-			return Point.calcDistance(caster.getPos(), unit.getPos()) <= coneInnerLength + unit.getRadius();
+			return Point.dist(caster.getPos(), unit.getPos()) <= coneInnerLength + unit.getRadius();
 		}
 	}
 
@@ -407,7 +407,7 @@ public class MageEffects {
 		@Override
 		public void tick() {
 			for (Unit unit : mapInstance.getUnits()) {
-				if (Point.calcDistance(ground, unit.getPos()) <= aoeRadius + unit.getRadius()) {
+				if (Point.dist(ground, unit.getPos()) <= aoeRadius + unit.getRadius()) {
 					if (unit.getSide() != caster.getSide()) {
 						unit.stats.doStunRollAgainst(18, stunDuration);
 					} else {
@@ -433,7 +433,7 @@ public class MageEffects {
 		@Override
 		public void tick() {
 			for (Unit unit : mapInstance.getUnits()) {
-				if (Point.calcDistance(ground, unit.getPos()) <= aoeRadius + unit.getRadius()) {
+				if (Point.dist(ground, unit.getPos()) <= aoeRadius + unit.getRadius()) {
 					if (unit.getSide() != caster.getSide()) {
 						unit.stats.applyBlind(blindDuration);
 					} else {

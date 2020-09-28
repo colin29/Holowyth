@@ -64,8 +64,12 @@ public class GameMap {
 		name = src.name;
 		tilemapPath = src.tilemapPath;
 		for(String s : src.locations.keySet()) {
-			locations.put(s, src.locations.get(s));
+			Location loc = src.locations.get(s);
+			locations.put(s, loc.cloneObject());
 		}
+
+		
+		
 		for(UnitMarker u: src.unitMarkers) {
 			unitMarkers.add(new UnitMarker(u));
 		}
@@ -84,13 +88,12 @@ public class GameMap {
 	
 	/**
 	 * @throw {@link #HoloResourceNotFoundException} if location not found
-	 * @return The location as a new point
 	 */
-	public Point getLocation(String name) {
+	public Location getLocation(String name) {
 		Location loc = locations.get(name);
 		if(loc == null) 
 			throw new HoloResourceNotFoundException("Location '" + name + "' not found in map '" + this.name + "'");
-		return new Point(loc.pos);
+		return loc;
 	}
 
 	
@@ -141,6 +144,14 @@ public class GameMap {
 	}
 	public List<Trigger> getTriggers(){
 		return Collections.unmodifiableList(triggers);
+	}
+	public List<Entrance> getEntrances(){
+		List<Entrance> entrances = new ArrayList<>();
+		for(var loc : locations.values()) {
+			if(loc instanceof Entrance)
+				entrances.add((Entrance) loc);
+		}
+		return entrances;
 	}
 	
 

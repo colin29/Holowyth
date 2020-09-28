@@ -76,7 +76,7 @@ public class WindBladeBolt extends ProjectileBase {
 	}
 
 	private float calculateAngleOffset() {
-		var dist = Point.calcDistance(pos, target.getPos());
+		var dist = Point.dist(pos, target.getPos());
 		float maxDistance = 200;
 		return Math.min(maxOffset, Math.max(0, maxOffset / maxDistance * dist));
 	}

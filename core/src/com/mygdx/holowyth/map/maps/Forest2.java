@@ -7,17 +7,12 @@ import com.mygdx.holowyth.map.Entrance;
 import com.mygdx.holowyth.map.GameMap;
 import com.mygdx.holowyth.map.Location;
 import com.mygdx.holowyth.map.UnitMarker;
-import com.mygdx.holowyth.map.trigger.Trigger;
-import com.mygdx.holowyth.map.trigger.UnitEntersRegion;
-import com.mygdx.holowyth.map.trigger.region.RectRegion;
-import com.mygdx.holowyth.skill.skill.Skills;
-import com.mygdx.holowyth.unit.Unit.Side;
-import com.mygdx.holowyth.unit.units.MonsterStats;
 import com.mygdx.holowyth.unit.units.MonsterTemplates;
 import com.mygdx.holowyth.util.Holo;
 
 public class Forest2 extends GameMap {
 
+	@SuppressWarnings("unused")
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	{
@@ -31,7 +26,7 @@ public class Forest2 extends GameMap {
 			unitMarkers.add(m);
 		}
 
-		locations.add(new Entrance("entrance_1", 50, 220));
+		locations.add(new Entrance("entrance_1", 50, 220).setDest("forest1", "entrance_2"));
 
 	}
 }

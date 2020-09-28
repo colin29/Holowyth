@@ -18,6 +18,7 @@ public class DebugStore {
 
 	/** When a component is registered twice, the old entries under that name are removed **/
 	public DebugValues registerComponent(String name) {
+		logger.debug("Registered component: {}", name);
 		if (store.containsKey(name)) {
 			logger.info("Replacing previously registered component '{}'", name);
 			store.get(name).clear();

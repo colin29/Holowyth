@@ -40,16 +40,16 @@ public class Forest1 extends GameMap {
 			addTrigger(t);
 		}
 
-		{
-			UnitMarker m = new UnitMarker();
-			m.pos.set(100, 400);
-			m.side = Side.PLAYER;
-			m.name = "Sally";
-			m.baseStats.set(MonsterStats.baseHuman);
-			m.animatedSpriteName = "pipo-charachip028d.png";
-			m.activeSkills.addAll(Skills.mageSkills);
-			unitMarkers.add(m);
-		}
+//		{
+//			UnitMarker m = new UnitMarker();
+//			m.pos.set(100, 400);
+//			m.side = Side.PLAYER;
+//			m.name = "Sally";
+//			m.baseStats.set(MonsterStats.baseHuman);
+//			m.animatedSpriteName = "pipo-charachip028d.png";
+//			m.activeSkills.addAll(Skills.mageSkills);
+//			unitMarkers.add(m);
+//		}
 		{
 			UnitMarker m = new UnitMarker(MonsterTemplates.goblin);
 			m.pos.set(400, 400);

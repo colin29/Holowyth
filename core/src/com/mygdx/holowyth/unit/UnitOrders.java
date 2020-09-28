@@ -178,7 +178,7 @@ public class UnitOrders {
 			return false;
 		}
 
-		if (Point.calcDistance(self.getPos(), target.getPos()) <= self.getRadius() + target.getRadius()
+		if (Point.dist(self.getPos(), target.getPos()) <= self.getRadius() + target.getRadius()
 				+ Holo.defaultUnitSwitchEngageRange) {
 			clearOrder();
 			order = isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT;
@@ -336,7 +336,7 @@ public class UnitOrders {
 
 				float aggroRange = self.getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
 
-				if (Point.calcDistance(self.getPos(), closestEnemy.getPos()) <= aggroRange) {
+				if (Point.dist(self.getPos(), closestEnemy.getPos()) <= aggroRange) {
 					orderAttackUnit(closestEnemy, false);
 				}
 			}
@@ -351,7 +351,7 @@ public class UnitOrders {
 
 				float aggroRange = self.getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
 
-				if (Point.calcDistance( self.getPos(), closestEnemy.getPos()) <= aggroRange) {
+				if (Point.dist( self.getPos(), closestEnemy.getPos()) <= aggroRange) {
 					orderTarget = (Unit) closestEnemy; // manually set target/path, since we want to keep the ATTACKMOVE
 														// order
 					if (!self.motion.pathFindTowardsTarget()) {
@@ -364,7 +364,7 @@ public class UnitOrders {
 
 	private void startAttackingIfInRangeForAttackOrders() {
 		if (!self.isAttacking() && (order.isAttackUnit() || isAttackMoveAndHasTarget())) {
-			float distToTarget = Point.calcDistance(self.getPos(), orderTarget.getPos());
+			float distToTarget = Point.dist(self.getPos(), orderTarget.getPos());
 			if (distToTarget <= getEngageRange(orderTarget)) {
 				self.combat.startAttacking(orderTarget);
 			}
@@ -373,7 +373,7 @@ public class UnitOrders {
 
 	private void stopAttackingIfEnemyIsOutOfRange() {
 		if (self.isAttacking()) {
-			float distToEnemy = Point.calcDistance(self.getPos(), self.getAttacking().getPos());
+			float distToEnemy = Point.dist(self.getPos(), self.getAttacking().getPos());
 			if (distToEnemy >= getDisengageRange(self.getAttacking())) {
 				self.combat.stopAttacking();
 			}
@@ -399,9 +399,9 @@ public class UnitOrders {
 		if (order == Order.ATTACKUNIT_SOFT) {
 			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(self, self.getMapInstance());
 			otherTargetsWithinAggroRange
-					.removeIf((t) -> Point.calcDistance(self.getPos(), t.getPos()) >= Holo.defaultAggroRange);
+					.removeIf((t) -> Point.dist(self.getPos(), t.getPos()) >= Holo.defaultAggroRange);
 			otherTargetsWithinAggroRange.remove(orderTarget);
-			float distToTarget = Point.calcDistance(self.getPos(), orderTarget.getPos());
+			float distToTarget = Point.dist(self.getPos(), orderTarget.getPos());
 
 			float aggroRange = self.getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
 			float chaseRange = self.getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange
@@ -422,9 +422,9 @@ public class UnitOrders {
 		if (order == Order.ATTACKMOVE) {
 			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(self, self.getMapInstance());
 			otherTargetsWithinAggroRange
-					.removeIf((t) -> Point.calcDistance(self.getPos(), t.getPos()) >= Holo.defaultAggroRange);
+					.removeIf((t) -> Point.dist(self.getPos(), t.getPos()) >= Holo.defaultAggroRange);
 			otherTargetsWithinAggroRange.remove(orderTarget);
-			float distToTarget = Point.calcDistance(self.getPos(), orderTarget.getPos());
+			float distToTarget = Point.dist(self.getPos(), orderTarget.getPos());
 
 			float aggroRange = self.getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
 			float chaseRange = self.getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange

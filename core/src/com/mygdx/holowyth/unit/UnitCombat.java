@@ -188,7 +188,7 @@ class UnitCombat {
 	 * Will do nothing if the two units are outside of engage range. 
 	 */
 	void setAttacking(Unit unit) {
-		float distToEnemy = Point.calcDistance(self.getPos(), unit.getPos());
+		float distToEnemy = Point.dist(self.getPos(), unit.getPos());
 		if (distToEnemy >= self.orders.getDisengageRange(unit)) {
 			logger.info("Tried to set attacking, but unit out of range");
 			return;

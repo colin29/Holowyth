@@ -165,7 +165,7 @@ public abstract class ProjectileBase {
 		var enemies = getCollisionTargets();
 
 		for (Unit enemy : enemies) {
-			if (Point.calcDistance(pos, enemy.getPos()) < enemy.getRadius()) {
+			if (Point.dist(pos, enemy.getPos()) < enemy.getRadius()) {
 				onCollision(enemy);
 				collided = true;
 				return;

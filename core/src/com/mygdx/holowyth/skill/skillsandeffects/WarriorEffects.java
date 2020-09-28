@@ -84,7 +84,7 @@ public class WarriorEffects {
 			for (Unit unit : mapInstance.getUnits()) {
 				if (unit == caster)
 					continue;
-				if (Point.calcDistance(caster.getPos(), unit.getPos()) <= aoeRadius + unit.getRadius()) {
+				if (Point.dist(caster.getPos(), unit.getPos()) <= aoeRadius + unit.getRadius()) {
 					if (unit.getSide() != caster.getSide()) {
 						unit.stats.doReelRollAgainst(15, reelDuration);
 					} else {

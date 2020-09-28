@@ -155,7 +155,7 @@ public class PFUnitControls implements InputProcessor {
 
 		for (PFDemoUnit u : units) {
 			p2.set(u.x, u.y);
-			dist = Point.calcDistance(p1, p2);
+			dist = Point.dist(p1, p2);
 			if (dist <= u.getRadius()) {
 				lastResult = u;
 			}
@@ -185,7 +185,7 @@ public class PFUnitControls implements InputProcessor {
 
 		for (PFDemoUnit u : units) {
 			p2.set(u.x, u.y);
-			dist = Point.calcDistance(p1, p2);
+			dist = Point.dist(p1, p2);
 			if (dist <= u.getRadius()) {
 				lastResult = u;
 			}

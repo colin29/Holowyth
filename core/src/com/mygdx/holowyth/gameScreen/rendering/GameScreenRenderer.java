@@ -22,8 +22,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.gameScreen.Controls;
-import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 import com.mygdx.holowyth.gameScreen.Controls.Context;
+import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.HoloSprite;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
@@ -90,8 +90,8 @@ public class GameScreenRenderer {
 	private Color clearColor = Color.BLACK;
 
 	private final int showMapPathingGraphKey = Keys.M;
-	private final int renderMapRegionsKey = Keys.B;
-	private final int renderMapLocationsKey = Keys.N;
+	private final int renderMapLocationsKey = Keys.B;
+	private final int renderMapRegionsKey = Keys.N;
 
 	/**
 	 * The game, worldCamera, and other screen-lifetime modules are passed in.
@@ -190,6 +190,7 @@ public class GameScreenRenderer {
 			GameMapRenderer.renderMapRegions(Holowyth.fonts.debugFont(), map, shapeDrawer, batch);
 		if(renderMapLocations)
 			GameMapRenderer.renderLocations(Holowyth.fonts.debugFont(), map, shapeDrawer, batch);
+		GameMapRenderer.renderEntrances(Holowyth.fonts.debugFont(), map, shapeDrawer, batch);
 		
 		if (Gdx.input.isKeyPressed(showMapPathingGraphKey)) {
 			pathingModule.renderGraph(true);

@@ -33,13 +33,13 @@ public class Point {
 		this.y = y;
 	}
 
-	public static float calcDistance(Point p1, Point p2) {
+	public static float dist(Point p1, Point p2) {
 		float dx = p2.x - p1.x;
 		float dy = p2.y - p1.y;
 		return (float) Math.sqrt(dx * dx + dy * dy);
 	}
 
-	public static float calcDistanceSqr(Point p1, Point p2) {
+	public static float distSqr(Point p1, Point p2) {
 		float dx = p2.x - p1.x;
 		float dy = p2.y - p1.y;
 		return dx * dx + dy * dy;

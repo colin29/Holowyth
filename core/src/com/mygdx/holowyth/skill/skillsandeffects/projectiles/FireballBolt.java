@@ -78,7 +78,7 @@ public class FireballBolt extends ProjectileBase {
 
 	private void damageEnemiesInRange() {
 		for (var unit : mapInstance.getUnits()) {
-			if (Point.calcDistance(pos, unit.getPos()) <= explosionRadius + unit.getRadius()) {
+			if (Point.dist(pos, unit.getPos()) <= explosionRadius + unit.getRadius()) {
 				if (isAEnemy(unit)) {
 					unit.stats.applyMagicDamage(damage);
 				} else {

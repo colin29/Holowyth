@@ -35,7 +35,7 @@ public class FleeUntilReachLocation extends HoloLeafTask {
 			self.orderMove(fleePoint.x, fleePoint.y);
 		}
 
-		return (Point.calcDistance(self.getPos(), fleePoint) < fleePointRadius) ? Status.SUCCEEDED : Status.RUNNING;
+		return (Point.dist(self.getPos(), fleePoint) < fleePointRadius) ? Status.SUCCEEDED : Status.RUNNING;
 	}
 
 	@Override

@@ -453,7 +453,7 @@ public class Controls extends InputProcessorAdapter {
 
 		for (Unit u : units) {
 			p2.set(u.x, u.y);
-			dist = Point.calcDistance(p1, p2);
+			dist = Point.dist(p1, p2);
 			if (dist <= u.getRadius()) {
 				target = u;
 			}
@@ -564,7 +564,7 @@ public class Controls extends InputProcessorAdapter {
 
 		for (Unit u : units) {
 			p2.set(u.x, u.y);
-			dist = Point.calcDistance(p1, p2);
+			dist = Point.dist(p1, p2);
 			if (dist <= u.getRadius()) {
 				target = u;
 			}
@@ -606,7 +606,7 @@ public class Controls extends InputProcessorAdapter {
 
 		for (Unit u : units) {
 			p2.set(u.x, u.y);
-			if (Point.calcDistance(p1, p2) <= u.getRadius()) {
+			if (Point.dist(p1, p2) <= u.getRadius()) {
 				selected = u;
 			}
 		}

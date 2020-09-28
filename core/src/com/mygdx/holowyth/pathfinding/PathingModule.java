@@ -439,7 +439,7 @@ public class PathingModule {
 
 		Point p1 = new Point(x, y);
 		Point p2 = new Point(cb.x, cb.y);
-		float dist = Point.calcDistance(p1, p2);
+		float dist = Point.dist(p1, p2);
 
 		float expandedRadius = cb.unitRadius + unitRadius;
 		float radSquared = expandedRadius * expandedRadius;
@@ -513,7 +513,7 @@ public class PathingModule {
 	}
 	private static boolean placementConflicts(Point placement, List<Point> prevPlacements) {
 		for(Point other : prevPlacements) {
-			if(Point.calcDistance(placement, other) < Holo.UNIT_RADIUS *2 + Holo.epsilon)
+			if(Point.dist(placement, other) < Holo.UNIT_RADIUS *2 + Holo.epsilon)
 				return true;
 		}
 		return false;

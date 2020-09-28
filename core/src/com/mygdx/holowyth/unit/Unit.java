@@ -581,7 +581,7 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	}
 
 	public static float getDist(Unit u1, Unit u2) {
-		return Point.calcDistance(u1.getPos(), u2.getPos());
+		return Point.dist(u1.getPos(), u2.getPos());
 	}
 
 }
