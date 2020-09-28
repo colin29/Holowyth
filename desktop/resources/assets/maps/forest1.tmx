@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.2" tiledversion="1.3.1" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="50" tilewidth="24" tileheight="24" infinite="0" nextlayerid="20" nextobjectid="54">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" compressionlevel="0" width="50" height="50" tilewidth="24" tileheight="24" infinite="0" nextlayerid="20" nextobjectid="54">
  <properties>
   <property name="atlas" value="Tilesets/tileset.atlas"/>
   <property name="name" value="forest1"/>
  </properties>
- <tileset firstgid="1" source="Tilesets/TownMerged.tsx"/>
- <tileset firstgid="2785" source="Tilesets/TownA.tsx"/>
+ <tileset firstgid="1" source="Tilesets/TownA1245.tsx"/>
+ <tileset firstgid="2785" source="Tilesets/TownA3.tsx"/>
  <tileset firstgid="3297" source="Tilesets/TownB.tsx"/>
  <tileset firstgid="4321" source="Tilesets/TownC.tsx"/>
  <tileset firstgid="5345" source="Tilesets/TownD.tsx"/>

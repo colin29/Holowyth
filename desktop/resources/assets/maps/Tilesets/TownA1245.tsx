@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.2" tiledversion="1.3.1" name="TownMerged" tilewidth="24" tileheight="24" tilecount="2784" columns="48">
- <image source="raw/townMerged.png" width="1152" height="1392"/>
+<tileset version="1.4" tiledversion="1.4.2" name="TownMerged" tilewidth="24" tileheight="24" tilecount="2784" columns="48">
+ <image source="townA1245.png" width="1152" height="1392"/>
  <terraintypes>
   <terrain name="Grass" tile="1203"/>
   <terrain name="Water" tile="146"/>
