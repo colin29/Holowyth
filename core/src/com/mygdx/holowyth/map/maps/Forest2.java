@@ -7,6 +7,8 @@ import com.mygdx.holowyth.map.Entrance;
 import com.mygdx.holowyth.map.GameMap;
 import com.mygdx.holowyth.map.Location;
 import com.mygdx.holowyth.map.UnitMarker;
+import com.mygdx.holowyth.unit.Unit.Side;
+import com.mygdx.holowyth.unit.units.MonsterStats;
 import com.mygdx.holowyth.unit.units.MonsterTemplates;
 import com.mygdx.holowyth.util.Holo;
 
@@ -23,6 +25,15 @@ public class Forest2 extends GameMap {
 		{
 			UnitMarker m = new UnitMarker(MonsterTemplates.goblin);
 			m.pos.set(500, 700);
+			unitMarkers.add(m);
+		}
+		{
+			UnitMarker m = new UnitMarker();
+			m.pos.set(60, 245);
+			m.name = "Sally";
+			m.baseStats.set(MonsterStats.baseHuman);
+			m.side = Side.PLAYER;
+			m.animatedSpriteName = "pipo-charachip028d.png";
 			unitMarkers.add(m);
 		}
 

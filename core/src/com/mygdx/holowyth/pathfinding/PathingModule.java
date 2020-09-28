@@ -22,6 +22,7 @@ import com.mygdx.holowyth.map.obstacledata.OrientedPoly;
 import com.mygdx.holowyth.map.obstacledata.OrientedSeg;
 import com.mygdx.holowyth.map.simplemap.SimpleMap;
 import com.mygdx.holowyth.pathfinding.PathSmoother.PathsInfo;
+import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Coord;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -242,7 +243,7 @@ public class PathingModule {
 
 		revertDynamicGraph();
 		if (!Holo.debugPathfindingIgnoreUnits) {
-			setDynamicGraph(colBodies, unit);
+			setDynamicGraph(colBodies, unit.getRadius());
 		}
 		Path newPath = astar.doAStar(unit.getX(), unit.getY(), dx, dy, obstacleExpandedSegs, obstaclePoints, colBodies,
 				dynamicGraph, unit.getRadius()); // use the dynamic graph
@@ -394,17 +395,17 @@ public class PathingModule {
 	 * 
 	 * @param infos List of the expanded polygons of units, excluding the pathing unit, with some extra
 	 *              information.
-	 * @param u     The pathing unit
+	 * @param u     The radius of the pathing unit (has to match the radius of the base graph though)
 	 */
-	private void setDynamicGraph(ArrayList<CBInfo> infos, UnitPF u) {
+	private void setDynamicGraph(List<CBInfo> infos, float unitRadius) {
 
 		for (CBInfo cb : infos) {
 			prospects = new ArrayList<Vertex>();
 			float x1, x2, y1, y2; // boundaries of the bounding box of the expanded colliding body
-			x1 = cb.x - cb.unitRadius - u.getRadius();
-			x2 = cb.x + cb.unitRadius + u.getRadius();
-			y1 = cb.y - cb.unitRadius - u.getRadius();
-			y2 = cb.y + cb.unitRadius + u.getRadius();
+			x1 = cb.x - cb.unitRadius - unitRadius;
+			x2 = cb.x + cb.unitRadius + unitRadius;
+			y1 = cb.y - cb.unitRadius - unitRadius;
+			y2 = cb.y + cb.unitRadius + unitRadius;
 
 			int upperIndexX = (int) Math.ceil(x2 / CELL_SIZE);
 			int upperIndexY = (int) Math.ceil(y2 / CELL_SIZE);
@@ -419,7 +420,7 @@ public class PathingModule {
 			// System.out.println("prospects: " + prospects.size());
 
 			for (Vertex v : prospects) {
-				restrictVertex(v, cb, u.getRadius());
+				restrictVertex(v, cb, unitRadius);
 			}
 
 		}
@@ -481,18 +482,23 @@ public class PathingModule {
 	 * 
 	 * Find pathable placements near a specified point Assumes all units have radius Holo.UNIT_RADIUS
 	 * 
+	 * @param existingCBs can be null
+	 * 
 	 * @return A list of non-overlapping pathable points up to length numPlacements. If initial location
 	 *         is unpathable, returns empty list. If only a partial number of placements could be found,
 	 *         returns that partial list.
 	 */
-	public List<Point> findPathablePlacements(Point spawnPoint, int numPlacements) {
+	public List<Point> findPathablePlacements(Point spawnPoint, int numPlacements, List<? extends UnitInfo> existingUnits) {
 		List<Point> placements = new ArrayList<>();
 
+//		revertDynamicGraph();
+//		setDynamicGraph(existingUnits, Holo.UNIT_RADIUS);
+//		
 		final Vertex closestVertex = HoloPF.findClosestReachableVertex(spawnPoint, graph, graphWidth, graphHeight);
 		if (closestVertex == null) {
 			return placements; // empty list
 		}
-		placements.add(closestVertex.getAsPoint(CELL_SIZE));
+		placements.add(closestVertex.toPos(CELL_SIZE));
 
 		Point newPlacement = new Point();
 		clearVisited();
@@ -500,21 +506,33 @@ public class PathingModule {
 			if (placements.size() >= numPlacements)
 				return;
 			newPlacement.set(c.x * Holo.CELL_SIZE, c.y * Holo.CELL_SIZE);
-			addPlacementIfNotConflicting(newPlacement, placements);
+			addPlacementIfNotConflicting(newPlacement, placements, existingUnits);
 		}, () -> (placements.size() >= numPlacements));
 
 		return placements;
 	}
 	
-	private static void addPlacementIfNotConflicting(Point p, List<Point> placements) {
-		if(!placementConflicts(p, placements)){
+	
+
+
+	private static void addPlacementIfNotConflicting(Point p, List<Point> placements, List<? extends UnitInfo> existingUnits) {
+		if (!placementConflicts(p, placements, existingUnits)) {
 			placements.add(new Point(p));
 		}
 	}
-	private static boolean placementConflicts(Point placement, List<Point> prevPlacements) {
-		for(Point other : prevPlacements) {
-			if(Point.dist(placement, other) < Holo.UNIT_RADIUS *2 + Holo.epsilon)
+
+
+	private static boolean placementConflicts(Point placement, List<Point> prevPlacements,
+			List<? extends UnitInfo> existingUnits) {
+		for (Point other : prevPlacements) {
+			if (Point.dist(placement, other) < Holo.UNIT_RADIUS * 2 + Holo.epsilon)
 				return true;
+		}
+		if (existingUnits != null) {
+			for (UnitInfo other : existingUnits) {
+				if (Point.dist(placement, other.getPos()) < Holo.UNIT_RADIUS * 2 + Holo.epsilon)
+					return true;
+			}
 		}
 		return false;
 	}
@@ -586,6 +604,7 @@ public class PathingModule {
 			}
 		}
 	}
+
 	private void addCoordToQueueAndMarkVisited(int ix, int iy, Queue<Coord> q) {
 		q.addLast(new Coord(ix, iy));
 		visited[iy][ix] = true;

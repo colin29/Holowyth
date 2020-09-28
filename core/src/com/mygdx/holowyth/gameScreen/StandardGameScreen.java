@@ -49,9 +49,13 @@ public class StandardGameScreen extends GameScreen {
 			goToMap("forest2", "entrance_1");
 		}, Keys.G);
 		
+		functionBindings.bindFunctionToKey(() -> { // center camera back on map
+			camera.position.set(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 0);
+		}, Keys.MINUS);
+
 		DebugValues debugValues = debugStore.registerComponent(this.getClass().getSimpleName());
-		debugValues.add("Map name", ()->map.getName());
-		
+		debugValues.add("Map name", () -> map.getName());
+
 		loadGameMapByName("forest1");
 	}
 
@@ -104,12 +108,13 @@ public class StandardGameScreen extends GameScreen {
 		placeUnits(arrivalLoc.pos, playerUnits);
 		// Center camera
 		camera.position.set(arrivalLoc.getX(), arrivalLoc.getY(), 0);
-		if(arrivalLoc instanceof Entrance)
+		if (arrivalLoc instanceof Entrance)
 			((Entrance) arrivalLoc).disableTemporarily();
 	}
 
 	private List<Unit> placeUnits(Point spawnPos, List<Unit> units) {
-		final List<Point> placements = pathingModule.findPathablePlacements(spawnPos, units.size());
+		final List<Point> placements = pathingModule.findPathablePlacements(spawnPos, units.size(),
+				mapInstance.getUnits());
 		if (placements.size() < units.size())
 			logger.warn("Tried to place {} units but only room for {} could be found", units.size(), placements.size());
 		for (int i = 0; i < placements.size(); i++) {
@@ -127,7 +132,8 @@ public class StandardGameScreen extends GameScreen {
 	 */
 	private List<Unit> testSpawnMultipleLecias(Point spawnPos, int numUnits) {
 		// fetch locations
-		final List<Point> unitPlacements = pathingModule.findPathablePlacements(spawnPos, numUnits);
+		final List<Point> unitPlacements = pathingModule.findPathablePlacements(spawnPos, numUnits,
+				mapInstance.getUnits());
 		if (unitPlacements.size() != numUnits) {
 			logger.warn("Expected {} placements, but got {} locations. Not all units may be placed.", numUnits,
 					unitPlacements.size());
@@ -190,9 +196,10 @@ public class StandardGameScreen extends GameScreen {
 
 	private void tickEntrances() {
 		for (Entrance entrance : map.getEntrances()) {
-			entrance.tick();	
+			entrance.tick();
 		}
 	}
+
 	private void transportPlayerUnitsIfStandingOnEntrance() {
 		for (Entrance entrance : map.getEntrances()) {
 			if (entrance.isBeingTriggered(playerUnits)) {
@@ -229,7 +236,7 @@ public class StandardGameScreen extends GameScreen {
 	public final void mapStartup() {
 		super.mapStartup();
 		if (!spawnedYet) {
-			playerUnits.addAll(testSpawnMultipleLecias(map.getLocation("default_spawn_location").pos, 4));
+			playerUnits.addAll(testSpawnMultipleLecias(map.getLocation("default_spawn_location").pos, 8));
 			spawnedYet = true;
 		}
 		if (lecia == null) {

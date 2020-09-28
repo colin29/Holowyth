@@ -42,7 +42,7 @@ public class Vertex {
 		this.SE = false;
 		this.reachable = false;
 	}
-	public Point getAsPoint(int CELL_SIZE) {
+	public Point toPos(int CELL_SIZE) {
 		return new Point(ix * CELL_SIZE, iy * CELL_SIZE);
 	}
 }

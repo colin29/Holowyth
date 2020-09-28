@@ -105,7 +105,6 @@ public class UnitOrders {
 	}
 
 	/**
-	 * @param unit
 	 * @return Whether the command was valid and accepted
 	 */
 	boolean orderAttackUnit(UnitOrderable unitOrd) {
