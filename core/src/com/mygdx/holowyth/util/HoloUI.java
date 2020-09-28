@@ -30,11 +30,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 public class HoloUI {
 
 	@FunctionalInterface
-	public interface VoidInterface {
-		public void run();
-	}
-
-	@FunctionalInterface
 	public interface FloatConsumer {
 		public void accept(Float f);
 	}
@@ -57,14 +52,14 @@ public class HoloUI {
 
 	// Widget Functions
 	public static Cell<TextButton> textButton(Table table, String text, Skin skin, PaddingValues padding,
-			VoidInterface action) {
+			Runnable action) {
 		Cell<TextButton> c = textButton(table, text, skin, action);
 		pad(c.getActor(), padding);
 		return c;
 	}
 
 	public static Cell<TextButton> textButton(Table table, String text, TextButtonStyle style, PaddingValues padding,
-			VoidInterface action) {
+			Runnable action) {
 		Cell<TextButton> c = textButton(table, text, style, action);
 		pad(c.getActor(), padding);
 		return c;
@@ -85,7 +80,7 @@ public class HoloUI {
 	}
 
 	// Widget Functions
-	public static Cell<TextButton> textButton(Table table, String text, Skin skin, VoidInterface action) {
+	public static Cell<TextButton> textButton(Table table, String text, Skin skin, Runnable action) {
 		return textButton(table, text, skin, new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -94,7 +89,7 @@ public class HoloUI {
 		});
 	}
 
-	public static Cell<TextButton> textButton(Table table, String text, TextButtonStyle style, VoidInterface action) {
+	public static Cell<TextButton> textButton(Table table, String text, TextButtonStyle style, Runnable action) {
 		return textButton(table, text, style, new ChangeListener() {
 			@Override
 			public void changed(ChangeEvent event, Actor actor) {
@@ -158,8 +153,8 @@ public class HoloUI {
 	}
 
 	public static void confirmationDialog(boolean condition, Stage stage, Skin skin, String titleText,
-			String contentText, String doAlteredText, String doOriginalText, VoidInterface alteredAction,
-			VoidInterface originalAction) {
+			String contentText, String doAlteredText, String doOriginalText, Runnable alteredAction,
+			Runnable originalAction) {
 
 		if (condition) {
 			Dialog dialog = new Dialog(titleText, skin);

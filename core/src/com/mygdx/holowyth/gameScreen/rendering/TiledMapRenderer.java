@@ -30,7 +30,6 @@ public class TiledMapRenderer extends SubRenderer {
 		this.map = map;
 		if (map != null) {
 			tiledMapRenderer = new OrthogonalTiledMapRenderer(map);
-			logger.debug("Set new map.");
 		}
 	}
 

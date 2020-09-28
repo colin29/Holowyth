@@ -15,6 +15,7 @@ import com.mygdx.holowyth.map.trigger.Trigger;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.units.MonsterStats;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.vn.VNController;
@@ -31,29 +32,32 @@ public class StandardGameScreen extends GameScreen {
 
 	private VNController vn;
 
-
 	private Unit lecia;
-	
+
 	public StandardGameScreen(Holowyth game) {
 		super(game);
 		loadGameMapByName("forest1");
-		
+
 //		vn = new VNController(new Stage(), batch, fixedCamera, multiplexer); // have vn draw using its OWN stage
 //		startConversation("myConv.conv", "default");
-		
-		functionBindings.bindFunctionToKey(this::addLeciaToWorld, Keys.Z);
-		functionBindings.bindFunctionToKey(this::removeLeciaFromWorld, Keys.X);
-		
+
+		functionBindings.bindFunctionToKey(this::addLeciaToMapInstance, Keys.Z);
+		functionBindings.bindFunctionToKey(this::removeLeciaFromMapInstance, Keys.X);
+		functionBindings.bindFunctionToKey(()->{
+			goToMap("forest2", "entrance_1");	
+		}, Keys.G);
+
 	}
+
 	/**
 	 * GameScreenBase does check triggers, but it doesn't load them from the map
 	 */
 	private void loadMapTriggers() {
-		for(Trigger t: map.getTriggers()) {
+		for (Trigger t : map.getTriggers()) {
 			triggers.addTrigger(t);
 		}
 	}
-	
+
 	@SuppressWarnings("unused")
 	private void startConversation(String convoName, String branch) {
 		pauseGame();
@@ -75,27 +79,52 @@ public class StandardGameScreen extends GameScreen {
 	private Unit spawnPlayerAtDefaultLocation() {
 		Point pos = map.getLocations().get("default_spawn_location").pos;
 		if (pos != null) {
-			return spawnPlayerUnit(pos);
+			return testSpawnLecia(pos);
 		} else {
 			logger.error("Couldn't spawn player, map has no default_spawn_location");
 			return null;
 		}
 	}
-	
+	public void goToMap(String mapName, String locationName) {
+		if (isMapLoaded()) {
+			for (UnitInfo unit : playerUnits) {
+				mapInstance.removeAndDetachUnitFromWorld((Unit) unit);
+			}
+		}
+		loadGameMapByName(mapName);
+		// map refers to new map now
+		placeUnits(map.getLocation(locationName), playerUnits);
+	}
+
+	private List<Unit> placeUnits(Point spawnPos, List<Unit> units){
+		final List<Point> placements = pathingModule.findPathablePlacements(spawnPos, units.size());
+		if(placements.size()<units.size())
+			logger.warn("Tried to place {} units but only room for {} could be found", units.size(), placements.size());
+		for(int i=0; i<placements.size();i++) {
+			Unit u = units.get(i);
+			Point placement = placements.get(i); 
+			u.setPos(placement.x, placement.y);
+			mapInstance.addPreExistingUnit(units.get(i));
+		}
+		
+		return null;
+	}
+
 	/**
 	 * @return a list of units that were actually spawned
 	 */
-	private List<Unit> spawnMultiplePlayerUnits(Point spawnPos, int numUnits) {
+	private List<Unit> testSpawnMultipleLecias(Point spawnPos, int numUnits) {
 		// fetch locations
 		final List<Point> unitPlacements = pathingModule.findPathablePlacements(spawnPos, numUnits);
-		if(unitPlacements.size() != numUnits) {
-			logger.warn("Expected {} placements, but got {} locations. Not all units may be placed.", numUnits, unitPlacements.size());
+		if (unitPlacements.size() != numUnits) {
+			logger.warn("Expected {} placements, but got {} locations. Not all units may be placed.", numUnits,
+					unitPlacements.size());
 		}
 
 		final List<Unit> units = new ArrayList<Unit>();
-		
-		for(int i=0;i<Math.min(numUnits, unitPlacements.size());i++) {
-			units.add(spawnPlayerUnit(unitPlacements.get(i)));
+
+		for (int i = 0; i < Math.min(numUnits, unitPlacements.size()); i++) {
+			units.add(testSpawnLecia(unitPlacements.get(i)));
 		}
 		return units;
 	}
@@ -103,7 +132,7 @@ public class StandardGameScreen extends GameScreen {
 	/**
 	 * @param pos can't be null
 	 */
-	private Unit spawnPlayerUnit(Point pos) {
+	private Unit testSpawnLecia(Point pos) {
 		var u = new Unit(pos.x, pos.y, Unit.Side.PLAYER, mapInstance);
 		u.setName("Lecia");
 		u.graphics.setAnimatedSprite(game.animations.get("pipo-charachip030e.png"));
@@ -115,35 +144,36 @@ public class StandardGameScreen extends GameScreen {
 		mapInstance.addUnit(u);
 		return u;
 	}
-	private void removeLeciaFromWorld() {
-		if(!isMapLoaded()) { // in case map was closed beforehand, try removing using her world ref.
-			if(lecia.getMapInstance() != null) {
+
+	private void removeLeciaFromMapInstance() {
+		if (!isMapLoaded()) { // in case map was closed beforehand, try removing using her world ref.
+			if (lecia.getMapInstance() != null) {
 				lecia.getMapInstanceMutable().removeAndDetachUnitFromWorld(lecia);
-			}else {
+			} else {
 				logger.warn("Remove: Lecia is not in a world");
 				return;
 			}
-		}else {
+		} else {
 			controls.removeUnitFromSelection(lecia);
 			mapInstance.removeAndDetachUnitFromWorld(lecia);
 		}
-		
-		
+
 	}
-	private void addLeciaToWorld() {
-		if(isMapLoaded()) {
-			if(lecia.getMapInstance() == null) {
+
+	private void addLeciaToMapInstance() {
+		if (isMapLoaded()) {
+			if (lecia.getMapInstance() == null) {
 				Point pos = map.getLocations().get("default_spawn_location").pos;
-				((Unit) lecia).x = pos.x+200;
+				((Unit) lecia).x = pos.x + 200;
 				((Unit) lecia).y = pos.y;
-				mapInstance.addPreExistingUnit(lecia);	
-			}else {
+				mapInstance.addPreExistingUnit(lecia);
+			} else {
 				logger.warn("Add: Lecia already has a world");
 			}
-		}else {
+		} else {
 			logger.info("Map isn't loaded, can't add player to world");
 		}
-		
+
 	}
 
 	@Override
@@ -154,7 +184,7 @@ public class StandardGameScreen extends GameScreen {
 	@Override
 	public void render(float delta) {
 		super.render(delta);
-		if(vn!=null)
+		if (vn != null)
 			vn.updateAndRenderIfVisible(delta); // render vn ui on top
 	}
 
@@ -163,15 +193,19 @@ public class StandardGameScreen extends GameScreen {
 		Gdx.input.setInputProcessor(multiplexer);
 	}
 
+	private boolean spawnedYet;
+
 	@Override
-	public
-	final void mapStartup() {
+	public final void mapStartup() {
 		super.mapStartup();
-		spawnMultiplePlayerUnits(map.getLocation("default_spawn_location"), 6);
-		if(lecia==null) {
+		if (!spawnedYet) {
+			playerUnits.addAll(testSpawnMultipleLecias(map.getLocation("default_spawn_location"), 4));
+			spawnedYet = true;
+		}
+		if (lecia == null) {
 //			lecia = spawnPlayerAtDefaultLocation();
-	
-		}else {
+
+		} else {
 			// insert existing lecia into the world
 		}
 		placeUnitsAccordingToUnitMarkers();
@@ -179,14 +213,13 @@ public class StandardGameScreen extends GameScreen {
 	}
 
 	@Override
-	public
-	final void mapShutdown() {
+	public final void mapShutdown() {
 		super.mapShutdown();
 	}
 
 	@Override
 	public void resize(int width, int height) {
-		if(vn!=null)
+		if (vn != null)
 			vn.resize(width, height);
 	}
 }

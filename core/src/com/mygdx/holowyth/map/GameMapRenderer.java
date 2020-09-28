@@ -15,6 +15,10 @@ import space.earlygrey.shapedrawer.ShapeDrawer;
  */
 public class GameMapRenderer {
 
+	
+	public static Color regionDisplayColor = HoloGL.rgb(219, 224, 72, 0.4f);
+	public static Color locDisplayColor = HoloGL.rgb(219, 224, 72, 1f);
+	
 	/**
 	 * Batch should be set to using the world camera.
 	 */
@@ -23,11 +27,25 @@ public class GameMapRenderer {
 		for(Region region : map.getRegions()) {
 			if(region instanceof RectRegion) {
 				RectRegion r = (RectRegion) region;
-				Color regionDisplayColor = HoloGL.rgb(219, 224, 72, 0.4f);
+				
 				shapeDrawer.filledRectangle(r.getX(), r.getY(), r.getWidth(), r.getHeight(), regionDisplayColor);
 				
 				font.draw(batch, r.getName(), r.getX(), r.getY() + r.getHeight());
 			}
+		}
+		
+		
+		batch.end();
+	}
+	
+	public static void renderLocations(BitmapFont font,GameMap map, ShapeDrawer shapeDrawer, SpriteBatch batch){
+		batch.begin();
+		for(Location loc : map.getLocations().values()) {
+				
+			shapeDrawer.setColor(locDisplayColor);
+			shapeDrawer.circle(loc.pos.x, loc.pos.y, 15);
+				
+			font.draw(batch, loc.name, loc.pos.x, loc.pos.y+font.getCapHeight());
 		}
 		
 		

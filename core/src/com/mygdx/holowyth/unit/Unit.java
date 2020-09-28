@@ -483,6 +483,10 @@ public class Unit implements UnitPF, UnitInfo, UnitOrderable {
 	public void setName(String name) {
 		this.stats.setName(name);
 	}
+	public void setPos(float x, float y) {
+		this.x = x;
+		this.y = y;
+	}
 
 	/**
 	 * Some classes only get a reference to WorldInfo because they are not intended to modify the world.

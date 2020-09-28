@@ -90,7 +90,8 @@ public class GameScreenRenderer {
 	private Color clearColor = Color.BLACK;
 
 	private final int showMapPathingGraphKey = Keys.M;
-	private final int showMapRegionsKey = Keys.N;
+	private final int renderMapRegionsKey = Keys.B;
+	private final int renderMapLocationsKey = Keys.N;
 
 	/**
 	 * The game, worldCamera, and other screen-lifetime modules are passed in.
@@ -133,9 +134,6 @@ public class GameScreenRenderer {
 
 			renderUnitHpSpBars(); // render unit bars low as to not obscure more important info
 
-			// Debug Map Visualizations
-			renderMapDebugVisualizationsIfKeysPressed();
-
 			// Unit paths
 			pathfinding.renderPaths(false);
 			unitMotion.renderUnitDestinations(Color.GREEN);
@@ -155,6 +153,9 @@ public class GameScreenRenderer {
 
 			// Obstacle Edges
 			renderMapObstacleEdges();
+			
+			// Debug Map Visualizations
+			renderMapDebugVisualizationsIfKeysPressed();
 
 			// Effects
 			renderEffects();
@@ -175,10 +176,21 @@ public class GameScreenRenderer {
 		Gdx.gl.glBlendFunc(GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
 	}
 
+	private boolean renderMapRegions;
+	private boolean renderMapLocations;
+
 	private void renderMapDebugVisualizationsIfKeysPressed() {
-		if (Gdx.input.isKeyPressed(showMapRegionsKey)) {
+		if (Gdx.input.isKeyJustPressed(renderMapRegionsKey))
+			renderMapRegions ^= true;
+
+		if (Gdx.input.isKeyJustPressed(renderMapLocationsKey))
+			renderMapLocations ^= true;
+
+		if (renderMapRegions)
 			GameMapRenderer.renderMapRegions(Holowyth.fonts.debugFont(), map, shapeDrawer, batch);
-		}
+		if(renderMapLocations)
+			GameMapRenderer.renderLocations(Holowyth.fonts.debugFont(), map, shapeDrawer, batch);
+		
 		if (Gdx.input.isKeyPressed(showMapPathingGraphKey)) {
 			pathingModule.renderGraph(true);
 			HoloGL.renderSegs(pathingModule.getObstacleExpandedSegs(), Color.PINK);

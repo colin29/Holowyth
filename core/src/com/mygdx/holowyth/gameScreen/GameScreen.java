@@ -1,5 +1,8 @@
 package com.mygdx.holowyth.gameScreen;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,7 +12,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.ai.AIModule;
-import com.mygdx.holowyth.gameScreen.basescreens.GameMapLoadingScreen;
+import com.mygdx.holowyth.gameScreen.basescreens.MapLoadingScreen;
 import com.mygdx.holowyth.gameScreen.rendering.GameScreenRenderer;
 import com.mygdx.holowyth.gameScreen.ui.GameScreenUI;
 import com.mygdx.holowyth.gameScreen.ui.GameLogDisplay;
@@ -18,6 +21,7 @@ import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.map.trigger.TriggersHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
 import com.mygdx.holowyth.util.tools.Timer;
@@ -33,7 +37,7 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
  * @author Colin
  *
  */
-public abstract class GameScreen extends GameMapLoadingScreen {
+public abstract class GameScreen extends MapLoadingScreen {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -52,7 +56,7 @@ public abstract class GameScreen extends GameMapLoadingScreen {
 	// Debugging and Convenience (App-lifetime)
 	private final DebugStore debugStore = new DebugStore();
 	protected final FunctionBindings functionBindings = new FunctionBindings();
-
+	
 	/**
 	 * For running game at constant FPS
 	 */
@@ -65,10 +69,16 @@ public abstract class GameScreen extends GameMapLoadingScreen {
 	private float snapLeftoverY;
 
 	protected final InputMultiplexer multiplexer = new InputMultiplexer();
+	
+	
+	// Gameplay
+	
+	protected final List<Unit> playerUnits = new ArrayList<Unit>();
+	
 
 	// Settings
 	private Color backgroundColor = HoloGL.rgb(79, 121, 66); // HoloGL.rbg(255, 236, 179);
-	private boolean mouseScrollEnabled = false;
+	private boolean mouseScrollEnabled = Holo.mouseScrollEnabled;
 
 	protected GameScreen(Holowyth game) {
 		super(game);

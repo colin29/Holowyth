@@ -24,9 +24,9 @@ import com.mygdx.holowyth.util.template.HoloBaseScreen;
  * @author Colin Ta
  *
  */
-public abstract class GameMapLoadingScreen extends HoloBaseScreen {
+public abstract class MapLoadingScreen extends HoloBaseScreen {
 
-	Logger logger = LoggerFactory.getLogger(TiledMapLoadingScreen.class);
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
 	 * The currently loaded game map
@@ -35,7 +35,7 @@ public abstract class GameMapLoadingScreen extends HoloBaseScreen {
 
 	private final TiledMapLoader tiledMapLoader;
 
-	protected GameMapLoadingScreen(Holowyth game) {
+	protected MapLoadingScreen(Holowyth game) {
 		super(game);
 
 		tiledMapLoader = new TiledMapLoader(stage, game.fileChooser);
@@ -48,7 +48,7 @@ public abstract class GameMapLoadingScreen extends HoloBaseScreen {
 	public void loadGameMapByName(String mapName) {
 		if(!game.mapRepo.hasMap(mapName))
 			throw new HoloResourceNotFoundException("Map '" + mapName + "' not found.");
-		GameMap newMap = game.mapRepo.getNewMapInstance("forest1");
+		GameMap newMap = game.mapRepo.getNewMapInstance(mapName);
 		
 		newMap.setTilemap(getTiledMapFromDisk(newMap.tilemapPath));
 		loadMap(newMap);

@@ -12,6 +12,7 @@ import com.mygdx.holowyth.map.trigger.Trigger;
 import com.mygdx.holowyth.map.trigger.region.Region;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
+import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 
 /**
  * Holds all the map information.
@@ -82,10 +83,14 @@ public class GameMap {
 	}
 	
 	/**
-	 * @return The location as a new point, or null if the location not found.
+	 * @throw {@link #HoloResourceNotFoundException} if location not found
+	 * @return The location as a new point
 	 */
 	public Point getLocation(String name) {
-		return new Point(locations.get(name).pos);
+		Location loc = locations.get(name);
+		if(loc == null) 
+			throw new HoloResourceNotFoundException("Location '" + name + "' not found in map '" + this.name + "'");
+		return new Point(loc.pos);
 	}
 
 	

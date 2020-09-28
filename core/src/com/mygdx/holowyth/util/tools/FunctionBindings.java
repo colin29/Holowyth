@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.badlogic.gdx.Input.Keys;
-import com.mygdx.holowyth.util.HoloUI;
-import com.mygdx.holowyth.util.HoloUI.VoidInterface;
 
 /**
  * Small class that lets you easily add hotkeys
@@ -14,10 +12,10 @@ import com.mygdx.holowyth.util.HoloUI.VoidInterface;
  */
 public class FunctionBindings {
 	
-	private Map<Integer, HoloUI.VoidInterface> functionBindings = new HashMap<Integer, VoidInterface>();
+	private Map<Integer, Runnable> functionBindings = new HashMap<Integer, Runnable>();
 	
 	
-	public void bindFunctionToKey(VoidInterface funct, int keyCode) {
+	public void bindFunctionToKey(Runnable funct, int keyCode) {
 		if(functionBindings.containsKey(keyCode)) {
 			System.out.printf("Key %s already has a function bound %n", Keys.toString(keyCode));
 			return;

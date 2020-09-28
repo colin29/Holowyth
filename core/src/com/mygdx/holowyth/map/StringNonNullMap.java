@@ -6,7 +6,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
+
 
 /**
  * A simple Map class that uses names as keys and forbids null keys and values
@@ -15,6 +19,9 @@ import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
  *
  */
 public class StringNonNullMap <V> {
+	
+	Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	private final Map<String, V> map = new LinkedHashMap<>();
 	/**
 	 * If entry doesn't exist, returns null

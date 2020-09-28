@@ -3,6 +3,7 @@ package com.mygdx.holowyth.map.maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mygdx.holowyth.map.Entrance;
 import com.mygdx.holowyth.map.GameMap;
 import com.mygdx.holowyth.map.Location;
 import com.mygdx.holowyth.map.UnitMarker;
@@ -16,13 +17,28 @@ import com.mygdx.holowyth.unit.units.MonsterTemplates;
 import com.mygdx.holowyth.util.Holo;
 
 public class Forest1 extends GameMap {
-	
+
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	{
 		tilemapPath = Holo.mapsDirectory + "/forest1.tmx";
-		locations.add(new Location("default_spawn_location", 100, 300));
 		setName("forest1");
+
+		{
+			locations.add(new Location("default_spawn_location", 100, 300));
+			locations.add(new Entrance("entrance_2", 1150, 635).setDest("forest2", "entrance_1"));
+		}
+		{
+			RectRegion r = new RectRegion(200, 100, 300, 200);
+			r.setName("Region 1");
+			putRegion(r);
+		}
+		{
+			Trigger t = new Trigger();
+			t.setTriggerEvent(new UnitEntersRegion(getRegion("Region 1")));
+			t.setTriggeredAction((world) -> logger.debug("Trigger happened: Unit entered region."));
+			addTrigger(t);
+		}
 
 		{
 			UnitMarker m = new UnitMarker();
@@ -38,17 +54,6 @@ public class Forest1 extends GameMap {
 			UnitMarker m = new UnitMarker(MonsterTemplates.goblin);
 			m.pos.set(400, 400);
 			unitMarkers.add(m);
-		}
-		{
-			RectRegion r =new RectRegion(200, 100, 300, 200);
-			r.setName("Region 1");
-			putRegion(r);
-		}
-		{
-			Trigger t = new Trigger();
-			t.setTriggerEvent(new UnitEntersRegion(getRegion("Region 1")));
-			t.setTriggeredAction((world) -> logger.debug("Trigger happened: Unit entered region."));
-			addTrigger(t);
 		}
 
 	}
