@@ -21,6 +21,8 @@ public interface UnitInfo {
 	public Side getSide();
 
 	public UnitStatsInfo getStats();
+	
+	public UnitStatusInfo getStatus();
 
 	public Order getOrder();
 

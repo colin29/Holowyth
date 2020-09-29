@@ -138,7 +138,7 @@ public class Controls extends InputProcessorAdapter {
 		debugValues.add("Movement speed of one unit", () -> {
 			if (selectedUnits.size() == 1) {
 				Unit u = selectedUnits.first();
-				return DataUtil.percentage(u.stats.getMoveSpeedRatio());
+				return DataUtil.percentage(u.status.getMoveSpeedRatio());
 			} else {
 				return "0";
 			}

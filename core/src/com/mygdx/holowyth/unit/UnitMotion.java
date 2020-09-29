@@ -96,7 +96,7 @@ public class UnitMotion {
 	public void tick() {
 
 		// unit motion can't handle 0 move speed for some reason (probably needs some extra special casing)
-		if (self.stats.getMoveSpeed() != 0) {
+		if (self.status.getMoveSpeed() != 0) {
 			setSpeedAndScaleAccel(self.stats.getBaseMoveSpeed());
 		}
 
@@ -243,7 +243,7 @@ public class UnitMotion {
 			}
 		}
 
-		float speedWithSlow = plannedSpeed * self.stats.getMoveSpeedRatio();
+		float speedWithSlow = plannedSpeed * self.status.getMoveSpeedRatio();
 		maxAcceleration = Math.min(accelRate / speedWithSlow, +accelRate * maxAccelFactor); // same accel rate as normal movement
 
 		float maxAllowableSpeed = Math.max(startingSpeed, actualSpeedLastFrame + maxAcceleration);

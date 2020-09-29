@@ -26,7 +26,7 @@ public class WarriorEffects {
 				mapInstance.getGfx().makeBlockEffect(caster, target);
 			}
 
-			target.stats.applySlow(slowAmount, slowDuration);
+			target.status.applySlow(slowAmount, slowDuration);
 			markAsComplete();
 		}
 	}
@@ -64,7 +64,7 @@ public class WarriorEffects {
 			target.interruptHard();
 			target.orderAttackUnit(caster, true);
 			target.setAttacking(caster);
-			target.stats.applyTaunt(tauntDuration, caster);
+			target.status.applyTaunt(tauntDuration, caster);
 			markAsComplete();
 		}
 

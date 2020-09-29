@@ -260,7 +260,7 @@ public class MageEffects {
 						Vector2 knockbackVec = new Vector2(u.x, u.y).sub(caster.x, caster.y).setLength(0.8f);
 						u.stats.doKnockBackRollAgainst(20, 0, knockbackVec);
 					}
-					u.stats.applySlow(slowAmount, slowDuration);
+					u.status.applySlow(slowAmount, slowDuration);
 
 				}
 			}
@@ -435,9 +435,9 @@ public class MageEffects {
 			for (Unit unit : mapInstance.getUnits()) {
 				if (Point.dist(ground, unit.getPos()) <= aoeRadius + unit.getRadius()) {
 					if (unit.getSide() != caster.getSide()) {
-						unit.stats.applyBlind(blindDuration);
+						unit.status.applyBlind(blindDuration);
 					} else {
-						unit.stats.applyBlind(blindDuration / 2);
+						unit.status.applyBlind(blindDuration / 2);
 					}
 				}
 			}

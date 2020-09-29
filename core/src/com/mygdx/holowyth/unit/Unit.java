@@ -19,6 +19,7 @@ import com.mygdx.holowyth.unit.UnitOrders.Order;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
+import com.mygdx.holowyth.unit.interfaces.UnitStatusInfo;
 import com.mygdx.holowyth.unit.sprite.UnitGraphics;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -66,6 +67,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	public final UnitGraphics graphics;
 	public final UnitEquip equip;
 	public final UnitAI ai;
+	public final UnitStatus status;
 
 	// Id (for debug)
 	private static int curId = 0;
@@ -120,6 +122,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 		equip = new UnitEquip(this);
 		ai = new UnitAI(this);
 		graphics = new UnitGraphics(this);
+		status = new UnitStatus(this);
 		
 		// Init map lifetime components
 		motion = new UnitMotion(this, world);
@@ -582,6 +585,11 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 
 	public static float getDist(Unit u1, Unit u2) {
 		return Point.dist(u1.getPos(), u2.getPos());
+	}
+
+	@Override
+	public UnitStatusInfo getStatus() {
+		return status;
 	}
 
 }

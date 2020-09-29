@@ -62,12 +62,6 @@ public class UnitStats implements UnitStatsInfo {
 	private EffectsHandler gfx;
 	private UnitStun stun; 
 	
-	// Status effects
-	private final List<SlowEffect> slowEffects = new LinkedList<SlowEffect>();
-	private float blindDurationRemaining;
-
-	private float tauntDurationRemaining = 0;
-	private Unit tauntedTowards = null;
 	
 	public UnitStats(Unit unit) {
 		this.self = unit;
@@ -90,43 +84,14 @@ public class UnitStats implements UnitStatsInfo {
 	
 	public void clearMapLifetimeData() {
 		clearMapLifetimeComponents();
-		clearStatusEffectsData();
 	}
 	private void clearMapLifetimeComponents() {
 		gfx = null;
 		stun = null;
 	}
-	private void clearStatusEffectsData() {
-		slowEffects.clear();
-		blindDurationRemaining = 0;
-
-		tauntDurationRemaining = 0;
-		tauntedTowards = null;
-	}
 
 	public void tick() {
-		tickStatusEffects();
 		stun.tick();
-	}
-
-	public void tickStatusEffects() {
-		slowEffects.forEach((effect) -> effect.tickDuration());
-		slowEffects.removeIf((effect) -> effect.isExpired());
-
-		blindDurationRemaining = Math.max(0, blindDurationRemaining - 1);
-
-		boolean wasTaunted = isTaunted();
-		tauntDurationRemaining = Math.max(0, tauntDurationRemaining - 1);
-		if (tauntDurationRemaining == 0) {
-			tauntedTowards = null;
-			if (wasTaunted)
-				onTauntEnd();
-		}
-
-	}
-
-	private void onTauntEnd() {
-		self.clearOrder();
 	}
 
 	/**
@@ -148,8 +113,6 @@ public class UnitStats implements UnitStatsInfo {
 
 		hp = getMaxHp();
 		sp = getMaxSp();
-
-		slowEffects.clear();
 	}
 
 	/**
@@ -176,8 +139,8 @@ public class UnitStats implements UnitStatsInfo {
 		}
 
 		// Add a slow effect, regardless of block or hit. This is for balancing fleeing enemies without engaging.
-		enemy.applyBasicAttackSlow(0.4f, 90);
-		enemy.applyBasicAttackSlow(0.2f, 150);
+		enemy.self.status.applyBasicAttackSlow(0.4f, 90);
+		enemy.self.status.applyBasicAttackSlow(0.2f, 150);
 
 		// 2. Simulate block chance
 
@@ -511,20 +474,6 @@ public class UnitStats implements UnitStatsInfo {
 		stun.applyKnockbackStunWithoutVelProrate(duration, maxStunDuration, dv);
 	}
 
-	public void applyBlind(float duration) {
-
-		if (duration < 0) {
-			throw new HoloIllegalArgumentsException("duration must be non-negative");
-		}
-		if (!isBlinded()) {
-			self.interruptRangedSkills();
-			blindDurationRemaining = duration;
-		} else {
-			blindDurationRemaining += duration;
-		}
-
-	}
-
 	@Override
 	public boolean isStunned() {
 		return stun.isStunned();
@@ -553,24 +502,6 @@ public class UnitStats implements UnitStatsInfo {
 		return stun.getReelDurationRemaining();
 	}
 
-	@Override
-	public boolean isSlowed() {
-		return !slowEffects.isEmpty();
-	}
-
-	@Override
-	public boolean isSlowedIgnoringBasicAttackSlow() {
-		for (var slowEffect : slowEffects) {
-			if (!(slowEffect instanceof BasicAttackSlowEffect))
-				return true;
-		}
-		return false;
-	}
-
-	@Override
-	public boolean isBlinded() {
-		return blindDurationRemaining > 0;
-	}
 
 	public void addSp(float amount) {
 		sp = Math.min(sp + amount, getMaxSp());
@@ -595,28 +526,6 @@ public class UnitStats implements UnitStatsInfo {
 		hp = value;
 	}
 
-	/**
-	 * @param slowAmount
-	 *            from 0 to 1, 1 being a total slow
-	 * @param duration
-	 *            in frames
-	 */
-	public void applySlow(float slowAmount, int duration) {
-		slowEffects.add(new SlowEffect(duration, slowAmount));
-	}
-
-	/**
-	 * Same as applySlow but uses a marker sub-class so that certain maneuvers can nullify this slow.
-	 */
-	public void applyBasicAttackSlow(float slowAmount, int duration) {
-		if (self.getOrder() != Order.RETREAT) { // units are unaffected by basic attack slow while retreating
-			slowEffects.add(new BasicAttackSlowEffect(duration, slowAmount));
-		}
-	}
-
-	public void removeAllBasicAttackSlows() {
-		slowEffects.removeIf((effect) -> effect instanceof BasicAttackSlowEffect);
-	}
 
 	// Printing Info Methods
 
@@ -752,31 +661,6 @@ public class UnitStats implements UnitStatsInfo {
 		return baseMoveSpeed;
 	}
 
-	public final float REEL_SLOW_AMOUNT = 0.4f;
-
-	@Override
-	public float getMoveSpeed() {
-
-		float largestSlow = 0;
-		for (var effect : slowEffects) {
-			largestSlow = Math.max(largestSlow, effect.getSlowAmount());
-		}
-
-		float reelingMoveSlow = isReeled() ? REEL_SLOW_AMOUNT : 0;
-
-		return baseMoveSpeed * (1 - largestSlow) * (1 - reelingMoveSlow);
-	}
-
-	/**
-	 * @returns movespeed / baseMoveSpeed. For example if a unit was slowed by 30%, it would return 0.7
-	 */
-	public float getMoveSpeedRatio() {
-		if (baseMoveSpeed == 0) {
-			return 0;
-		}
-
-		return getMoveSpeed() / baseMoveSpeed;
-	}
 
 	@Override
 	public float getDamage() {
@@ -880,29 +764,6 @@ public class UnitStats implements UnitStatsInfo {
 		}
 	}
 
-	public void applyTaunt(int duration, Unit tauntSource) {
-		if (tauntSource == null) {
-			logger.warn("tauntSource is null");
-			return;
-		}
-		tauntDurationRemaining = duration;
-		tauntedTowards = tauntSource;
-	}
-
-	@Override
-	public float getTauntDurationRemaining() {
-		return tauntDurationRemaining;
-	}
-
-	@Override
-	public boolean isTaunted() {
-		return tauntDurationRemaining > 0;
-	}
-
-	@Override
-	public UnitInfo getTauntAttackTarget() {
-		return tauntedTowards;
-	}
 
 	float getMultiTeamingAtkspdPenalty(Unit target) {
 		int n = self.getUnitsAttackingThis().size();
@@ -917,6 +778,4 @@ public class UnitStats implements UnitStatsInfo {
 			return 0.82f;
 		}
 	}
-
-
 }

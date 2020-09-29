@@ -47,12 +47,6 @@ public interface UnitStatsInfo {
 
 	String getName();
 
-	/**
-	 * Gets the statistical movespeed of the object, modified by slows. Note this is the speed of the unit for "normal" motion (as opposed to
-	 * knockback motion).
-	 */
-	float getMoveSpeed();
-
 	float getStunDurationRemaining();
 
 	boolean isStunned();
@@ -72,9 +66,6 @@ public interface UnitStatsInfo {
 
 	int getArmor();
 
-	boolean isSlowed();
-
-	boolean isBlinded();
 
 	UnitStatValues getSkillBonuses();
 
@@ -84,11 +75,5 @@ public interface UnitStatsInfo {
 
 	float getDamage();
 
-	UnitInfo getTauntAttackTarget();
 
-	boolean isTaunted();
-
-	float getTauntDurationRemaining();
-
-	boolean isSlowedIgnoringBasicAttackSlow();
 }

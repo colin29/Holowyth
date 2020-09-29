@@ -87,7 +87,7 @@ class UnitCombat {
 		if (self.getMotion().pathFindTowardsPoint(x, y)) {
 			stopAttacking();
 			self.orders.setOrder(Order.RETREAT);
-			self.stats.removeAllBasicAttackSlows();
+			self.status.removeAllBasicAttackSlows();
 
 			var attackers = self.getUnitsAttackingThis();
 			for (Unit attacker : attackers) {

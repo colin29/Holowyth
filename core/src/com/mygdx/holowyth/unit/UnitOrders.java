@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
+import com.mygdx.holowyth.unit.interfaces.UnitStatusInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
@@ -18,7 +19,8 @@ public class UnitOrders {
 
 	private final Unit self;
 	private final UnitStats stats;
-
+	private final UnitStatusInfo status;
+	
 	final UnitOrdersDeferring deffering;
 	
 	private Order order = Order.NONE;
@@ -52,17 +54,18 @@ public class UnitOrders {
 	UnitOrders(Unit self) {
 		this.self = self;
 		stats = self.stats;
+		status = self.status;
 		deffering = new UnitOrdersDeferring(self, this);
 	}
 
 	/** Handles the complex logic revolving around switching orders and targets */
 	void tick() {
 
-		if (stats.isTaunted()) {
+		if (status.isTaunted()) {
 			if (order == Order.NONE) {
 
 				if (isAnyOrderAllowedIgnoringTaunt())
-					orderAttackUnit((Unit) stats.getTauntAttackTarget(), true, true);
+					orderAttackUnit((Unit) status.getTauntAttackTarget(), true, true);
 			}
 		}
 
@@ -281,7 +284,7 @@ public class UnitOrders {
 	}
 
 	public boolean isUseSkillAllowed() {
-		return isGeneralOrderAllowed() && !stats.isBlinded();
+		return isGeneralOrderAllowed() && !status.isBlinded();
 	}
 
 	/**
@@ -299,7 +302,7 @@ public class UnitOrders {
 	 * @return
 	 */
 	public boolean isAnyOrderAllowed() {
-		return isAnyOrderAllowedIgnoringTaunt() && !stats.isTaunted();
+		return isAnyOrderAllowedIgnoringTaunt() && !status.isTaunted();
 	}
 
 	public boolean isAnyOrderAllowedIgnoringTaunt() {

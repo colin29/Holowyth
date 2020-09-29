@@ -501,19 +501,19 @@ public class GameScreenRenderer {
 
 	private void renderOutlineAroundSlowedUnits() {
 		renderThickOutlineIfTrueForAllUnits(Color.SKY, (UnitInfo u) -> {
-			return u.getStats().isSlowedIgnoringBasicAttackSlow();
+			return u.getStatus().isSlowedIgnoringBasicAttackSlow();
 		});
 	}
 
 	private void renderOutlineAroundBlindedUnits() {
 		renderThickOutlineIfTrueForAllUnits(Color.YELLOW, (UnitInfo u) -> {
-			return u.getStats().isBlinded();
+			return u.getStatus().isBlinded();
 		});
 	}
 
 	private void renderOutlineAroundTauntedUnits() {
 		renderThickOutlineIfTrueForAllUnits(Color.PURPLE, (UnitInfo u) -> {
-			return u.getStats().isTaunted();
+			return u.getStatus().isTaunted();
 		});
 	}
 
