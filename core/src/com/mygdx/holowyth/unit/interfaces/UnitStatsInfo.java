@@ -47,14 +47,6 @@ public interface UnitStatsInfo {
 
 	String getName();
 
-	float getStunDurationRemaining();
-
-	boolean isStunned();
-
-	boolean isReeled();
-
-	float getReeledDurationRemaining();
-
 	float getArmorNegation();
 
 	/**

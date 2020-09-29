@@ -436,7 +436,7 @@ public class MapInstance implements MapInstanceInfo {
 			} else {
 				thisUnit.getMotion().addKnockbackVelocity(dv1);
 				// We need to apply a stun to otherUnit, thus the different call
-				otherUnit.stats.applyKnockbackStunWithoutVelProrate(dv2);
+				otherUnit.status.applyKnockbackStunWithoutVelProrate(dv2);
 			}
 			break;
 		case OBSTACLE_SEG:

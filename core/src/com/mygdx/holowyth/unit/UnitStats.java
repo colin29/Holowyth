@@ -38,9 +38,6 @@ public class UnitStats implements UnitStatsInfo {
 	private static float atkChanceFloor = 0.01f;
 	private static float atkChanceCeiling = 1f;
 
-	private static float defaultStunProration = 60; // means a duration of x gets prorated around a max of x+60 frames
-	private static float defaultReelProration = 120;
-	
 	// Unit-lifetime components
 	public final Unit self;
 	private final UnitStatCalculator calc;
@@ -55,19 +52,18 @@ public class UnitStats implements UnitStatsInfo {
 	/** A character's base stat values, before equipment and skill bonuses */
 	public final UnitStatValues base = new UnitStatValues();
 	/** Unused atm, UnitMotion just uses the default movespeed */
-	public float baseMoveSpeed = Holo.defaultUnitMoveSpeed;  // Is this actually unused?
+	private float baseMoveSpeed = Holo.defaultUnitMoveSpeed;  // Is this actually unused?
 
 	
 	// Map-lifetime components
 	private EffectsHandler gfx;
-	private UnitStun stun; 
+	
 	
 	
 	public UnitStats(Unit unit) {
 		this.self = unit;
 		this.gfx = unit.getMapInstance().getGfx();
 
-		stun = new UnitStun(unit);
 		calc = new UnitStatCalculator(this);
 	}
 
@@ -79,7 +75,6 @@ public class UnitStats implements UnitStatsInfo {
 	}
 	public void reinitializeForWorld() {
 		gfx = self.getMapInstance().getGfx();
-		stun = new UnitStun(self);
 	}
 	
 	public void clearMapLifetimeData() {
@@ -87,11 +82,6 @@ public class UnitStats implements UnitStatsInfo {
 	}
 	private void clearMapLifetimeComponents() {
 		gfx = null;
-		stun = null;
-	}
-
-	public void tick() {
-		stun.tick();
 	}
 
 	/**
@@ -260,15 +250,15 @@ public class UnitStats implements UnitStatsInfo {
 	// }
 
 	private int getStunDefPenalty() {
-		return stun.isStunned() ? 20 : 0;
+		return self.status.isStunned() ? 20 : 0;
 	}
 
 	private int getReelAtkPenalty() {
-		return stun.isReeled() ? 10 : 0;
+		return self.status.isReeled() ? 10 : 0;
 	}
 
 	private int getReelDefPenalty() {
-		return stun.isReeled() ? 10 : 0;
+		return self.status.isReeled() ? 10 : 0;
 	}
 
 	/**
@@ -346,7 +336,7 @@ public class UnitStats implements UnitStatsInfo {
 	 * @return
 	 */
 	public void doStunRollAgainst(int force, float stunDuration) {
-		doStunRollAgainst(force, stunDuration, stunDuration + defaultStunProration, false, null, 0);
+		doStunRollAgainst(force, stunDuration, stunDuration + UnitStatus.defaultStunProration, false, null, 0);
 	}
 
 	/**
@@ -361,11 +351,11 @@ public class UnitStats implements UnitStatsInfo {
 	 *            Affects velocity proration
 	 */
 	public void doKnockBackRollAgainst(int force, float stunDuration, Vector2 knockbackVel, float maxKnockbackVel) {
-		doStunRollAgainst(force, stunDuration, stunDuration + defaultStunProration, true, knockbackVel, maxKnockbackVel);
+		doStunRollAgainst(force, stunDuration, stunDuration + UnitStatus.defaultStunProration, true, knockbackVel, maxKnockbackVel);
 	}
 
 	public void doKnockBackRollAgainst(int force, float stunDuration, Vector2 knockbackVel) {
-		doStunRollAgainst(force, stunDuration, stunDuration + defaultStunProration, true, knockbackVel, knockbackVel.len() + 1);
+		doStunRollAgainst(force, stunDuration, stunDuration + UnitStatus.defaultStunProration, true, knockbackVel, knockbackVel.len() + 1);
 	}
 
 	/**
@@ -383,25 +373,25 @@ public class UnitStats implements UnitStatsInfo {
 
 		if (attackerResult >= 10) { // apply full effect
 			if (isKnockback) {
-				applyKnockbackStun(stunDuration, maxStunDuration, knockbackVel, maxKnockbackVel);
+			self.status.applyKnockbackStun(stunDuration, maxStunDuration, knockbackVel, maxKnockbackVel);
 			} else {
-				applyStun(stunDuration, maxStunDuration);
+			self.status.applyStun(stunDuration, maxStunDuration);
 			}
 		} else if (attackerResult > 0) { // reduced stun and/or knockback
 			float factor = attackerResult * 0.1f;
 			if (isKnockback) {
-				applyKnockbackStun(stunDuration * factor, maxStunDuration, knockbackVel.scl(factor), maxKnockbackVel);
+			self.status.applyKnockbackStun(stunDuration * factor, maxStunDuration, knockbackVel.scl(factor), maxKnockbackVel);
 			} else {
-				applyStun(stunDuration * factor, maxStunDuration);
+			self.status.applyStun(stunDuration * factor, maxStunDuration);
 			}
 		} else if (attackerResult > -10) {
-			applyReel(stunDuration * (attackerResult + 10) * 0.1f, stunDuration + defaultReelProration);
+		self.status.applyReel(stunDuration * (attackerResult + 10) * 0.1f, stunDuration + UnitStatus.defaultReelProration);
 		}
 
 	}
 
 	public void doReelRollAgainst(int force, float reelDuration) {
-		doReelRollAgainst(force, reelDuration, reelDuration + defaultReelProration);
+		doReelRollAgainst(force, reelDuration, reelDuration + UnitStatus.defaultReelProration);
 	}
 
 	public void doReelRollAgainst(int force, float reelDuration, float maxReelDuration) {
@@ -414,93 +404,17 @@ public class UnitStats implements UnitStatsInfo {
 				getName(), attackerResult, force, attackerRoll, getStab());
 
 		if (attackerResult >= 10) { // apply full effect
-			applyReel(reelDuration, maxReelDuration);
+			self.status.applyReel(reelDuration, maxReelDuration);
 		} else if (attackerResult > 0) { // reduced stun and/or knockback
 			float factor = (attackerResult + 10) * 0.1f;
-			applyReel(reelDuration * factor, maxReelDuration);
+			self.status.applyReel(reelDuration * factor, maxReelDuration);
 		} else {
 			// resisted
 		}
 
 	}
 
-	public void applyStun(float duration) {
-		stun.applyStun(duration, duration + 60); // thus a 0.5 sec stun will prorate around a 1.5sec max, 3sec -> 4 sec max
-	}
 
-	public void applyStun(float duration, float maxStunDuration) {
-		stun.applyStun(duration, maxStunDuration);
-	}
-
-	/**
-	 * Unlike doKnockbackRoll, this method has no concept of force/stability
-	 * 
-	 * @param dv
-	 */
-	public void applyKnockbackStun(float duration, float maxStunDuration, Vector2 dv) {
-		applyKnockbackStun(duration, maxStunDuration, dv, dv.len() + 1);
-	}
-
-	/**
-	 * 
-	 * @param duration
-	 * @param maxStunDuration
-	 *            stun contribution by this effect is prorated around this value
-	 * @param dv
-	 * @param maxKnockbackVel
-	 *            velocity contribution by this effect is prorated around this value
-	 */
-	public void applyKnockbackStun(float duration, float maxStunDuration, Vector2 dv, float maxKnockbackVel) {
-		stun.applyKnockbackStun(duration, dv, maxKnockbackVel, maxStunDuration);
-	}
-
-	/**
-	 * Apply a knockback stun without adding any minimum stun time
-	 * 
-	 * @param dv
-	 */
-	public void applyKnockbackStunWithoutVelProrate(Vector2 dv) {
-		applyKnockbackStunWithoutVelProrate(0, dv);
-	}
-
-	/**
-	 * Use default stun proration
-	 */
-	public void applyKnockbackStunWithoutVelProrate(float duration, Vector2 dv) {
-		applyKnockbackStunWithoutVelProrate(duration, duration + defaultStunProration, dv);
-	}
-
-	public void applyKnockbackStunWithoutVelProrate(float duration, float maxStunDuration, Vector2 dv) {
-		stun.applyKnockbackStunWithoutVelProrate(duration, maxStunDuration, dv);
-	}
-
-	@Override
-	public boolean isStunned() {
-		return stun.isStunned();
-	}
-
-	@Override
-	public float getStunDurationRemaining() {
-		return stun.getStunDurationRemaining();
-	}
-
-	public void applyReel(float duration) {
-		applyReel(duration, duration + defaultReelProration);
-	}
-
-	public void applyReel(float duration, float maxReelDuration) {
-		stun.applyReel(duration, maxReelDuration);
-	}
-
-	@Override
-	public boolean isReeled() {
-		return stun.isReeled();
-	}
-
-	@Override
-	public float getReeledDurationRemaining() {
-		return stun.getReelDurationRemaining();
-	}
 
 
 	public void addSp(float amount) {

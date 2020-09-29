@@ -489,13 +489,13 @@ public class GameScreenRenderer {
 
 	private void renderOutlineAroundStunnedUnits() {
 		renderThickOutlineIfTrueForAllUnits(Color.SCARLET, (UnitInfo u) -> {
-			return u.getStats().isStunned();
+			return u.getStatus().isStunned();
 		});
 	}
 
 	private void renderOutlineAroundReeledUnits() {
 		renderThickOutlineIfTrueForAllUnits(Color.ORANGE, (UnitInfo u) -> {
-			return u.getStats().isReeled();
+			return u.getStatus().isReeled();
 		});
 	}
 

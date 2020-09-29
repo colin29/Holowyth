@@ -96,7 +96,7 @@ public class UnitOrders {
 
 	void orderMove(float x, float y) {
 		if (!isMoveOrderAllowed()) {
-			if (stats.isStunned()) {
+			if (status.isStunned()) {
 				deffering.tryToDeferOrder(Order.MOVE, null, x, y);
 			}
 			return;
@@ -141,7 +141,7 @@ public class UnitOrders {
 			return false;
 		}
 		if (isATauntedOrder ? isAnyOrderAllowedIgnoringTaunt() : isAttackOrderAllowed(unit)) {
-			if (stats.isStunned()) {
+			if (status.isStunned()) {
 				deffering.tryToDeferOrder(isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT,
 						(Unit) unitOrd, 0, 0);
 			}
@@ -199,7 +199,7 @@ public class UnitOrders {
 				attackMoveDestY = y;
 				this.order = Order.ATTACKMOVE;
 			}
-		} else if (stats.isStunned()) {
+		} else if (status.isStunned()) {
 			deffering.tryToDeferOrder(Order.ATTACKMOVE, null, x, y);
 		}
 
@@ -208,7 +208,7 @@ public class UnitOrders {
 	void orderRetreat(float x, float y) {
 		if (isRetreatOrderAllowed()) {
 			self.combat.retreat(x, y);
-		} else if (stats.isStunned()) {
+		} else if (status.isStunned()) {
 			deffering.tryToDeferOrder(Order.RETREAT, null, x, y);
 		}
 	}
@@ -219,7 +219,7 @@ public class UnitOrders {
 	 */
 	void orderStop() {
 		if (!isStopOrderAllowed()) {
-			if (stats.isStunned())
+			if (status.isStunned())
 				deffering.clearDeferredOrder();
 			return;
 		}
@@ -231,7 +231,7 @@ public class UnitOrders {
 	 */
 	void orderUseSkill(ActiveSkill skill) {
 
-		if (stats.isStunned()) {
+		if (status.isStunned()) {
 			deffering.clearDeferredOrder(); // deferring a skill order is not supported but it will still clear an
 													// existing deferred order
 		}
@@ -306,7 +306,7 @@ public class UnitOrders {
 	}
 
 	public boolean isAnyOrderAllowedIgnoringTaunt() {
-		return !stats.isDead() && !self.motion.isBeingKnockedBack() && !stats.isStunned();
+		return !stats.isDead() && !self.motion.isBeingKnockedBack() && !status.isStunned();
 	}
 
 	// @formatter:on

@@ -118,11 +118,11 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 
 		// Init unit lifetime components before map-lifetime components, just so that the latter can acquire reference in constructor.
 		stats = new UnitStats(this);
+		status = new UnitStatus(this);
 		skills = new UnitSkills(this);
 		equip = new UnitEquip(this);
 		ai = new UnitAI(this);
 		graphics = new UnitGraphics(this);
-		status = new UnitStatus(this);
 		
 		// Init map lifetime components
 		motion = new UnitMotion(this, world);
@@ -550,8 +550,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 		ai.tick();
 	
 		motion.tick();
-		stats.tick();
-	
+		status.tick();
 		orders.tick();
 		skills.tick();
 

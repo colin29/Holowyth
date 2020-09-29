@@ -19,4 +19,12 @@ public interface UnitStatusInfo {
 
 	boolean isSlowed();
 
+	float getReeledDurationRemaining();
+
+	boolean isReeled();
+
+	float getStunDurationRemaining();
+
+	boolean isStunned();
+
 }

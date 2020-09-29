@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.unit.UnitOrders.Order;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitStatusInfo;
@@ -25,6 +26,9 @@ public class UnitStatus implements UnitStatusInfo {
 
 	public static final float REEL_SLOW_AMOUNT = 0.4f;
 	
+	static float defaultStunProration = 60; // means a duration of x gets prorated around a max of x+60 frames
+	static float defaultReelProration = 120;
+	
 	private final Unit self;
 	
 	// Status effects
@@ -33,15 +37,21 @@ public class UnitStatus implements UnitStatusInfo {
 
 	private float tauntDurationRemaining = 0;
 	private Unit tauntedTowards = null;
-	
-	private float baseMoveSpeed = Holo.defaultUnitMoveSpeed;
-	
 
+	private UnitStun stun; 
+	
 	public UnitStatus(Unit self) {
 		this.self = self;
+		stun = new UnitStun(self);
+	}
+	
+	void reinitializeforMapInstance() {
+		stun = new UnitStun(self);
 	}
 	
 	void clearMapLifetimeData() {
+		stun = null;
+		
 		slowEffects.clear();
 		blindDurationRemaining = 0;
 
@@ -49,6 +59,8 @@ public class UnitStatus implements UnitStatusInfo {
 		tauntedTowards = null;
 	}
 	
+	
+
 	/**
 	 * @param slowAmount
 	 *            from 0 to 1, 1 being a total slow
@@ -94,6 +106,64 @@ public class UnitStatus implements UnitStatusInfo {
 		slowEffects.removeIf((effect) -> effect instanceof BasicAttackSlowEffect);
 	}
 
+	public void applyStun(float duration) {
+		stun.applyStun(duration, duration + 60); // thus a 0.5 sec stun will prorate around a 1.5sec max, 3sec -> 4 sec max
+	}
+
+	public void applyStun(float duration, float maxStunDuration) {
+		stun.applyStun(duration, maxStunDuration);
+	}
+
+	/**
+	 * Unlike doKnockbackRoll, this method has no concept of force/stability
+	 * 
+	 * @param dv
+	 */
+	public void applyKnockbackStun(float duration, float maxStunDuration, Vector2 dv) {
+		applyKnockbackStun(duration, maxStunDuration, dv, dv.len() + 1);
+	}
+
+	/**
+	 * 
+	 * @param duration
+	 * @param maxStunDuration
+	 *            stun contribution by this effect is prorated around this value
+	 * @param dv
+	 * @param maxKnockbackVel
+	 *            velocity contribution by this effect is prorated around this value
+	 */
+	public void applyKnockbackStun(float duration, float maxStunDuration, Vector2 dv, float maxKnockbackVel) {
+		stun.applyKnockbackStun(duration, dv, maxKnockbackVel, maxStunDuration);
+	}
+
+	/**
+	 * Apply a knockback stun without adding any minimum stun time
+	 * 
+	 * @param dv
+	 */
+	public void applyKnockbackStunWithoutVelProrate(Vector2 dv) {
+		applyKnockbackStunWithoutVelProrate(0, dv);
+	}
+
+	/**
+	 * Use default stun proration
+	 */
+	public void applyKnockbackStunWithoutVelProrate(float duration, Vector2 dv) {
+		applyKnockbackStunWithoutVelProrate(duration, duration + defaultStunProration, dv);
+	}
+
+	public void applyKnockbackStunWithoutVelProrate(float duration, float maxStunDuration, Vector2 dv) {
+		stun.applyKnockbackStunWithoutVelProrate(duration, maxStunDuration, dv);
+	}
+
+	public void applyReel(float duration) {
+		applyReel(duration, duration + defaultReelProration);
+	}
+
+	public void applyReel(float duration, float maxReelDuration) {
+		stun.applyReel(duration, maxReelDuration);
+	}
+
 	@Override
 	public boolean isSlowed() {
 		return !slowEffects.isEmpty();
@@ -124,6 +194,26 @@ public class UnitStatus implements UnitStatusInfo {
 	}
 
 	@Override
+	public boolean isStunned() {
+		return stun.isStunned();
+	}
+
+	@Override
+	public float getStunDurationRemaining() {
+		return stun.getStunDurationRemaining();
+	}
+
+	@Override
+	public boolean isReeled() {
+		return stun.isReeled();
+	}
+
+	@Override
+	public float getReeledDurationRemaining() {
+		return stun.getReelDurationRemaining();
+	}
+
+	@Override
 	public float getMoveSpeed() {
 	
 		float largestSlow = 0;
@@ -131,9 +221,9 @@ public class UnitStatus implements UnitStatusInfo {
 			largestSlow = Math.max(largestSlow, effect.getSlowAmount());
 		}
 	
-		float reelingMoveSlow = self.stats.isReeled() ? REEL_SLOW_AMOUNT : 0;
+		float reelingMoveSlow = isReeled() ? REEL_SLOW_AMOUNT : 0;
 	
-		return baseMoveSpeed * (1 - largestSlow) * (1 - reelingMoveSlow);
+		return self.stats.getBaseMoveSpeed() * (1 - largestSlow) * (1 - reelingMoveSlow);
 	}
 
 	/**
@@ -141,6 +231,7 @@ public class UnitStatus implements UnitStatusInfo {
 	 */
 	@Override
 	public float getMoveSpeedRatio() {
+		float baseMoveSpeed = self.stats.getBaseMoveSpeed();
 		if (baseMoveSpeed == 0) {
 			return 0;
 		}
@@ -161,6 +252,8 @@ public class UnitStatus implements UnitStatusInfo {
 			if (wasTaunted)
 				onTauntEnd();
 		}
+		
+		stun.tick();
 	}
 	
 	private void onTauntEnd() {
