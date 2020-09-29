@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.mygdx.holowyth.unit.UnitEquip.Slot;
+import com.mygdx.holowyth.unit.WornEquips.Slot;
 import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
@@ -15,48 +15,48 @@ import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
  *
  */
 class EquippedItemsMap {
-	private final Map<Slot, Equip> items = new HashMap<Slot, Equip>();
+	private final Map<WornEquips.Slot, Equip> equippedItems = new HashMap<WornEquips.Slot, Equip>();
 	// Set up slots so that iteration prints through all the slots
 	{
-		for (Slot slot : Slot.values()) {
-			items.put(slot, null);
+		for (WornEquips.Slot slot : WornEquips.Slot.values()) {
+			equippedItems.put(slot, null);
 		}
 	}
 
 	/**
 	 * Does not allow putting null values or keys
 	 */
-	public void put(Slot slot, Equip equip) {
+	public void put(WornEquips.Slot slot, Equip equip) {
 		if (slot == null)
 			throw new HoloIllegalArgumentsException("Can't equip to a null slot");
 		if (equip == null)
 			throw new HoloIllegalArgumentsException("Can't equip a null item");
-		items.put(slot, equip);
+		equippedItems.put(slot, equip);
 	}
 
-	public Equip get(Slot slot) {
+	public Equip get(WornEquips.Slot slot) {
 		if (slot == null)
 			throw new HoloIllegalArgumentsException("Can't access a null slot");
-		return items.get(slot);
+		return equippedItems.get(slot);
 	}
 
-	public void remove(Slot slot) {
+	public void remove(WornEquips.Slot slot) {
 		if (slot == null)
 			throw new HoloIllegalArgumentsException("Can't access a null slot");
-		items.put(slot, null);
+		equippedItems.put(slot, null);
 	}
 
-	public boolean isNull(Slot slot) {
+	public boolean isNull(WornEquips.Slot slot) {
 		if (slot == null)
 			throw new HoloIllegalArgumentsException("Can't access a null slot");
-		return items.get(slot) == null;
+		return equippedItems.get(slot) == null;
 	}
 
 	public boolean contains(Equip equip) {
-		return items.containsValue(equip);
+		return equippedItems.containsValue(equip);
 	}
 
-	public Map<Slot, Equip> getReadOnlyMap() {
-		return Collections.unmodifiableMap(items);
+	public Map<WornEquips.Slot, Equip> getReadOnlyMap() {
+		return Collections.unmodifiableMap(equippedItems);
 	}
 }

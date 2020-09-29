@@ -179,7 +179,13 @@ public class Controls extends InputProcessorAdapter {
 		bindNumberKeysToSkills();
 		functionBindings.bindFunctionToKey(() -> setSPToMax(), Keys.Q);
 		functionBindings.bindFunctionToKey(() -> orderSelectedUnitsToStop(), Keys.S);
+		functionBindings.bindFunctionToKey(() -> printInfoOfSelectedUnits(), Keys.I);
 
+	}
+	private void printInfoOfSelectedUnits() {
+		for (Unit unit : selectedUnits) {
+			unit.stats.printInfo(true);
+		}
 	}
 
 	private void bindNumberKeysToSkills() {

@@ -4,9 +4,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import com.mygdx.holowyth.gamedata.skillsandeffects.MageSkills;
+import com.mygdx.holowyth.gamedata.skillsandeffects.WarriorSkills;
 import com.mygdx.holowyth.skill.ActiveSkill;
-import com.mygdx.holowyth.skill.skillsandeffects.MageSkills;
-import com.mygdx.holowyth.skill.skillsandeffects.WarriorSkills;
 
 /**
  * Common collections of skill

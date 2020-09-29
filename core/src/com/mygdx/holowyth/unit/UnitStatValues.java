@@ -9,8 +9,12 @@ public class UnitStatValues implements Cloneable {
 	public float damage;
 	public int atk, def, force, stab, dodge;
 
-	public int armor, armorPiercing;
-	public float percentArmor, armorNegate;
+	/** Flat armor */
+	public int armor;
+	/** Is between 0 and 1. Eg. 0.2 means 20% damage reduction */
+	public float percentArmor;
+	public int armorPiercing;
+	public float armorNegate;
 
 	public UnitStatValues() {
 	}

@@ -8,12 +8,13 @@ import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.gameScreen.Controls;
 import com.mygdx.holowyth.gameScreen.MapInstance;
+import com.mygdx.holowyth.gamedata.items.Weapons;
+import com.mygdx.holowyth.gamedata.skillsandeffects.PassiveSkills;
+import com.mygdx.holowyth.gamedata.units.MonsterStats;
 import com.mygdx.holowyth.skill.skill.Skills;
-import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.sprite.AnimatedSprite;
 import com.mygdx.holowyth.unit.sprite.Animations;
-import com.mygdx.holowyth.unit.units.MonsterStats;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
@@ -107,7 +108,7 @@ public class CombatPrototyping {
 		for (var p : scenario.enemySpawnLocs) {
 			var unit = new Unit(p.x, p.y, Unit.Side.ENEMY, mapInstance);
 			unit.setName("Goblin");
-			unit.stats.base.set(MonsterStats.goblin);
+			unit.stats.base.set(MonsterStats.goblinScavenger);
 			unit.skills.slotSkills(Skills.warriorSkills);
 			unit.graphics.setAnimatedSprite(animations.get("goblin1.png"));
 			mapInstance.addUnit(unit);
@@ -143,7 +144,7 @@ public class CombatPrototyping {
 			u.stats.self.skills.addSkill(PassiveSkills.basicCombatTraining);
 			u.skills.addSkills(Skills.warriorSkills);
 			u.skills.slotSkills(Skills.warriorSkills);
-			u.equip.equip(Equips.longSword.copy());
+			u.equip.equip(Weapons.longSword.cloneObject());
 		}
 		{
 			var u = players.get(1);
@@ -153,7 +154,7 @@ public class CombatPrototyping {
 			u.skills.addSkill(PassiveSkills.basicCombatTraining);
 			u.skills.addSkills(Skills.warriorSkills);
 			u.skills.slotSkills(Skills.warriorSkills);
-			u.stats.getEquip().equip(Equips.longSword.copy());
+			u.stats.getEquip().equip(Weapons.longSword.cloneObject());
 		}
 		{
 			var u = players.get(2);
@@ -163,7 +164,7 @@ public class CombatPrototyping {
 			u.skills.addSkills(Skills.mageSkills);
 			u.skills.slotSkills(
 					Skills.mageSkills);
-			u.stats.getEquip().equip(Equips.staff.copy());
+			u.stats.getEquip().equip(Weapons.staff.cloneObject());
 
 		}
 	}

@@ -36,7 +36,7 @@ public class World {
 		return name;
 	}
 
-	void setName(String name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 
@@ -44,7 +44,7 @@ public class World {
 		return author;
 	}
 
-	void setAuthor(String author) {
+	public void setAuthor(String author) {
 		this.author = author;
 	}
 

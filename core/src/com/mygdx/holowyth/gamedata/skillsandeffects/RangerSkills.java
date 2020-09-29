@@ -1,7 +1,7 @@
-package com.mygdx.holowyth.skill.skillsandeffects;
+package com.mygdx.holowyth.gamedata.skillsandeffects;
 
+import com.mygdx.holowyth.gamedata.skillsandeffects.RangerEffects.CrossSlashEffect;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
-import com.mygdx.holowyth.skill.skillsandeffects.RangerEffects.CrossSlashEffect;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.DataUtil;
 

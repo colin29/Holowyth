@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.unit.units;
+package com.mygdx.holowyth.gamedata.units;
 
 import com.mygdx.holowyth.unit.UnitStatValues;
 
@@ -19,16 +19,17 @@ public class MonsterStats {
 
 	// At the moment, monsters solely use their base stats -- they don't use equipment
 
-	public static final UnitStatValues goblin = new UnitStatValues() {
+	public static final UnitStatValues goblinScavenger = new UnitStatValues() {
 		{
-			maxHp = 100;
+			maxHp = 80;
 			maxSp = 50;
 
-			damage = 6;
-			atk = 7;
-			def = 5;
+			damage = 2;
+			
+			atk = 3;
+			def = 4;
 			force = 3;
-			stab = 4;
+			stab = 3;
 		}
 	};
 

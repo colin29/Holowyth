@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.skill.skillsandeffects;
+package com.mygdx.holowyth.gamedata.skillsandeffects;
 
 import com.mygdx.holowyth.gameScreen.rendering.SkillsAimingGraphics;
 import com.mygdx.holowyth.skill.skill.GroundSkill;

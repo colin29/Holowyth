@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.skill.skillsandeffects.projectiles;
+package com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.skill.skillsandeffects;
+package com.mygdx.holowyth.gamedata.skillsandeffects;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;

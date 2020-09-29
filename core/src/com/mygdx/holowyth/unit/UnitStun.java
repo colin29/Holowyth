@@ -142,7 +142,7 @@ class UnitStun {
 			return;
 		}
 
-		float reelTimeAddedDebug;
+		float reelTimeAdded;
 
 		switch (state) {
 		case NORMAL:
@@ -150,14 +150,14 @@ class UnitStun {
 			logger.debug("Reel time: {} (+{})", reelDurationRemaining, reelDurationRemaining);
 			break;
 		case REELED:
-			reelTimeAddedDebug = getReelTime(duration, maxDuration, reelDurationRemaining);
-			reelDurationRemaining += reelTimeAddedDebug;
-			logger.debug("Reel time: {} (+{}) (max: {})", reelDurationRemaining, reelTimeAddedDebug, maxDuration);
+			reelTimeAdded = getReelTime(duration, maxDuration, reelDurationRemaining);
+			reelDurationRemaining += reelTimeAdded;
+			logger.debug("Reel time: {} (+{}) (max: {})", reelDurationRemaining, reelTimeAdded, maxDuration);
 			break;
 		case STUNNED:
-			reelTimeAddedDebug = getReelTime(duration, maxDuration, deferredReelAmount);
-			deferredReelAmount += reelTimeAddedDebug;
-			logger.debug("Reel time: {} (+{}) (max: {}) (Deferred)", deferredReelAmount, reelTimeAddedDebug, maxDuration);
+			reelTimeAdded = getReelTime(duration, maxDuration, deferredReelAmount);
+			deferredReelAmount += reelTimeAdded;
+			logger.debug("Reel time: {} (+{}) (max: {}) (Deferred)", deferredReelAmount, reelTimeAdded, maxDuration);
 			break;
 		default:
 			throw new HoloAssertException("Unsupported state");
@@ -201,7 +201,7 @@ class UnitStun {
 
 	private void beginReel(float duration) {
 		// reeling doesn't interrupt attacking or motion, unlike stun
-		self.interruptNormal();
+		self.interruptSoft();
 
 		state = State.REELED;
 		reelDurationRemaining = duration;

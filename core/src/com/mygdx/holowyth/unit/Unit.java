@@ -461,11 +461,10 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * Normal interrupts are caused by damage and reel. Some skills, particularly melee skills, are not
-	 * interrupt by this.
+	 * See {@link UnitSkills#interruptSoft()}
 	 */
-	public void interruptNormal() {
-		skills.interruptNormal();
+	public void interruptSoft() {
+		skills.interruptSoft();
 	}
 
 	public void interruptRangedSkills() {

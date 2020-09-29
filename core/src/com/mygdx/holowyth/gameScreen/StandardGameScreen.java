@@ -9,16 +9,16 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.gameScreen.combatDemo.prototyping.Equips;
+import com.mygdx.holowyth.gamedata.items.Weapons;
+import com.mygdx.holowyth.gamedata.skillsandeffects.PassiveSkills;
+import com.mygdx.holowyth.gamedata.units.MonsterStats;
 import com.mygdx.holowyth.map.Entrance;
 import com.mygdx.holowyth.map.Location;
 import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.map.trigger.Trigger;
 import com.mygdx.holowyth.skill.skill.Skills;
-import com.mygdx.holowyth.skill.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
-import com.mygdx.holowyth.unit.units.MonsterStats;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
@@ -158,7 +158,7 @@ public class StandardGameScreen extends GameScreen {
 		u.stats.base.set(MonsterStats.baseHuman);
 		u.stats.self.skills.addSkill(PassiveSkills.basicCombatTraining);
 		u.skills.slotSkills(Skills.warriorSkills);
-		u.equip.equip(Equips.longSword.copy());
+		u.equip.equip(Weapons.longSword.cloneObject());
 		mapInstance.addUnit(u);
 		return u;
 	}

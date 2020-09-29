@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.holowyth.unit.UnitStatValues;
+import com.mygdx.holowyth.unit.item.Equip.EquipType;
 
 /**
  * Only equips have bonuses
@@ -24,6 +25,8 @@ public class Equip extends Item {
 	public EquipType equipType;
 	public final UnitStatValues bonus = new UnitStatValues();
 	public boolean is2HWeapon;
+	/** Only applies for weapons. This is a relative value, 1 is the standard */
+	public float baseAtkSpd = 1; 
 
 	public Equip(String name, EquipType equipType) {
 		this.name = name;
@@ -34,18 +37,18 @@ public class Equip extends Item {
 	public Equip(String name) {
 		this(name, false);
 	}
+	public Equip(Equip src) {
+		this(src.name, src.equipType);
+		bonus.set(bonus);
+		is2HWeapon = src.is2HWeapon;
+		baseAtkSpd = src.baseAtkSpd;
+	}
 
 	public Equip(String name, boolean isTemplate) {
 		this.name = name;
 		this.isTemplate = isTemplate;
 	}
 
-	public Equip copy() {
-		Equip item = new Equip(name, equipType);
-		item.bonus.set(bonus);
-		item.is2HWeapon = is2HWeapon;
-		return item;
-	}
 
 	public void printInfo() {
 		System.out.println(getInfo());
@@ -86,6 +89,8 @@ public class Equip extends Item {
 		registerStat.accept("agi", bonus.agi);
 		registerStat.accept("fort", bonus.fort);
 		registerStat.accept("percep", bonus.percep);
+		
+		registerStat.accept("damage", bonus.damage);
 
 		registerStat.accept("atk", bonus.atk);
 		registerStat.accept("def", bonus.def);
@@ -124,4 +129,31 @@ public class Equip extends Item {
 		s += "\n";
 		return s;
 	}
+	
+	public void setBasicBonuses(float damage, int atk, int force, int def, int stab) {
+		bonus.damage = damage;
+		bonus.atk = atk;
+		bonus.force = force;
+		bonus.def = def;
+		bonus.stab = stab;
+	}
+	
+	
+	
+	public static class TemplateEquip extends Equip {
+		public TemplateEquip(String name, EquipType equipType) {
+			super(name, equipType);
+			markAsTemplate();
+		}
+
+		public TemplateEquip(String name) {
+			super(name);
+			markAsTemplate();
+		}
+
+	}
+	public Equip cloneObject() {
+		return new Equip(this);
+	}
+	
 }

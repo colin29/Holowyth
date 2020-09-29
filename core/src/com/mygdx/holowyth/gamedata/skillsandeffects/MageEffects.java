@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.skill.skillsandeffects;
+package com.mygdx.holowyth.gamedata.skillsandeffects;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,15 +13,15 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.holowyth.gameScreen.MapInstance;
+import com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles.ArcaneBoltBolt;
+import com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles.FireballBolt;
+import com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles.MagicMissileBolt;
+import com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles.ProjectileBase;
+import com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles.WindBladeBolt;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.effect.CasterGroundEffect;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
 import com.mygdx.holowyth.skill.effect.Effect;
-import com.mygdx.holowyth.skill.skillsandeffects.projectiles.ArcaneBoltBolt;
-import com.mygdx.holowyth.skill.skillsandeffects.projectiles.FireballBolt;
-import com.mygdx.holowyth.skill.skillsandeffects.projectiles.MagicMissileBolt;
-import com.mygdx.holowyth.skill.skillsandeffects.projectiles.ProjectileBase;
-import com.mygdx.holowyth.skill.skillsandeffects.projectiles.WindBladeBolt;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.dataobjects.Line;

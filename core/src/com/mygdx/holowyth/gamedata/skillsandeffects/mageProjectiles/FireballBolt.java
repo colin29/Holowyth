@@ -1,10 +1,9 @@
-package com.mygdx.holowyth.skill.skillsandeffects.projectiles;
+package com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles;
 
-import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
-public class ArcaneBoltBolt extends ProjectileBase {
+public class FireballBolt extends ProjectileBase {
 
 	private static float maxDuration = 800;
 	private static float speed = 1.8f;
@@ -12,12 +11,15 @@ public class ArcaneBoltBolt extends ProjectileBase {
 	private float turnSpeed = 1;
 
 	private float damage;
+	private float explosionRadius;
 
 	private Unit target;
 
-	public ArcaneBoltBolt(float damage, Unit caster, Unit target) {
+	public FireballBolt(float damage, float explosionRadius, Unit caster, Unit target) {
 		super(caster.x, caster.y, speed, Point.getAngleInDegrees(caster.getPos(), target.getPos()), maxDuration, caster);
 		this.damage = damage;
+		this.explosionRadius = explosionRadius;
+
 		this.target = target;
 	}
 
@@ -66,10 +68,24 @@ public class ArcaneBoltBolt extends ProjectileBase {
 
 	@Override
 	protected void onCollision(Unit enemy) {
-		enemy.stats.applyMagicDamage(damage);
+		damageEnemiesInRange();
+	}
 
-		Vector2 knockBackVec = getVelocity().setLength(1.5f);
-		enemy.stats.doKnockBackRollAgainst(25, 60 * 3f, knockBackVec);
+	@Override
+	protected void onCollisionWithObstacle(float x, float y) {
+		damageEnemiesInRange();
+	}
+
+	private void damageEnemiesInRange() {
+		for (var unit : mapInstance.getUnits()) {
+			if (Point.dist(pos, unit.getPos()) <= explosionRadius + unit.getRadius()) {
+				if (isAEnemy(unit)) {
+					unit.stats.applyMagicDamage(damage);
+				} else {
+					unit.stats.applyMagicDamage(damage / 2);
+				}
+			}
+		}
 	}
 
 	private void handleTargetDead() {

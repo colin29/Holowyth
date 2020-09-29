@@ -1,8 +1,10 @@
-package com.mygdx.holowyth.map.maps;
+package com.mygdx.holowyth.gamedata.maps;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mygdx.holowyth.gamedata.units.MonsterStats;
+import com.mygdx.holowyth.gamedata.units.Monsters;
 import com.mygdx.holowyth.map.Entrance;
 import com.mygdx.holowyth.map.GameMap;
 import com.mygdx.holowyth.map.Location;
@@ -12,8 +14,6 @@ import com.mygdx.holowyth.map.trigger.UnitEntersRegion;
 import com.mygdx.holowyth.map.trigger.region.RectRegion;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.unit.Unit.Side;
-import com.mygdx.holowyth.unit.units.MonsterStats;
-import com.mygdx.holowyth.unit.units.MonsterTemplates;
 import com.mygdx.holowyth.util.Holo;
 
 public class Forest1 extends GameMap {
@@ -51,7 +51,7 @@ public class Forest1 extends GameMap {
 //			unitMarkers.add(m);
 //		}
 		{
-			UnitMarker m = new UnitMarker(MonsterTemplates.goblin);
+			UnitMarker m = new UnitMarker(Monsters.goblin);
 			m.pos.set(400, 400);
 			unitMarkers.add(m);
 		}

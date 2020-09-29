@@ -1,10 +1,10 @@
-package com.mygdx.holowyth.skill.skillsandeffects;
+package com.mygdx.holowyth.gamedata.skillsandeffects;
 
+import com.mygdx.holowyth.gamedata.skillsandeffects.WarriorEffects.BashEffect;
+import com.mygdx.holowyth.gamedata.skillsandeffects.WarriorEffects.DeafeningCryEffect;
+import com.mygdx.holowyth.gamedata.skillsandeffects.WarriorEffects.RageBlowEffect;
+import com.mygdx.holowyth.gamedata.skillsandeffects.WarriorEffects.TauntEffect;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
-import com.mygdx.holowyth.skill.skillsandeffects.WarriorEffects.BashEffect;
-import com.mygdx.holowyth.skill.skillsandeffects.WarriorEffects.DeafeningCryEffect;
-import com.mygdx.holowyth.skill.skillsandeffects.WarriorEffects.RageBlowEffect;
-import com.mygdx.holowyth.skill.skillsandeffects.WarriorEffects.TauntEffect;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.DataUtil;
 

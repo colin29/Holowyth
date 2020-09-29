@@ -1,7 +1,7 @@
 package com.mygdx.holowyth.unit;
 
 import com.mygdx.holowyth.skill.Skill;
-import com.mygdx.holowyth.unit.UnitEquip.Slot;
+import com.mygdx.holowyth.unit.WornEquips.Slot;
 import com.mygdx.holowyth.util.Holo;
 
 public class UnitStatCalculator {
@@ -25,10 +25,10 @@ public class UnitStatCalculator {
 		var equip = self.getEquip();
 
 		calculateSkillStatBonuses(skillBonus);
-		calculateEquipStatBonuses(equipBonus, Slot.HEAD, Slot.TORSO, Slot.MAIN_HAND, Slot.ACCESSORY1, Slot.ACCESSORY2);
+		calculateEquipStatBonuses(equipBonus, WornEquips.Slot.HEAD, WornEquips.Slot.TORSO, WornEquips.Slot.MAIN_HAND, WornEquips.Slot.ACCESSORY1, WornEquips.Slot.ACCESSORY2);
 
-		if (equip.getEquip(Slot.MAIN_HAND) != equip.getEquip(Slot.OFF_HAND)) // don't count a 2H weapon twice
-			addEquipStatBonuses(equipBonus, Slot.OFF_HAND);
+		if (equip.getEquip(WornEquips.Slot.MAIN_HAND) != equip.getEquip(WornEquips.Slot.OFF_HAND)) // don't count a 2H weapon twice
+			addEquipStatBonuses(equipBonus, WornEquips.Slot.OFF_HAND);
 
 		my.set(self.base);
 		my.add(skillBonus);
@@ -54,13 +54,13 @@ public class UnitStatCalculator {
 		}
 	}
 
-	private void calculateEquipStatBonuses(UnitStatValues values, Slot... slots) {
+	private void calculateEquipStatBonuses(UnitStatValues values, WornEquips.Slot... slots) {
 		values.zero();
 		addEquipStatBonuses(values, slots);
 	}
 
-	private void addEquipStatBonuses(UnitStatValues values, Slot... slots) {
-		for (Slot slot : slots) {
+	private void addEquipStatBonuses(UnitStatValues values, WornEquips.Slot... slots) {
+		for (WornEquips.Slot slot : slots) {
 			var item = self.getEquip().getEquip(slot);
 			if (item != null) {
 				values.add(item.bonus);

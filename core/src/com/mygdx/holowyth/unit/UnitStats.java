@@ -12,8 +12,8 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
-import com.mygdx.holowyth.unit.UnitEquip.Slot;
 import com.mygdx.holowyth.unit.UnitOrders.Order;
+import com.mygdx.holowyth.unit.WornEquips.Slot;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.unit.item.Equip;
@@ -78,9 +78,6 @@ public class UnitStats implements UnitStatsInfo {
 	}
 	
 	public void clearMapLifetimeData() {
-		clearMapLifetimeComponents();
-	}
-	private void clearMapLifetimeComponents() {
 		gfx = null;
 	}
 
@@ -135,8 +132,8 @@ public class UnitStats implements UnitStatsInfo {
 		// 2. Simulate block chance
 
 		if (!isAttackRollSuccessful(enemy, atkBonus, false)) {
-			// System.out.printf("%s's attack was blocked by %s %n", this.name, enemy.name);
 			gfx.makeBlockEffect(this.self, enemy.self);
+			// System.out.printf("%s's attack was blocked by %s %n", this.name, enemy.name);
 			return;
 		}
 
@@ -149,7 +146,7 @@ public class UnitStats implements UnitStatsInfo {
 
 		enemy.applyDamageIgnoringArmor(damage);
 		if (damage > 0) {
-			enemy.self.interruptNormal();
+			enemy.self.interruptSoft();
 		}
 
 	}
@@ -486,7 +483,7 @@ public class UnitStats implements UnitStatsInfo {
 
 		final var equip = self.equip;
 
-		for (Slot slot : UnitEquip.Slot.values()) {
+		for (WornEquips.Slot slot : WornEquips.Slot.values()) {
 			Equip item = equip.getEquip(slot);
 			if (item != null) {
 				s += " -" + slot.getName() + ": " + item.name + "\n";

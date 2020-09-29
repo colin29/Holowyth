@@ -16,9 +16,9 @@ import com.mygdx.holowyth.util.exceptions.HoloException;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 public class UnitSkills {
-	
+
 	Logger logger = LoggerFactory.getLogger(this.getClass());
-	
+
 	public final Unit self;
 
 	// Parameters
@@ -27,10 +27,10 @@ public class UnitSkills {
 	/** Skills the unit knows */
 	private Set<Skill> skills = new LinkedHashSet<Skill>();
 	/**
-	 *  Note: slot 0 cannot be used
+	 * Note: slot 0 cannot be used
 	 */
 	private ActiveSkill[] slot = new ActiveSkill[11];
-	
+
 	/**
 	 * The skill the character is actively casting or channelling, else null. The Skill class will reset
 	 * this when the active portion has finished.
@@ -41,34 +41,31 @@ public class UnitSkills {
 	 */
 	private float skillCooldownRemaining;
 
-	
-	
 	public UnitSkills(Unit unit) {
 		self = unit;
 	}
+
 	public void clearMapLifetimeData() {
 		activeSkill = null;
 		skillCooldownRemaining = 0;
 	}
 
-	
 	void tick() {
 		if (skillCooldownRemaining > 0) {
 			skillCooldownRemaining -= 1;
 		}
-		
+
 		if (activeSkill != null)
 			activeSkill.tick();
-		
+
 		tickSkillCooldowns();
 	}
-	
-	
+
 	/**
-	 * Normal interrupts are caused by damage and reel. Some skills, particularly melee skills, are not
-	 * interrupt by this.
+	 * Soft interrupts are caused by damage and reel. Only some skills are affected; most melee skills
+	 * are not.
 	 */
-	public void interruptNormal() {
+	public void interruptSoft() {
 		if (isCasting() || isChannelling()) {
 			activeSkill.interrupt(false);
 		}
@@ -90,10 +87,9 @@ public class UnitSkills {
 			activeSkill.interrupt(true);
 		}
 	}
-	
+
 	/**
-	 * @param slotNumber
-	 *            between 1 and 10.
+	 * @param slotNumber between 1 and 10.
 	 * 
 	 * @return A cloned instance of the skill, or null if there was no skill in that slot
 	 */
@@ -118,7 +114,8 @@ public class UnitSkills {
 
 	/**
 	 * 
-	 * @return the skill slots, where you can access the original skill instances. Slots go from indexes 1-10, 0 is unused.
+	 * @return the skill slots, where you can access the original skill instances. Slots go from indexes
+	 *         1-10, 0 is unused.
 	 */
 	public ActiveSkill[] getSkillSlots() {
 		return slot;
@@ -143,8 +140,9 @@ public class UnitSkills {
 		self.stats.recalculateStats();
 		return added;
 	}
+
 	public void addSkills(List<? extends Skill> skills) {
-		for(Skill s : skills) {
+		for (Skill s : skills) {
 			addSkill(s);
 		}
 	}
@@ -182,19 +180,23 @@ public class UnitSkills {
 	public Set<Skill> getSkills() {
 		return Collections.unmodifiableSet(skills);
 	}
+
 	ActiveSkill getActiveSkill() {
 		return activeSkill;
 	}
+
 	void setActiveSkill(ActiveSkill activeSkill) {
 		this.activeSkill = activeSkill;
 	}
+
 	float getSkillCooldownRemaining() {
 		return skillCooldownRemaining;
 	}
+
 	void setSkillCooldownRemaining(float skillCooldownRemaining) {
 		this.skillCooldownRemaining = skillCooldownRemaining;
 	}
-	
+
 	public boolean isCasting() {
 		return this.activeSkill != null && activeSkill.getStatus() == Status.CASTING;
 	}
@@ -206,6 +208,5 @@ public class UnitSkills {
 	public boolean isSkillsOnCooldown() {
 		return (skillCooldownRemaining > 0);
 	}
-
 
 }
