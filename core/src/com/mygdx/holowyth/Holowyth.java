@@ -5,7 +5,6 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
@@ -49,7 +48,7 @@ public class Holowyth extends Game {
 	public FileChooser fileChooser;
 	
 	/* Game */
-	public final World mapRepo = new HolowythWorld(); 
+	public final World mapRepo = new HolowythWorld();
 	
 	/* Sprite resources */
 	public Animations animations;

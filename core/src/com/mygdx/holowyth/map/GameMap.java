@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +25,8 @@ public class GameMap {
 	
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	private String name = "Untitled Map";
+	
+	private @NonNull String name = "Untitled Map";
 	
 	/**
 	 * Whether this map is a template and meant to be copied first before using. 
@@ -115,7 +118,7 @@ public class GameMap {
 	 * Should not modify a map's name inside MapRepo, because map key should remain the same as name 
 	 * @param name
 	 */
-	public void setName(String name) {
+	public void setName(@NonNull String name) {
 		this.name = name;
 	}
 
@@ -153,6 +156,5 @@ public class GameMap {
 		return entrances;
 	}
 	
-
 	
 }

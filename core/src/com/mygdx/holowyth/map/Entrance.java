@@ -23,7 +23,7 @@ public class Entrance extends Location {
 	
 	
 	
-	public Entrance(String name, float x, float y) {
+	public Entrance(@NonNull String name, float x, float y) {
 		super(name, x, y);
 	}
 	public Entrance(Entrance src) {

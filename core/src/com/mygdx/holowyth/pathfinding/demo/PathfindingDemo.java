@@ -198,8 +198,6 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
@@ -340,6 +338,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 	/**
 	 * Logically initializes a bunch of components necessary to run the map
 	 */
+	@SuppressWarnings("null")
 	private void mapStartup(SimpleMap map) {
 		// Unit Controls
 		if (unitControls != null) {

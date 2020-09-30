@@ -1,14 +1,16 @@
 package com.mygdx.holowyth.map;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class Location {
 	
 	/**Should not modify a loc's name after it is added to a map */
-	public String name = "";
+	public @NonNull String name = "";
 	public final Point pos = new Point();
 	
-	public Location(String name, float x, float y){
+	public Location(@NonNull String name, float x, float y){
 		this(x, y);
 		this.name = name;
 	}

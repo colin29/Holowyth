@@ -1,5 +1,6 @@
 package com.mygdx.holowyth.gameScreen.basescreens;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +15,7 @@ import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.map.GameMap;
 import com.mygdx.holowyth.tiled.TiledMapLoader;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 import com.mygdx.holowyth.util.exceptions.HoloException;
 import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;
@@ -42,18 +44,17 @@ public abstract class MapLoadingScreen extends HoloBaseScreen {
 	}
 
 	/**
-	 * Loads a GameMap by name. (Some of the information is simply being stored in
-	 * the program atm, in a gameMap repository)
+	 * Loads a GameMap by name. (Some of the information is simply being stored in the program atm, in a
+	 * gameMap repository)
 	 */
-	public void loadGameMapByName(String mapName) {
-		if(!game.mapRepo.hasMap(mapName))
+	public void loadGameMapByName(@NonNull String mapName) {
+		if (!game.mapRepo.hasMap(mapName))
 			throw new HoloResourceNotFoundException("Map '" + mapName + "' not found.");
 		GameMap newMap = game.mapRepo.getNewMapInstance(mapName);
-		
 		newMap.setTilemap(getTiledMapFromDisk(newMap.tilemapPath));
 		loadMap(newMap);
-		}
-	
+	}
+
 	/**
 	 * Creates and loads a GameMap from a tiled map on disk. <br>
 	 * See {@link #makeGameMapFromTiledMapOnDisk(String)}
@@ -61,12 +62,14 @@ public abstract class MapLoadingScreen extends HoloBaseScreen {
 	protected void loadGameMapFromTiledMapOnDisk(String pathname) {
 		loadMap(makeGameMapFromTiledMapOnDisk(pathname));
 	}
+
 	/**
 	 * The GameMap only contains info from the Tiled Map. Other fields are left blank.
 	 */
 	private GameMap makeGameMapFromTiledMapOnDisk(String pathname) {
 		return new GameMap(getTiledMapFromDisk(pathname));
 	}
+
 	private TiledMap getTiledMapFromDisk(String pathname) {
 		return tiledMapLoader.getTiledMapFromTMXFile(pathname);
 	}
@@ -113,11 +116,15 @@ public abstract class MapLoadingScreen extends HoloBaseScreen {
 		game.fileChooser.setMode(Mode.OPEN);
 		game.fileChooser.setSelectionMode(SelectionMode.FILES);
 		game.fileChooser.setListener(new FileChooserAdapter() {
+			@SuppressWarnings("null")
 			@Override
 			public void selected(Array<FileHandle> file) {
 				logger.debug("Selected file: {}", file.get(0).file().getAbsolutePath());
 
-				loadGameMapByName(file.get(0).file().getPath()); // tmx map loader uses relative path
+				String path = file.get(0).file().getPath();
+				if(path == null)
+					throw new HoloAssertException("File's path was null");
+				loadGameMapByName((@NonNull String) path); // tmx map loader uses relative path
 			}
 		});
 
@@ -127,7 +134,7 @@ public abstract class MapLoadingScreen extends HoloBaseScreen {
 	public abstract void mapStartup();
 
 	public abstract void mapShutdown();
-	
+
 	public boolean isMapLoaded() {
 		return map != null;
 	}

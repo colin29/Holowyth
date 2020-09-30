@@ -26,8 +26,6 @@ public class NonNullFieldTemplate {
 	
 	public static void main(String[] args) {
 		var n = new NonNullFieldTemplate();
-		n.getMapItem(null);
-		
 	}
 	
 	

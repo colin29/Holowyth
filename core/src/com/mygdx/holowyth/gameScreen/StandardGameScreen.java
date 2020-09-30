@@ -96,7 +96,7 @@ public class StandardGameScreen extends GameScreen {
 		}
 	}
 
-	public void goToMap(String mapName, String locationName) {
+	public void goToMap(@NonNull String mapName, String locationName) {
 		if (isMapLoaded()) {
 			for (UnitInfo unit : playerUnits) {
 				mapInstance.removeAndDetachUnitFromWorld((Unit) unit);
@@ -178,6 +178,7 @@ public class StandardGameScreen extends GameScreen {
 
 	}
 
+	@SuppressWarnings("null")
 	private void addLeciaToMapInstance() {
 		if (lecia!=null && isMapLoaded()) {
 			if (lecia.getMapInstance() == null) {
@@ -200,11 +201,12 @@ public class StandardGameScreen extends GameScreen {
 		}
 	}
 
+	@SuppressWarnings("null")
 	private void transportPlayerUnitsIfStandingOnEntrance() {
 		for (Entrance entrance : map.getEntrances()) {
 			if (entrance.isBeingTriggered(playerUnits)) {
 				if (entrance.hasDestination()) {
-					goToMap(entrance.destMap, entrance.destLoc);
+					goToMap((@NonNull String) entrance.destMap, entrance.destLoc);
 					return;
 				}
 			}
