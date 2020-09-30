@@ -32,10 +32,14 @@ public class Entrance extends Location {
 		destLoc = src.destLoc;
 	}
 	
-	public Entrance setDest(String destMap, String destLoc) {
+	public Entrance setDest(@NonNull String destMap, @NonNull String destLoc) {
 		this.destMap = destMap;
 		this.destLoc = destLoc;
 		return this;
+	}
+	public void clearDest() {
+		destMap = null;
+		destLoc = null;
 	}
 	
 	public void tick() {

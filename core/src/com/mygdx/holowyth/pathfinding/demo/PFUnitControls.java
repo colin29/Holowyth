@@ -3,7 +3,6 @@ package com.mygdx.holowyth.pathfinding.demo;
 import java.util.ArrayList;
 
 import org.eclipse.jdt.annotation.NonNull;
-
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
@@ -24,7 +23,8 @@ import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
  *
- * Simpler UnitControls class for pathfinding Demo. Units can be ordered to move and attack, but no additional commands.
+ * Simpler UnitControls class for pathfinding Demo. Units can be ordered to move and attack, but no
+ * additional commands.
  *
  * @author Colin Ta
  */
@@ -37,12 +37,11 @@ public class PFUnitControls implements InputProcessor {
 
 	ArrayList<@NonNull PFDemoUnit> units;
 
-	public ArrayList<@NonNull PFDemoUnit> selectedUnits = new ArrayList<PFDemoUnit>();
+	public ArrayList<@NonNull PFDemoUnit> selectedUnits = new ArrayList<@NonNull PFDemoUnit>();
 	boolean leftMouseKeyDown = false;
 
 	PFDemoUnit prospectUnit; // In order to single-select a unit, the user must mouse down on a unit, and mouse up on
-								// the same
-	// unit.
+								// the same unit.
 
 	boolean attackClickWaiting;
 
@@ -130,8 +129,8 @@ public class PFUnitControls implements InputProcessor {
 	}
 
 	/**
-	 * Makes it so when you are part-way through an order, and then the start of a separate order, the game will stop
-	 * waiting for the first one
+	 * Makes it so when you are part-way through an order, and then the start of a separate order, the
+	 * game will stop waiting for the first one
 	 */
 	private void clearAwaitingOrders() {
 		attackClickWaiting = false;
@@ -151,7 +150,8 @@ public class PFUnitControls implements InputProcessor {
 		Point p1 = new Point(x, y);
 		Point p2 = new Point();
 		float dist;
-		// select a unit if there is one underneath this point. If there are multiple units, select the one that
+		// select a unit if there is one underneath this point. If there are multiple units, select the one
+		// that
 		// occurs last (on top)
 		PFDemoUnit lastResult = null;
 
@@ -181,7 +181,8 @@ public class PFUnitControls implements InputProcessor {
 		Point p1 = new Point(x, y);
 		Point p2 = new Point();
 		float dist;
-		// select a unit if there is one underneath this point. If there are multiple units, select the one that
+		// select a unit if there is one underneath this point. If there are multiple units, select the one
+		// that
 		// occurs last (on top)
 		PFDemoUnit lastResult = null;
 
@@ -230,7 +231,7 @@ public class PFUnitControls implements InputProcessor {
 
 				// check if unit circles are inside or touching the selection box.
 
-				ArrayList<PFDemoUnit> newlySelected = new ArrayList<PFDemoUnit>();
+				ArrayList<@NonNull PFDemoUnit> newlySelected = new ArrayList<>();
 
 				for (PFDemoUnit u : units) {
 					if (u.x >= x - u.getRadius() && u.x <= x2 + u.getRadius() && u.y >= y - u.getRadius()
