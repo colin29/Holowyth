@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -18,7 +20,6 @@ import com.mygdx.holowyth.map.obstacledata.OrientedPoly;
 import com.mygdx.holowyth.map.obstacledata.OrientedSeg;
 import com.mygdx.holowyth.map.simplemap.SimpleMap;
 import com.mygdx.holowyth.pathfinding.PathSmoother.PathsInfo;
-import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Coord;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -199,11 +200,11 @@ public class PathingModule {
 
 	// Unit pathfinding
 
-	public Path findPathForUnit(UnitPF unit, float dx, float dy, List<? extends UnitPF> allUnits) {
+	public Path findPathForUnit(UnitPF unit, float dx, float dy, List<@NonNull ? extends UnitPF> allUnits) {
 
 		// For pathfinding, need to get expanded geometry of unit collision bodies as well
 
-		ArrayList<UnitPF> colBodies = new ArrayList<UnitPF>();
+		ArrayList<@NonNull UnitPF> colBodies = new ArrayList<@NonNull UnitPF>();
 
 		for (UnitPF u : allUnits) {
 			if (unit.equals(u)) { // don't consider the unit's own collision body
@@ -384,7 +385,7 @@ public class PathingModule {
 	 *              information.
 	 * @param u     The radius of the pathing unit (has to match the radius of the base graph though)
 	 */
-	private void setDynamicGraph(List<? extends UnitPF> infos, float unitRadius) {
+	private void setDynamicGraph(List<@NonNull  ? extends UnitPF> infos, float unitRadius) {
 
 		for (UnitPF cb : infos) {
 			prospects = new ArrayList<Vertex>();
@@ -475,7 +476,7 @@ public class PathingModule {
 	 *         is unpathable, returns empty list. If only a partial number of placements could be found,
 	 *         returns that partial list.
 	 */
-	public List<Point> findPathablePlacements(Point spawnPoint, int numPlacements, List<? extends UnitPF> existingUnits) {
+	public List<Point> findPathablePlacements(Point spawnPoint, int numPlacements, List<@NonNull ? extends UnitPF> existingUnits) {
 		List<Point> placements = new ArrayList<>();
 
 		revertDynamicGraph();
@@ -504,7 +505,7 @@ public class PathingModule {
 	
 
 
-	private static void addPlacementIfNotConflicting(Point p, List<Point> placements, List<? extends UnitPF> existingUnits) {
+	private static void addPlacementIfNotConflicting(Point p, List<Point> placements, List<@NonNull  ? extends UnitPF> existingUnits) {
 		if (!placementConflicts(p, placements, existingUnits)) {
 			placements.add(new Point(p));
 		}
@@ -512,7 +513,7 @@ public class PathingModule {
 
 
 	private static boolean placementConflicts(Point placement, List<Point> prevPlacements,
-			List<? extends UnitPF> existingUnits) {
+			List<@NonNull  ? extends UnitPF> existingUnits) {
 		
 		for (Point other : prevPlacements) {
 			if (Point.dist(placement, other) < Holo.UNIT_RADIUS * 2 + Holo.epsilon)

@@ -2,6 +2,7 @@ package com.mygdx.holowyth.pathfinding.demo;
 
 import java.util.ArrayList;
 
+import org.eclipse.jdt.annotation.NonNull;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
@@ -362,8 +363,9 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		//// ---------Test Area---------////:
 
 		// Create units
-		playerUnit = new PFDemoUnit(35, 20, this);
-		units.add(playerUnit);
+		playerUnit = new PFDemoUnit(35, 20, this); 
+		units.add((@NonNull PFDemoUnit) playerUnit);
+		
 		unitControls.selectedUnits.add(playerUnit);
 		createTestUnits();
 
@@ -379,7 +381,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
 	// Unit Logic Related
 
-	ArrayList<PFDemoUnit> units = new ArrayList<PFDemoUnit>();
+	ArrayList<@NonNull PFDemoUnit> units = new ArrayList<@NonNull PFDemoUnit>();
 	PFDemoUnit playerUnit; // the main unit we are using to demo pathfinding
 
 	public void orderMoveTo(PFDemoUnit u, float dx, float dy) {
@@ -599,7 +601,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 	}
 
 	@Override
-	public ArrayList<PFDemoUnit> getUnits() {
+	public ArrayList<@NonNull PFDemoUnit> getUnits() {
 		return this.units;
 	}
 

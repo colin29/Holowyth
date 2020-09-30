@@ -16,6 +16,7 @@ import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
 
+@SuppressWarnings("unused")
 public class Forest1 extends GameMap {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());

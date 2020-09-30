@@ -12,7 +12,6 @@ import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.map.simplemap.SimpleMap;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloIO;
-import com.mygdx.holowyth.util.exceptions.HoloException;
 
 /**
  * Works with the simple kind of map, which is used in older demos which have no need to load TMX

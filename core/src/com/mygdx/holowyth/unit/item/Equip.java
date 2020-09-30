@@ -10,7 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.holowyth.unit.UnitStatValues;
-import com.mygdx.holowyth.unit.item.Equip.EquipType;
 
 /**
  * Only equips have bonuses

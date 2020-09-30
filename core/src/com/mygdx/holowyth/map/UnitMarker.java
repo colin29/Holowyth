@@ -6,7 +6,6 @@ import java.util.List;
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.unit.UnitEquip;
 import com.mygdx.holowyth.unit.UnitStatValues;
 import com.mygdx.holowyth.unit.WornEquips;
 import com.mygdx.holowyth.util.dataobjects.Point;

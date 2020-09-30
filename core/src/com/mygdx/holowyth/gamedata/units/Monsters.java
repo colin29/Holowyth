@@ -6,6 +6,7 @@ import com.mygdx.holowyth.map.UnitMarker.TemplateUnitMarker;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.unit.Unit.Side;
 
+@SuppressWarnings("unused")
 public class Monsters {
 	public static final UnitMarker goblin = new TemplateUnitMarker() {
 		{

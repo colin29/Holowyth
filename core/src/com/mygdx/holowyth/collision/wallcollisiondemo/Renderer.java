@@ -21,7 +21,6 @@ public class Renderer {
 	private WallCollisionSimulation simulation;
 
 	private Color wallOutlineColor = Color.BLACK;
-	private Color objectMotionColor = Color.CORAL;
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	private Color clearColor = Color.BLACK;

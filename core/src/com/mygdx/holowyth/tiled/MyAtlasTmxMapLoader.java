@@ -50,6 +50,7 @@ public class MyAtlasTmxMapLoader extends AtlasTmxMapLoader {
 				}
 			}
 
+			@SuppressWarnings("null")
 			String name = element.get("name", null);
 			// Get the firstid attribute from the tileset element in the TMX file, not tsx file.
 			int firstgid = mapElement.getIntAttribute("firstgid", 1); 

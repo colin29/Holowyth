@@ -3,6 +3,7 @@ package com.mygdx.holowyth.gameScreen;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,7 +22,6 @@ import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.map.trigger.TriggersHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
 import com.mygdx.holowyth.util.tools.Timer;
@@ -73,7 +73,7 @@ public abstract class GameScreen extends MapLoadingScreen {
 	
 	// Gameplay
 	
-	protected final List<Unit> playerUnits = new ArrayList<Unit>();
+	protected final List<@NonNull Unit> playerUnits = new ArrayList<@NonNull Unit>();
 	
 
 	// Settings

@@ -43,10 +43,10 @@ import com.mygdx.holowyth.util.dataobjects.Point;
  * For example, some skills might castable while attacking, and a unit could retain certain orders
  * while attacking.
  * 
- * <b>currentOrder</b> -- a unit with an order will continue trying to do something <br>
- * <b>attacking</b> -- a unit attacking is locked in combat and will regularly attack their target
+ * <b>orders.currentOrder</b> -- a unit with an order will continue trying to do something <br>
+ * <b>combat.attacking</b> -- a unit attacking is locked in combat and will regularly attack their target
  * <br>
- * <b>activeSkill</b> -- a unit with an active ability is either casting or channelling that ability
+ * <b>skills.activeSkill</b> -- a unit with an active ability is either casting or channelling that ability
  * <br>
  * 
  * <b>motion.isBeingKnockedBack()</b> -- a unit being knocked back cannot be given new orders or
@@ -493,9 +493,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 
 	/**
 	 * Some classes only get a reference to WorldInfo because they are not intended to modify the world.
-	 * This method can be used to explicitly get a mutable World instance.
-	 * 
-	 * @return
+	 * This method can be used to explicitly get a mutable World reference.
 	 */
 	public MapInstance getMapInstanceMutable() {
 		return (MapInstance) mapInstance;
@@ -520,8 +518,6 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 		orders.clearOrder();
 	}
 
-	// Tick Logic
-	
 	void unitDies() {
 		motion.stopCurrentMovement();
 		this.clearOrder();
@@ -537,12 +533,6 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 		return mapInstance.getUnitsAttackingThis(this);
 	}
 
-	// Tick Logic
-	
-	/**
-	 * Main function: Determine movement, tick status effects, tick basic cooldowns
-	 * 
-	 */
 	public void tick() {
 		if (isDead())
 			return;
@@ -576,7 +566,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	}
 
 	/**
-	 * For debug purposes. Gets any created unit, regardless of whether is it a {@link MapInstance}
+	 * For debug purposes. Gets any created unit, regardless of whether is in a {@link MapInstance}
 	 */
 	public static Unit getUnitByID(int id) {
 		return idToUnit.get(id);

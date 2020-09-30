@@ -3,7 +3,6 @@ package com.mygdx.holowyth.unit;
 import static com.mygdx.holowyth.util.DataUtil.getRoundedString;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.lang3.RandomUtils;
@@ -12,16 +11,10 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
-import com.mygdx.holowyth.unit.UnitOrders.Order;
-import com.mygdx.holowyth.unit.WornEquips.Slot;
-import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.unit.item.Equip;
-import com.mygdx.holowyth.unit.statuseffect.BasicAttackSlowEffect;
-import com.mygdx.holowyth.unit.statuseffect.SlowEffect;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.Holo;
-import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**
  * Simple stat fields are exposed public, while those which may trigger extra handling will be exposed through getters and setters

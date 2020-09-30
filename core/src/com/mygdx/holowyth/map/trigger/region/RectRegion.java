@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.badlogic.gdx.math.Rectangle;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
-import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class RectRegion extends Region{
 	

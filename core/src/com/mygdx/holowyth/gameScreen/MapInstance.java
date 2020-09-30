@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -315,6 +316,7 @@ public class MapInstance implements MapInstanceInfo {
 		UNIT, OBSTACLE_SEG, OBSTACLE_POINT
 	}
 
+	@SuppressWarnings("null")
 	private void resolveUnitKnockbackCollision(CollisionInfo collision) {
 		// The collision info takes
 		// the opposite's vx/vy is either their normal movement speed, or their knockback
@@ -348,6 +350,7 @@ public class MapInstance implements MapInstanceInfo {
 		}
 
 		Unit thisUnit = units.colBodyToUnit().get(thisBody);
+		
 		Unit otherUnit = collisionType == CollisionType.UNIT ? units.colBodyToUnit().get(otherBody) : null;
 
 		Vector2 normalNorm = new Vector2((float) Math.cos(collision.collisionSurfaceNormalAngle),
@@ -372,7 +375,7 @@ public class MapInstance implements MapInstanceInfo {
 		boolean unitReboundsOffSecondUnit = false;
 
 		// Based on type of collision, set the elasticity and mass of the bodies (angle is already provided)
-
+		
 		switch (collisionType) {
 		case UNIT:
 			if (!otherUnit.getMotion().isBeingKnockedBack() && collisionMagnitudeOfUnit1 < 1) {
@@ -481,18 +484,18 @@ public class MapInstance implements MapInstanceInfo {
 	 * 
 	 * @param u
 	 */
-	public void addUnit(Unit u) {
+	public void addUnit(@NonNull Unit u) {
 		addUnit(u, true);
 	}
 	/**
 	 * Add a unit that has been on another map already and we don't want to initiliaze hp/sp
 	 */
-	public void addPreExistingUnit(Unit u) {
+	public void addPreExistingUnit(@NonNull Unit u) {
 		if(addUnit(u, false)) {
 			u.reinitializeForWorld(this);
 		}
 	}
-	private boolean addUnit(Unit u, boolean shouldPrepareUnit) {
+	private boolean addUnit(@NonNull Unit u, boolean shouldPrepareUnit) {
 		if (units.getUnits().contains(u)) {
 			logger.warn("Tried to add a unit that already exists, ignoring: {}", u.getName());
 			return false;
@@ -530,7 +533,7 @@ public class MapInstance implements MapInstanceInfo {
 	 * The list itself is read-only, though elements can be modified
 	 */
 	@Override
-	public List<Unit> getUnits() {
+	public List<@NonNull Unit> getUnits() {
 		return units.getUnits();
 	}
 

@@ -14,7 +14,6 @@ import com.mygdx.holowyth.Holowyth;
 public class BaseHoloRenderer {
 
 	private Camera worldCamera;
-	private Holowyth game;
 
 	protected ShapeRenderer shapeRenderer;
 	protected SpriteBatch batch;
@@ -26,8 +25,6 @@ public class BaseHoloRenderer {
 
 		batch = game.batch;
 		shapeRenderer = game.shapeRenderer;
-
-		this.game = game;
 
 		this.worldCamera = worldCamera;
 	}

@@ -1,7 +1,6 @@
 package com.mygdx.holowyth.unit;
 
 import com.mygdx.holowyth.skill.Skill;
-import com.mygdx.holowyth.unit.WornEquips.Slot;
 import com.mygdx.holowyth.util.Holo;
 
 public class UnitStatCalculator {

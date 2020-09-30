@@ -17,7 +17,6 @@ public class Renderer {
 
 	private Camera worldCamera;
 	private Stage stage;
-	private Holowyth game;
 	private ShapeRenderer shapeRenderer;
 	private SpriteBatch batch;
 
@@ -30,8 +29,6 @@ public class Renderer {
 
 		batch = game.batch;
 		shapeRenderer = game.shapeRenderer;
-
-		this.game = game;
 
 		this.worldCamera = worldCamera;
 		this.stage = stage;

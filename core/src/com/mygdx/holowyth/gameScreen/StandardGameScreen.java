@@ -3,6 +3,7 @@ package com.mygdx.holowyth.gameScreen;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +20,6 @@ import com.mygdx.holowyth.map.trigger.Trigger;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
-import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 import com.mygdx.holowyth.vn.VNController;
@@ -112,7 +112,7 @@ public class StandardGameScreen extends GameScreen {
 			((Entrance) arrivalLoc).disableTemporarily();
 	}
 
-	private List<Unit> placeUnits(Point spawnPos, List<Unit> units) {
+	private List<Unit> placeUnits(Point spawnPos, List<@NonNull Unit> units) {
 		final List<Point> placements = pathingModule.findPathablePlacements(spawnPos, units.size(),
 				mapInstance.getUnits());
 		if (placements.size() < units.size())
@@ -130,7 +130,7 @@ public class StandardGameScreen extends GameScreen {
 	/**
 	 * @return a list of units that were actually spawned
 	 */
-	private List<Unit> testSpawnMultipleLecias(Point spawnPos, int numUnits) {
+	private List<@NonNull Unit> testSpawnMultipleLecias(Point spawnPos, int numUnits) {
 		// fetch locations
 		final List<Point> unitPlacements = pathingModule.findPathablePlacements(spawnPos, numUnits,
 				mapInstance.getUnits());
@@ -139,7 +139,7 @@ public class StandardGameScreen extends GameScreen {
 					unitPlacements.size());
 		}
 
-		final List<Unit> units = new ArrayList<Unit>();
+		final List<@NonNull Unit> units = new ArrayList<@NonNull Unit>();
 
 		for (int i = 0; i < Math.min(numUnits, unitPlacements.size()); i++) {
 			units.add(testSpawnLecia(unitPlacements.get(i)));
@@ -150,7 +150,7 @@ public class StandardGameScreen extends GameScreen {
 	/**
 	 * @param pos can't be null
 	 */
-	private Unit testSpawnLecia(Point pos) {
+	private @NonNull Unit testSpawnLecia(Point pos) {
 		var u = new Unit(pos.x, pos.y, Unit.Side.PLAYER, mapInstance);
 		u.setName("Lecia");
 		u.graphics.setAnimatedSprite(game.animations.get("pipo-charachip030e.png"));
@@ -179,12 +179,12 @@ public class StandardGameScreen extends GameScreen {
 	}
 
 	private void addLeciaToMapInstance() {
-		if (isMapLoaded()) {
+		if (lecia!=null && isMapLoaded()) {
 			if (lecia.getMapInstance() == null) {
 				Point pos = map.getLocations().get("default_spawn_location").pos;
 				((Unit) lecia).x = pos.x + 200;
 				((Unit) lecia).y = pos.y;
-				mapInstance.addPreExistingUnit(lecia);
+				mapInstance.addPreExistingUnit((@NonNull Unit) lecia);
 			} else {
 				logger.warn("Add: Lecia already has a world");
 			}

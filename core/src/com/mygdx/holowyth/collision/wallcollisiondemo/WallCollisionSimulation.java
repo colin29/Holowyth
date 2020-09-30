@@ -242,14 +242,11 @@ public class WallCollisionSimulation {
 						* (m1 * (v1ZeroFrame * v1ZeroFrame) + m2 * (v2ZeroFrame * v2ZeroFrame))
 						/ (m1 * (1 + m1 / m2)));
 
-		// 2. Plugin to momentum equation to get v2'
-
-		float v2FinalZeroFrame = -1 * v1FinalZeroFrame * m1 / m2;
+		// 2. Plugin to momentum equation to get v2' (was unneeded)
 
 		// 3. Subtract from initial velocities to get the change in velocity along the collision normal vector
 
 		float dv1ColAxis = v1FinalZeroFrame - v1ZeroFrame;
-		float dv2ColAxis = v2FinalZeroFrame - v2ZeroFrame;
 
 		// 4. Convert change in velocity into standard coordinates and modify both body's velocities by that much,
 		// respectively.

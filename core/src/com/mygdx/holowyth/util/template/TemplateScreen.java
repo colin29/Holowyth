@@ -24,6 +24,8 @@ public class TemplateScreen implements Screen {
 	private OrthographicCamera fixedCam;
 
 	private Stage stage;
+
+	@SuppressWarnings("unused")
 	private Skin skin;
 	private Table root;
 

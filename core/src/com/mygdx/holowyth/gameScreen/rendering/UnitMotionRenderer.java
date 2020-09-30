@@ -14,7 +14,6 @@ class UnitMotionRenderer extends SubRenderer {
 		super(renderer);
 	}
 
-	@SuppressWarnings("unused")
 	void renderPlayerUnreachedWaypoints(Color color) {
 		for (Unit unit : getMapInstance().getUnits()) {
 			if (unit.isAPlayerCharacter() && unit.getMotion().getPath() != null) {

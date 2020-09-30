@@ -5,6 +5,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.effect.Effect;
@@ -17,7 +19,7 @@ public interface MapInstanceInfo {
 	/**
 	 * The list itself is read-only, though elements can be modified
 	 */
-	public List<Unit> getUnits();
+	public List<@NonNull Unit> getUnits();
 
 	public PathingModule getPathingModule();
 

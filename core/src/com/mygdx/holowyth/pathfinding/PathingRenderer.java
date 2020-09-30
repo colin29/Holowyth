@@ -2,6 +2,8 @@ package com.mygdx.holowyth.pathfinding;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -122,7 +124,7 @@ public class PathingRenderer {
 	/**
 	 * Render intermediate paths for all units in the list
 	 */
-	public void renderIntermediateAndFinalPaths(List<? extends UnitPFWithPath> units) {
+	public void renderIntermediateAndFinalPaths(List<@NonNull ? extends UnitPFWithPath> units) {
 		for (UnitPFWithPath unit : units) {
 			PathsInfo info = model.intermediatePaths.get(unit);
 			if (info != null && (unit.getPath() != null || Holo.continueShowingPathAfterArrival)) {

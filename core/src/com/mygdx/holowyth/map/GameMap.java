@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.mygdx.holowyth.map.trigger.Trigger;
 import com.mygdx.holowyth.map.trigger.region.Region;
-import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 

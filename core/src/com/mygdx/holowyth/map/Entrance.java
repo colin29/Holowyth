@@ -2,6 +2,8 @@ package com.mygdx.holowyth.map;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -40,7 +42,7 @@ public class Entrance extends Location {
 		inactiveFramesRemaining = Math.max(0, inactiveFramesRemaining-1);
 	}
 	
-	public boolean isBeingTriggered(List<? extends UnitInfo> units) {
+	public boolean isBeingTriggered(List<@NonNull ? extends UnitInfo> units) {
 		if(inactiveFramesRemaining > 0)
 			return false;
 		for(var unit : units) {

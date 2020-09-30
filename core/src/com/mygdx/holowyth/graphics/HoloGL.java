@@ -70,6 +70,7 @@ public class HoloGL {
 		shapeRenderer.end();
 	}
 
+	@SuppressWarnings("null")
 	public static <S extends Segment> void renderSegs(List<S> segs, Color color) {
 		shapeRenderer.begin(ShapeType.Line);
 		shapeRenderer.setColor(color);

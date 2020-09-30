@@ -3,6 +3,7 @@ package com.mygdx.holowyth.unit;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,7 @@ public class UnitMotion {
 	// Application References
 
 	Unit self;
-	List<Unit> units;
+	List<@NonNull Unit> units;
 	private PathingModule pathing;
 
 	// Knockback variables
@@ -113,7 +114,7 @@ public class UnitMotion {
 	 */
 	public boolean pathFindTowardsTarget() {
 		// find path as normal, except for pathing ignore the target's collision body
-		ArrayList<Unit> someUnits = new ArrayList<Unit>(units);
+		ArrayList<@NonNull Unit> someUnits = new ArrayList<@NonNull Unit>(units);
 		final Unit orderTarget = self.orders.getOrderTarget();
 		someUnits.remove(orderTarget);
 		Path newPath = pathing.findPathForUnit(self, orderTarget.x, orderTarget.y, someUnits);

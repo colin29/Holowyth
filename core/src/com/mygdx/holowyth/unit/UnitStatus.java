@@ -12,7 +12,6 @@ import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitStatusInfo;
 import com.mygdx.holowyth.unit.statuseffect.BasicAttackSlowEffect;
 import com.mygdx.holowyth.unit.statuseffect.SlowEffect;
-import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**

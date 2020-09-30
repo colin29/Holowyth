@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
-import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.pathfinding.PathingRenderer;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;

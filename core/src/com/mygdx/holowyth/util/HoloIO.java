@@ -19,48 +19,26 @@ public class HoloIO {
 
 	public static SimpleMap getMapFromDisk(String pathname) {
 		SimpleMap map;
-		FileInputStream fileIn = null;
-		ObjectInputStream in = null;
-		try {
-			fileIn = new FileInputStream(pathname);
-			in = new ObjectInputStream(fileIn);
+		
+		try (FileInputStream fileIn = new FileInputStream(pathname);
+				ObjectInputStream in = new ObjectInputStream(fileIn);
+				){
 			map = (SimpleMap) in.readObject();
 			return map;
-
 		} catch (IOException e) {
 			throw new HoloException("Couldn't read map from disk", e);
 		} catch (ClassNotFoundException e) {
 			throw new HoloException(e);
-		} finally {
-			try {
-				in.close();
-				fileIn.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
+		} 
 
 	}
 
 	public static void saveMapToDisk(String pathname, SimpleMap map) {
-		ObjectOutputStream oos = null;
-		FileOutputStream fout = null;
-		try {
-
-			fout = new FileOutputStream(pathname);
-			oos = new ObjectOutputStream(fout);
+		try (FileOutputStream fout = new FileOutputStream(pathname);
+			ObjectOutputStream oos = new ObjectOutputStream(fout);){
 			oos.writeObject(map);
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			if (oos != null) {
-				try {
-					fout.close();
-					oos.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
 		}
 		map.hasUnsavedChanges = false;
 		System.out.println("Writing Map to disk finished");

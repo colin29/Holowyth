@@ -13,6 +13,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -48,7 +50,7 @@ public class PFDemoUnit implements UnitPFWithPath {
 
 	// World Fields
 	PathingModule pathingModule;
-	ArrayList<PFDemoUnit> units;
+	ArrayList<@NonNull PFDemoUnit> units;
 
 	// Collision Detection
 	private float radius = Holo.UNIT_RADIUS;
@@ -152,7 +154,7 @@ public class PFDemoUnit implements UnitPFWithPath {
 
 	private void pathForAttackingUnit() {
 		// find path as normal, except for pathing ignore the target's collision body
-		ArrayList<PFDemoUnit> someUnits = new ArrayList<PFDemoUnit>(units);
+		ArrayList<@NonNull PFDemoUnit> someUnits = new ArrayList<@NonNull PFDemoUnit>(units);
 		someUnits.remove(target);
 
 		Path path = pathingModule.findPathForUnit(this, target.x, target.y, someUnits);

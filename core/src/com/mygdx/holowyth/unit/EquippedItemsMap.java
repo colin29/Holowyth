@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.mygdx.holowyth.unit.WornEquips.Slot;
 import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 

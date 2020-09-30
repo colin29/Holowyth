@@ -28,6 +28,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 
 public class ParticleEmitter {
 	static private final int UPDATE_SCALE = 1 << 0;
@@ -411,6 +412,8 @@ public class ParticleEmitter {
 		case random:
 			sprite = sprites.random();
 			break;
+		default:
+			throw new HoloAssertException("Unhandled sprite mode");
 		}
 		
 		Particle particle = particles[index];
@@ -688,6 +691,8 @@ public class ParticleEmitter {
 				particle.frame = Math.min((int)(percent * sprites.size), sprites.size - 1);
 				sprite = sprites.get(particle.frame);
 				break;
+			default:
+				throw new HoloAssertException("Unhandled sprite mode");
 			}
 			particle.setRegion(sprite);
 			particle.setOrigin(sprite.getOriginX(), sprite.getOriginY());

@@ -8,20 +8,18 @@ import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
- * Handles the unit's attacking and retreating logic
- * Map life-time
+ * Handles the unit's attacking and retreating logic Map life-time
+ * 
  * @author Colin
  *
  */
 class UnitCombat {
-	
+
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final Unit self;
 	private final UnitStats stats;
-	
-	
-	
+
 	// Attacking
 	/** The unit this unit is attacking. Attacking a unit <--> being engaged. */
 	private Unit attacking;
@@ -32,22 +30,20 @@ class UnitCombat {
 	/** Time in frames. When a unit engages it cannot retreat for a certain amount of time. */
 	private float retreatCooldown = 0;
 	private float retreatCooldownRemaining = 0;
-	
+
 	/**
 	 * For a short time when a unit starts retreating they can't be given any other commands.
 	 */
 	static final int retreatDuration = 50;
 	private int retreatDurationRemaining;
-	
-	
+
 	private float attackOfOpportunityCooldown = 120;
 	private float attackOfOpportunityCooldownRemaining = 0;
-	
+
 	public UnitCombat(Unit self) {
 		this.self = self;
 		stats = self.stats;
 	}
-
 
 	/**
 	 * Updates attacking units
@@ -57,7 +53,7 @@ class UnitCombat {
 			return;
 
 		if (!self.isCastingOrChanneling()) {
-			attackCooldownRemaining = Math.max(0, attackCooldownRemaining - 1); 
+			attackCooldownRemaining = Math.max(0, attackCooldownRemaining - 1);
 		}
 
 		if (isAttacking()) {
@@ -76,12 +72,12 @@ class UnitCombat {
 				attackCooldownRemaining = attackCooldown / stats.getMultiTeamingAtkspdPenalty(attacking);
 			}
 		}
-		
+
 		tickRetreatDurationIfRetreating();
 		tickRetreatCooldown();
 		tickAttackOfOpportunityCooldown();
 	}
-	
+
 	void retreat(float x, float y) {
 		retreatDurationRemaining = retreatDuration;
 		if (self.getMotion().pathFindTowardsPoint(x, y)) {
@@ -96,26 +92,24 @@ class UnitCombat {
 			}
 		}
 	}
-	
+
 	private void tickRetreatDurationIfRetreating() {
 		if (self.orders.getOrder() == Order.RETREAT)
 			retreatDurationRemaining -= 1;
 	}
+
 	private void tickRetreatCooldown() {
-		if (retreatCooldownRemaining > 0) {
+		if (retreatCooldownRemaining > 0)
 			retreatCooldownRemaining -= 1;
-		}
 	}
 
 	private void tickAttackOfOpportunityCooldown() {
-		if (attackOfOpportunityCooldownRemaining > 0) {
+		if (attackOfOpportunityCooldownRemaining > 0)
 			attackOfOpportunityCooldownRemaining -= 1;
-		}
 	}
-	
+
 	/**
-	 * Lowest level method for attacking. Fine to call while attacking, though will warn you if you are
-	 * already attacking the same target.
+	 * Fine to call while attacking, though will warn you if you are already attacking the same target.
 	 */
 	void startAttacking(Unit target) {
 		logger.debug("Unit {} started attacking {}", self.getName(), target.getName());
@@ -181,11 +175,13 @@ class UnitCombat {
 	boolean isAttacking() {
 		return attacking != null;
 	}
+
 	boolean isAttacking(UnitInfo target) {
 		return attacking == target;
 	}
+
 	/**
-	 * Will do nothing if the two units are outside of engage range. 
+	 * Will do nothing if the two units are outside of engage range.
 	 */
 	void setAttacking(Unit unit) {
 		float distToEnemy = Point.dist(self.getPos(), unit.getPos());
@@ -196,6 +192,5 @@ class UnitCombat {
 		if (attacking != unit)
 			startAttacking(unit);
 	}
-
 
 }

@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.map.obstacledata.OrientedPoly;
 import com.mygdx.holowyth.map.obstacledata.OrientedSeg;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
@@ -167,17 +166,7 @@ public class CollisionDetection {
 		CollisionInfo firstCollision = q.peek();
 		return firstCollision;
 	}
-
-	private static List<OrientedSeg> getObstacleExpandedSegs(List<OrientedPoly> polys, float bodyRadius) {
-		var segs = new ArrayList<OrientedSeg>();
-		for (var poly : polys) {
-			for (var seg : poly.segments) {
-				segs.add(seg.getOutwardlyDisplacedSegment(bodyRadius));
-			}
-		}
-		return segs;
-	}
-
+	
 	private static Point lineSegsIntersect(Segment s1, Segment s2) {
 
 		float a1, a2, b1, b2, c1, c2;

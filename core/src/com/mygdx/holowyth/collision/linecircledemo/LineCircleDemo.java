@@ -8,7 +8,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
@@ -21,7 +20,6 @@ public class LineCircleDemo extends HoloBaseScreen {
 
 	Renderer renderer;
 
-	private final Color PALE_GREEN = HoloGL.rgb(229, 255, 216);
 	private final Color backgroundColor = Color.WHITE;
 
 	private final float CIRCLE_RADIUS = 100;

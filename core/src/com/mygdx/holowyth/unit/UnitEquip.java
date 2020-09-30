@@ -7,17 +7,15 @@ import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.unit.WornEquips.Slot;
 import com.mygdx.holowyth.unit.item.Equip;
-import com.mygdx.holowyth.util.exceptions.HoloAssertException;
-import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**
  * @author Colin Ta
  */
 public class UnitEquip {
+	
+	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final Unit self;
-
-	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final WornEquips wornEquips = new WornEquips();
 
