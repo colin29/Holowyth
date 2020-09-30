@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.mygdx.holowyth.map.obstacledata.OrientedSeg;
@@ -29,7 +31,7 @@ public class PathSmoother {
 	 * @return A new path that is a smoothed version of the given path
 	 */
 	public Path smoothPath(Path origPath, List<OrientedSeg> obstacleExpandedSegs,
-			List<Point> obstaclePoints, ArrayList<UnitPF> cbs, float unitRadius) {
+			List<Point> obstaclePoints, ArrayList<@NonNull UnitPF> cbs, float unitRadius) {
 
 		path0s = origPath.deepCopy();
 		path1s = null;
@@ -90,7 +92,7 @@ public class PathSmoother {
 	 * @return A new path that is a smoothed version of the given path
 	 */
 	private Path doSecondarySmoothing(Path origPath, List<OrientedSeg> obstacleExpandedSegs,
-			List<Point> obstaclePoints, ArrayList<UnitPF> cbs, float unitRadius) {
+			List<Point> obstaclePoints, ArrayList<@NonNull UnitPF> cbs, float unitRadius) {
 
 		testCount = 0;
 

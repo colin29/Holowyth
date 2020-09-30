@@ -2,6 +2,8 @@ package com.mygdx.holowyth.pathfinding.demo;
 
 import java.util.ArrayList;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
@@ -33,9 +35,9 @@ public class PFUnitControls implements InputProcessor {
 	Camera camera;
 	ShapeRenderer shapeRenderer;
 
-	ArrayList<PFDemoUnit> units;
+	ArrayList<@NonNull PFDemoUnit> units;
 
-	public ArrayList<PFDemoUnit> selectedUnits = new ArrayList<PFDemoUnit>();
+	public ArrayList<@NonNull PFDemoUnit> selectedUnits = new ArrayList<PFDemoUnit>();
 	boolean leftMouseKeyDown = false;
 
 	PFDemoUnit prospectUnit; // In order to single-select a unit, the user must mouse down on a unit, and mouse up on
@@ -52,7 +54,7 @@ public class PFUnitControls implements InputProcessor {
 	Table table;
 	Label currentStateText;
 
-	public PFUnitControls(Holowyth game, Camera camera, ArrayList<PFDemoUnit> units) {
+	public PFUnitControls(Holowyth game, Camera camera, ArrayList<@NonNull PFDemoUnit> units) {
 		this.shapeRenderer = game.shapeRenderer;
 		this.camera = camera;
 		this.units = units;
@@ -262,13 +264,11 @@ public class PFUnitControls implements InputProcessor {
 
 	@Override
 	public boolean mouseMoved(int screenX, int screenY) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
 	public boolean scrolled(int amount) {
-		// TODO Auto-generated method stub
 		return false;
 	}
 
@@ -280,10 +280,6 @@ public class PFUnitControls implements InputProcessor {
 			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + 2.5f, Color.GREEN);
 			HoloGL.renderCircleOutline(u.x, u.y, u.getRadius() + 4, Color.GREEN);
 		}
-	}
-
-	public void renderDebuggingText() {
-		// TODO:
 	}
 
 	public static Color defaultSelectionBoxColor = Color.BLUE;

@@ -58,7 +58,6 @@ public class LoadingScreen extends HoloBaseScreen {
 
 	}
 
-	@SuppressWarnings("null")
 	private void loadTexture(String path) {
 		TextureParameter  param = new TextureParameter();
 		param.genMipMaps = true;

@@ -14,6 +14,7 @@ import com.mygdx.holowyth.skill.ActiveSkill;
  * @author Colin Ta
  *
  */
+@SuppressWarnings("null")
 public class Skills {
 
 	public static final List<ActiveSkill> warriorSkills = Collections.unmodifiableList(

@@ -47,6 +47,8 @@ import com.mygdx.holowyth.util.tools.FunctionBindings;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 /**
  * Accepts player input to select and order units to move (and other behaviour later on). <br>
  * 
@@ -65,7 +67,7 @@ public class Controls extends InputProcessorAdapter {
 	private ShapeRenderer shapeRenderer;
 
 	MapInstanceInfo mapInstance;
-	List<Unit> units;
+	List<@NonNull Unit> units;
 
 	private FunctionBindings functionBindings = new FunctionBindings();
 
@@ -102,7 +104,7 @@ public class Controls extends InputProcessorAdapter {
 
 	private GameLogDisplay gameLog;
 
-	public Controls(Holowyth game, Camera camera, Camera fixedCam, List<Unit> units, DebugStore debugStore,
+	public Controls(Holowyth game, Camera camera, Camera fixedCam, List<@NonNull Unit> units, DebugStore debugStore,
 			MapInstanceInfo world, GameLogDisplay gameLog) {
 		this.shapeRenderer = game.shapeRenderer;
 		this.camera = camera;

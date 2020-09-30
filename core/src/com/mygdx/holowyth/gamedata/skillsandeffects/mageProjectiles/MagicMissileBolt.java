@@ -2,6 +2,7 @@ package com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +34,7 @@ public class MagicMissileBolt extends ProjectileBase {
 
 	Unit target; // target is allowed to be null;
 
-	public MagicMissileBolt(float x, float y, float damage, Unit target, Unit caster, List<Unit> units) {
+	public MagicMissileBolt(float x, float y, float damage, Unit target, Unit caster, List<@NonNull Unit> units) {
 		super(x, y, intialSpeed, Point.getAngleInDegrees(caster.getPos(), target.getPos()), maxDuration, caster);
 		this.damage = damage;
 		this.target = target;

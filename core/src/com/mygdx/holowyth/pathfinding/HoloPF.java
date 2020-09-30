@@ -4,6 +4,8 @@ import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
@@ -41,7 +43,7 @@ public class HoloPF {
 	 * Checks pathability based on obstacles AND other units
 	 */
 	public static boolean isSegmentPathable(float x1, float y1, float x2, float y2, List<OrientedSeg> obstacleExpandedSegs,
-			List<Point> obstaclePoints, List<UnitPF> unitCBs,
+			List<Point> obstaclePoints, List<@NonNull UnitPF> unitCBs,
 			float thisUnitRadius) {
 		tempSeg.set(x1, y1, x2, y2);
 		return isSegmentPathable(tempSeg, obstacleExpandedSegs, obstaclePoints, unitCBs, thisUnitRadius);
@@ -50,7 +52,7 @@ public class HoloPF {
 	/**
 	 * Checks pathability based on obstacles AND other units
 	 */
-	public static boolean isSegmentPathable(Segment motion, List<OrientedSeg> obstacleExpandedSegs, List<Point> obstaclePoints, List<UnitPF> unitCBs,
+	public static boolean isSegmentPathable(Segment motion, List<OrientedSeg> obstacleExpandedSegs, List<Point> obstaclePoints, List<@NonNull UnitPF> unitCBs,
 			float thisUnitRadius) {
 		for (var other : unitCBs) {
 			if (Intersector.distanceSegmentPoint(motion.x1, motion.y1, motion.x2, motion.y2, other.getX(), other.getY()) <= thisUnitRadius + other.getRadius()) {
