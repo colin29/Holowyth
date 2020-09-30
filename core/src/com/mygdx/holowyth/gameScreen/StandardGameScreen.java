@@ -48,9 +48,9 @@ public class StandardGameScreen extends GameScreen {
 		functionBindings.bindFunctionToKey(() -> {
 			goToMap("forest2", "entrance_1");
 		}, Keys.G);
-		
+
 		functionBindings.bindFunctionToKey(() -> { // center camera back on map
-			camera.position.set(Gdx.graphics.getWidth()/2, Gdx.graphics.getHeight()/2, 0);
+			camera.position.set(Gdx.graphics.getWidth() / 2, Gdx.graphics.getHeight() / 2, 0);
 		}, Keys.MINUS);
 
 		DebugValues debugValues = debugStore.registerComponent(this.getClass().getSimpleName());
@@ -178,14 +178,21 @@ public class StandardGameScreen extends GameScreen {
 
 	}
 
-	@SuppressWarnings("null")
 	private void addLeciaToMapInstance() {
-		if (lecia!=null && isMapLoaded()) {
+
+		@NonNull Unit lecia; //shadow with nonNull reference
+		if (this.lecia != null) { 
+			lecia = this.lecia;
+		} else {
+			return;
+		}
+
+		if (lecia != null && isMapLoaded()) {
 			if (lecia.getMapInstance() == null) {
 				Point pos = map.getLocations().get("default_spawn_location").pos;
 				((Unit) lecia).x = pos.x + 200;
 				((Unit) lecia).y = pos.y;
-				mapInstance.addPreExistingUnit((@NonNull Unit) lecia);
+				mapInstance.addPreExistingUnit(lecia);
 			} else {
 				logger.warn("Add: Lecia already has a world");
 			}
@@ -201,12 +208,11 @@ public class StandardGameScreen extends GameScreen {
 		}
 	}
 
-	@SuppressWarnings("null")
 	private void transportPlayerUnitsIfStandingOnEntrance() {
 		for (Entrance entrance : map.getEntrances()) {
 			if (entrance.isBeingTriggered(playerUnits)) {
-				if (entrance.hasDestination()) {
-					goToMap((@NonNull String) entrance.destMap, entrance.destLoc);
+				if (entrance.dest != null) {
+					goToMap(entrance.dest.map, entrance.dest.loc);
 					return;
 				}
 			}

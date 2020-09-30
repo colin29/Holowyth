@@ -3,7 +3,6 @@ package com.mygdx.holowyth.map;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
-
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -15,12 +14,24 @@ public class Entrance extends Location {
 	public static final int inactiveFramesOnArrival = Holo.GAME_FPS * 8; 
 	public static final float triggerRange = Holo.UNIT_RADIUS + 20;
 	
-	
-	public String destMap;
-	public String destLoc;
-	
+	/** Null if the location has no destination */
+	public Destination dest;
+		
 	private transient int inactiveFramesRemaining; 
 	
+	
+	public static class Destination{
+		public @NonNull String map;
+		public @NonNull String loc;
+		public Destination(@NonNull String map, @NonNull String loc) {
+			this.map = map;
+			this.loc = loc;
+		}
+		public Destination(Destination src) {
+			map = src.map;
+			loc = src.loc;
+		}
+	}
 	
 	
 	public Entrance(@NonNull String name, float x, float y) {
@@ -28,18 +39,15 @@ public class Entrance extends Location {
 	}
 	public Entrance(Entrance src) {
 		super(src);
-		destMap = src.destMap;
-		destLoc = src.destLoc;
+		dest = src.dest!=null ? new Destination(src.dest) : null;
 	}
 	
 	public Entrance setDest(@NonNull String destMap, @NonNull String destLoc) {
-		this.destMap = destMap;
-		this.destLoc = destLoc;
+		dest = new Destination(destMap, destLoc);
 		return this;
 	}
 	public void clearDest() {
-		destMap = null;
-		destLoc = null;
+		dest = null;
 	}
 	
 	public void tick() {
@@ -62,10 +70,7 @@ public class Entrance extends Location {
 	public void disableTemporarily() {
 		inactiveFramesRemaining = inactiveFramesOnArrival;
 	}
-	public boolean hasDestination() {
-		return destMap != null && destLoc != null;
-	}
-
+	
 	@Override
 	public Location cloneObject() {
 		return new Entrance(this);

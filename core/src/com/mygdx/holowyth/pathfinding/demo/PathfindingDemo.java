@@ -338,7 +338,6 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 	/**
 	 * Logically initializes a bunch of components necessary to run the map
 	 */
-	@SuppressWarnings("null")
 	private void mapStartup(SimpleMap map) {
 		// Unit Controls
 		if (unitControls != null) {
@@ -355,8 +354,9 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		//// ---------Test Area---------////:
 
 		// Create units
-		playerUnit = new PFDemoUnit(35, 20, this); 
-		units.add((@NonNull PFDemoUnit) playerUnit);
+		@NonNull PFDemoUnit unit = new PFDemoUnit(35, 20, this); 
+		units.add(unit);
+		playerUnit = unit;
 		
 		unitControls.selectedUnits.add(playerUnit);
 		createTestUnits();

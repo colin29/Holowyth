@@ -116,7 +116,6 @@ public abstract class MapLoadingScreen extends HoloBaseScreen {
 		game.fileChooser.setMode(Mode.OPEN);
 		game.fileChooser.setSelectionMode(SelectionMode.FILES);
 		game.fileChooser.setListener(new FileChooserAdapter() {
-			@SuppressWarnings("null")
 			@Override
 			public void selected(Array<FileHandle> file) {
 				logger.debug("Selected file: {}", file.get(0).file().getAbsolutePath());
@@ -124,7 +123,7 @@ public abstract class MapLoadingScreen extends HoloBaseScreen {
 				String path = file.get(0).file().getPath();
 				if(path == null)
 					throw new HoloAssertException("File's path was null");
-				loadGameMapByName((@NonNull String) path); // tmx map loader uses relative path
+				loadGameMapByName(path); // tmx map loader uses relative path
 			}
 		});
 
