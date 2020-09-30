@@ -77,6 +77,8 @@ public class UnitStatValues implements Cloneable {
 		maxHp += other.maxHp;
 		maxSp += other.maxSp;
 
+		damage += other.damage;
+		
 		atk += other.atk;
 		def += other.def;
 		force += other.force;
@@ -87,8 +89,6 @@ public class UnitStatValues implements Cloneable {
 		armorPiercing += other.armorPiercing;
 		percentArmor += other.percentArmor;
 		armorNegate += other.armorNegate;
-
-		damage += other.damage;
 
 		return this;
 	}

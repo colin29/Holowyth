@@ -39,7 +39,7 @@ public class Equip extends Item {
 	}
 	public Equip(Equip src) {
 		this(src.name, src.equipType);
-		bonus.set(bonus);
+		bonus.set(src.bonus);
 		is2HWeapon = src.is2HWeapon;
 		baseAtkSpd = src.baseAtkSpd;
 	}

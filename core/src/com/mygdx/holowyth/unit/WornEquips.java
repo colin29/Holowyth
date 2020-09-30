@@ -51,20 +51,13 @@ public class WornEquips {
 				continue;
 			
 			if(slot == Slot.OFF_HAND && !src.is2HWieldingWeapon()) {
-				equipOrNull(src.getEquip(Slot.OFF_HAND).cloneObject());
+				equip(src.getEquip(Slot.OFF_HAND).cloneObject());
 			}else {
-				equipOrNull(src.getEquip(slot).cloneObject());
+				equip(src.getEquip(slot).cloneObject());
 			}
 		}
 	}
-	
-	private boolean equipOrNull(Equip item) {
-		if(item == null) {
-			return false;
-		}else {
-			return equip(item);
-		}
-	}
+
 
 	/**
 	 * 

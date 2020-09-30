@@ -5,6 +5,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mygdx.holowyth.unit.WornEquips.Slot;
 import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
@@ -18,14 +19,11 @@ public class UnitEquip {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	
-	
 	private final WornEquips wornEquips = new WornEquips();
-	
+
 	public UnitEquip(Unit self) {
 		this.self = self;
 	}
-	
 
 	public void clearMapLifetimeData() {
 		// None
@@ -40,7 +38,6 @@ public class UnitEquip {
 		self.stats.recalculateStats();
 		return isSuccess;
 	}
-
 
 	public boolean unequip(Equip item) {
 		return wornEquips.unequip(item);
@@ -65,4 +62,15 @@ public class UnitEquip {
 		return wornEquips.is2HWieldingWeapon();
 	}
 
+	void equipAllFromTemplate(WornEquips src) {
+		for (Slot slot : Slot.values()) {
+			if (src.getEquip(slot) == null)
+				continue;
+			if (slot == Slot.OFF_HAND && !src.is2HWieldingWeapon()) {
+				equip(src.getEquip(Slot.OFF_HAND).cloneObject());
+			} else {
+				equip(src.getEquip(slot).cloneObject());
+			}
+		}
+	}
 }
