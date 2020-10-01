@@ -1,15 +1,16 @@
 import com.badlogic.gdx.Gdx;
-import com.wizered67.game.conversations.Conversation;
-import com.wizered67.game.conversations.commands.ConversationCommand;
-import com.wizered67.game.conversations.commands.impl.base.ChangeBranchCommand;
-import com.wizered67.game.conversations.commands.impl.base.DebugCommand;
-import com.wizered67.game.conversations.commands.impl.base.MessageCommand;
-import com.wizered67.game.conversations.commands.impl.base.ShowChoicesCommand;
-import com.wizered67.game.conversations.commands.impl.scripting.VariableConditionCommand;
-import com.wizered67.game.conversations.xmlio.ConversationLoader;
-import com.wizered67.game.conversations.xmlio.ConversationLoaderImpl;
-import com.wizered67.game.conversations.xmlio.ConversationParsingException;
-import com.wizered67.game.gui.GUIManager;
+import com.wizered67.vnlib.conversations.Conversation;
+import com.wizered67.vnlib.conversations.commands.ConversationCommand;
+import com.wizered67.vnlib.conversations.commands.impl.base.ChangeBranchCommand;
+import com.wizered67.vnlib.conversations.commands.impl.base.DebugCommand;
+import com.wizered67.vnlib.conversations.commands.impl.base.MessageCommand;
+import com.wizered67.vnlib.conversations.commands.impl.base.ShowChoicesCommand;
+import com.wizered67.vnlib.conversations.commands.impl.scripting.VariableConditionCommand;
+import com.wizered67.vnlib.conversations.xmlio.ConversationLoader;
+import com.wizered67.vnlib.conversations.xmlio.ConversationLoaderImpl;
+import com.wizered67.vnlib.conversations.xmlio.ConversationParsingException;
+import com.wizered67.vnlib.gui.GUIManager;
+
 import junitx.util.PrivateAccessor;
 import org.junit.BeforeClass;
 import org.junit.Test;

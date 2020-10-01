@@ -28,4 +28,30 @@ dependencies {
 	
 	// AI
 	compile "com.badlogicgames.gdx:gdx-ai:$gdxAIVersion"
+
+
+	// Dev
+	compile group: 'org.eclipse.jdt', name: 'org.eclipse.jdt.annotation', version: '2.2.600'
+
+	// Visual Novel Library
+
+	// Shared dependencies
+	//  compile "com.badlogicgames.gdx:gdx:$gdxVersion"
+    //  compile "com.badlogicgames.gdx:gdx-controllers:$gdxVersion"
+    //  compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
+    // //  compile "com.kotcrab.vis:vis-ui:$visuiVersion"
+
+
+        
+        compile 'com.esotericsoftware:kryo:4.0.0'
+        compile "com.rafaskoberg.gdx:typing-label:1.0.4"
+        compile "org.luaj:luaj-jse:3.0"
+
+
+    //     testCompile "junit:junit:4.11"
+    //     testCompile "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
+    //     testCompile "com.badlogicgames.gdx:gdx:$gdxVersion"
+    //     testCompile "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+    //     testCompile group: 'junit-addons', name: 'junit-addons', version: '1.4'
+
 }

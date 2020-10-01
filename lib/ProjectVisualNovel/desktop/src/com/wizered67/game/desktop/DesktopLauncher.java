@@ -3,8 +3,8 @@ package com.wizered67.game.desktop;
 import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import com.wizered67.game.Constants;
-import com.wizered67.game.MainGame;
+import com.wizered67.vnlib.Constants;
+import com.wizered67.vnlib.MainGame;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {

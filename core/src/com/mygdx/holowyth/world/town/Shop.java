@@ -30,6 +30,8 @@ public class Shop {
 	
 	private final List<@NonNull ItemStock> itemStocks = new ArrayList<>();
 	
+	private final List<@NonNull ShopChangedListener> listeners = new  ArrayList<>();
+	
 	public static class ItemStock {
 		public Item item; // this item should be copied when bought
 		public int costEa;
@@ -64,6 +66,7 @@ public class Shop {
 	public void addItemStock(Item item, int costEa, int stock) {
 		logger.debug("Added {}x '{}' to store with price [{} sp]", stock, item.name, costEa);
 		itemStocks.add(new ItemStock(item, costEa, stock));
+		onShopChanged();
 	}
 	void removeItemStock(ItemStock itemStock, int amount) {
 		if(!itemStocks.contains(itemStock))
@@ -75,6 +78,7 @@ public class Shop {
 		}else {
 			itemStock.count -= amount;
 		}
+		onShopChanged();
 	}
 	public ShopSession enter(OwnedCurrency customerFunds, OwnedItems customerItems) {
 		return new ShopSession(this, customerFunds, customerItems);
@@ -86,6 +90,22 @@ public class Shop {
 
 	public Shop cloneObject() {
 		return new Shop(this);
+	}
+	
+	public void addListener(ShopChangedListener o) {
+		listeners.add(o);
+	}
+	public boolean removeListener(ShopChangedListener o) {
+		return listeners.remove(o);
+	}
+	private void onShopChanged() {
+		for(var o: listeners) {
+			o.changed();
+		}
+	}
+	
+	public interface ShopChangedListener{
+		public abstract void changed();
 	}
 	
 }

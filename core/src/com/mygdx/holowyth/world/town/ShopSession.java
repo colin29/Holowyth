@@ -43,4 +43,12 @@ public class ShopSession {
 		return false;
 	}
 
+	public OwnedCurrency getCustomerFunds() {
+		return customerFunds;
+	}
+
+	public Shop getShop() {
+		return shop;
+	}
+
 }

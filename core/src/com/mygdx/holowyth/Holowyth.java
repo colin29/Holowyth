@@ -5,6 +5,10 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
@@ -37,7 +41,7 @@ public class Holowyth extends Game {
 	public ShapeRenderer shapeRenderer;
 
 	public static final String ASSETS_PATH = "assets/";
-	public AssetManager assets;
+	public @NonNull AssetManager assets;
 
 	/* Fonts */
 

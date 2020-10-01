@@ -1,0 +1,4 @@
+<resources xmlns="urn:resourceConfig">
+	<resource name="demonstration.conv" identifier="demonstration.conv"/>
+	<resource name="myConv.conv" identifier="myConv.conv"/>
+</resources>

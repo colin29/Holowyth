@@ -1,0 +1,28 @@
+<conversation xmlns="urn:conversations">
+    <branch name="default">
+    	 <!-- <bg id="testbackground"/> -->
+
+        <position id="Lecia" x="0" y="0"/>
+        <animation id="Lecia" animation="lecia"/>
+        <scale id="Lecia" xScale="0.5" yScale="0.5" />
+        <visible id="Lecia" visible="true"/>
+
+
+        Lecia: Hmph! It's not like I wanted to be in a visual novel for your sake!
+        n: She jabs a finger at the screen, wherever that is.
+
+        <visible id="Lecia" visible="false" fadeTime="0.5" wait="true"/>
+
+
+ <!--        <script>playerName="Spinaria"</script> -->
+<!-- 
+        Lecia: {COLOR=PINK}hello!
+        <visible id="Lecia" visible="false"/>
+        <visible id="Detective" visible="true"/>
+        Detective: Hello. The clues are located in the {COLOR=YELLOW}Goblin Ruins{CLEAR_COLOR}.
+ -->
+      
+
+
+    </branch>
+   </conversation>

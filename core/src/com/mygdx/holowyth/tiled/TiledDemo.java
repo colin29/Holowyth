@@ -3,6 +3,8 @@ package com.mygdx.holowyth.tiled;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,29 +20,36 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.dataobjects.Segment;
+import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;
 
+@NonNullByDefault
 public class TiledDemo extends HoloBaseScreen implements InputProcessor {
 
+	@SuppressWarnings("null")
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private OrthogonalTiledMapRenderer tiledMapRenderer;
 	private TiledMap map;
-
-	private ShapeDrawerPlus shapeDrawer;
+	
+	List<Segment> segs = new ArrayList<Segment>();
 
 	public TiledDemo(Holowyth game) {
 		super(game);
-		loadMap();
+		map = loadMap();
+		tiledMapRenderer = new OrthogonalTiledMapRenderer(map);
+		
 		Gdx.input.setInputProcessor(this);
-		shapeDrawer = game.shapeDrawer;
 	}
 
-	public void loadMap() {
-		map = new MyAtlasTmxMapLoader().load("assets/maps/forest1.tmx");
-		tiledMapRenderer = new OrthogonalTiledMapRenderer(map);
-
-		readCollisionObjectsFromMap();
+	public TiledMap loadMap() {
+		TiledMap map = new MyAtlasTmxMapLoader().load("assets/maps/forest1.tmx");
+		if(map != null) {
+			readCollisionObjectsFromMap();
+			return map;
+		}else {
+			throw new HoloResourceNotFoundException();
+		}
 	}
 
 	@Override
@@ -68,8 +77,6 @@ public class TiledDemo extends HoloBaseScreen implements InputProcessor {
 		batch.end();
 
 	}
-
-	List<Segment> segs = new ArrayList<Segment>();
 
 	private void readCollisionObjectsFromMap() {
 

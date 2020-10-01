@@ -7,15 +7,15 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.wizered67.game.Constants;
-import com.wizered67.game.VNHubManager;
-import com.wizered67.game.VNHub;
-import com.wizered67.game.MusicManager;
-import com.wizered67.game.assets.Assets;
-import com.wizered67.game.conversations.ConversationController;
-import com.wizered67.game.gui.GUIManager;
-import com.wizered67.game.inputs.Controls;
-import com.wizered67.game.saving.SaveManager;
+import com.wizered67.vnlib.Constants;
+import com.wizered67.vnlib.MusicManager;
+import com.wizered67.vnlib.VNHub;
+import com.wizered67.vnlib.VNHubManager;
+import com.wizered67.vnlib.assets.Assets;
+import com.wizered67.vnlib.conversations.ConversationController;
+import com.wizered67.vnlib.gui.GUIManager;
+import com.wizered67.vnlib.inputs.Controls;
+import com.wizered67.vnlib.saving.SaveManager;
 
 /**
  * Responsible for init'ing modules and resources, and loading all the assets on construction.

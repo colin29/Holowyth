@@ -20,4 +20,7 @@ public class OwnedCurrency {
 		logger.debug("Subtracted {} sp, new balance: {} sp", spAmount, sp-spAmount);
 		sp -= spAmount;
 	}
+	public int getBalance() {
+		return sp;
+	}
 }

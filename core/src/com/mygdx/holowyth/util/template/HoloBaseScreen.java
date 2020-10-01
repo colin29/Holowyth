@@ -1,5 +1,8 @@
 package com.mygdx.holowyth.util.template;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
@@ -14,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.graphics.Cameras;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
+import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 
 /**
  * Holds cameras, rendering equipment and common scene2d fields.
@@ -22,6 +26,7 @@ import com.mygdx.holowyth.util.ShapeDrawerPlus;
  * need.
  *
  */
+@NonNullByDefault
 public abstract class HoloBaseScreen implements Screen, InputProcessor {
 
 	protected final Holowyth game;
@@ -42,11 +47,31 @@ public abstract class HoloBaseScreen implements Screen, InputProcessor {
 
 	public HoloBaseScreen(final Holowyth game) {
 		this.game = game;
-		batch = game.batch;
-		shapeRenderer = game.shapeRenderer;
-		shapeDrawer = game.shapeDrawer;
+		if(game.batch!=null) {
+			@NonNull SpriteBatch o = game.batch;
+			batch = o;
+		}else {
+			throw new HoloResourceNotFoundException();
+		}
+		if(game.shapeRenderer!=null) {
+			@NonNull ShapeRenderer o = game.shapeRenderer;
+			shapeRenderer = o;
+		}else {
+			throw new HoloResourceNotFoundException();
+		}
+		if(game.shapeDrawer!=null) {
+			@NonNull ShapeDrawerPlus o = game.shapeDrawer;
+			shapeDrawer = o;
+		}else {
+			throw new HoloResourceNotFoundException();
+		}
+		if(game.skin!=null) {
+			@NonNull Skin o = game.skin;
+			skin = o;
+		}else {
+			throw new HoloResourceNotFoundException();
+		}
 		assets = game.assets;
-		skin = game.skin;
 
 		camera = new OrthographicCamera(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 		camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
@@ -55,6 +80,8 @@ public abstract class HoloBaseScreen implements Screen, InputProcessor {
 
 		cameras = new Cameras(camera, fixedCamera);
 
+		stage = new Stage(new ScreenViewport());
+		root = new Table();
 		createStage();
 	}
 
@@ -91,9 +118,6 @@ public abstract class HoloBaseScreen implements Screen, InputProcessor {
 	}
 
 	private void createStage() {
-		stage = new Stage(new ScreenViewport());
-
-		root = new Table();
 		root.setFillParent(true);
 		stage.addActor(root);
 		root.top().left();
