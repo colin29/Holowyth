@@ -15,10 +15,10 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector3;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.map.obstacledata.Polygon;
-import com.mygdx.holowyth.map.simplemap.Polygons;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
+import com.mygdx.holowyth.world.map.obstacle.Polygon;
+import com.mygdx.holowyth.world.map.simplemap.Polygons;
 
 public class PolygonDemo implements Screen, InputProcessor {
 

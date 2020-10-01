@@ -27,8 +27,6 @@ import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.HoloSprite;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
-import com.mygdx.holowyth.map.GameMap;
-import com.mygdx.holowyth.map.GameMapRenderer;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.pathfinding.PathingRenderer;
 import com.mygdx.holowyth.skill.ActiveSkill.Status;
@@ -42,6 +40,8 @@ import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.world.map.GameMap;
+import com.mygdx.holowyth.world.map.GameMapRenderer;
 
 /**
  * Handles all of GameScreenBase's rendering <br>

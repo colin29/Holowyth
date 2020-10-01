@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.map.trigger;
+package com.mygdx.holowyth.world.map.trigger;
 
 import java.util.function.Consumer;
 

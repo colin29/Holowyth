@@ -5,16 +5,16 @@ import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.gamedata.units.MonsterStats;
 import com.mygdx.holowyth.gamedata.units.Monsters;
-import com.mygdx.holowyth.map.Entrance;
-import com.mygdx.holowyth.map.GameMap;
-import com.mygdx.holowyth.map.Location;
-import com.mygdx.holowyth.map.UnitMarker;
-import com.mygdx.holowyth.map.trigger.Trigger;
-import com.mygdx.holowyth.map.trigger.UnitEntersRegion;
-import com.mygdx.holowyth.map.trigger.region.RectRegion;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.world.map.Entrance;
+import com.mygdx.holowyth.world.map.GameMap;
+import com.mygdx.holowyth.world.map.Location;
+import com.mygdx.holowyth.world.map.UnitMarker;
+import com.mygdx.holowyth.world.map.trigger.Trigger;
+import com.mygdx.holowyth.world.map.trigger.UnitEntersRegion;
+import com.mygdx.holowyth.world.map.trigger.region.RectRegion;
 
 @SuppressWarnings("unused")
 public class Forest1 extends GameMap {

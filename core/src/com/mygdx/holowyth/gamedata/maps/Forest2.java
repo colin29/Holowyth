@@ -5,12 +5,12 @@ import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.gamedata.units.MonsterStats;
 import com.mygdx.holowyth.gamedata.units.Monsters;
-import com.mygdx.holowyth.map.Entrance;
-import com.mygdx.holowyth.map.GameMap;
-import com.mygdx.holowyth.map.Location;
-import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.world.map.Entrance;
+import com.mygdx.holowyth.world.map.GameMap;
+import com.mygdx.holowyth.world.map.Location;
+import com.mygdx.holowyth.world.map.UnitMarker;
 
 public class Forest2 extends GameMap {
 

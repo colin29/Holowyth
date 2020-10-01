@@ -15,4 +15,15 @@ public class SessionData {
 	public final List<@NonNull Unit> playerUnits = new ArrayList<@NonNull Unit>();
 	public final @NonNull OwnedCurrency ownedCurrency = new OwnedCurrency();
 	public final @NonNull OwnedItems ownedItems = new OwnedItems();
+	
+	
+	/**
+	 * For testing
+	 */
+	public static class DummySessionData extends SessionData{
+		{
+			ownedCurrency.add(5000);
+		}
+	}
+
 }

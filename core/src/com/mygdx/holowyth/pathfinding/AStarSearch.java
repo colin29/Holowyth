@@ -8,8 +8,8 @@ import java.util.PriorityQueue;
 
 import org.eclipse.jdt.annotation.NonNull;
 
-import com.mygdx.holowyth.map.obstacledata.OrientedSeg;
 import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.world.map.obstacle.OrientedSeg;
 
 /**
  * Currently the result of an AStarSearch can be extracted from ancestor.

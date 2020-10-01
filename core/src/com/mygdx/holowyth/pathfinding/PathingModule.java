@@ -16,13 +16,13 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Polyline;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Queue;
-import com.mygdx.holowyth.map.obstacledata.OrientedPoly;
-import com.mygdx.holowyth.map.obstacledata.OrientedSeg;
-import com.mygdx.holowyth.map.simplemap.SimpleMap;
+import com.mygdx.holowyth.world.map.simplemap.SimpleMap;
 import com.mygdx.holowyth.pathfinding.PathSmoother.PathsInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Coord;
 import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.world.map.obstacle.OrientedPoly;
+import com.mygdx.holowyth.world.map.obstacle.OrientedSeg;
 
 /**
  * Handles pathfinding for the app's needs <br>

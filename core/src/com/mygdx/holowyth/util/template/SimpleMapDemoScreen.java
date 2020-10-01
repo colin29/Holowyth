@@ -9,7 +9,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.map.simplemap.SimpleMap;
+import com.mygdx.holowyth.world.map.simplemap.SimpleMap;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloIO;
 

@@ -1,10 +1,10 @@
 package com.mygdx.holowyth.gamedata.units;
 
 import com.mygdx.holowyth.gamedata.items.Weapons;
-import com.mygdx.holowyth.map.UnitMarker;
-import com.mygdx.holowyth.map.UnitMarker.TemplateUnitMarker;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.unit.Unit.Side;
+import com.mygdx.holowyth.world.map.UnitMarker;
+import com.mygdx.holowyth.world.map.UnitMarker.TemplateUnitMarker;
 
 @SuppressWarnings("unused")
 public class Monsters {

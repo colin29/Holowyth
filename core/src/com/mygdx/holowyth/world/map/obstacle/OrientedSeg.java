@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.map.obstacledata;
+package com.mygdx.holowyth.world.map.obstacle;
 
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.util.dataobjects.Segment;

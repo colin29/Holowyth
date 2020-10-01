@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.map.trigger;
+package com.mygdx.holowyth.world.map.trigger;
 
 import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
 

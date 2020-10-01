@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.map.simplemap;
+package com.mygdx.holowyth.world.map.simplemap;
 
 import java.io.Serializable;
 

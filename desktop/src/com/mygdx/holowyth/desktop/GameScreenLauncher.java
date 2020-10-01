@@ -5,7 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.gameScreen.StandardGameScreen;
 import com.mygdx.holowyth.gameScreen.combatDemo.CombatDemo;
-import com.mygdx.holowyth.gameScreen.town.TownScreen;
+import com.mygdx.holowyth.world.town.TownScreen;
 
 public class GameScreenLauncher {
 	public static void main(String[] arg) {

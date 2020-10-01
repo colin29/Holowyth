@@ -15,13 +15,13 @@ import com.mygdx.holowyth.gameScreen.ui.GameScreenUI;
 import com.mygdx.holowyth.gameScreen.ui.GameLogDisplay;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
-import com.mygdx.holowyth.map.trigger.TriggersHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
 import com.mygdx.holowyth.util.tools.Timer;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
+import com.mygdx.holowyth.world.map.trigger.TriggersHandler;
 
 /**
  * Offers the common functionality for playing one or more levels. Has all the modules to run a

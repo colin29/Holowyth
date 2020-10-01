@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.map;
+package com.mygdx.holowyth.world.map;
 
 public class MapOfMapLocations extends StringNonNullMap<Location> {
 	public boolean add(Location loc) {

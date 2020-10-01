@@ -7,7 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Paths;
 
-import com.mygdx.holowyth.map.simplemap.SimpleMap;
+import com.mygdx.holowyth.world.map.simplemap.SimpleMap;
 import com.mygdx.holowyth.util.exceptions.HoloException;
 /**
  * Utility methods related to disk access and paths

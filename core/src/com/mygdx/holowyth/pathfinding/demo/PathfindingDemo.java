@@ -32,7 +32,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.graphics.HoloGL;
-import com.mygdx.holowyth.map.simplemap.SimpleMap;
+import com.mygdx.holowyth.world.map.simplemap.SimpleMap;
 import com.mygdx.holowyth.pathfinding.UnitPF;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;

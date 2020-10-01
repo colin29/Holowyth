@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.map;
+package com.mygdx.holowyth.world.map;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,10 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.mygdx.holowyth.map.trigger.Trigger;
-import com.mygdx.holowyth.map.trigger.region.Region;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
+import com.mygdx.holowyth.world.map.trigger.Trigger;
+import com.mygdx.holowyth.world.map.trigger.region.Region;
 
 /**
  * Holds all the map information.

@@ -1,11 +1,11 @@
-package com.mygdx.holowyth.map;
+package com.mygdx.holowyth.world.map;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.holowyth.graphics.HoloGL;
-import com.mygdx.holowyth.map.trigger.region.RectRegion;
-import com.mygdx.holowyth.map.trigger.region.Region;
+import com.mygdx.holowyth.world.map.trigger.region.RectRegion;
+import com.mygdx.holowyth.world.map.trigger.region.Region;
 
 import space.earlygrey.shapedrawer.ShapeDrawer;
 

@@ -20,7 +20,6 @@ import com.mygdx.holowyth.collision.ObstaclePoint;
 import com.mygdx.holowyth.collision.ObstacleSeg;
 import com.mygdx.holowyth.collision.UnitAdapterCircleCB;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
-import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.pathfinding.UnitPF;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
@@ -32,12 +31,13 @@ import com.mygdx.holowyth.util.HoloAssert;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.exceptions.HoloOperationException;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
+import com.mygdx.holowyth.world.map.UnitMarker;
 
 /**
  * 
  * Processes everything happening in a running game map.  <br><br>
  * 
- * Technically a running level also uses a {@link com.mygdx.holowyth.map.GameMap} whose data can be changed dynamically. 
+ * Technically a running level also uses a {@link com.mygdx.holowyth.world.map.GameMap} whose data can be changed dynamically. 
  * 
  * Has map lifetime <br><br>
  * 

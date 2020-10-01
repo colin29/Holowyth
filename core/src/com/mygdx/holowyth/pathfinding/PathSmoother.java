@@ -8,9 +8,9 @@ import org.eclipse.jdt.annotation.NonNull;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.mygdx.holowyth.map.obstacledata.OrientedSeg;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
+import com.mygdx.holowyth.world.map.obstacle.OrientedSeg;
 
 public class PathSmoother {
 

@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.gameScreen.town;
+package com.mygdx.holowyth.world.town;
 
 import java.util.ArrayList;
 import java.util.List;

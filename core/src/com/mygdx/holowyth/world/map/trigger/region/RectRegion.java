@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.map.trigger.region;
+package com.mygdx.holowyth.world.map.trigger.region;
 
 import java.util.List;
 

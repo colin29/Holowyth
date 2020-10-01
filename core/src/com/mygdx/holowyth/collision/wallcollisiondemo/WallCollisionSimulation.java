@@ -18,12 +18,12 @@ import com.mygdx.holowyth.collision.ObstaclePoint;
 import com.mygdx.holowyth.collision.ObstacleSeg;
 import com.mygdx.holowyth.collision.collisiondemo.CircleCB;
 import com.mygdx.holowyth.collision.collisiondemo.CircleCBImpl;
-import com.mygdx.holowyth.map.obstacledata.OrientedPoly;
-import com.mygdx.holowyth.map.obstacledata.OrientedSeg;
-import com.mygdx.holowyth.map.obstacledata.Polygon;
-import com.mygdx.holowyth.map.simplemap.Polygons;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
+import com.mygdx.holowyth.world.map.obstacle.OrientedPoly;
+import com.mygdx.holowyth.world.map.obstacle.OrientedSeg;
+import com.mygdx.holowyth.world.map.obstacle.Polygon;
+import com.mygdx.holowyth.world.map.simplemap.Polygons;
 
 /**
  * Detects and calculates a collision between a moving object and a set of polygon obstacles

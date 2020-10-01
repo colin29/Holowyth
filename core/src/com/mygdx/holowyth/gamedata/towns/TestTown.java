@@ -1,8 +1,8 @@
 package com.mygdx.holowyth.gamedata.towns;
 
 
-import com.mygdx.holowyth.gameScreen.town.Town;
 import com.mygdx.holowyth.gamedata.items.Weapons;
+import com.mygdx.holowyth.world.town.Town;
 
 public class TestTown extends Town {
 	{

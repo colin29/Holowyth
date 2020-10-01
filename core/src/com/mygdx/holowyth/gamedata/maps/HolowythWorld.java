@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.gamedata.maps;
 
-import com.mygdx.holowyth.map.World;
+import com.mygdx.holowyth.world.map.World;
 
 /**
  * Stores a bunch of 'template' maps. To use the maps you should copy construct a new instance to use.

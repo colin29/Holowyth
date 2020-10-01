@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.map;
+package com.mygdx.holowyth.world.map;
 
 import java.util.ArrayList;
 import java.util.List;

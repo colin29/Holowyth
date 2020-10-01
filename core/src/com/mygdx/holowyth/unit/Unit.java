@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.mygdx.holowyth.ai.UnitAI;
 import com.mygdx.holowyth.gameScreen.MapInstance;
 import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
-import com.mygdx.holowyth.map.UnitMarker;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitPFWithPath;
 import com.mygdx.holowyth.skill.ActiveSkill;
@@ -23,6 +22,7 @@ import com.mygdx.holowyth.unit.interfaces.UnitStatusInfo;
 import com.mygdx.holowyth.unit.sprite.UnitGraphics;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.world.map.UnitMarker;
 
 /**
  * Responsibilities:<br>

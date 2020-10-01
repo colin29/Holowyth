@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.map.obstacledata;
+package com.mygdx.holowyth.world.map.obstacle;
 
 public class Polygon implements java.io.Serializable {
 

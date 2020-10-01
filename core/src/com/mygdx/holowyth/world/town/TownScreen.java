@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.gameScreen.town;
+package com.mygdx.holowyth.world.town;
 
 import org.eclipse.jdt.annotation.NonNull;
 

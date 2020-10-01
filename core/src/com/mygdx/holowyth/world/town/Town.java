@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.gameScreen.town;
+package com.mygdx.holowyth.world.town;
 
 /**
  * All towns are assumed to have exactly one shop, atm.
