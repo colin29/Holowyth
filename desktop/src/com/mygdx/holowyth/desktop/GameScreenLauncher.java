@@ -5,6 +5,7 @@ import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.gameScreen.StandardGameScreen;
 import com.mygdx.holowyth.gameScreen.combatDemo.CombatDemo;
+import com.mygdx.holowyth.gameScreen.town.TownScreen;
 
 public class GameScreenLauncher {
 	public static void main(String[] arg) {
@@ -15,6 +16,6 @@ public class GameScreenLauncher {
 		config.samples = 5;
 		config.vSyncEnabled = false;
 		config.foregroundFPS = 0;
-		new LwjglApplication(new Holowyth(StandardGameScreen.class), config);
+		new LwjglApplication(new Holowyth(TownScreen.class), config);
 	}
 }

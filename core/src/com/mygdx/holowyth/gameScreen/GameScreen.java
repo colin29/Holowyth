@@ -72,9 +72,6 @@ public abstract class GameScreen extends MapLoadingScreen {
 	
 	
 	// Gameplay
-	
-	protected final List<@NonNull Unit> playerUnits = new ArrayList<@NonNull Unit>();
-	
 
 	// Settings
 	private Color backgroundColor = HoloGL.rgb(79, 121, 66); // HoloGL.rbg(255, 236, 179);

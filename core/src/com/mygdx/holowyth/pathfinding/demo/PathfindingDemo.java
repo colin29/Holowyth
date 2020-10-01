@@ -356,9 +356,9 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 		// Create units
 		@NonNull PFDemoUnit unit = new PFDemoUnit(35, 20, this); 
 		units.add(unit);
+		unitControls.selectedUnits.add(unit);
 		playerUnit = unit;
 		
-		unitControls.selectedUnits.add(playerUnit);
 		createTestUnits();
 
 		orderMoveTo(playerUnit, CELL_SIZE * 22 + 10, CELL_SIZE * 15 + 20);

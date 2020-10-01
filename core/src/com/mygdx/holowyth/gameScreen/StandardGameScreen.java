@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.gameScreen.session.OwnedCurrency;
+import com.mygdx.holowyth.gameScreen.session.SessionData;
+import com.mygdx.holowyth.gameScreen.town.TownScreen;
 import com.mygdx.holowyth.gamedata.items.Weapons;
 import com.mygdx.holowyth.gamedata.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.gamedata.units.MonsterStats;
@@ -28,6 +31,9 @@ import com.mygdx.holowyth.vn.VNController;
  * 
  * The standard game screen. Populates the level from GameMap and manages UI for normal gameplay (as
  * opposed to a demo which does its own thing)
+ * 
+ * A StandardGameScreen instance correspond to a single session. If the player loads a different
+ * save file, a new screen will be made.
  *
  */
 public class StandardGameScreen extends GameScreen {
@@ -37,6 +43,8 @@ public class StandardGameScreen extends GameScreen {
 	private VNController vn;
 
 	private Unit lecia;
+	
+	private final @NonNull SessionData session = new SessionData();
 
 	public StandardGameScreen(Holowyth game) {
 		super(game);
@@ -46,7 +54,8 @@ public class StandardGameScreen extends GameScreen {
 		functionBindings.bindFunctionToKey(this::addLeciaToMapInstance, Keys.Z);
 		functionBindings.bindFunctionToKey(this::removeLeciaFromMapInstance, Keys.X);
 		functionBindings.bindFunctionToKey(() -> {
-			goToMap("forest2", "entrance_1");
+//			goToMap("forest2", "entrance_1");
+			goToTown();
 		}, Keys.G);
 
 		functionBindings.bindFunctionToKey(() -> { // center camera back on map
@@ -98,18 +107,22 @@ public class StandardGameScreen extends GameScreen {
 
 	public void goToMap(@NonNull String mapName, String locationName) {
 		if (isMapLoaded()) {
-			for (UnitInfo unit : playerUnits) {
+			for (UnitInfo unit : session.playerUnits) {
 				mapInstance.removeAndDetachUnitFromWorld((Unit) unit);
 			}
 		}
 		loadGameMapByName(mapName);
 		// map refers to new map now
 		Location arrivalLoc = map.getLocation(locationName);
-		placeUnits(arrivalLoc.pos, playerUnits);
+		placeUnits(arrivalLoc.pos, session.playerUnits);
 		// Center camera
 		camera.position.set(arrivalLoc.getX(), arrivalLoc.getY(), 0);
 		if (arrivalLoc instanceof Entrance)
 			((Entrance) arrivalLoc).disableTemporarily();
+	}
+
+	public void goToTown() {
+		game.setScreen(new TownScreen(game, session));
 	}
 
 	private List<Unit> placeUnits(Point spawnPos, List<@NonNull Unit> units) {
@@ -180,8 +193,9 @@ public class StandardGameScreen extends GameScreen {
 
 	private void addLeciaToMapInstance() {
 
-		@NonNull Unit lecia; //shadow with nonNull reference
-		if (this.lecia != null) { 
+		@NonNull
+		Unit lecia; // shadow with nonNull reference
+		if (this.lecia != null) {
 			lecia = this.lecia;
 		} else {
 			return;
@@ -210,7 +224,7 @@ public class StandardGameScreen extends GameScreen {
 
 	private void transportPlayerUnitsIfStandingOnEntrance() {
 		for (Entrance entrance : map.getEntrances()) {
-			if (entrance.isBeingTriggered(playerUnits)) {
+			if (entrance.isBeingTriggered(session.playerUnits)) {
 				if (entrance.dest != null) {
 					goToMap(entrance.dest.map, entrance.dest.loc);
 					return;
@@ -244,7 +258,7 @@ public class StandardGameScreen extends GameScreen {
 	public final void mapStartup() {
 		super.mapStartup();
 		if (!spawnedYet) {
-			playerUnits.addAll(testSpawnMultipleLecias(map.getLocation("default_spawn_location").pos, 8));
+			session.playerUnits.addAll(testSpawnMultipleLecias(map.getLocation("default_spawn_location").pos, 8));
 			spawnedYet = true;
 		}
 		if (lecia == null) {

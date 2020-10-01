@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jdt.annotation.NonNull;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.holowyth.unit.UnitStatValues;
@@ -21,31 +22,23 @@ public class Equip extends Item {
 		HEADGEAR, ARMOR, WEAPON, SHIELD, ACCESSORY
 	}
 
-	public EquipType equipType;
+	public @NonNull EquipType equipType;
 	public final UnitStatValues bonus = new UnitStatValues();
 	public boolean is2HWeapon;
 	/** Only applies for weapons. This is a relative value, 1 is the standard */
 	public float baseAtkSpd = 1; 
 
-	public Equip(String name, EquipType equipType) {
-		this.name = name;
+	public Equip(@NonNull String name, @NonNull EquipType equipType) {
+		super(name);
 		this.itemType = ItemType.EQUIP;
 		this.equipType = equipType;
 	}
-
-	public Equip(String name) {
-		this(name, false);
-	}
 	public Equip(Equip src) {
 		this(src.name, src.equipType);
+		
 		bonus.set(src.bonus);
 		is2HWeapon = src.is2HWeapon;
 		baseAtkSpd = src.baseAtkSpd;
-	}
-
-	public Equip(String name, boolean isTemplate) {
-		this.name = name;
-		this.isTemplate = isTemplate;
 	}
 
 
@@ -140,18 +133,12 @@ public class Equip extends Item {
 	
 	
 	public static class TemplateEquip extends Equip {
-		public TemplateEquip(String name, EquipType equipType) {
+		public TemplateEquip(@NonNull String name, @NonNull EquipType equipType) {
 			super(name, equipType);
 			markAsTemplate();
 		}
-
-		public TemplateEquip(String name) {
-			super(name);
-			markAsTemplate();
-		}
-
 	}
-	public Equip cloneObject() {
+	public @NonNull Equip cloneObject() {
 		return new Equip(this);
 	}
 	

@@ -55,6 +55,7 @@ public class LoadingScreen extends HoloBaseScreen {
 		loadTexture("img/cursors/cursor.png");
 		loadTexture("img/cursors/MagicCursor.png");
 		loadTexture("img/cursors/RetreatCursor.png");
+		loadTexture("img/bg/shop.jpg");
 
 	}
 

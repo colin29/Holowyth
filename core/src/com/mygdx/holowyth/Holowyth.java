@@ -19,6 +19,9 @@ import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.mygdx.holowyth.gameScreen.combatDemo.CombatDemo;
+import com.mygdx.holowyth.gameScreen.session.SessionData;
+import com.mygdx.holowyth.gameScreen.town.DummySessionData;
+import com.mygdx.holowyth.gameScreen.town.TownScreen;
 import com.mygdx.holowyth.gamedata.maps.HolowythWorld;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.map.World;
@@ -81,8 +84,7 @@ public class Holowyth extends Game {
 		new LoadingScreen(this);
 		this.assets.finishLoading();
 
-		setScreenToClass(screenClassToLoad);
-
+		createAndSetToScreen(screenClassToLoad);
 	}
 
 	private void initRendering() {
@@ -131,16 +133,20 @@ public class Holowyth extends Game {
 		fonts.init();
 	}
 
-	private void setScreenToClass(Class<? extends Screen> clazz) {
+	private void createAndSetToScreen(Class<? extends Screen> clazz) {
 		Constructor<?> cons;
 		try {
-			cons = screenClassToLoad.getConstructor(Holowyth.class);
+			cons = screenClassToLoad.getConstructor(Holowyth.class, SessionData.class);
 		} catch (NoSuchMethodException | SecurityException e1) {
 			e1.printStackTrace();
 			return;
 		}
 		try {
-			this.setScreen((Screen) cons.newInstance(this));
+			if(clazz == TownScreen.class) {
+				this.setScreen((Screen) cons.newInstance(this, new DummySessionData()));
+			}else {
+				this.setScreen((Screen) cons.newInstance(this));	
+			}
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
 				| InvocationTargetException e) {
 			e.printStackTrace();
