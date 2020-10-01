@@ -1,9 +1,11 @@
-package com.mygdx.holowyth.world.map;
+package com.mygdx.holowyth.world;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
+import com.mygdx.holowyth.world.map.GameMap;
+import com.mygdx.holowyth.world.map.StringNonNullMap;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 /**
@@ -18,6 +20,7 @@ public class World {
 	@SuppressWarnings("null")
 	Logger logger =  LoggerFactory.getLogger(this.getClass());
 	private final StringNonNullMap<GameMap> maps = new StringNonNullMap<GameMap>();
+//	private final StringNonNullMap<Town> town = new Town<>
 
 	public boolean putMap(GameMap map) {
 		map.isTemplate = true;

@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.gameScreen.rendering;
+package com.mygdx.holowyth.gameScreen.rendering.aiminggraphic;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;

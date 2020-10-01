@@ -41,7 +41,6 @@ import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.world.map.GameMap;
-import com.mygdx.holowyth.world.map.GameMapRenderer;
 
 /**
  * Handles all of GameScreenBase's rendering <br>

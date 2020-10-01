@@ -1,9 +1,11 @@
-package com.mygdx.holowyth.world.map;
+package com.mygdx.holowyth.gameScreen.rendering;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.holowyth.graphics.HoloGL;
+import com.mygdx.holowyth.world.map.GameMap;
+import com.mygdx.holowyth.world.map.Location;
 import com.mygdx.holowyth.world.map.trigger.region.RectRegion;
 import com.mygdx.holowyth.world.map.trigger.region.Region;
 

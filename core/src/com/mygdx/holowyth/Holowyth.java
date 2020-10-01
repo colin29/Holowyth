@@ -24,7 +24,7 @@ import com.mygdx.holowyth.gamedata.maps.HolowythWorld;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
-import com.mygdx.holowyth.world.map.World;
+import com.mygdx.holowyth.world.World;
 import com.mygdx.holowyth.world.town.TownScreen;
 
 public class Holowyth extends Game {
