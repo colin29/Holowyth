@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.gameScreen.session.OwnedCurrency;
 import com.mygdx.holowyth.gameScreen.session.SessionData;
 import com.mygdx.holowyth.gameScreen.town.TownScreen;
 import com.mygdx.holowyth.gamedata.items.Weapons;
