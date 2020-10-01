@@ -1,5 +1,6 @@
 package com.mygdx.holowyth.gamedata.maps;
 
+import com.mygdx.holowyth.gamedata.towns.TestTown;
 import com.mygdx.holowyth.world.World;
 
 /**
@@ -13,6 +14,7 @@ public class HolowythWorld extends World {
 		setAuthor("Rimilel");
 		putMap(new Forest1());
 		putMap(new Forest2());
+		putTown(new TestTown());
 	}
 
 	

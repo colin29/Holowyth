@@ -27,6 +27,7 @@ import com.mygdx.holowyth.world.map.Entrance.TownDestination;
 import com.mygdx.holowyth.world.map.Location;
 import com.mygdx.holowyth.world.map.UnitMarker;
 import com.mygdx.holowyth.world.map.trigger.Trigger;
+import com.mygdx.holowyth.world.town.Town;
 import com.mygdx.holowyth.world.town.TownScreen;
 
 /**
@@ -57,7 +58,7 @@ public class StandardGameScreen extends GameScreen {
 		functionBindings.bindFunctionToKey(this::removeLeciaFromMapInstance, Keys.X);
 		functionBindings.bindFunctionToKey(() -> {
 //			goToMap("forest2", "entrance_1");
-			goToTown();
+			goToTown("testTown");
 		}, Keys.G);
 
 		functionBindings.bindFunctionToKey(() -> { // center camera back on map
@@ -123,8 +124,11 @@ public class StandardGameScreen extends GameScreen {
 			((Entrance) arrivalLoc).disableTemporarily();
 	}
 
-	public void goToTown() {
-		game.setScreen(new TownScreen(game, session));
+	public void goToTown(String townName) {
+		Town town = game.world.getNewTownInstance(townName);
+		var townScreen = new TownScreen(game, session);
+		townScreen.loadTown(town);
+		game.setScreen(townScreen);
 	}
 
 	private List<Unit> placeUnits(Point spawnPos, List<@NonNull Unit> units) {
@@ -240,7 +244,9 @@ public class StandardGameScreen extends GameScreen {
 					goToMap(mapDest.map, mapDest.loc);
 					return;
 				}else if (dest instanceof TownDestination) {
-					//TODO send players to the town
+					var townDest = (TownDestination) dest;
+					goToTown(townDest.town);
+					return;
 				}
 			}
 		}

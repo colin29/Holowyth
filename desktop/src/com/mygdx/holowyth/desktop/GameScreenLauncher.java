@@ -16,6 +16,6 @@ public class GameScreenLauncher {
 		config.samples = 5;
 		config.vSyncEnabled = false;
 		config.foregroundFPS = 0;
-		new LwjglApplication(new Holowyth(TownScreen.class), config);
+		new LwjglApplication(new Holowyth(StandardGameScreen.class), config);
 	}
 }

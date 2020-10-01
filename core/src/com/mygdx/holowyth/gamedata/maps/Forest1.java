@@ -26,8 +26,9 @@ public class Forest1 extends GameMap {
 		setName("forest1");
 
 		{
-			locations.add(new Location("default_spawn_location", 100, 300));
-			locations.add(new Entrance("entrance_2", 1150, 635).setDest("forest2", "entrance_1"));
+			locations.add(new Location("default_spawn_location", 350, 350));
+			locations.add(new Entrance("entrance_1", 35, 215).setDestToTown("testTown"));
+			locations.add(new Entrance("entrance_2", 1150, 635).setDestToMap("forest2", "entrance_1"));
 		}
 		{
 			RectRegion r = new RectRegion(200, 100, 300, 200);

@@ -20,6 +20,14 @@ public class Shop {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 
+	public Shop() {
+	}
+	public Shop(Shop src) {
+		for(var itemStock: src.itemStocks) {
+			itemStocks.add(itemStock.cloneObject());
+		}
+	}
+	
 	private final List<@NonNull ItemStock> itemStocks = new ArrayList<>();
 	
 	public static class ItemStock {
@@ -32,12 +40,20 @@ public class Shop {
 			this.item = item;
 			this.costEa = costEa;
 		}
-		
-		public ItemStock(Item item, int costEa, int stock) {
+		public ItemStock(Item item, int costEa, int count) {
 			item.markAsTemplate();
 			this.item = item;
 			this.costEa = costEa;
-			this.count = stock;
+			this.count = count;
+		}
+		public ItemStock(ItemStock src) {
+			item = src.item.cloneObject();
+			item.markAsTemplate();
+			costEa = src.costEa;
+			count = src.count;
+		}
+		public ItemStock cloneObject() {
+			return new ItemStock(this);
 		}
 	}
 	
@@ -66,6 +82,10 @@ public class Shop {
 	
 	public List<@NonNull ItemStock> getItemStocks() {
 		return itemStocks;
+	}
+
+	public Shop cloneObject() {
+		return new Shop(this);
 	}
 	
 }

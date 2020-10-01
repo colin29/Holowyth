@@ -6,6 +6,7 @@ import com.mygdx.holowyth.world.town.Town;
 
 public class TestTown extends Town {
 	{
+	setName("testTown");
 	shop.addItemStock(Weapons.longSword, 350);
 	shop.addItemStock(Weapons.shortSword, 120);
 	shop.addItemStock(Weapons.staff, 50);

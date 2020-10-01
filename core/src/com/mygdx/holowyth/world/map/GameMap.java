@@ -70,9 +70,6 @@ public class GameMap {
 			Location loc = src.locations.get(s);
 			locations.put(s, loc.cloneObject());
 		}
-
-		
-		
 		for(UnitMarker u: src.unitMarkers) {
 			unitMarkers.add(new UnitMarker(u));
 		}
@@ -156,6 +153,8 @@ public class GameMap {
 		}
 		return entrances;
 	}
-	
+	public @NonNull GameMap cloneObject() {
+		return new GameMap(this);
+	}
 	
 }

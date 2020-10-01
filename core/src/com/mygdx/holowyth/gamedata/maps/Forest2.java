@@ -37,7 +37,7 @@ public class Forest2 extends GameMap {
 			unitMarkers.add(m);
 		}
 
-		locations.add(new Entrance("entrance_1", 50, 220).setDest("forest1", "entrance_2"));
+		locations.add(new Entrance("entrance_1", 50, 220).setDestToMap("forest1", "entrance_2"));
 
 	}
 }

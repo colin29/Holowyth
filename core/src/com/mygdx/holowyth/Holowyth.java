@@ -50,7 +50,7 @@ public class Holowyth extends Game {
 	public FileChooser fileChooser;
 	
 	/* Game */
-	public final World mapRepo = new HolowythWorld();
+	public final World world = new HolowythWorld();
 	
 	/* Sprite resources */
 	public Animations animations;
@@ -136,7 +136,7 @@ public class Holowyth extends Game {
 		Constructor<?> cons;
 		try {
 			if(clazz == TownScreen.class) {
-			cons = screenClassToLoad.getConstructor(Holowyth.class, SessionData.DummySessionData.class);
+			cons = screenClassToLoad.getConstructor(Holowyth.class, SessionData.class);
 			}else {
 				cons = screenClassToLoad.getConstructor(Holowyth.class);
 			}
@@ -146,7 +146,10 @@ public class Holowyth extends Game {
 		}
 		try {
 			if(clazz == TownScreen.class) {
-				this.setScreen((Screen) cons.newInstance(this, new SessionData.DummySessionData()));
+				var townScreen = new TownScreen(this, new SessionData.DummySessionData());
+				townScreen.loadTown(world.getNewTownInstance("testTown"));
+				this.setScreen(townScreen);
+				
 			}else {
 				this.setScreen((Screen) cons.newInstance(this));	
 			}

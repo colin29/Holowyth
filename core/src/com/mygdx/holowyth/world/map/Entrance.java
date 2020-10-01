@@ -18,59 +18,23 @@ public class Entrance extends Location {
 	
 	/** Null if the location has no destination */
 	public @Nullable Destination dest;
-		
+	
 	private transient int inactiveFramesRemaining; 
-	
-	public static class Destination{
-		public Destination() {
-		}
-		public Destination(Destination src) {
-		}
-		public Destination cloneObject() {
-			return new Destination(this);
-		}
-	}
-	
-	
-	public static class MapDestination extends Destination{
-		public String map;
-		public String loc;
-		public MapDestination(String map, String loc) {
-			this.map = map;
-			this.loc = loc;
-		}
-		public MapDestination(MapDestination src) {
-			map = src.map;
-			loc = src.loc;
-		}
-		public MapDestination cloneObject() {
-			return new MapDestination(this);
-		}
-	}
-	public static class TownDestination extends Destination{
-		public String town;
-		public TownDestination(String town) {
-			this.town=town;
-		}
-		public TownDestination(TownDestination src) {
-			town = src.town;
-		}
-		public TownDestination cloneObject() {
-			return new TownDestination(this);
-		}
-	}
-	
 	
 	public Entrance(String name, float x, float y) {
 		super(name, x, y);
 	}
 	public Entrance(Entrance src) {
 		super(src);
-		dest = src.dest!=null ? new Destination(src.dest) : null;
+		dest = src.dest!=null ? src.dest.cloneObject() : null;
 	}
 	
-	public Entrance setDest(String destMap, String destLoc) {
+	public Entrance setDestToMap(String destMap, String destLoc) {
 		dest = new MapDestination(destMap, destLoc);
+		return this;
+	}
+	public Entrance setDestToTown(String destTown) {
+		dest = new TownDestination(destTown);
 		return this;
 	}
 	public void clearDest() {
@@ -101,5 +65,48 @@ public class Entrance extends Location {
 	@Override
 	public Location cloneObject() {
 		return new Entrance(this);
+	}
+
+	public static class Destination{
+		public Destination() {
+		}
+		public Destination(Destination src) {
+		}
+		public Destination cloneObject() {
+			return new Destination(this);
+		}
+	}
+
+
+	public static class MapDestination extends Destination{
+		public String map;
+		public String loc;
+		public MapDestination(String map, String loc) {
+			this.map = map;
+			this.loc = loc;
+		}
+		public MapDestination(MapDestination src) {
+			super(src);
+			map = src.map;
+			loc = src.loc;
+		}
+		public MapDestination cloneObject() {
+			return new MapDestination(this);
+		}
+	}
+
+
+	public static class TownDestination extends Destination{
+		public String town;
+		public TownDestination(String town) {
+			this.town=town;
+		}
+		public TownDestination(TownDestination src) {
+			super(src);
+			town = src.town;
+		}
+		public TownDestination cloneObject() {
+			return new TownDestination(this);
+		}
 	}
 }

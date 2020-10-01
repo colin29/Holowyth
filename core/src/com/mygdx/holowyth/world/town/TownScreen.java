@@ -1,6 +1,8 @@
 package com.mygdx.holowyth.world.town;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -11,7 +13,10 @@ import com.mygdx.holowyth.gameScreen.session.SessionData;
 import com.mygdx.holowyth.gamedata.towns.TestTown;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;
 
+
 public class TownScreen extends HoloBaseScreen {
+	
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	private Town town;
 	
 	public TownScreen(Holowyth game, @NonNull SessionData session) {
@@ -30,6 +35,7 @@ public class TownScreen extends HoloBaseScreen {
 	}
 	
 	public void loadTown(@NonNull Town town){
+		logger.info("Loaded town '{}'", town.getName());
 		this.town = town;
 		Drawable bg = new TextureRegionDrawable(assets.get("img/bg/shop.jpg", Texture.class));
 		root.setBackground(bg);
