@@ -8,12 +8,11 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.gameScreen.StandardGameScreen;
 import com.mygdx.holowyth.gameScreen.session.SessionData;
+import com.mygdx.holowyth.gamedata.items.Weapons;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;
 
 public class TownScreen extends HoloBaseScreen {
-
-	
-	private final Shop shop;
+	protected final Shop shop;
 	
 	public TownScreen(Holowyth game, @NonNull SessionData session) {
 		this(game, session, null);
@@ -26,6 +25,14 @@ public class TownScreen extends HoloBaseScreen {
 		
 		Drawable bg = new TextureRegionDrawable(assets.get("img/bg/shop.jpg", Texture.class));
 		root.setBackground(bg);
+		
+		shop.addItemStock(Weapons.longSword, 350);
+		shop.addItemStock(Weapons.shortSword, 120);
+		shop.addItemStock(Weapons.staff, 50);
+		shop.addItemStock(Weapons.dagger, 50);
+		
+		shop.purchase(shop.getItemStocks().get(0));
+		
 	}
 
 	@Override

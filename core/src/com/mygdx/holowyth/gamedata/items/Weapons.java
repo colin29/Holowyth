@@ -1,5 +1,7 @@
 package com.mygdx.holowyth.gamedata.items;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
 import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.unit.item.Equip.TemplateEquip;
 import com.mygdx.holowyth.unit.item.Equip.EquipType;
@@ -10,6 +12,7 @@ import com.mygdx.holowyth.unit.item.Equip.EquipType;
  * Generally weaker equips are listed first
  *
  */
+@NonNullByDefault
 public class Weapons {
 
 	
