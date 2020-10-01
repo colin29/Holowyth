@@ -7,12 +7,14 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.world.town.Shop.ItemStock;
 
 /**
@@ -28,18 +30,20 @@ public class ShopUI implements Shop.ShopChangedListener {  // Give it a stage
 	private final ShopSession session;
 	private final Shop shop;
 	private Skin skin;
+	private final Stage stage;
 	
 	@SuppressWarnings("null")
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
 	
 	public ShopUI(ShopSession session, Stage stage, Skin skin) {
+		this.stage = stage;
 		this.session = session;
 		this.shop = session.getShop();
 		this.skin = skin;
 		currencyOwned = new Label("", skin);
 		createUI(shop, stage);
-		root.setDebug(true, true);
+//		root.setDebug(true, true);
 		shop.addListener(this);
 		
 		update();
@@ -72,22 +76,26 @@ public class ShopUI implements Shop.ShopChangedListener {  // Give it a stage
 		Label[]  labels = new Label[3];
 		labels[0] = new Label(entry.item.name, skin);
 		labels[1] = new Label(String.format("(x%s)", entry.count), skin);
-		labels[2] = new Label(String.format("[x%s]", entry.costEa), skin);
-		
-		for(var label : labels) {
-			label.addListener(new ClickListener() {
+		labels[2] = new Label(String.format("[%ssp]", entry.costEa), skin);
+		for(int i=0;i<labels.length;i++) {
+			labels[i].addListener(new InputListener() {
 				@Override
-				public void clicked(@Nullable InputEvent event, float x, float y) {
-					makePurchaseConfirmationDialog(entry);
+				public boolean touchDown(@Nullable InputEvent event, float x, float y, int pointer, int button) {
+					createPurchaseConfirmationDialog(entry);
+					return true;
 				}
 			});
-			listings.add(label);
+			if(i!=0) {
+				labels[i].setAlignment(Align.center);
+			}
+			listings.add(labels[i]).fill().space(10);
 		}
 		
 	}
 	
-	private void makePurchaseConfirmationDialog(ItemStock entry) {
+	private void createPurchaseConfirmationDialog(ItemStock entry) {
 		logger.debug("Hi!");
+		HoloUI.confirmationDialog(stage, skin, String.format("Purchase '%s'  for %ssp?", entry.item.name, entry.costEa), "", "Purchase", ()->{session.purchase(entry);});
 	}
 
 	/**

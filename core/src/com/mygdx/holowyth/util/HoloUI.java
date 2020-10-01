@@ -136,11 +136,9 @@ public class HoloUI {
 	/**
 	 * Creates an exit button
 	 * 
-	 * @param table
-	 *            Location to add the button
+	 * @param table  Location to add the button
 	 * @param skin
-	 * @param parent
-	 *            UI element which the button should close
+	 * @param parent UI element which the button should close
 	 * @return The enclosing cell for the new button
 	 */
 	public static Cell<TextButton> exitButton(Table table, Skin skin, final Actor parent) {
@@ -152,42 +150,67 @@ public class HoloUI {
 		});
 	}
 
-	public static void confirmationDialog(boolean condition, Stage stage, Skin skin, String titleText,
+	public static void confirmationDialogIfConditionWithAlternateAction(boolean condition, Stage stage, Skin skin, String titleText,
 			String contentText, String doAlteredText, String doOriginalText, Runnable alteredAction,
 			Runnable originalAction) {
 
 		if (condition) {
-			Dialog dialog = new Dialog(titleText, skin);
-			stage.addActor(dialog);
-
-			Table contents = dialog.getContentTable();
-			contents.add(new Label(contentText, skin));
-
-			Table buttons = dialog.getButtonTable();
-			textButton(buttons, doAlteredText, skin, () -> {
-				alteredAction.run();
-				dialog.remove();
-			});
-			textButton(buttons, doOriginalText, skin, () -> {
-				originalAction.run();
-				dialog.remove();
-			});
-			textButton(buttons, "Cancel", skin, () -> {
-				dialog.remove();
-			});
-			dialog.pack();
-			centerOnStage(dialog);
+			confirmationDialogWithAlternateAction(stage, skin, titleText, contentText, doAlteredText, doOriginalText, alteredAction, originalAction);
 		} else {
 			originalAction.run();
 		}
 
 	}
 
+	public static void confirmationDialogWithAlternateAction(Stage stage, Skin skin, String titleText, String contentText,
+			String doAlteredText, String doOriginalText, Runnable alteredAction, Runnable originalAction) {
+
+		Dialog dialog = new Dialog(titleText, skin);
+		stage.addActor(dialog);
+
+		Table contents = dialog.getContentTable();
+		contents.add(new Label(contentText, skin));
+
+		Table buttons = dialog.getButtonTable();
+		textButton(buttons, doAlteredText, skin, () -> {
+			alteredAction.run();
+			dialog.remove();
+		});
+		textButton(buttons, doOriginalText, skin, () -> {
+			originalAction.run();
+			dialog.remove();
+		});
+		textButton(buttons, "Cancel", skin, () -> {
+			dialog.remove();
+		});
+		dialog.pack();
+		centerOnStage(dialog);
+	}
+	public static void confirmationDialog(Stage stage, Skin skin, String titleText, String contentText,
+			String doOriginalText, Runnable originalAction) {
+
+		Dialog dialog = new Dialog(titleText, skin);
+		stage.addActor(dialog);
+
+		Table contents = dialog.getContentTable();
+		contents.add(new Label(contentText, skin));
+
+		Table buttons = dialog.getButtonTable();
+		textButton(buttons, doOriginalText, skin, () -> {
+			originalAction.run();
+			dialog.remove();
+		});
+		textButton(buttons, "Cancel", skin, () -> {
+			dialog.remove();
+		});
+		dialog.pack();
+		centerOnStage(dialog);
+	}
+
 	/**
 	 * Creates a parameter slider for quickly adjusting the values of parameters
 	 * 
-	 * @param action
-	 *            This should be a lambda which takes in a float and sets the parameter
+	 * @param action This should be a lambda which takes in a float and sets the parameter
 	 */
 	public static void parameterSlider(float minVal, float maxVal, String parameterName, Table parent, Skin skin,
 			FloatConsumer action) {

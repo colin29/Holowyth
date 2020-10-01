@@ -34,6 +34,10 @@ public class ShopSession {
 		if(!shop.getItemStocks().contains(itemStock))
 			throw new HoloIllegalArgumentsException("Tried to purchase item entry not in store");
 		if(customerFunds.canAfford(itemStock.costEa)) {
+			if(itemStock.count < 1) {
+				logger.warn("Insufficient stock: purchase not made");
+				return false;
+			}
 			logger.debug("Purchased '{}' from shop", itemStock.item.name);
 			customerFunds.subtract(itemStock.costEa);
 			customerItems.addItem(itemStock.item.cloneObject());

@@ -140,8 +140,8 @@ public abstract class GameScreen extends MapLoadingScreen {
 		ifTimeElapsedTickGame();
 
 		handleMousePanning(delta);
+		
 		renderer.render(delta);
-
 		ui.render();
 	}
 
