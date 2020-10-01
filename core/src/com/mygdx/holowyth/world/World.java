@@ -5,7 +5,8 @@ import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 import com.mygdx.holowyth.world.map.GameMap;
-import com.mygdx.holowyth.world.map.StringNonNullMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 /**
@@ -19,25 +20,25 @@ public class World {
 
 	@SuppressWarnings("null")
 	Logger logger =  LoggerFactory.getLogger(this.getClass());
-	private final StringNonNullMap<GameMap> maps = new StringNonNullMap<GameMap>();
-//	private final StringNonNullMap<Town> town = new Town<>
+	private final Map<String, GameMap> maps = new LinkedHashMap<String,GameMap>();
 
-	public boolean putMap(GameMap map) {
+	public void putMap(GameMap map) {
 		map.isTemplate = true;
-		if(maps.has(map.getName()))
+		if(maps.containsKey(map.getName()))
 			logger.warn("Map {} already exists in repo, replacing", map.getName());
-		return maps.put(map.getName(), map);
+		maps.put(map.getName(), map);
+		return;
 	}
 
 	public boolean hasMap(String name) {
-		return maps.has(name);
+		return maps.containsKey(name);
 	}
 
 	/**
 	 * @throw {@link HoloResourceNotFoundException} if map isn't found
 	 */
 	public GameMap getNewMapInstance(String name) {
-		if(maps.has(name)) {
+		if(maps.containsKey(name)) {
 			return new GameMap(maps.get(name));
 		}else {
 			throw new HoloResourceNotFoundException("Map not found: " + name);

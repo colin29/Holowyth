@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 
 import com.mygdx.holowyth.unit.Unit;
 
@@ -11,10 +12,12 @@ import com.mygdx.holowyth.unit.Unit;
  * @author Colin
  *
  */
+
+@NonNullByDefault
 public class SessionData {
 	public final List<@NonNull Unit> playerUnits = new ArrayList<@NonNull Unit>();
-	public final @NonNull OwnedCurrency ownedCurrency = new OwnedCurrency();
-	public final @NonNull OwnedItems ownedItems = new OwnedItems();
+	public final OwnedCurrency ownedCurrency = new OwnedCurrency();
+	public final OwnedItems ownedItems = new OwnedItems();
 	
 	
 	/**

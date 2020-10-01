@@ -21,6 +21,9 @@ import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 import com.mygdx.holowyth.vn.VNController;
 import com.mygdx.holowyth.world.map.Entrance;
+import com.mygdx.holowyth.world.map.Entrance.Destination;
+import com.mygdx.holowyth.world.map.Entrance.MapDestination;
+import com.mygdx.holowyth.world.map.Entrance.TownDestination;
 import com.mygdx.holowyth.world.map.Location;
 import com.mygdx.holowyth.world.map.UnitMarker;
 import com.mygdx.holowyth.world.map.trigger.Trigger;
@@ -224,9 +227,20 @@ public class StandardGameScreen extends GameScreen {
 	private void transportPlayerUnitsIfStandingOnEntrance() {
 		for (Entrance entrance : map.getEntrances()) {
 			if (entrance.isBeingTriggered(session.playerUnits)) {
-				if (entrance.dest != null) {
-					goToMap(entrance.dest.map, entrance.dest.loc);
+				
+				@NonNull Destination dest;
+				if(entrance.dest != null) {
+					dest = entrance.dest;
+				}else {
+					continue;
+				}
+				
+				if(dest instanceof MapDestination) {
+					var mapDest = (MapDestination) dest;
+					goToMap(mapDest.map, mapDest.loc);
 					return;
+				}else if (dest instanceof TownDestination) {
+					//TODO send players to the town
 				}
 			}
 		}

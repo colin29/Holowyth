@@ -112,7 +112,7 @@ public class GameMap {
 		return tilemap != null;
 	}
 	
-	public String getName() {
+	public @NonNull String getName() {
 		return name;
 	}
 	/**
