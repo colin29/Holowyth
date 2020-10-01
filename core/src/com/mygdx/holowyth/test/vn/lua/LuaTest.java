@@ -3,7 +3,7 @@ package com.mygdx.holowyth.test.vn.lua;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.wizered67.vnlib.scripting.lua.LuaScriptManager;
+import com.wizered67.game.scripting.lua.LuaScriptManager;
 
 public class LuaTest {
 	

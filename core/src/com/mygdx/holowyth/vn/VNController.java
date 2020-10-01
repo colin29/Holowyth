@@ -8,11 +8,11 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.wizered67.vnlib.VNHubManager;
-import com.wizered67.vnlib.conversations.Conversation;
-import com.wizered67.vnlib.conversations.ConversationController;
-import com.wizered67.vnlib.gui.GUIManager;
-import com.wizered67.vnlib.inputs.ControlInputAdapter;
+import com.wizered67.game.VNHubManager;
+import com.wizered67.game.conversations.Conversation;
+import com.wizered67.game.conversations.ConversationController;
+import com.wizered67.game.gui.GUIManager;
+import com.wizered67.game.inputs.ControlInputAdapter;
 
 /**
  * To use, construct an instance, call startConversation and show()

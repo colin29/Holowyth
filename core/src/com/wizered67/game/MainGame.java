@@ -1,5 +1,7 @@
-package com.mygdx.holowyth.vn;
+package com.wizered67.game;
 
+import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -7,73 +9,71 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.wizered67.game.Constants;
-import com.wizered67.game.MusicManager;
-import com.wizered67.game.VNHub;
-import com.wizered67.game.VNHubManager;
 import com.wizered67.game.assets.Assets;
+import com.wizered67.game.conversations.Conversation;
 import com.wizered67.game.conversations.ConversationController;
 import com.wizered67.game.gui.GUIManager;
 import com.wizered67.game.inputs.Controls;
 import com.wizered67.game.saving.SaveManager;
+import com.wizered67.game.screens.LoadingScreen;
+import com.wizered67.game.screens.MainGameScreen;
 
-/**
- * Responsible for init'ing modules and resources, and loading all the assets on construction.
- * 
- * After creating an instance of this, the static VNHubManager is used to access resources. Don't need to keep a reference to this.
- * 
- * @author Colin
- *
- */
-public class VNHubImpl implements VNHub {
-	   
+public class MainGame extends Game implements VNHub{
+    
     //Modules
     private GUIManager guiManager;
     private ConversationController conversationController;
     private Controls controls;
     private Assets assetManager;
 	private MusicManager musicManager;
+    
+	private MainGameScreen gameScreen; 
 	
-	//Resources to be inherited from my main game / stage
-	private InputMultiplexer multiplexer;
-	private SpriteBatch batch;
-	private OrthographicCamera camera;
-	
-	// Resources not sure if shared.
+	//Resources
+	private InputMultiplexer inputMultiplexer;
+	private SpriteBatch mainBatch;
+	private OrthographicCamera mainCamera;
 	private Viewport mainViewport;
 	private Viewport guiViewport;
 
-	
-	public VNHubImpl(Stage stage, SpriteBatch batch, OrthographicCamera camera, InputMultiplexer multiplexer){
-		
+	@Override
+	public void create() {
+		VNHubManager.init(this);
 
-        // Fetch our shared resources
-        this.batch = batch;
-        this.camera = camera;
-        this.multiplexer = multiplexer;
-        
-        //  Init modules
-        
-        VNHubManager.init(this);
-        
-        controls = new Controls();
+		initInput();
 
 		assetManager = new Assets();
         musicManager = new MusicManager();
-        
+        mainBatch = new SpriteBatch();
+
+        mainCamera = new OrthographicCamera();
+        mainCamera.setToOrtho(false);
         mainViewport = new ExtendViewport(Constants.VIRTUAL_WIDTH, Constants.VIRTUAL_HEIGHT,
 				Constants.MAX_VIEWPORT_WORLD_WIDTH, Constants.MAX_VIEWPORT_WORLD_HEIGHT);
         guiViewport = new ScreenViewport();
 
-        guiManager = new GUIManager(stage);  // use our pre-existing stage
+        guiManager = new GUIManager(new Stage(guiViewport));
         conversationController = guiManager.conversationController();
 		SaveManager.init();
 		VNHubManager.assetManager().loadGroup("common");
-		
-		assetManager.finishLoading();
-		
-		// VNHub's job is finished here. All it does is init modules and load resources.
-		
+		gameScreen = new MainGameScreen();
+		setScreen(new LoadingScreen(new LoadingScreen.LoadResult() {
+			@Override
+			public void finishLoading() {
+				setScreen(gameScreen);
+				
+				final String convoToLoad = "myConv.conv";  //"demonstration.conv"
+				
+				conversationController.setConv(VNHubManager.assetManager().get(convoToLoad, Conversation.class));
+				conversationController.setBranch("default");
+			}
+		}));
+	}
+
+	private void initInput() {
+		controls = new Controls();
+		inputMultiplexer = new InputMultiplexer();
+		Gdx.input.setInputProcessor(inputMultiplexer);
 	}
 
 	@Override
@@ -113,16 +113,17 @@ public class VNHubImpl implements VNHub {
 
 	@Override
 	public InputMultiplexer inputMultiplexer() {
-		return multiplexer;
+		return inputMultiplexer;
 	}
 
 	@Override
 	public SpriteBatch mainBatch() {
-		return batch;
+		return mainBatch;
 	}
 
 	@Override
 	public OrthographicCamera mainCamera() {
-		return camera;
+		return mainCamera;
 	}
+	
 }

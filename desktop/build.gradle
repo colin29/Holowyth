@@ -23,7 +23,7 @@ sourceSets {
             srcDirs = ['src']
         }
         resources {
-            srcDirs = ['resources', '../lib/ProjectVisualNovel/desktop/assets']
+            srcDirs = ['resources']
             exclude 'assets/maps/Tilesets/raw/**'
         }
     }
