@@ -12,6 +12,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.game.base.GameScreen;
 import com.mygdx.holowyth.game.session.SessionData;
+import com.mygdx.holowyth.game.ui.InventoryDisplay;
 import com.mygdx.holowyth.game.ui.WornEquipsDisplay;
 import com.mygdx.holowyth.gamedata.items.Weapons;
 import com.mygdx.holowyth.gamedata.skillsandeffects.PassiveSkills;
@@ -72,8 +73,21 @@ public class StandardGameScreen extends GameScreen {
 
 		loadGameMapByName("forest1");
 		
+		session.playerUnits.addAll(testSpawnMultipleLecias(map.getLocation("default_spawn_location").pos, 1));
+		lecia = session.playerUnits.get(0);
+		
+		for(Unit u : session.playerUnits) {
+			u.setInventory(session.ownedItems); 
+		}
+		
 		new WornEquipsDisplay(lecia.equip.getWornEquips(), stage, skin, game.assets);
-		lecia.equip.equip(Weapons.mace);
+		lecia.equip.equip(Weapons.mace.cloneObject());
+		
+		session.ownedItems.addItem(Weapons.spear.cloneObject());
+		session.ownedItems.addItem(Weapons.club.cloneObject());
+		session.ownedItems.addItem(Weapons.club.cloneObject());
+		new InventoryDisplay(stage, skin, session.ownedItems);
+		session.ownedItems.addItem(Weapons.dagger.cloneObject());
 	}
 
 	/**
@@ -276,18 +290,11 @@ public class StandardGameScreen extends GameScreen {
 		Gdx.input.setInputProcessor(multiplexer);
 	}
 
-	private boolean spawnedYet;
 
 	@Override
 	public final void mapStartup() {
 		super.mapStartup();
-		if (!spawnedYet) {
-			session.playerUnits.addAll(testSpawnMultipleLecias(map.getLocation("default_spawn_location").pos, 1));
-			spawnedYet = true;
-		}
-		lecia = session.playerUnits.get(0);
 
-		
 		placeUnitsAccordingToUnitMarkers();
 		loadMapTriggers();
 	}

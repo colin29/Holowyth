@@ -3,11 +3,15 @@ package com.mygdx.holowyth.world.map;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.UnitStatValues;
 import com.mygdx.holowyth.unit.WornEquips;
+import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
@@ -18,6 +22,7 @@ import com.mygdx.holowyth.util.dataobjects.Point;
  * @author Colin
  *
  */
+@NonNullByDefault
 public class UnitMarker {
 	
 	public boolean isTemplate = false;
@@ -29,10 +34,11 @@ public class UnitMarker {
 	public final List<ActiveSkill> activeSkills = new ArrayList<ActiveSkill>();
 	public final List<Skill> passiveSkills = new ArrayList<Skill>();
 
-	public String animatedSpriteName;
+	public @Nullable String animatedSpriteName;
 
 	public UnitMarker() {
 		 wornEquips = new WornEquips();
+		 side = Side.ENEMY;  // default to avoid null
 	}
 	public UnitMarker(UnitMarker src) {
 		name = src.name;

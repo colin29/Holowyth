@@ -12,6 +12,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mygdx.holowyth.game.session.OwnedItems;
 import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 
@@ -21,6 +22,11 @@ import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 @NonNullByDefault
 public class WornEquips {
 
+	/**
+	 * If set, de-equipped items are added to this inventory
+	 */
+	@Nullable private OwnedItems inventory;
+	
 	@SuppressWarnings("null")
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -64,7 +70,6 @@ public class WornEquips {
 	}
 
 	/**
-	 * 
 	 * @return true if the equip was successful
 	 */
 	public boolean equip(Equip item) {
@@ -123,17 +128,39 @@ public class WornEquips {
 
 	public boolean unequip(Equip item) {
 		if (!hasEquipped(item)) {
-			logger.info("Tried to unequip {}, but item is not equipped by this", item.name);
+			logger.warn("Tried to unequip {}, but item is not equipped by this", item.name);
 			return false;
 		}
-		for (WornEquips.Slot slot : WornEquips.Slot.values()) {
+		boolean wasPresent = false;
+		for (WornEquips.Slot slot : WornEquips.Slot.values()) { // in case of 2-handed wep both slots removed
 			if (equips.get(slot) == item) {
 				equips.remove(slot);
+				wasPresent = true;
 			}
 		}
-		changed();
-		return true;
+		if(wasPresent) {
+			changed();
+			if(inventory != null) {
+				inventory.addItem(item);
+			}
+			logger.debug("Un-equipped '{}'", item.name);
+			return true;
+		}
+		return false;
 	}
+	
+	/**
+	 * @return true if an equip existed in that slot
+	 */
+	public boolean unequip(Slot slot) {
+		if(equips.containsKey(slot)) {
+			unequip(equips.get(slot));
+			return true;
+		}else {
+			return false;
+		}
+	}
+	
 
 	public boolean hasEquipped(Equip equip) {
 		for (var wornEquip : equips.values()) {
@@ -182,5 +209,9 @@ public class WornEquips {
 
 	public static interface EquippedItemsListener {
 		public abstract void changed();
+	}
+
+	public void setInventory(OwnedItems inventory) {
+		this.inventory = inventory;
 	}
 }

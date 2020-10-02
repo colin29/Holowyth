@@ -4,12 +4,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.ai.UnitAI;
 import com.mygdx.holowyth.game.MapInstance;
 import com.mygdx.holowyth.game.MapInstanceInfo;
+import com.mygdx.holowyth.game.session.OwnedItems;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitPFWithPath;
 import com.mygdx.holowyth.skill.ActiveSkill;
@@ -135,8 +137,8 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	/**
 	 * Create unit from marker
 	 */
-	public Unit(UnitMarker m, MapInstanceInfo world) {
-		this(m.pos.x, m.pos.y, world, m.side, m.name);
+	public Unit(UnitMarker m, MapInstanceInfo mapInstance) {
+		this(m.pos.x, m.pos.y, mapInstance, m.side, m.name);
 
 		stats.base.set(m.baseStats);
 
@@ -145,8 +147,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 		skills.slotSkills(m.activeSkills);
 		equip.equipAllFromTemplate(m.wornEquips);
 
-		graphics.setAnimatedSprite(world.getAnimations().get(m.animatedSpriteName));
-
+		graphics.setAnimatedSprite(mapInstance.getAnimations().get(m.animatedSpriteName));
 	}
 
 	/** Specifically for units that have been initialized and removed from a world once */
@@ -579,6 +580,9 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	@Override
 	public UnitStatusInfo getStatus() {
 		return status;
+	}
+	public void setInventory(@NonNull OwnedItems owned) {
+		equip.getWornEquips().setInventory(owned);
 	}
 
 }

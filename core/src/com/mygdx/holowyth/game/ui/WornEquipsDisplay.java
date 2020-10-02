@@ -1,24 +1,33 @@
 package com.mygdx.holowyth.game.ui;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mygdx.holowyth.unit.WornEquips;
 import com.mygdx.holowyth.unit.WornEquips.EquippedItemsListener;
 import com.mygdx.holowyth.unit.WornEquips.Slot;
 import com.mygdx.holowyth.unit.item.Equip;
 
 
+
 @NonNullByDefault
 public class WornEquipsDisplay extends SingleUseUIWidget implements EquippedItemsListener {
 
+	@SuppressWarnings("null")
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	Table equipsDisplay = new Table();
 	
 	WornEquips worn;
@@ -29,15 +38,15 @@ public class WornEquipsDisplay extends SingleUseUIWidget implements EquippedItem
 		super(stage, skin);
 		this.worn = worn;
 		worn.addListener(this);
-		createEquipsDisplay();
+		createDisplay();
 		root.debugAll();
 		
-		Texture tex = assets.get("img/sprites/head/Sonia1.png", Texture.class);
+		Texture tex = assets.get("img/sprites/head/Sonia.png", Texture.class);
 		soniaFace = new Image(tex);
 		
 	}
 	
-	private void createEquipsDisplay(){
+	private void createDisplay(){
 		root.add(equipsDisplay);
 		regenerateDisplay();
 		
@@ -76,6 +85,19 @@ public class WornEquipsDisplay extends SingleUseUIWidget implements EquippedItem
 		}else{
 			entry.setText(equip.name);
 		}
+		entry.addListener(new ClickListener() {
+			{
+//				setTapCountInterval()
+			}
+			@Override
+			public void clicked(@Nullable InputEvent event, float x, float y) {
+				logger.debug("tap count: {}", getTapCount());
+				if(getTapCount() == 2) {
+					worn.unequip(slot);
+				}
+			}
+			
+		});
 		return entry;
 	}
 
