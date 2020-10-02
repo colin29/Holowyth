@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
 	<name>Holowyth-desktop</name>
-	<comment>Project Holowyth-desktop created by Buildship.</comment>
+	<comment></comment>
 	<projects>
 	</projects>
 	<buildSpec>
@@ -20,10 +20,4 @@
 		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<variableList>
-		<variable>
-			<name>copy_PARENT</name>
-			<value>$%7BPARENT-2-PROJECT_LOC%7D/Holowyth</value>
-		</variable>
-	</variableList>
 </projectDescription>
