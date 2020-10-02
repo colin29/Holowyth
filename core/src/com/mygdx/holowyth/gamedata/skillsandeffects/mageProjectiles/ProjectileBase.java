@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
+import com.mygdx.holowyth.game.MapInstanceInfo;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;

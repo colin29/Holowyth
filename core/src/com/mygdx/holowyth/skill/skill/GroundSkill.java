@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.skill.skill;
 
-import com.mygdx.holowyth.gameScreen.rendering.aiminggraphic.AimingGraphic;
+import com.mygdx.holowyth.game.rendering.aiminggraphic.AimingGraphic;
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.unit.Unit;
 

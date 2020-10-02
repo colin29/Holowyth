@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.mygdx.holowyth.gameScreen.MapInstance;
+import com.mygdx.holowyth.game.MapInstance;
 import com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles.ArcaneBoltBolt;
 import com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles.FireballBolt;
 import com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles.MagicMissileBolt;

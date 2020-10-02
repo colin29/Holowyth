@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.unit.interfaces;
 
-import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
+import com.mygdx.holowyth.game.MapInstanceInfo;
 import com.mygdx.holowyth.skill.SkillInfo;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.UnitMotion;

@@ -7,8 +7,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.jdt.annotation.NonNullByDefault;
-
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.assets.AssetManager;
@@ -22,14 +20,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.kotcrab.vis.ui.VisUI;
 import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
-import com.mygdx.holowyth.gameScreen.combatDemo.CombatDemo;
-import com.mygdx.holowyth.gameScreen.session.SessionData;
+import com.mygdx.holowyth.game.session.SessionData;
+import com.mygdx.holowyth.game.town.TownScreen;
 import com.mygdx.holowyth.gamedata.maps.HolowythWorld;
 import com.mygdx.holowyth.graphics.HoloGL;
+import com.mygdx.holowyth.test.demos.combatdemo.CombatDemo;
 import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.world.World;
-import com.mygdx.holowyth.world.town.TownScreen;
 
 public class Holowyth extends Game {
 

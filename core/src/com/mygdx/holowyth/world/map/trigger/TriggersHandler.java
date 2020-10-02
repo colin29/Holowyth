@@ -3,7 +3,7 @@ package com.mygdx.holowyth.world.map.trigger;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mygdx.holowyth.gameScreen.MapInstance;
+import com.mygdx.holowyth.game.MapInstance;
 
 /**
  * Is a map-life time component

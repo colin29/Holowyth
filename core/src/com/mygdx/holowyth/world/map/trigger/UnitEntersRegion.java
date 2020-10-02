@@ -3,7 +3,7 @@ package com.mygdx.holowyth.world.map.trigger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
+import com.mygdx.holowyth.game.MapInstanceInfo;
 import com.mygdx.holowyth.world.map.trigger.region.Region;
 
 public class UnitEntersRegion extends TriggerEvent{

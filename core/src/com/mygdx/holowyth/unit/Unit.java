@@ -8,8 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.ai.UnitAI;
-import com.mygdx.holowyth.gameScreen.MapInstance;
-import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
+import com.mygdx.holowyth.game.MapInstance;
+import com.mygdx.holowyth.game.MapInstanceInfo;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitPFWithPath;
 import com.mygdx.holowyth.skill.ActiveSkill;

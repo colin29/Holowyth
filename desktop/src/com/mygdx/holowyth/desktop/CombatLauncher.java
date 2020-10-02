@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.gameScreen.combatDemo.CombatDemo;
+import com.mygdx.holowyth.test.demos.combatdemo.CombatDemo;
 
 public class CombatLauncher {
 	public static void main(String[] arg) {

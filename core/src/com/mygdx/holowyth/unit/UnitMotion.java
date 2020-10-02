@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
+import com.mygdx.holowyth.game.MapInstanceInfo;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingModule;

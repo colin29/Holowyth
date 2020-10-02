@@ -2,7 +2,7 @@ package com.mygdx.holowyth.world.map.trigger;
 
 import java.util.function.Consumer;
 
-import com.mygdx.holowyth.gameScreen.MapInstance;
+import com.mygdx.holowyth.game.MapInstance;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**

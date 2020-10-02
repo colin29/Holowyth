@@ -13,7 +13,7 @@ import com.kotcrab.vis.ui.widget.file.FileChooser;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
-import com.mygdx.holowyth.gameScreen.basescreens.TiledMapLoadingScreen;
+import com.mygdx.holowyth.game.base.TiledMapLoadingScreen;
 import com.mygdx.holowyth.util.Holo;
 
 /**

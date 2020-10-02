@@ -2,7 +2,7 @@ package com.mygdx.holowyth.skill.effect;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.holowyth.gameScreen.MapInstance;
+import com.mygdx.holowyth.game.MapInstance;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 
 public abstract class Effect {

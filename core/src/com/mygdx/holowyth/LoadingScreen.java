@@ -7,7 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.loaders.TextureLoader.TextureParameter;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.mygdx.holowyth.gameScreen.combatDemo.CombatDemo;
+import com.mygdx.holowyth.test.demos.combatdemo.CombatDemo;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;
 
 public class LoadingScreen extends HoloBaseScreen {

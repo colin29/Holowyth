@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.world.map.trigger;
 
-import com.mygdx.holowyth.gameScreen.MapInstanceInfo;
+import com.mygdx.holowyth.game.MapInstanceInfo;
 
 public abstract class TriggerEvent {
 

@@ -8,8 +8,8 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.mygdx.holowyth.gameScreen.session.OwnedCurrency;
-import com.mygdx.holowyth.gameScreen.session.OwnedItems;
+import com.mygdx.holowyth.game.session.OwnedCurrency;
+import com.mygdx.holowyth.game.session.OwnedItems;
 import com.mygdx.holowyth.unit.item.Item;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 

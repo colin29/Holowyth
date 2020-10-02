@@ -3,7 +3,6 @@ package com.mygdx.holowyth.tiled;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +17,6 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Polyline;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;
