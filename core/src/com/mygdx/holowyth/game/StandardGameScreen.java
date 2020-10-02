@@ -80,7 +80,7 @@ public class StandardGameScreen extends GameScreen {
 			u.setInventory(session.ownedItems); 
 		}
 		
-		new WornEquipsDisplay(lecia.equip.getWornEquips(), stage, skin, game.assets);
+		new WornEquipsDisplay(lecia, stage, skin, game.assets);
 		lecia.equip.equip(Weapons.mace.cloneObject());
 		
 		session.ownedItems.addItem(Weapons.spear.cloneObject());

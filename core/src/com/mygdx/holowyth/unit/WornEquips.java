@@ -70,6 +70,7 @@ public class WornEquips {
 	}
 
 	/**
+	 * If you are equipping for a unit (as opposed to a unit marker), access via UnitEquip!!!
 	 * @return true if the equip was successful
 	 */
 	public boolean equip(Equip item) {
@@ -126,6 +127,9 @@ public class WornEquips {
 		}
 	}
 
+	/**
+	 *  If you are unequipping for a unit, access via UnitEquip!!!
+	 */
 	public boolean unequip(Equip item) {
 		if (!hasEquipped(item)) {
 			logger.warn("Tried to unequip {}, but item is not equipped by this", item.name);
@@ -150,6 +154,7 @@ public class WornEquips {
 	}
 	
 	/**
+	 * If you are unequipping for a unit, access via UnitEquip!!!
 	 * @return true if an equip existed in that slot
 	 */
 	public boolean unequip(Slot slot) {

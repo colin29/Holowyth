@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
@@ -15,6 +14,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.UnitEquip;
 import com.mygdx.holowyth.unit.WornEquips;
 import com.mygdx.holowyth.unit.WornEquips.EquippedItemsListener;
 import com.mygdx.holowyth.unit.WornEquips.Slot;
@@ -30,14 +31,16 @@ public class WornEquipsDisplay extends SingleUseUIWidget implements EquippedItem
 	
 	Table equipsDisplay = new Table();
 	
+	UnitEquip unitEquip;
 	WornEquips worn;
 	
 	Image soniaFace;
 	
-	public WornEquipsDisplay(WornEquips worn, Stage stage, Skin skin, AssetManager assets) {
+	public WornEquipsDisplay(Unit unit, Stage stage, Skin skin, AssetManager assets) {
 		super(stage, skin);
-		this.worn = worn;
-		worn.addListener(this);
+		unitEquip = unit.equip;
+		worn = unit.equip.getWornEquips();
+		unitEquip.getWornEquips().addListener(this);
 		createDisplay();
 		root.debugAll();
 		
@@ -90,7 +93,7 @@ public class WornEquipsDisplay extends SingleUseUIWidget implements EquippedItem
 			public void clicked(@Nullable InputEvent event, float x, float y) {
 				logger.debug("tap count: {}", getTapCount());
 				if(getTapCount() == 2) {
-					worn.unequip(slot);
+					unitEquip.unequip(slot);
 				}
 			}
 			

@@ -55,8 +55,6 @@ import com.mygdx.holowyth.world.map.UnitMarker;
  * perform any action (it may retain its old order, depending on the type)
  */
 public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
-
-	
 	
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 	
@@ -64,12 +62,12 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	private static Map<Integer, Unit> idToUnit = new HashMap<Integer, Unit>();
 
 	// Unit life-time Components
-	public final UnitStats stats;
-	public final UnitSkills skills;
-	public final UnitGraphics graphics;
-	public final UnitEquip equip;
-	public final UnitAI ai;
-	public final UnitStatus status;
+	public @NonNull final UnitStats stats;
+	public @NonNull final UnitSkills skills;
+	public @NonNull final UnitGraphics graphics;
+	public @NonNull final UnitEquip equip;
+	public @NonNull final UnitAI ai;
+	public @NonNull final UnitStatus status;
 
 	// Id (for debug)
 	private static int curId = 0;

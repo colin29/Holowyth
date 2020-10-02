@@ -21,7 +21,7 @@ public class UnitEquip {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final Unit self;
-	private final WornEquips wornEquips = new WornEquips();
+	private final WornEquips worn = new WornEquips();
 
 	public UnitEquip(Unit self) {
 		this.self = self;
@@ -36,32 +36,44 @@ public class UnitEquip {
 	 * @return true if the equip was successful
 	 */
 	public boolean equip(Equip item) {
-		boolean isSuccess = wornEquips.equip(item);
+		boolean isSuccess = worn.equip(item);
 		self.stats.recalculateStats();
 		return isSuccess;
 	}
 
 	public boolean unequip(Equip item) {
-		return wornEquips.unequip(item);
+		boolean isSuccess = worn.unequip(item);
+		if(isSuccess) {
+			self.stats.recalculateStats();
+		}
+		return isSuccess; 
+	}
+	
+	public boolean unequip(Slot slot) {
+		boolean isSuccess = worn.unequip(slot);
+		if(isSuccess) {
+			self.stats.recalculateStats();
+		}
+		return false;
 	}
 
 	public boolean hasEquipped(Equip equip) {
-		return wornEquips.hasEquipped(equip);
+		return worn.hasEquipped(equip);
 	}
 
 	public @Nullable Equip getEquip(WornEquips.Slot slot) {
-		return wornEquips.getEquip(slot);
+		return worn.getEquip(slot);
 	}
 
 	/**
 	 * @return Read-only collection of the equip slots
 	 */
 	public Map<WornEquips.@NonNull Slot, @NonNull Equip> getEquipped() {
-		return wornEquips.getEquipped();
+		return worn.getEquipped();
 	}
 
 	public boolean is2HWieldingWeapon() {
-		return wornEquips.is2HWieldingWeapon();
+		return worn.is2HWieldingWeapon();
 	}
 
 	void equipAllFromTemplate(WornEquips src) {
@@ -75,6 +87,6 @@ public class UnitEquip {
 	}
 
 	public WornEquips getWornEquips() {
-		return wornEquips;
+		return worn;
 	}
 }
