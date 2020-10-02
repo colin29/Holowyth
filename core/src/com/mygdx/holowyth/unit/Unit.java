@@ -146,6 +146,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 		equip.equipAllFromTemplate(m.wornEquips);
 
 		graphics.setAnimatedSprite(mapInstance.getAnimations().get(m.animatedSpriteName));
+		graphics.setHeadSpriteName(m.headSpriteName);
 	}
 
 	/** Specifically for units that have been initialized and removed from a world once */

@@ -13,10 +13,12 @@ import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.game.base.GameScreen;
 import com.mygdx.holowyth.game.session.SessionData;
 import com.mygdx.holowyth.game.ui.InventoryDisplay;
+import com.mygdx.holowyth.game.ui.PartyUnitSelectionPanel;
 import com.mygdx.holowyth.game.ui.WornEquipsDisplay;
 import com.mygdx.holowyth.gamedata.items.Weapons;
 import com.mygdx.holowyth.gamedata.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.gamedata.units.MonsterStats;
+import com.mygdx.holowyth.gamedata.units.Players;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.town.TownScreen;
 import com.mygdx.holowyth.town.model.Town;
@@ -49,7 +51,7 @@ public class StandardGameScreen extends GameScreen {
 	private VNController vn;
 
 	private Unit lecia;
-	
+
 	private final @NonNull SessionData session = new SessionData();
 
 	public StandardGameScreen(Holowyth game) {
@@ -72,23 +74,28 @@ public class StandardGameScreen extends GameScreen {
 		debugValues.add("Map name", () -> map.getName());
 
 		loadGameMapByName("forest1");
+
+		var spawnPos = map.getLocation("default_spawn_location").pos;
+//		session.playerUnits.addAll(testSpawnMultipleLecias(3, map.getLocation("default_spawn_location").pos));
+		session.playerUnits.addAll(spawnThreeMemberParty(spawnPos));
 		
-		session.playerUnits.addAll(testSpawnMultipleLecias(map.getLocation("default_spawn_location").pos, 1));
 		lecia = session.playerUnits.get(0);
-		
-		for(Unit u : session.playerUnits) {
-			u.setInventory(session.ownedItems); 
+
+		for (Unit u : session.playerUnits) {
+			u.setInventory(session.ownedItems);
 		}
-		
+
 		new WornEquipsDisplay(lecia, stage, skin, game.assets);
 		lecia.equip.equip(Weapons.mace.cloneObject());
-		
+
 		session.ownedItems.addItem(Weapons.spear.cloneObject());
 		session.ownedItems.addItem(Weapons.club.cloneObject());
 		session.ownedItems.addItem(Weapons.club.cloneObject());
-		var inv = new InventoryDisplay(stage, skin, session.ownedItems);
+		var inv = new InventoryDisplay(stage, skin, session.ownedItems, assets);
 		inv.setLinkedUnit(lecia);
 		session.ownedItems.addItem(Weapons.dagger.cloneObject());
+
+		var party = new PartyUnitSelectionPanel(session.playerUnits, stage, skin, assets);
 	}
 
 	/**
@@ -169,7 +176,8 @@ public class StandardGameScreen extends GameScreen {
 	/**
 	 * @return a list of units that were actually spawned
 	 */
-	private List<@NonNull Unit> testSpawnMultipleLecias(Point spawnPos, int numUnits) {
+	@SuppressWarnings("unused")
+	private List<@NonNull Unit> testSpawnMultipleLecias(int numUnits, Point spawnPos) {
 		// fetch locations
 		final List<Point> unitPlacements = pathingModule.findPathablePlacements(spawnPos, numUnits,
 				mapInstance.getUnits());
@@ -183,6 +191,27 @@ public class StandardGameScreen extends GameScreen {
 		for (int i = 0; i < Math.min(numUnits, unitPlacements.size()); i++) {
 			units.add(testSpawnLecia(unitPlacements.get(i)));
 		}
+		return units;
+	}
+
+	@SuppressWarnings("null")
+	private List<@NonNull Unit> spawnThreeMemberParty(Point spawnPos) {
+		// fetch locations
+		final List<Point> unitPlacements = pathingModule.findPathablePlacements(spawnPos, 3,
+				mapInstance.getUnits());
+		if (unitPlacements.size() != 3) {
+			logger.warn("Expected {} placements, but got {} locations. Not all units may be placed.", 3,
+					unitPlacements.size());
+		}
+		final List<@NonNull Unit> units = new ArrayList<@NonNull Unit>();
+
+//		for (int i = 0; i < Math.min(numUnits, unitPlacements.size()); i++) {
+//			units.add(testSpawnLecia(unitPlacements.get(i)));
+//		}
+		units.add(mapInstance.addUnit(Players.lecia, unitPlacements.get(0)));
+		units.add(mapInstance.addUnit(Players.sonia, unitPlacements.get(1)));
+		units.add(mapInstance.addUnit(Players.elvin, unitPlacements.get(2)));
+		
 		return units;
 	}
 
@@ -251,19 +280,20 @@ public class StandardGameScreen extends GameScreen {
 	private void transportPlayerUnitsIfStandingOnEntrance() {
 		for (Entrance entrance : map.getEntrances()) {
 			if (entrance.isBeingTriggered(session.playerUnits)) {
-				
-				@NonNull Destination dest;
-				if(entrance.dest != null) {
+
+				@NonNull
+				Destination dest;
+				if (entrance.dest != null) {
 					dest = entrance.dest;
-				}else {
+				} else {
 					continue;
 				}
-				
-				if(dest instanceof MapDestination) {
+
+				if (dest instanceof MapDestination) {
 					var mapDest = (MapDestination) dest;
 					goToMap(mapDest.map, mapDest.loc);
 					return;
-				}else if (dest instanceof TownDestination) {
+				} else if (dest instanceof TownDestination) {
 					var townDest = (TownDestination) dest;
 					goToTown(townDest.town);
 					return;
@@ -290,7 +320,6 @@ public class StandardGameScreen extends GameScreen {
 	public void show() {
 		Gdx.input.setInputProcessor(multiplexer);
 	}
-
 
 	@Override
 	public final void mapStartup() {

@@ -3,6 +3,7 @@ package com.mygdx.holowyth.game.ui;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -27,8 +28,8 @@ public class InventoryDisplay extends SingleUseUIWidget implements InventoryList
 
 	private final OwnedItems owned;
 
-	public InventoryDisplay(Stage stage, Skin skin, OwnedItems owned) {
-		super(stage, skin);
+	public InventoryDisplay(Stage stage, Skin skin, OwnedItems owned, AssetManager assets) {
+		super(stage, skin, assets);
 		this.owned = owned;
 		createDisplay();
 		owned.addListener(this);

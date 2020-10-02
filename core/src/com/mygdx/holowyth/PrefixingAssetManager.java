@@ -32,6 +32,8 @@ public class PrefixingAssetManager extends AssetManager {
 			return super.get(prefixPath + fileName);
 		}
 	}
+	
+	
 
 	@Override
 	public synchronized <T> T get(String fileName, Class<T> type) {
@@ -44,5 +46,15 @@ public class PrefixingAssetManager extends AssetManager {
 	}
 	private void logRequest(String fileName) {
 		logger.debug("Requested asset: '{}'", prefixPath + fileName);
+	}
+
+	@Override
+	public synchronized boolean isLoaded(String fileName) {
+		return super.isLoaded(fileName) || super.isLoaded(prefixPath + fileName) ;
+	}
+
+	@Override
+	public synchronized boolean isLoaded(String fileName, Class type) {
+		return super.isLoaded(fileName, type) || super.isLoaded(prefixPath + fileName, type) ;
 	}
 }

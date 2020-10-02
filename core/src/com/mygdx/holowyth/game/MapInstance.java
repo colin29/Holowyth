@@ -28,6 +28,7 @@ import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloAssert;
+import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.exceptions.HoloOperationException;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
@@ -471,10 +472,17 @@ public class MapInstance implements MapInstanceInfo {
 
 	/**
 	 * Creates a new unit from a unitMarker and adds it to the world
-	 * @param u
 	 */
-	public void addUnit(UnitMarker unitMarker) {
-		addUnit(new Unit(unitMarker, this));
+	public @NonNull Unit addUnit(@NonNull UnitMarker unitMarker) {
+		return addUnit(new Unit(unitMarker, this));
+	}
+	/**
+	 * Creates a new unit from a unitMarker, but specify a position
+	 */
+	public @NonNull Unit addUnit(@NonNull UnitMarker unitMarker, @NonNull Point pos) {
+		var u = addUnit(new Unit(unitMarker, this));
+		u.setPos(pos.x, pos.y);
+		return u;
 	}
 
 	/**
@@ -484,8 +492,9 @@ public class MapInstance implements MapInstanceInfo {
 	 * 
 	 * @param u
 	 */
-	public void addUnit(@NonNull Unit u) {
+	public @NonNull Unit addUnit(@NonNull Unit u) {
 		addUnit(u, true);
+		return u;
 	}
 	/**
 	 * Add a unit that has been on another map already and we don't want to initiliaze hp/sp

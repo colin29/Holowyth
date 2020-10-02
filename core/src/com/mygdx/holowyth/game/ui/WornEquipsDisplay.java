@@ -29,7 +29,7 @@ public class WornEquipsDisplay extends SingleUseUIWidget implements EquippedItem
 	@SuppressWarnings("null")
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	
-	Table equipsDisplay = new Table();
+	Table display = new Table();
 	
 	UnitEquip unitEquip;
 	WornEquips worn;
@@ -37,7 +37,7 @@ public class WornEquipsDisplay extends SingleUseUIWidget implements EquippedItem
 	Image soniaFace;
 	
 	public WornEquipsDisplay(Unit unit, Stage stage, Skin skin, AssetManager assets) {
-		super(stage, skin);
+		super(stage, skin, assets);
 		unitEquip = unit.equip;
 		worn = unit.equip.getWornEquips();
 		unitEquip.getWornEquips().addListener(this);
@@ -50,12 +50,12 @@ public class WornEquipsDisplay extends SingleUseUIWidget implements EquippedItem
 	}
 	
 	private void createDisplay(){
-		root.add(equipsDisplay);
+		root.add(display);
 		regenerateDisplay();
 		
 	}
 	private void regenerateDisplay() {
-		equipsDisplay.clear();
+		display.clear();
 		Table slots1 = new Table();
 		Table slots2 = new Table();
 		
@@ -76,9 +76,9 @@ public class WornEquipsDisplay extends SingleUseUIWidget implements EquippedItem
 		slots2.add(makeLabel(Slot.ACCESSORY));
 		slots2.row();
 		
-		equipsDisplay.add(slots1).width(150);
-		equipsDisplay.add(soniaFace).maxWidth(100).top().padTop(20);
-		equipsDisplay.add(slots2).width(150);
+		display.add(slots1).width(150);
+		display.add(soniaFace).maxWidth(100).top().padTop(20);
+		display.add(slots2).width(150);
 	}
 	private Label makeLabel(Slot slot) {
 		Equip equip = worn.getEquip(slot);

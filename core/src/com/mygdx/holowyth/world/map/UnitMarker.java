@@ -35,6 +35,7 @@ public class UnitMarker {
 	public final List<Skill> passiveSkills = new ArrayList<Skill>();
 
 	public @Nullable String animatedSpriteName;
+	public @Nullable String headSpriteName;
 
 	public UnitMarker() {
 		 wornEquips = new WornEquips();

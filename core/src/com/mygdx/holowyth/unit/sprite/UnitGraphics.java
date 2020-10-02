@@ -1,5 +1,6 @@
 package com.mygdx.holowyth.unit.sprite;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,6 +29,7 @@ public class UnitGraphics {
 	private final int SPRITE_HEIGHT = 32;
 
 	private AnimatedSprite animatedSprite; // can be null
+	private @Nullable String headSpriteName;
 
 	private Animation<TextureRegion> activeAnimation;
 	private Animation<TextureRegion> prevAnimation;
@@ -110,6 +112,14 @@ public class UnitGraphics {
 
 	public AnimatedSprite getAnimatedSprite() {
 		return animatedSprite;
+	}
+
+	public String getHeadSpriteName() {
+		return headSpriteName;
+	}
+
+	public void setHeadSpriteName(String headSpriteName) {
+		this.headSpriteName = headSpriteName;
 	}
 
 
