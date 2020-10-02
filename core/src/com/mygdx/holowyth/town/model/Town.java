@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.world.town;
+package com.mygdx.holowyth.town.model;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 

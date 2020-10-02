@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.world.town;
+package com.mygdx.holowyth.town.model;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.game.session.OwnedCurrency;
 import com.mygdx.holowyth.game.session.OwnedItems;
+import com.mygdx.holowyth.town.model.Shop.ItemStock;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
-import com.mygdx.holowyth.world.town.Shop.ItemStock;
 
 @NonNullByDefault
 public class ShopSession {

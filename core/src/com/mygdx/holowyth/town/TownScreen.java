@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.game.town;
+package com.mygdx.holowyth.town;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -16,9 +16,9 @@ import com.mygdx.holowyth.game.StandardGameScreen;
 import com.mygdx.holowyth.game.session.SessionData;
 import com.mygdx.holowyth.gamedata.towns.TestTown;
 import com.mygdx.holowyth.graphics.HoloGL;
+import com.mygdx.holowyth.town.model.Shop;
+import com.mygdx.holowyth.town.model.Town;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;
-import com.mygdx.holowyth.world.town.Shop;
-import com.mygdx.holowyth.world.town.Town;
 
 @NonNullByDefault
 public class TownScreen extends HoloBaseScreen {

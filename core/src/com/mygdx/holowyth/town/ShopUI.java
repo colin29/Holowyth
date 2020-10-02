@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.game.town;
+package com.mygdx.holowyth.town;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -12,10 +12,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
+import com.mygdx.holowyth.town.model.Shop;
+import com.mygdx.holowyth.town.model.ShopSession;
+import com.mygdx.holowyth.town.model.Shop.ItemStock;
 import com.mygdx.holowyth.util.HoloUI;
-import com.mygdx.holowyth.world.town.Shop;
-import com.mygdx.holowyth.world.town.ShopSession;
-import com.mygdx.holowyth.world.town.Shop.ItemStock;
 
 /**
  * This object should be created when someone enters a store

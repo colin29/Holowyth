@@ -2,7 +2,7 @@ package com.mygdx.holowyth.gamedata.towns;
 
 
 import com.mygdx.holowyth.gamedata.items.Weapons;
-import com.mygdx.holowyth.world.town.Town;
+import com.mygdx.holowyth.town.model.Town;
 
 public class TestTown extends Town {
 	{

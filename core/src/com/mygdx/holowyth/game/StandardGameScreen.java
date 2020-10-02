@@ -12,11 +12,12 @@ import com.badlogic.gdx.Input.Keys;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.game.base.GameScreen;
 import com.mygdx.holowyth.game.session.SessionData;
-import com.mygdx.holowyth.game.town.TownScreen;
 import com.mygdx.holowyth.gamedata.items.Weapons;
 import com.mygdx.holowyth.gamedata.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.gamedata.units.MonsterStats;
 import com.mygdx.holowyth.skill.skill.Skills;
+import com.mygdx.holowyth.town.TownScreen;
+import com.mygdx.holowyth.town.model.Town;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -29,7 +30,6 @@ import com.mygdx.holowyth.world.map.Entrance.TownDestination;
 import com.mygdx.holowyth.world.map.Location;
 import com.mygdx.holowyth.world.map.UnitMarker;
 import com.mygdx.holowyth.world.map.trigger.Trigger;
-import com.mygdx.holowyth.world.town.Town;
 
 /**
  * 

@@ -3,9 +3,9 @@ package com.mygdx.holowyth.world;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mygdx.holowyth.town.model.Town;
 import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 import com.mygdx.holowyth.world.map.GameMap;
-import com.mygdx.holowyth.world.town.Town;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

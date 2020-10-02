@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.world.town;
+package com.mygdx.holowyth.town.model;
 
 import java.util.ArrayList;
 import java.util.List;
