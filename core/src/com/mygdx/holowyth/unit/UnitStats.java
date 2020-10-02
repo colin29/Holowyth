@@ -476,15 +476,10 @@ public class UnitStats implements UnitStatsInfo {
 
 		final var equip = self.equip;
 
-		for (WornEquips.Slot slot : WornEquips.Slot.values()) {
-			Equip item = equip.getEquip(slot);
-			if (item != null) {
-				s += " -" + slot.getName() + ": " + item.name + "\n";
-			} else {
-				s += " -" + slot.getName() + ": [None]\n";
-			}
+		for (WornEquips.Slot slotType : WornEquips.Slot.values()) {
+			Equip item = equip.getEquip(slotType);
+			s += " -" + slotType.getName() + ": " + item.name + "\n";
 		}
-
 		return s;
 	}
 
@@ -494,7 +489,7 @@ public class UnitStats implements UnitStatsInfo {
 		List<Equip> distinctItems = new ArrayList<Equip>();
 
 		final var equip = self.equip;
-		for (Equip item : equip.getEquipSlots().values()) {
+		for (Equip item : equip.getEquipped().values()) {
 			if (distinctItems.stream().noneMatch(i -> i==item)) {
 				distinctItems.add(item);
 			}

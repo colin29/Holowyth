@@ -52,11 +52,12 @@ public class Forest1 extends GameMap {
 //			m.activeSkills.addAll(Skills.mageSkills);
 //			unitMarkers.add(m);
 //		}
-		{
-			UnitMarker m = new UnitMarker(Monsters.goblin);
-			m.pos.set(400, 400);
-			unitMarkers.add(m);
-		}
+		
+//		{
+//			UnitMarker m = new UnitMarker(Monsters.goblin);
+//			m.pos.set(400, 400);
+//			unitMarkers.add(m);
+//		}
 
 	}
 }

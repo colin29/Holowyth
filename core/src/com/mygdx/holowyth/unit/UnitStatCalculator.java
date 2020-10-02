@@ -1,6 +1,9 @@
 package com.mygdx.holowyth.unit;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.util.Holo;
 
 public class UnitStatCalculator {
@@ -24,7 +27,7 @@ public class UnitStatCalculator {
 		var equip = self.getEquip();
 
 		calculateSkillStatBonuses(skillBonus);
-		calculateEquipStatBonuses(equipBonus, WornEquips.Slot.HEAD, WornEquips.Slot.TORSO, WornEquips.Slot.MAIN_HAND, WornEquips.Slot.ACCESSORY);
+		calculateEquipStatBonuses(equipBonus, WornEquips.Slot.HEAD, WornEquips.Slot.BODY, WornEquips.Slot.MAIN_HAND, WornEquips.Slot.ACCESSORY);
 
 		if (equip.getEquip(WornEquips.Slot.MAIN_HAND) != equip.getEquip(WornEquips.Slot.OFF_HAND)) // don't count a 2H weapon twice
 			addEquipStatBonuses(equipBonus, WornEquips.Slot.OFF_HAND);

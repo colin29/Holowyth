@@ -59,7 +59,7 @@ public class Weapons {
 		}
 	};
 	
-	public final static Equip mace = new TemplateEquip("Long Sword", EquipType.WEAPON) {
+	public final static Equip mace = new TemplateEquip("Mace", EquipType.WEAPON) {
 		{
 			setBasicBonuses(6, 3, 5, 0, 1);
 		}

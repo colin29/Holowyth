@@ -12,6 +12,7 @@ import com.badlogic.gdx.Input.Keys;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.game.base.GameScreen;
 import com.mygdx.holowyth.game.session.SessionData;
+import com.mygdx.holowyth.game.ui.WornEquipsDisplay;
 import com.mygdx.holowyth.gamedata.items.Weapons;
 import com.mygdx.holowyth.gamedata.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.gamedata.units.MonsterStats;
@@ -70,6 +71,9 @@ public class StandardGameScreen extends GameScreen {
 		debugValues.add("Map name", () -> map.getName());
 
 		loadGameMapByName("forest1");
+		
+		new WornEquipsDisplay(lecia.equip.getWornEquips(), stage, skin, game.assets);
+		lecia.equip.equip(Weapons.mace);
 	}
 
 	/**
@@ -278,15 +282,12 @@ public class StandardGameScreen extends GameScreen {
 	public final void mapStartup() {
 		super.mapStartup();
 		if (!spawnedYet) {
-			session.playerUnits.addAll(testSpawnMultipleLecias(map.getLocation("default_spawn_location").pos, 8));
+			session.playerUnits.addAll(testSpawnMultipleLecias(map.getLocation("default_spawn_location").pos, 1));
 			spawnedYet = true;
 		}
-		if (lecia == null) {
-//			lecia = spawnPlayerAtDefaultLocation();
+		lecia = session.playerUnits.get(0);
 
-		} else {
-			// insert existing lecia into the world
-		}
+		
 		placeUnitsAccordingToUnitMarkers();
 		loadMapTriggers();
 	}

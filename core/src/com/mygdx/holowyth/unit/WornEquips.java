@@ -1,11 +1,14 @@
 package com.mygdx.holowyth.unit;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,27 +25,28 @@ public class WornEquips {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final Map<WornEquips.@NonNull Slot, @NonNull Equip> equips = new LinkedHashMap<>();
+	private final List<EquippedItemsListener> listeners = new ArrayList<>();
 
 	public enum Slot {
-		HEAD, MAIN_HAND, OFF_HAND, TORSO, ACCESSORY, FOOTWEAR;
+		HEAD, MAIN_HAND, OFF_HAND, BODY, ACCESSORY, SHOES;
 
 		public String getName() {
 			switch (this) {
 			case HEAD:
-				return "head";
+				return "Head";
 			case MAIN_HAND:
 				return "Main Hand";
 			case OFF_HAND:
 				return "Off Hand";
-			case TORSO:
-				return "Torso";
+			case BODY:
+				return "Body";
 			case ACCESSORY:
 				return "Accessory";
-			case FOOTWEAR:
-				return "Footwear";
+			case SHOES:
+				return "Shoes";
 			default:
 				throw new HoloAssertException("Unhandled Equip slot");
-			
+
 			}
 		}
 	}
@@ -51,8 +55,8 @@ public class WornEquips {
 	}
 
 	public WornEquips(WornEquips src) {
-		for (Slot slot : Slot.values()) {
-			equips.put(slot, src.getEquip(slot));
+		for (var e : src.equips.entrySet()) {
+			equips.put(e.getKey(), e.getValue().cloneObject());
 			if (src.is2HWieldingWeapon()) { // discard the duplicate copied reference in OFF_HAND
 				equips.put(Slot.OFF_HAND, equips.get(Slot.MAIN_HAND));
 			}
@@ -74,7 +78,7 @@ public class WornEquips {
 			equips.put(WornEquips.Slot.HEAD, item);
 			break;
 		case ARMOR:
-			equips.put(WornEquips.Slot.TORSO, item);
+			equips.put(WornEquips.Slot.BODY, item);
 			break;
 		case WEAPON:
 			clearMainHandSlot();
@@ -95,6 +99,7 @@ public class WornEquips {
 		default:
 			throw new HoloAssertException("Unhandled equipment type");
 		}
+		changed();
 		return true;
 	}
 
@@ -126,6 +131,7 @@ public class WornEquips {
 				equips.remove(slot);
 			}
 		}
+		changed();
 		return true;
 	}
 
@@ -137,7 +143,10 @@ public class WornEquips {
 		return false;
 	}
 
-	public Equip getEquip(WornEquips.Slot slot) {
+	/**
+	 * Can return null, iterate over getEquipped().entrySet() if you want all occupied slots
+	 */
+	public @Nullable Equip getEquip(WornEquips.Slot slot) {
 		return equips.get(slot);
 	}
 
@@ -145,7 +154,7 @@ public class WornEquips {
 	 * @return Read-only collection of the equip slots
 	 */
 	@SuppressWarnings("null")
-	public Map<WornEquips.Slot, Equip> getEquipSlots() {
+	public Map<WornEquips.Slot, Equip> getEquipped() {
 		return Collections.unmodifiableMap(equips);
 	}
 
@@ -158,4 +167,20 @@ public class WornEquips {
 		return new WornEquips(this);
 	}
 
+	public void addListener(EquippedItemsListener o) {
+		listeners.add(o);
+	}
+
+	public boolean removeListener(EquippedItemsListener o) {
+		return listeners.remove(o);
+	}
+
+	public void changed() {
+		for (var o : listeners)
+			o.changed();
+	}
+
+	public static interface EquippedItemsListener {
+		public abstract void changed();
+	}
 }

@@ -6,7 +6,7 @@ import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.game.StandardGameScreen;
 import com.mygdx.holowyth.town.TownScreen;
 
-public class GameScreenLauncher {
+public class TownLauncher {
 	public static void main(String[] arg) {
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 		config.title = "Holowyth";
@@ -15,6 +15,6 @@ public class GameScreenLauncher {
 		config.samples = 5;
 		config.vSyncEnabled = false;
 		config.foregroundFPS = 0;
-		new LwjglApplication(new Holowyth(StandardGameScreen.class), config);
+		new LwjglApplication(new Holowyth(TownScreen.class), config);
 	}
 }

@@ -19,7 +19,7 @@ public class Holo {
 
 	// Initial Settings (only apply at startup)
 	public static boolean enableCursorGrabbing = false;
-	public static boolean mouseScrollEnabled = true;
+	public static boolean mouseScrollEnabled = false;
 	
 	public static String titleName = "Holowyth";
 

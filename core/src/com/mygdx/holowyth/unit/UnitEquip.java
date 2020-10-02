@@ -3,6 +3,8 @@ package com.mygdx.holowyth.unit;
 import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,12 +14,13 @@ import com.mygdx.holowyth.unit.item.Equip;
 /**
  * @author Colin Ta
  */
+@NonNullByDefault
 public class UnitEquip {
 	
+	@SuppressWarnings("null")
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final Unit self;
-
 	private final WornEquips wornEquips = new WornEquips();
 
 	public UnitEquip(Unit self) {
@@ -46,15 +49,15 @@ public class UnitEquip {
 		return wornEquips.hasEquipped(equip);
 	}
 
-	public Equip getEquip(WornEquips.Slot slot) {
+	public @Nullable Equip getEquip(WornEquips.Slot slot) {
 		return wornEquips.getEquip(slot);
 	}
 
 	/**
 	 * @return Read-only collection of the equip slots
 	 */
-	public Map<WornEquips.@NonNull Slot, @NonNull Equip> getEquipSlots() {
-		return wornEquips.getEquipSlots();
+	public Map<WornEquips.@NonNull Slot, @NonNull Equip> getEquipped() {
+		return wornEquips.getEquipped();
 	}
 
 	public boolean is2HWieldingWeapon() {
@@ -62,12 +65,16 @@ public class UnitEquip {
 	}
 
 	void equipAllFromTemplate(WornEquips src) {
-		for (Slot slot : Slot.values()) {
-			if (slot == Slot.OFF_HAND && !src.is2HWieldingWeapon()) {
-				equip(src.getEquip(Slot.OFF_HAND).cloneObject());
+		for (var e : src.getEquipped().entrySet()) { // this only iterates over occupied slots, because nonNull map
+			if (e.getKey() == Slot.OFF_HAND && !src.is2HWieldingWeapon()) {
+				equip(e.getValue().cloneObject());
 			} else {
-				equip(src.getEquip(slot).cloneObject());
+				equip(e.getValue().cloneObject());
 			}
 		}
+	}
+
+	public WornEquips getWornEquips() {
+		return wornEquips;
 	}
 }

@@ -38,6 +38,7 @@ public class Holowyth extends Game {
 	public SpriteBatch batch;
 	public ShapeRenderer shapeRenderer;
 
+	public static final String ASSETS_DISK_PATH = "./resources/assets/";
 	public static final String ASSETS_PATH = "assets/";
 	public @NonNull AssetManager assets;
 
