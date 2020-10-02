@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 
 import org.eclipse.jdt.annotation.NonNull;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.effect.Effect;
@@ -44,4 +45,6 @@ public interface MapInstanceInfo {
 	Animations getAnimations();
 
 	Set<Unit> getUnitsAttackingThis(Unit u);
+
+	AssetManager getAssets();
 }

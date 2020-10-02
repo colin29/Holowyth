@@ -12,6 +12,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.collision.CircleCBInfo;
 import com.mygdx.holowyth.collision.CollisionDetection;
@@ -56,6 +57,7 @@ public class MapInstance implements MapInstanceInfo {
 	final EffectsHandler gfx;
 	final Animations animations;
 	final DebugStore debugStore;
+	final AssetManager assets;
 
 	private final UnitCollection units = new UnitCollection();
 
@@ -72,10 +74,11 @@ public class MapInstance implements MapInstanceInfo {
 	 */
 	private final Map<Unit, Set<Unit>> unitsAttackingThis = new HashMap<Unit, Set<Unit>>();
 
-	public MapInstance(PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects, Animations animations) {
+	public MapInstance(PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects, Animations animations, AssetManager assets) {
 		this.pathing = pathingModule;
 		this.gfx = effects;
 		this.animations = animations;
+		this.assets = assets;
 
 		this.debugStore = debugStore;
 	}
@@ -579,6 +582,11 @@ public class MapInstance implements MapInstanceInfo {
 	}
 	public void onUnitStopsAttacking(Unit attacker, Unit target) {
 		unitsAttackingThis.get(target).remove(attacker);
+	}
+
+	@Override
+	public AssetManager getAssets() {
+		return assets;
 	}
 
 }

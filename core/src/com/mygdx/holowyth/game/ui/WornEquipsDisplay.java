@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -20,6 +21,7 @@ import com.mygdx.holowyth.unit.WornEquips;
 import com.mygdx.holowyth.unit.WornEquips.EquippedItemsListener;
 import com.mygdx.holowyth.unit.WornEquips.Slot;
 import com.mygdx.holowyth.unit.item.Equip;
+import com.mygdx.holowyth.util.HoloUI;
 
 
 
@@ -31,26 +33,26 @@ public class WornEquipsDisplay extends SingleUseUIWidget implements EquippedItem
 	
 	Table display = new Table();
 	
-	UnitEquip unitEquip;
-	WornEquips worn;
+	final UnitEquip unitEquip;
+	final WornEquips worn;
 	
-	Image soniaFace;
+	final Unit unit;
+	
+
 	
 	public WornEquipsDisplay(Unit unit, Stage stage, Skin skin, AssetManager assets) {
 		super(stage, skin, assets);
+		this.unit = unit;
 		unitEquip = unit.equip;
 		worn = unit.equip.getWornEquips();
 		unitEquip.getWornEquips().addListener(this);
 		createDisplay();
-		root.debugAll();
-		
-		Texture tex = assets.get("img/sprites/head/Sonia.png", Texture.class);
-		soniaFace = new Image(tex);
-		
+//		root.debugAll();
 	}
 	
 	private void createDisplay(){
 		root.add(display);
+		display.setBackground(HoloUI.getSolidBG(HoloUI.menuColor));
 		regenerateDisplay();
 		
 	}
@@ -77,7 +79,7 @@ public class WornEquipsDisplay extends SingleUseUIWidget implements EquippedItem
 		slots2.row();
 		
 		display.add(slots1).width(150);
-		display.add(soniaFace).maxWidth(100).top().padTop(20);
+		display.add(unit.graphics.getHeadSprite()).maxWidth(100).top().padTop(20);
 		display.add(slots2).width(150);
 	}
 	private Label makeLabel(Slot slot) {

@@ -32,7 +32,6 @@ public class Players {
 		side = Side.PLAYER;
 		name = "Elvin";
 		baseStats.set(MonsterStats.baseHuman);
-		wornEquips.equip(Weapons.shortSword);  
 		activeSkills.addAll(Skills.warriorSkills);
 		passiveSkills.add(PassiveSkills.basicCombatTraining);
 		
@@ -45,9 +44,8 @@ public class Players {
 		side = Side.PLAYER;
 		name = "Sonia";
 		baseStats.set(MonsterStats.baseHuman);
-		wornEquips.equip(Weapons.staff.cloneObject());  
-		activeSkills.addAll(Skills.warriorSkills);
-		passiveSkills.add(PassiveSkills.basicCombatTraining);
+		wornEquips.equip(Weapons.staff);  
+		activeSkills.addAll(Skills.mageSkills);
 		
 		animatedSpriteName = "pipo-charachip017c.png";
 		headSpriteName = HEAD_SPRITE_DIR + "Sonia.png";

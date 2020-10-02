@@ -28,6 +28,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
  *
  */
 public class HoloUI {
+	
+	public static final Color menuColor = new Color(0.2f, 0.2f, 0.2f, 0.7f);
 
 	@FunctionalInterface
 	public interface FloatConsumer {

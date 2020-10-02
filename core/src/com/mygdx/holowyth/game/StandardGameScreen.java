@@ -85,7 +85,6 @@ public class StandardGameScreen extends GameScreen {
 			u.setInventory(session.ownedItems);
 		}
 
-		new WornEquipsDisplay(lecia, stage, skin, game.assets);
 		lecia.equip.equip(Weapons.mace.cloneObject());
 
 		session.ownedItems.addItem(Weapons.spear.cloneObject());
@@ -95,7 +94,7 @@ public class StandardGameScreen extends GameScreen {
 		inv.setLinkedUnit(lecia);
 		session.ownedItems.addItem(Weapons.dagger.cloneObject());
 
-		var party = new PartyUnitSelectionPanel(session.playerUnits, stage, skin, assets);
+		new PartyUnitSelectionPanel(session.playerUnits, inv, stage, skin, assets);
 	}
 
 	/**

@@ -150,7 +150,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	}
 
 	/** Specifically for units that have been initialized and removed from a world once */
-	public void reinitializeForWorld(MapInstance world) {
+	public void reinitializeForWorld(MapInstanceInfo world) {
 		this.mapInstance = world;
 		motion = new UnitMotion(this, world);
 		combat = new UnitCombat(this);

@@ -15,6 +15,7 @@ import com.mygdx.holowyth.game.session.OwnedItems.InventoryListener;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.unit.item.Item;
+import com.mygdx.holowyth.util.HoloUI;
 
 @NonNullByDefault
 public class InventoryDisplay extends SingleUseUIWidget implements InventoryListener {
@@ -26,26 +27,27 @@ public class InventoryDisplay extends SingleUseUIWidget implements InventoryList
 	 */
 	private @Nullable Unit unit;
 
-	private final OwnedItems owned;
+	private final OwnedItems inv;
 
 	public InventoryDisplay(Stage stage, Skin skin, OwnedItems owned, AssetManager assets) {
 		super(stage, skin, assets);
-		this.owned = owned;
+		inv = owned;
 		createDisplay();
 		owned.addListener(this);
-		root.debugAll();
 		root.right();
+//		root.debugAll();
 	}
 
 	private void createDisplay() {
 		root.add(display).pad(10);
 		display.defaults().space(20);
+		display.setBackground(HoloUI.getSolidBG(HoloUI.menuColor));
 		regenerateDisplay();
 	}
 
 	private void regenerateDisplay() {
 		display.clear();
-		for (Item item : owned.getItems()) {
+		for (Item item : inv.getItems()) {
 			display.add(makeLabel(item)).width(100).height(30);
 			display.row();
 		}
@@ -62,7 +64,10 @@ public class InventoryDisplay extends SingleUseUIWidget implements InventoryList
 					if (item instanceof Equip) {
 						Equip equip = (Equip) item;
 						if (unit != null) {
-							unit.equip.equip(equip);
+							boolean result = unit.equip.equip(equip);
+							if(result) {
+								inv.remove(equip);
+							}
 						}
 					}
 				}

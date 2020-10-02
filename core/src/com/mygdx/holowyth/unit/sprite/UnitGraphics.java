@@ -4,10 +4,12 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
@@ -36,8 +38,8 @@ public class UnitGraphics {
 
 	private TextureRegion currentFrame;
 
-	public UnitGraphics(Unit parent) {
-		this.self = parent;
+	public UnitGraphics(Unit self) {
+		this.self = self;
 	}
 
 	public void clearMapLifetimeData() {
@@ -120,6 +122,17 @@ public class UnitGraphics {
 
 	public void setHeadSpriteName(String headSpriteName) {
 		this.headSpriteName = headSpriteName;
+	}
+
+	public Image getHeadSprite() {
+		if(self.getMapInstance().getAssets().isLoaded(headSpriteName)) { // isLoaded will return false if null
+			return  getImage(headSpriteName);
+		}else {
+			return getImage("img/sprites/head/Default.png");
+		}
+	}
+	private Image getImage(String path) {
+		return new Image(self.getMapInstance().getAssets().get(path, Texture.class));
 	}
 
 
