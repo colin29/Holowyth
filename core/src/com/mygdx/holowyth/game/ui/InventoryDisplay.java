@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mygdx.holowyth.game.session.OwnedItems;
 import com.mygdx.holowyth.game.session.OwnedItems.InventoryListener;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.WornEquips.EquipResult;
 import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.unit.item.Item;
 import com.mygdx.holowyth.util.HoloUI;
@@ -64,9 +65,12 @@ public class InventoryDisplay extends SingleUseUIWidget implements InventoryList
 					if (item instanceof Equip) {
 						Equip equip = (Equip) item;
 						if (unit != null) {
-							boolean result = unit.equip.equip(equip);
-							if(result) {
+							EquipResult result = unit.equip.equip(equip);
+							if(result.success) {
 								inv.remove(equip);
+								for(Equip e : result.itemsRemoved) {
+									inv.addItem(e);
+								}
 							}
 						}
 					}

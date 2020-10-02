@@ -8,6 +8,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mygdx.holowyth.unit.WornEquips.EquipResult;
 import com.mygdx.holowyth.unit.WornEquips.Slot;
 import com.mygdx.holowyth.unit.item.Equip;
 
@@ -33,12 +34,16 @@ public class UnitEquip {
 
 	/**
 	 * 
+	 * Doesn't have a notion of the concept of inventory, that needs to be handled higher up
+	 * 
 	 * @return true if the equip was successful
 	 */
-	public boolean equip(Equip item) {
-		boolean isSuccess = worn.equip(item);
-		self.stats.recalculateStats();
-		return isSuccess;
+	public EquipResult equip(Equip item) {
+		EquipResult result = worn.equip(item);
+		
+		if(result.success)
+			self.stats.recalculateStats();
+		return result;
 	}
 
 	public boolean unequip(Equip item) {

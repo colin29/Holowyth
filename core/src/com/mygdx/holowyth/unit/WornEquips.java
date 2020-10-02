@@ -3,8 +3,10 @@ package com.mygdx.holowyth.unit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
@@ -69,61 +71,89 @@ public class WornEquips {
 		}
 	}
 
+	public static class EquipResult{
+		public boolean success;
+		public final Set<Equip> itemsRemoved;
+		
+		public EquipResult(boolean success, Set<@NonNull Equip> itemsRemoved) {
+			this.success = success;
+			this.itemsRemoved = itemsRemoved;
+		}
+	}
+	
+	@SuppressWarnings("null")
+	private final Set<@NonNull Equip> EMPTY_SET = Collections.unmodifiableSet(new LinkedHashSet<@NonNull Equip>());
+	
 	/**
 	 * If you are equipping for a unit (as opposed to a unit marker), access via UnitEquip!!!
 	 * @return true if the equip was successful
 	 */
-	public boolean equip(Equip item) {
-		if (this.hasEquipped(item)) {
+	public EquipResult equip(Equip item) {
+		if (hasEquipped(item)) {
 			logger.warn("Tried to equip item {} which was already equipped by this.", item.name);
-			return false;
+			return new EquipResult(false, EMPTY_SET);
 		}
 
+		Set<Equip> itemsRemoved = new LinkedHashSet<>();
+		@Nullable Equip removed;
+		@Nullable Equip removed2 = null;  
+		
 		switch (item.equipType) {
 		case HEADGEAR:
-			equips.put(WornEquips.Slot.HEAD, item);
+			removed = equips.put(WornEquips.Slot.HEAD, item);
 			break;
 		case ARMOR:
-			equips.put(WornEquips.Slot.BODY, item);
+			removed = equips.put(WornEquips.Slot.BODY, item);
 			break;
 		case WEAPON:
-			clearMainHandSlot();
+			removed = clearMainHandSlot();
 			if (item.is2HWeapon) {
 				equips.put(WornEquips.Slot.MAIN_HAND, item);
-				equips.put(WornEquips.Slot.OFF_HAND, item);
+				removed2 = equips.put(WornEquips.Slot.OFF_HAND, item);
 			} else {
 				equips.put(WornEquips.Slot.MAIN_HAND, item);
 			}
 			break;
 		case SHIELD:
-			clearOffHandSlot();
+			removed = clearOffHandSlot();
 			equips.put(WornEquips.Slot.OFF_HAND, item);
 			break;
 		case ACCESSORY:
-			equips.put(WornEquips.Slot.ACCESSORY, item);
+			removed = equips.put(WornEquips.Slot.ACCESSORY, item);
 			break;
 		default:
 			throw new HoloAssertException("Unhandled equipment type");
 		}
 		changed();
-		return true;
+		if(removed != null)
+			itemsRemoved.add(removed);
+		if(removed2 != null)
+			itemsRemoved.add(removed2);
+		
+		logger.debug("Removed {} items while equiping '{}'", itemsRemoved.size(), item.name);
+		return new EquipResult(true, itemsRemoved);
 	}
 
-	private void clearMainHandSlot() {
+	/**
+	 * @return Returns the equip that was removed, or null if none
+	 */
+	private @Nullable Equip clearMainHandSlot() {
 		if (is2HWieldingWeapon()) {
 			equips.remove(WornEquips.Slot.MAIN_HAND);
-			equips.remove(WornEquips.Slot.OFF_HAND);
+			return equips.remove(WornEquips.Slot.OFF_HAND);
 		} else {
-			equips.remove(WornEquips.Slot.MAIN_HAND);
+			return equips.remove(WornEquips.Slot.MAIN_HAND);
 		}
 	}
-
-	private void clearOffHandSlot() {
+	/**
+	 * @return Returns the equip that was removed, or null if none
+	 */
+	private @Nullable Equip clearOffHandSlot() {
 		if (is2HWieldingWeapon()) {
 			equips.remove(WornEquips.Slot.MAIN_HAND);
-			equips.remove(WornEquips.Slot.OFF_HAND);
+			return equips.remove(WornEquips.Slot.OFF_HAND);
 		} else {
-			equips.remove(WornEquips.Slot.OFF_HAND);
+			return equips.remove(WornEquips.Slot.OFF_HAND);
 		}
 	}
 

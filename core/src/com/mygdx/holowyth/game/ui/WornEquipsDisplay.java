@@ -87,8 +87,10 @@ public class WornEquipsDisplay extends SingleUseUIWidget implements EquippedItem
 		Label entry = new Label("", skin);
 		if(equip==null) {
 			entry.setText(String.format("{%s}", slot.getName()));
+			entry.getColor().a = 0.5f;
 		}else{
 			entry.setText(equip.name);
+			entry.getColor().a = 1f;
 		}
 		entry.addListener(new ClickListener() {
 			@Override
