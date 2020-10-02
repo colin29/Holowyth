@@ -3,7 +3,6 @@ package com.mygdx.holowyth.desktop.demo.pathing;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.collision.wallcollisiondemo.WallCollisionDemo;
 import com.mygdx.holowyth.pathfinding.demo.PathfindingDemo;
 
 public class PathfindingDemoLauncher {

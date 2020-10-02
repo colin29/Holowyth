@@ -1,10 +1,6 @@
 package com.wizered67.game.conversations.scene;
 
-import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.wizered67.game.VNHubManager;
-import com.wizered67.game.conversations.CompleteEvent;
 
 /**
  * Represents a character in the game. Contains information about the

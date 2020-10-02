@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import static com.badlogic.gdx.utils.XmlReader.Element;
 
-import java.io.IOException;
 import java.util.*;
 
 

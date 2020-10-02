@@ -2,6 +2,7 @@ package com.mygdx.holowyth.unit;
 
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +53,7 @@ public class UnitEquip {
 	/**
 	 * @return Read-only collection of the equip slots
 	 */
-	public Map<WornEquips.Slot, Equip> getEquipSlots() {
+	public Map<WornEquips.@NonNull Slot, @NonNull Equip> getEquipSlots() {
 		return wornEquips.getEquipSlots();
 	}
 
@@ -62,8 +63,6 @@ public class UnitEquip {
 
 	void equipAllFromTemplate(WornEquips src) {
 		for (Slot slot : Slot.values()) {
-			if (src.getEquip(slot) == null)
-				continue;
 			if (slot == Slot.OFF_HAND && !src.is2HWieldingWeapon()) {
 				equip(src.getEquip(Slot.OFF_HAND).cloneObject());
 			} else {

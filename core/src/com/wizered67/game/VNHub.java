@@ -8,7 +8,6 @@ import com.wizered67.game.assets.Assets;
 import com.wizered67.game.conversations.ConversationController;
 import com.wizered67.game.gui.GUIManager;
 import com.wizered67.game.inputs.Controls;
-import com.wizered67.game.screens.MainGameScreen;
 
 /**
  * Central hub that holds references to modules and resources.

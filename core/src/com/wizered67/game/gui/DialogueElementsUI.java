@@ -1,19 +1,11 @@
 package com.wizered67.game.gui;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.rafaskoberg.gdx.typinglabel.TypingLabel;
 import com.wizered67.game.Constants;
-import com.wizered67.game.VNHubManager;
 
 /**
  * Creates and contains elements necessary for the main dialogue UI, including textboxes and choice buttons.

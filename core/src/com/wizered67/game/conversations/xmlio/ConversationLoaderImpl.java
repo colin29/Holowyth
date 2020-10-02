@@ -2,7 +2,6 @@ package com.wizered67.game.conversations.xmlio;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.XmlReader.Element;
 import com.wizered67.game.assets.Assets;
 import com.wizered67.game.conversations.Conversation;
@@ -39,7 +38,6 @@ import com.wizered67.game.conversations.commands.factories.VariableWhileCommandF
 import com.wizered67.game.conversations.commands.factories.WaitForLoadingCommandFactory;
 import com.wizered67.game.conversations.commands.factories.WaitUntilVariableCommandFactory;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;

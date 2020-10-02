@@ -489,15 +489,13 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	private String getInfoForAllEquippedItems() {
-		// Get a list of all different named items
+		// Get a list of all distinct items
 
 		List<Equip> distinctItems = new ArrayList<Equip>();
 
 		final var equip = self.equip;
 		for (Equip item : equip.getEquipSlots().values()) {
-			if (item == null)
-				continue;
-			if (distinctItems.stream().noneMatch(i -> i.name == item.name)) {
+			if (distinctItems.stream().noneMatch(i -> i==item)) {
 				distinctItems.add(item);
 			}
 		}

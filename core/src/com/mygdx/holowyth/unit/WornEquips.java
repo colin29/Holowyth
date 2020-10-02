@@ -1,26 +1,31 @@
 package com.mygdx.holowyth.unit;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.util.exceptions.HoloAssertException;
-import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**
  * Represents a set of equipments that can be worn at one time.
  */
+@NonNullByDefault
 public class WornEquips {
 
+	@SuppressWarnings("null")
 	Logger logger = LoggerFactory.getLogger(this.getClass());
-	
-	private EquippedItemsMap equips = new EquippedItemsMap();
-	
+
+	private final Map<WornEquips.@NonNull Slot, @NonNull Equip> equips = new LinkedHashMap<>();
+
 	public enum Slot {
-		HEAD, MAIN_HAND, OFF_HAND, TORSO, ACCESSORY1, ACCESSORY2;
-	
+		HEAD, MAIN_HAND, OFF_HAND, TORSO, ACCESSORY, FOOTWEAR;
+
 		public String getName() {
 			switch (this) {
 			case HEAD:
@@ -31,42 +36,36 @@ public class WornEquips {
 				return "Off Hand";
 			case TORSO:
 				return "Torso";
-			case ACCESSORY1:
-				return "Accessory 1";
-			case ACCESSORY2:
-				return "Accessory 2";
+			case ACCESSORY:
+				return "Accessory";
+			case FOOTWEAR:
+				return "Footwear";
 			default:
 				throw new HoloAssertException("Unhandled Equip slot");
+			
 			}
 		}
 	}
-	
+
 	public WornEquips() {
 	}
 
 	public WornEquips(WornEquips src) {
 		for (Slot slot : Slot.values()) {
-			
-			if(src.getEquip(slot) == null)
-				continue;
-			
-			if(slot == Slot.OFF_HAND && !src.is2HWieldingWeapon()) {
-				equip(src.getEquip(Slot.OFF_HAND).cloneObject());
-			}else {
-				equip(src.getEquip(slot).cloneObject());
+			equips.put(slot, src.getEquip(slot));
+			if (src.is2HWieldingWeapon()) { // discard the duplicate copied reference in OFF_HAND
+				equips.put(Slot.OFF_HAND, equips.get(Slot.MAIN_HAND));
 			}
 		}
 	}
-
 
 	/**
 	 * 
 	 * @return true if the equip was successful
 	 */
 	public boolean equip(Equip item) {
-		// Don't report null equip, let the underlying collection throw an exception (??)
 		if (this.hasEquipped(item)) {
-			logger.info("Tried to equip item {} which was already equipped by this.", item.name);
+			logger.warn("Tried to equip item {} which was already equipped by this.", item.name);
 			return false;
 		}
 
@@ -91,11 +90,7 @@ public class WornEquips {
 			equips.put(WornEquips.Slot.OFF_HAND, item);
 			break;
 		case ACCESSORY:
-			if (equips.isNull(WornEquips.Slot.ACCESSORY1) && equips.isNull(WornEquips.Slot.ACCESSORY2)) {
-				equips.put(WornEquips.Slot.ACCESSORY2, item);
-			} else {
-				equips.put(WornEquips.Slot.ACCESSORY1, item);
-			}
+			equips.put(WornEquips.Slot.ACCESSORY, item);
 			break;
 		default:
 			throw new HoloAssertException("Unhandled equipment type");
@@ -122,8 +117,6 @@ public class WornEquips {
 	}
 
 	public boolean unequip(Equip item) {
-		if (item == null)
-			throw new HoloIllegalArgumentsException("Can't unequip a null item");
 		if (!hasEquipped(item)) {
 			logger.info("Tried to unequip {}, but item is not equipped by this", item.name);
 			return false;
@@ -137,7 +130,11 @@ public class WornEquips {
 	}
 
 	public boolean hasEquipped(Equip equip) {
-		return equips.contains(equip);
+		for (var wornEquip : equips.values()) {
+			if (equip == wornEquip)
+				return true;
+		}
+		return false;
 	}
 
 	public Equip getEquip(WornEquips.Slot slot) {
@@ -147,15 +144,16 @@ public class WornEquips {
 	/**
 	 * @return Read-only collection of the equip slots
 	 */
+	@SuppressWarnings("null")
 	public Map<WornEquips.Slot, Equip> getEquipSlots() {
-		return equips.getReadOnlyMap();
+		return Collections.unmodifiableMap(equips);
 	}
 
 	public boolean is2HWieldingWeapon() {
-		return !equips.isNull(WornEquips.Slot.MAIN_HAND) &&
-				equips.get(WornEquips.Slot.MAIN_HAND) == equips.get(WornEquips.Slot.OFF_HAND);
+		return !equips.containsKey(WornEquips.Slot.MAIN_HAND)
+				&& equips.get(WornEquips.Slot.MAIN_HAND) == equips.get(WornEquips.Slot.OFF_HAND);
 	}
-	
+
 	public WornEquips cloneObject() {
 		return new WornEquips(this);
 	}

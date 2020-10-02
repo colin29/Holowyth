@@ -16,7 +16,6 @@ import com.wizered67.game.conversations.Conversation;
 import com.wizered67.game.conversations.ConversationController;
 import com.wizered67.game.conversations.scene.SceneEntity;
 import com.wizered67.game.conversations.scene.SceneManager;
-import com.wizered67.game.gui.GUIManager;
 import com.wizered67.game.saving.serializers.*;
 import com.wizered67.game.saving.serializers.luaserializers.LuaBooleanSerializer;
 import com.wizered67.game.saving.serializers.luaserializers.LuaDoubleSerializer;

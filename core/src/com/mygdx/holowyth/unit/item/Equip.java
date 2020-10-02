@@ -19,7 +19,7 @@ import com.mygdx.holowyth.unit.UnitStatValues;
 public class Equip extends Item {
 
 	public enum EquipType {
-		HEADGEAR, ARMOR, WEAPON, SHIELD, ACCESSORY
+		HEADGEAR, ARMOR, WEAPON, SHIELD, ACCESSORY, FOOTWEAR
 	}
 
 	public @NonNull EquipType equipType;

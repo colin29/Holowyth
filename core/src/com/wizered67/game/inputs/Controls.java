@@ -3,8 +3,6 @@ package com.wizered67.game.inputs;
 import com.badlogic.gdx.Input;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Created by Adam on 5/18/2017.

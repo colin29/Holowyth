@@ -1,8 +1,6 @@
 package com.wizered67.game.conversations.scene;
 
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
-import com.wizered67.game.VNHubManager;
 
 /**
  * Represents an image displayed by the user during a scene. Extends the SceneEntity abstract

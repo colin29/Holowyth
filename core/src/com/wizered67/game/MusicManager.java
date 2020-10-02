@@ -1,6 +1,5 @@
 package com.wizered67.game;
 
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.audio.Music;
 import com.wizered67.game.assets.parameters.MusicParameters;
 

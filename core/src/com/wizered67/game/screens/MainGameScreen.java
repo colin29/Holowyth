@@ -5,12 +5,9 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.*;
 import com.wizered67.game.VNHubManager;
 import com.wizered67.game.inputs.ControlInputAdapter;
-import com.wizered67.game.inputs.Controls;
 
 /**
  * Main Game Screen for initializing and updating GUIManager.

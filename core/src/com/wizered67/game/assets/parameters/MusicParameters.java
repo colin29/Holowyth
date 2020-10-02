@@ -1,6 +1,5 @@
 package com.wizered67.game.assets.parameters;
 
-import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.MusicLoader;
 import com.badlogic.gdx.audio.Music;

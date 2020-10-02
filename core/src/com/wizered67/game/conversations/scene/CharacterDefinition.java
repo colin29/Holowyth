@@ -1,7 +1,5 @@
 package com.wizered67.game.conversations.scene;
 
-import com.wizered67.game.conversations.ConversationController;
-
 /**
  * Defines a base of a character that SceneCharacters can be created from.
  * @author Adam Victor

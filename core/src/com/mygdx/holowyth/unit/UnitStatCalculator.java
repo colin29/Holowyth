@@ -24,7 +24,7 @@ public class UnitStatCalculator {
 		var equip = self.getEquip();
 
 		calculateSkillStatBonuses(skillBonus);
-		calculateEquipStatBonuses(equipBonus, WornEquips.Slot.HEAD, WornEquips.Slot.TORSO, WornEquips.Slot.MAIN_HAND, WornEquips.Slot.ACCESSORY1, WornEquips.Slot.ACCESSORY2);
+		calculateEquipStatBonuses(equipBonus, WornEquips.Slot.HEAD, WornEquips.Slot.TORSO, WornEquips.Slot.MAIN_HAND, WornEquips.Slot.ACCESSORY);
 
 		if (equip.getEquip(WornEquips.Slot.MAIN_HAND) != equip.getEquip(WornEquips.Slot.OFF_HAND)) // don't count a 2H weapon twice
 			addEquipStatBonuses(equipBonus, WornEquips.Slot.OFF_HAND);

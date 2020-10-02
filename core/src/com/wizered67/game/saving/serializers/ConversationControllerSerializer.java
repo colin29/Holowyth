@@ -7,7 +7,6 @@ import com.esotericsoftware.kryo.serializers.FieldSerializer;
 import com.esotericsoftware.kryo.serializers.FieldSerializerConfig;
 import com.wizered67.game.VNHubManager;
 import com.wizered67.game.conversations.ConversationController;
-import com.wizered67.game.gui.GUIManager;
 
 /**
  * Serializer used for saving and loading ConversationControllers.
