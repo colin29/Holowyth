@@ -86,7 +86,8 @@ public class StandardGameScreen extends GameScreen {
 		session.ownedItems.addItem(Weapons.spear.cloneObject());
 		session.ownedItems.addItem(Weapons.club.cloneObject());
 		session.ownedItems.addItem(Weapons.club.cloneObject());
-		new InventoryDisplay(stage, skin, session.ownedItems);
+		var inv = new InventoryDisplay(stage, skin, session.ownedItems);
+		inv.setLinkedUnit(lecia);
 		session.ownedItems.addItem(Weapons.dagger.cloneObject());
 	}
 

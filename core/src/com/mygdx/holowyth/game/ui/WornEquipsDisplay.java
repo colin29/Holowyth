@@ -86,9 +86,6 @@ public class WornEquipsDisplay extends SingleUseUIWidget implements EquippedItem
 			entry.setText(equip.name);
 		}
 		entry.addListener(new ClickListener() {
-			{
-//				setTapCountInterval()
-			}
 			@Override
 			public void clicked(@Nullable InputEvent event, float x, float y) {
 				logger.debug("tap count: {}", getTapCount());
