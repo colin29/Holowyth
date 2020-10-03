@@ -169,6 +169,14 @@ public class Controls extends InputProcessorAdapter {
 				return "N/A";
 			}
 		});
+		debugValues.add("curGlobalCooldown of one unit", () -> {
+			if (selectedUnits.size() == 1) {
+				Unit u = selectedUnits.first();
+				return u.skills.getCurGlobalCooldown();
+			} else {
+				return 0;
+			}
+		});
 		debugValues.add("Btree last task", () -> {
 			if (selectedUnits.size() == 1) {
 				Unit u = selectedUnits.first();
@@ -229,6 +237,10 @@ public class Controls extends InputProcessorAdapter {
 
 			if (unit.isSkillsOnCooldown() && !Holo.debugSkillCooldownDisabled) {
 				logger.info("{}: Skills are on cooldown", unit.getName());
+				return;
+			}
+			if (unit.isCasting()) {
+				logger.info("{}: Is busy casting", unit.getName());
 				return;
 			}
 			if (curSkill.getParent().curCooldown > 0 && !Holo.debugSkillCooldownDisabled) {

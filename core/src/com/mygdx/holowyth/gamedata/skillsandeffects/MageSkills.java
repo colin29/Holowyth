@@ -156,6 +156,7 @@ public class MageSkills {
 			casting.castTime = 60 * 1.8f;
 			spCost = 18;
 			cooldown = 60 * 24;
+			globalCooldown = 60 * 3;
 			addTag(Tag.RANGED_MAGIC);
 			defaultAimingHelperRadius = MageEffects.BlindingFlashEffect.aoeRadius;
 

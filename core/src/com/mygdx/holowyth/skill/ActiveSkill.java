@@ -33,6 +33,7 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	public float globalCooldown = 60 * 2; // default 
 	public float cooldown; // in game frames
 
 	/**
@@ -149,6 +150,7 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 
 				if (parent != null) {
 					parent.curCooldown = cooldown;
+					caster.skills.setCurGlobalCooldown(globalCooldown);
 				} else {
 					throw new HoloException("Skill used but parent field false");
 				}

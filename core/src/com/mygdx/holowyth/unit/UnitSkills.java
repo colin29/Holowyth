@@ -21,6 +21,8 @@ public class UnitSkills {
 
 	public final Unit self;
 
+	private float curGlobalSkillsCooldown;
+
 	// Parameters
 	public static final int NUM_SKILL_SLOTS = 10;
 
@@ -36,10 +38,7 @@ public class UnitSkills {
 	 * this when the active portion has finished.
 	 */
 	ActiveSkill activeSkill;
-	/**
-	 * Time in frames before the unit can use skills again
-	 */
-	private float skillCooldownRemaining;
+
 
 	public UnitSkills(Unit unit) {
 		self = unit;
@@ -47,14 +46,9 @@ public class UnitSkills {
 
 	public void clearMapLifetimeData() {
 		activeSkill = null;
-		skillCooldownRemaining = 0;
 	}
 
 	void tick() {
-		if (skillCooldownRemaining > 0) {
-			skillCooldownRemaining -= 1;
-		}
-
 		if (activeSkill != null)
 			activeSkill.tick();
 
@@ -128,6 +122,7 @@ public class UnitSkills {
 				skill.tickCooldown();
 			}
 		}
+		curGlobalSkillsCooldown = Math.max(0, curGlobalSkillsCooldown - 1);
 	}
 
 	/**
@@ -189,14 +184,6 @@ public class UnitSkills {
 		this.activeSkill = activeSkill;
 	}
 
-	float getSkillCooldownRemaining() {
-		return skillCooldownRemaining;
-	}
-
-	void setSkillCooldownRemaining(float skillCooldownRemaining) {
-		this.skillCooldownRemaining = skillCooldownRemaining;
-	}
-
 	public boolean isCasting() {
 		return this.activeSkill != null && activeSkill.getStatus() == Status.CASTING;
 	}
@@ -206,7 +193,15 @@ public class UnitSkills {
 	}
 
 	public boolean isSkillsOnCooldown() {
-		return (skillCooldownRemaining > 0);
+		return (curGlobalSkillsCooldown > 0);
+	}
+
+	public float getCurGlobalCooldown() {
+		return curGlobalSkillsCooldown;
+	}
+
+	public void setCurGlobalCooldown(float curGlobalCooldown) {
+		this.curGlobalSkillsCooldown = curGlobalCooldown;
 	}
 
 }

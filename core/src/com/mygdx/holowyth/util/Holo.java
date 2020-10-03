@@ -43,7 +43,7 @@ public class Holo {
 
 	// Debug Cheats
 	public static boolean debugFastCastEnbabled = false;
-	public static boolean debugSkillCooldownDisabled = true;
+	public static boolean debugSkillCooldownDisabled = false;
 	public static boolean debugHighHpUnits = false;
 	public static boolean debugNoManaCost = false;
 

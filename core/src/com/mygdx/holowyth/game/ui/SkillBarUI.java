@@ -166,7 +166,7 @@ public class SkillBarUI {
 		if (isSkillBarActive()) {
 			for (SkillButton button : skillButtons) {
 				if (button.skill != null) {
-					button.setDisabled(button.skill.isOnCooldown());
+					button.setDisabled(button.skill.isOnCooldown() || !unit.isUseSkillAllowed() || unit.isSkillsOnCooldown());
 				}
 			}
 		}
@@ -221,20 +221,32 @@ public class SkillBarUI {
 
 	private Vector2 temp = new Vector2();
 
-	private Color skillCoolDownOverlayColor = new Color(1, 1, 1, 0.25f);
+	private Color skillCdOverlayColor = new Color(1, 1, 1, 0.25f);
+	private Color globalCdOverlayColor = new Color(1, 1, 0, 0.3f);
 
 	public void draw(Cameras cameras, SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
 		batch.begin();
 		batch.setProjectionMatrix(cameras.fixedCamera.combined);
 
-		shapeDrawer.setColor(skillCoolDownOverlayColor);
+		
 
 		for (SkillButton button : skillButtons) {
 			var skill = button.skill;
 			if (skill != null && skill.isOnCooldown()) {
-
+				shapeDrawer.setColor(skillCdOverlayColor);
 				float cooldownFractionRemaining = Math.min(1, skill.curCooldown / skill.cooldown);
-
+				temp = button.localToStageCoordinates(temp.setZero());
+				shapeDrawer.filledRectangle(temp.x, temp.y, button.getWidth(), button.getHeight() * cooldownFractionRemaining);
+			}
+			if(skill != null && unit.skills.getCurGlobalCooldown() > 0) {
+				shapeDrawer.setColor(globalCdOverlayColor);
+				float cooldownFractionRemaining = 0;
+				if(skill.cooldown == 0) {
+					cooldownFractionRemaining = 1;
+				}else {
+					cooldownFractionRemaining = Math.min(1, unit.skills.getCurGlobalCooldown() / skill.cooldown);	
+				}
+				
 				temp = button.localToStageCoordinates(temp.setZero());
 				shapeDrawer.filledRectangle(temp.x, temp.y, button.getWidth(), button.getHeight() * cooldownFractionRemaining);
 			}
