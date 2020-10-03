@@ -54,6 +54,8 @@ public class StandardGameScreen extends GameScreen {
 
 	private final @NonNull SessionData session = new SessionData();
 
+	private @NonNull PartyUnitSelectionPanel partyPanel;
+
 	public StandardGameScreen(Holowyth game) {
 		super(game);
 //		vn = new VNController(new Stage(), batch, fixedCamera, multiplexer); // have vn draw using its OWN stage
@@ -71,14 +73,14 @@ public class StandardGameScreen extends GameScreen {
 		}, Keys.MINUS);
 
 		DebugValues debugValues = debugStore.registerComponent(this.getClass().getSimpleName());
-		debugValues.add("Map name", () -> map.getName());
+		debugValues.add("Map name", () -> map != null ? map.getName() : "No map loaded");
 
 		loadGameMapByName("forest1");
 
 		var spawnPos = map.getLocation("default_spawn_location").pos;
 //		session.playerUnits.addAll(testSpawnMultipleLecias(3, map.getLocation("default_spawn_location").pos));
 		session.playerUnits.addAll(spawnThreeMemberParty(spawnPos));
-		
+
 		lecia = session.playerUnits.get(0);
 
 		for (Unit u : session.playerUnits) {
@@ -89,12 +91,13 @@ public class StandardGameScreen extends GameScreen {
 
 		session.ownedItems.addItem(Weapons.spear.cloneObject());
 		session.ownedItems.addItem(Weapons.club.cloneObject());
-		session.ownedItems.addItem(Weapons.club.cloneObject());
 		var inv = new InventoryDisplay(stage, skin, session.ownedItems, assets);
 		inv.setLinkedUnit(lecia);
 		session.ownedItems.addItem(Weapons.dagger.cloneObject());
 
-		new PartyUnitSelectionPanel(session.playerUnits, inv, stage, skin, assets);
+		partyPanel = new PartyUnitSelectionPanel(session.playerUnits, inv, stage, multiplexer, skin, assets);
+		
+		session.ownedCurrency.add(50);
 	}
 
 	/**
@@ -151,8 +154,9 @@ public class StandardGameScreen extends GameScreen {
 	}
 
 	public void goToTown(String townName) {
+		mapShutdown();
 		Town town = game.world.getNewTownInstance(townName);
-		var townScreen = new TownScreen(game, session);
+		var townScreen = new TownScreen(game, session, this);
 		townScreen.loadTown(town);
 		game.setScreen(townScreen);
 	}
@@ -196,8 +200,7 @@ public class StandardGameScreen extends GameScreen {
 	@SuppressWarnings("null")
 	private List<@NonNull Unit> spawnThreeMemberParty(Point spawnPos) {
 		// fetch locations
-		final List<Point> unitPlacements = pathingModule.findPathablePlacements(spawnPos, 3,
-				mapInstance.getUnits());
+		final List<Point> unitPlacements = pathingModule.findPathablePlacements(spawnPos, 3, mapInstance.getUnits());
 		if (unitPlacements.size() != 3) {
 			logger.warn("Expected {} placements, but got {} locations. Not all units may be placed.", 3,
 					unitPlacements.size());
@@ -210,7 +213,7 @@ public class StandardGameScreen extends GameScreen {
 		units.add(mapInstance.addUnit(Players.lecia, unitPlacements.get(0)));
 		units.add(mapInstance.addUnit(Players.sonia, unitPlacements.get(1)));
 		units.add(mapInstance.addUnit(Players.elvin, unitPlacements.get(2)));
-		
+
 		return units;
 	}
 
@@ -304,8 +307,10 @@ public class StandardGameScreen extends GameScreen {
 	@Override
 	protected void tickGame() {
 		super.tickGame();
-		tickEntrances();
-		transportPlayerUnitsIfStandingOnEntrance();
+		if (isMapLoaded()) {
+			tickEntrances();
+			transportPlayerUnitsIfStandingOnEntrance();
+		}
 	}
 
 	@Override
@@ -318,8 +323,14 @@ public class StandardGameScreen extends GameScreen {
 	@Override
 	public void show() {
 		Gdx.input.setInputProcessor(multiplexer);
+		logger.debug("Showed Screen");
 	}
-
+	 
+	@Override
+	public void hide() {
+		super.hide();
+		partyPanel.onScreenHide();
+	}
 	@Override
 	public final void mapStartup() {
 		super.mapStartup();
@@ -338,4 +349,5 @@ public class StandardGameScreen extends GameScreen {
 		if (vn != null)
 			vn.resize(width, height);
 	}
+
 }

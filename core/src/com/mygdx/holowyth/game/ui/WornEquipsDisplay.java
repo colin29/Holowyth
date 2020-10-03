@@ -60,6 +60,7 @@ public class WornEquipsDisplay extends SingleUseUIWidget implements EquippedItem
 		display.clear();
 		Table slots1 = new Table();
 		Table slots2 = new Table();
+		Table imgColumn = new Table();
 		
 		slots1.defaults().pad(20);
 		slots2.defaults().pad(20);
@@ -78,8 +79,12 @@ public class WornEquipsDisplay extends SingleUseUIWidget implements EquippedItem
 		slots2.add(makeLabel(Slot.ACCESSORY));
 		slots2.row();
 		
+		imgColumn.add(unit.graphics.getHeadSprite()).maxWidth(100);
+		imgColumn.row();
+		imgColumn.add(new Label(unit.getName(), skin)).spaceTop(7);
+		
 		display.add(slots1).width(150);
-		display.add(unit.graphics.getHeadSprite()).maxWidth(100).top().padTop(20);
+		display.add(imgColumn).top().padTop(20);
 		display.add(slots2).width(150);
 	}
 	private Label makeLabel(Slot slot) {

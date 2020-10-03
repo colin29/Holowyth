@@ -149,7 +149,7 @@ public class Holowyth extends Game {
 		}
 		try {
 			if(clazz == TownScreen.class) {
-				var townScreen = new TownScreen(this, new SessionData.DummySessionData());
+				var townScreen = new TownScreen(this, new SessionData.DummySessionData(), null);
 				townScreen.loadTown(world.getNewTownInstance("testTown"));
 				this.setScreen(townScreen);
 				

@@ -91,8 +91,8 @@ public class GameScreenUI extends InputProcessorAdapter {
 		stage.addActor(root2);
 		
 		root2.defaults().space(20);
-		HoloUI.textButton(root2, "Close map", skin, ()->{game.mapShutdown();});
-		HoloUI.textButton(root2, "Load map", skin, ()->{game.loadGameMapByName("forest1");});
+//		HoloUI.textButton(root2, "Close map", skin, ()->{game.mapShutdown();});
+//		HoloUI.textButton(root2, "Load map", skin, ()->{game.loadGameMapByName("forest1");});
 		
 		
 	}

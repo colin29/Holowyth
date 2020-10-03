@@ -66,7 +66,7 @@ public class Holo {
 	public static float alliedUnitsAttackChaseRange = 175;
 
 	// Debug display
-	public static boolean debugPanelShowAtStartup = true;
+	public static boolean debugPanelShowAtStartup = false;
 	public static Color debugFontColor = Color.BLACK;
 	public static boolean debugShowMouseLocationText = true;
 

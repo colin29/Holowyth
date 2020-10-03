@@ -1,5 +1,6 @@
 package com.mygdx.holowyth.game.base;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,10 +66,8 @@ public abstract class GameScreen extends MapLoadingScreen {
 	private float snapLeftoverX;
 	private float snapLeftoverY;
 
-	protected final InputMultiplexer multiplexer = new InputMultiplexer();
+	protected final @NonNull InputMultiplexer multiplexer = new InputMultiplexer();
 	
-	
-	// Gameplay
 
 	// Settings
 	private Color backgroundColor = HoloGL.rgb(79, 121, 66); // HoloGL.rbg(255, 236, 179);
