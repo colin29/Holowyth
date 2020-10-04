@@ -1,19 +1,26 @@
 package com.mygdx.holowyth.graphics;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.world.map.obstacle.Polygon;
 import com.mygdx.holowyth.world.map.simplemap.Polygons;
 import com.mygdx.holowyth.world.map.simplemap.SimpleMap;
+import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
+import com.mygdx.holowyth.util.exceptions.HoloIOException;
+import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**
  * Utility class with various basic rendering/visualization functions. One should set shapeRenderer's projection matrix before calling functions.
@@ -22,6 +29,36 @@ import com.mygdx.holowyth.util.dataobjects.Segment;
 public class HoloGL {
 
 	static ShapeRenderer shapeRenderer;
+	
+	public static TextureRegion[] getKeyFrames(String path, int frameWidth, int frameHeight) {
+		
+			Texture origTexture  = new Texture(Gdx.files.internal(Holowyth.ASSETS_DISK_PATH + path));
+			
+			TextureRegion[][] tex = TextureRegion.split(origTexture,
+					frameWidth,
+					frameHeight);
+			
+			if(tex.length == 0) {
+				throw new HoloIllegalArgumentsException("TextureRegion.split produced 0 tiles");
+			}
+
+			int FRAME_ROWS = tex.length;
+			int FRAME_COLS = tex[0].length;
+			
+			// Place the regions into a 1D array in the correct order, starting from the top
+			// left, going across first. The Animation constructor requires a 1D array.
+
+			TextureRegion[] keyFrames = new TextureRegion[FRAME_ROWS*FRAME_COLS];
+
+			for (int i = 0; i < FRAME_ROWS; i++) {
+				for (int j = 0; j < FRAME_COLS; j++) {
+					keyFrames[i*FRAME_COLS + j] = tex[i][j];
+				}
+			}
+			
+			return keyFrames;
+		}
+
 
 	public static void renderSegment(Segment s, Color color) {
 		if (s != null) {

@@ -14,7 +14,7 @@ import com.mygdx.holowyth.gamedata.units.MonsterStats;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.sprite.AnimatedSprite;
-import com.mygdx.holowyth.unit.sprite.Animations;
+import com.mygdx.holowyth.unit.sprite.AnimatedSprites;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
@@ -104,7 +104,7 @@ public class CombatPrototyping {
 		setPlayerUnitSprites(players);
 		setUpThreeUnitScenario(players);
 
-		Animations animations = mapInstance.getAnimations();
+		AnimatedSprites animations = mapInstance.getAnimations();
 		for (var p : scenario.enemySpawnLocs) {
 			var unit = new Unit(p.x, p.y, Unit.Side.ENEMY, mapInstance);
 			unit.setName("Goblin");
@@ -117,7 +117,7 @@ public class CombatPrototyping {
 
 	private void setPlayerUnitSprites(List<Unit> players) {
 		AnimatedSprite[] sprites = new AnimatedSprite[3];
-		Animations animations = mapInstance.getAnimations();
+		AnimatedSprites animations = mapInstance.getAnimations();
 
 		// default sprites
 		sprites[0] = animations.get("pipo-charachip001b.png");
@@ -134,7 +134,7 @@ public class CombatPrototyping {
 		if (players.size() < 3) {
 			return;
 		}
-		Animations animations = mapInstance.getAnimations();
+		AnimatedSprites animations = mapInstance.getAnimations();
 
 		{
 			var u = players.get(0);

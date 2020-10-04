@@ -9,6 +9,7 @@ package com.mygdx.holowyth.util.tools;
 public class Timer {
 
 	boolean started = false;
+	
 	long timeOfLastFrame;
 	long timeSinceLastFrame;
 	long curFrame;
@@ -16,6 +17,9 @@ public class Timer {
 	long intervalTimeMili; // in milliseconds
 	long extraTime; // in nanoseconds
 
+	//  fields for returning absolute elapsed time
+	long timeInitial;
+	
 	public Timer() {
 
 	}
@@ -31,6 +35,7 @@ public class Timer {
 		if (!started) {
 			timeOfLastFrame = System.nanoTime();
 			started = true;
+			timeInitial = System.nanoTime();
 		}
 	}
 
@@ -44,6 +49,19 @@ public class Timer {
 			return true;
 		}
 		return false;
+	}
+	/**
+	 * In Miliseconds
+	 * @return
+	 */
+	public int getTimeElapsed() {
+		return (int) ((System.nanoTime() - timeInitial)/1000000);
+	}
+	public float getTimeElapsedSeconds() {
+		return (float)( ((System.nanoTime() - timeInitial)/ 1000000000.0));
+	}
+	public static float getTimeElapsedSeconds(long initialTime) {
+		return (float)( ((System.nanoTime() - initialTime)/ 1000000000.0));
 	}
 
 }

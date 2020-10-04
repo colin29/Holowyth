@@ -56,7 +56,6 @@ public class PartyUnitSelectionPanel extends SingleUseUIWidget {
 		multiplexer.addProcessor(0, new InputProcessorAdapter() {
 			@Override
 			public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-				logger.debug("Got touch down {}, {}", pointer, button);
 				if (button == Input.Buttons.RIGHT && pointer == 0) {
 					removeEquipsDisplay();
 				}

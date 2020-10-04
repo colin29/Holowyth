@@ -28,7 +28,7 @@ public class AnimatedSprite {
 
 	public AnimatedSprite(String path) {
 		walkSheet = new Texture(Gdx.files.internal(Holowyth.ASSETS_PATH + path));
-		TextureRegion[][] tmp = TextureRegion.split(walkSheet,
+		TextureRegion[][] tex = TextureRegion.split(walkSheet,
 				32,
 				32);
 
@@ -46,7 +46,7 @@ public class AnimatedSprite {
 
 		for (int i = 0; i < FRAME_ROWS; i++) {
 			for (int j = 0; j < FRAME_COLS; j++) {
-				keyFrames.get(i)[j] = tmp[i][j];
+				keyFrames.get(i)[j] = tex[i][j];
 			}
 		}
 
