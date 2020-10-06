@@ -25,7 +25,7 @@ import com.mygdx.holowyth.gamedata.maps.HolowythWorld;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.test.demos.combatdemo.CombatDemo;
 import com.mygdx.holowyth.town.TownScreen;
-import com.mygdx.holowyth.unit.sprite.AnimatedSprites;
+import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.world.World;
 
@@ -56,7 +56,7 @@ public class Holowyth extends Game {
 	public final World world = new HolowythWorld();
 	
 	/* Sprite resources */
-	public AnimatedSprites animatedSprites;
+	public Animations animations;
 	
 
 	Class<? extends Screen> screenClassToLoad;
@@ -81,7 +81,7 @@ public class Holowyth extends Game {
 		initFileChoosers();
 		initFonts();
 		
-		animatedSprites = new AnimatedSprites();
+		animations = new Animations();
 		
 
 		new LoadingScreen(this);

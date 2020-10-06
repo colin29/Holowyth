@@ -26,7 +26,7 @@ import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.unit.sprite.AnimatedSprites;
+import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloAssert;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -55,7 +55,7 @@ public class MapInstance implements MapInstanceInfo {
 
 	final PathingModule pathing;
 	final EffectsHandler gfx;
-	final AnimatedSprites animations;
+	final Animations animations;
 	final DebugStore debugStore;
 	final AssetManager assets;
 
@@ -74,7 +74,7 @@ public class MapInstance implements MapInstanceInfo {
 	 */
 	private final Map<Unit, Set<Unit>> unitsAttackingThis = new HashMap<Unit, Set<Unit>>();
 
-	public MapInstance(PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects, AnimatedSprites animations, AssetManager assets) {
+	public MapInstance(PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects, Animations animations, AssetManager assets) {
 		this.pathing = pathingModule;
 		this.gfx = effects;
 		this.animations = animations;
@@ -569,7 +569,7 @@ public class MapInstance implements MapInstanceInfo {
 	}
 
 	@Override
-	public AnimatedSprites getAnimations() {
+	public Animations getAnimations() {
 		return animations;
 	}
 	

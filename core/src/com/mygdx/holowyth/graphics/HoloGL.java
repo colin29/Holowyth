@@ -29,36 +29,6 @@ import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 public class HoloGL {
 
 	static ShapeRenderer shapeRenderer;
-	
-	public static TextureRegion[] getKeyFrames(String path, int frameWidth, int frameHeight) {
-		
-			Texture origTexture  = new Texture(Gdx.files.internal(Holowyth.ASSETS_DISK_PATH + path));
-			
-			TextureRegion[][] tex = TextureRegion.split(origTexture,
-					frameWidth,
-					frameHeight);
-			
-			if(tex.length == 0) {
-				throw new HoloIllegalArgumentsException("TextureRegion.split produced 0 tiles");
-			}
-
-			int FRAME_ROWS = tex.length;
-			int FRAME_COLS = tex[0].length;
-			
-			// Place the regions into a 1D array in the correct order, starting from the top
-			// left, going across first. The Animation constructor requires a 1D array.
-
-			TextureRegion[] keyFrames = new TextureRegion[FRAME_ROWS*FRAME_COLS];
-
-			for (int i = 0; i < FRAME_ROWS; i++) {
-				for (int j = 0; j < FRAME_COLS; j++) {
-					keyFrames[i*FRAME_COLS + j] = tex[i][j];
-				}
-			}
-			
-			return keyFrames;
-		}
-
 
 	public static void renderSegment(Segment s, Color color) {
 		if (s != null) {

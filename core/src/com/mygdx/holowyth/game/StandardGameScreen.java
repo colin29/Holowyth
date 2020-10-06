@@ -9,20 +9,15 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.game.base.GameScreen;
 import com.mygdx.holowyth.game.session.SessionData;
 import com.mygdx.holowyth.game.ui.InventoryDisplay;
 import com.mygdx.holowyth.game.ui.PartyUnitSelectionPanel;
-import com.mygdx.holowyth.game.ui.WornEquipsDisplay;
 import com.mygdx.holowyth.gamedata.items.Weapons;
 import com.mygdx.holowyth.gamedata.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.gamedata.units.MonsterStats;
 import com.mygdx.holowyth.gamedata.units.Players;
-import com.mygdx.holowyth.graphics.GifDecoder;
-import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.town.TownScreen;
 import com.mygdx.holowyth.town.model.Town;
@@ -56,7 +51,7 @@ public class StandardGameScreen extends GameScreen {
 
 	private Unit lecia;
 
-	private final @NonNull SessionData session = new SessionData();
+	protected final @NonNull SessionData session = new SessionData();
 
 	private @NonNull PartyUnitSelectionPanel partyPanel;
 
@@ -82,36 +77,22 @@ public class StandardGameScreen extends GameScreen {
 		loadGameMapByName("forest1");
 
 		var spawnPos = map.getLocation("default_spawn_location").pos;
-//		session.playerUnits.addAll(testSpawnMultipleLecias(3, map.getLocation("default_spawn_location").pos));
 		session.playerUnits.addAll(spawnThreeMemberParty(spawnPos));
 
+		// Setup inventory UI
 		lecia = session.playerUnits.get(0);
 		for (Unit u : session.playerUnits) {
 			u.setInventory(session.ownedItems);
 		}
 		var inv = new InventoryDisplay(stage, skin, session.ownedItems, assets);
 		partyPanel = makePartyPanel(inv);
-		addTestWeaponsToInventory();
+		
 
-		testInitEffect();
 	}
-
-	Animation<TextureRegion> darkSpike;
-
-	private void testInitEffect() {
-		darkSpike = new Animation<TextureRegion>(0.10f, HoloGL.getKeyFrames("img/effects/dark_spike.png", 192, 192));
-	}
-
-	private void addTestWeaponsToInventory() {
-		session.ownedItems.addItem(Weapons.spear.cloneObject());
-		session.ownedItems.addItem(Weapons.club.cloneObject());
-		session.ownedItems.addItem(Weapons.dagger.cloneObject());
-		session.ownedCurrency.add(50);
-	}
+	
 
 	private @NonNull PartyUnitSelectionPanel makePartyPanel(@NonNull InventoryDisplay inv) {
 		var partyPanel = new PartyUnitSelectionPanel(session.playerUnits, inv, stage, multiplexer, skin, assets);
-		addTestWeaponsToInventory();
 		return partyPanel;
 	}
 
@@ -238,7 +219,7 @@ public class StandardGameScreen extends GameScreen {
 	private @NonNull Unit testSpawnLecia(Point pos) {
 		var u = new Unit(pos.x, pos.y, Unit.Side.PLAYER, mapInstance);
 		u.setName("Lecia");
-		u.graphics.setAnimatedSprite(game.animatedSprites.get("pipo-charachip030e.png"));
+		u.graphics.setAnimatedSprite(game.animations.getSprite("pipo-charachip030e.png"));
 
 		u.stats.base.set(MonsterStats.baseHuman);
 		u.stats.self.skills.addSkill(PassiveSkills.basicCombatTraining);
@@ -334,9 +315,7 @@ public class StandardGameScreen extends GameScreen {
 		if (vn != null)
 			vn.updateAndRenderIfVisible(delta); // render vn ui on top
 
-		batch.begin();
-		batch.draw(darkSpike.getKeyFrame(timer.getTimeElapsedSeconds(), true), 200, 200);
-		batch.end();
+		
 	}
 
 	@Override

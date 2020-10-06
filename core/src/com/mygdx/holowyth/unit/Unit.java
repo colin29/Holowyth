@@ -145,7 +145,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 		skills.slotSkills(m.activeSkills);
 		equip.equipAllFromTemplate(m.wornEquips);
 
-		graphics.setAnimatedSprite(mapInstance.getAnimations().get(m.animatedSpriteName));
+		graphics.setAnimatedSprite(mapInstance.getAnimations().getSprite(m.animatedSpriteName));
 		graphics.setHeadSpriteName(m.headSpriteName);
 	}
 

@@ -14,7 +14,7 @@ import com.mygdx.holowyth.gamedata.units.MonsterStats;
 import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.sprite.AnimatedSprite;
-import com.mygdx.holowyth.unit.sprite.AnimatedSprites;
+import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
@@ -104,25 +104,25 @@ public class CombatPrototyping {
 		setPlayerUnitSprites(players);
 		setUpThreeUnitScenario(players);
 
-		AnimatedSprites animations = mapInstance.getAnimations();
+		Animations animations = mapInstance.getAnimations();
 		for (var p : scenario.enemySpawnLocs) {
 			var unit = new Unit(p.x, p.y, Unit.Side.ENEMY, mapInstance);
 			unit.setName("Goblin");
 			unit.stats.base.set(MonsterStats.goblinScavenger);
 			unit.skills.slotSkills(Skills.warriorSkills);
-			unit.graphics.setAnimatedSprite(animations.get("goblin1.png"));
+			unit.graphics.setAnimatedSprite(animations.getSprite("goblin1.png"));
 			mapInstance.addUnit(unit);
 		}
 	}
 
 	private void setPlayerUnitSprites(List<Unit> players) {
 		AnimatedSprite[] sprites = new AnimatedSprite[3];
-		AnimatedSprites animations = mapInstance.getAnimations();
+		Animations animations = mapInstance.getAnimations();
 
 		// default sprites
-		sprites[0] = animations.get("pipo-charachip001b.png");
-		sprites[1] = animations.get("pipo-charachip001b.png");
-		sprites[2] = animations.get("pipo-charachip028d.png");
+		sprites[0] = animations.getSprite("pipo-charachip001b.png");
+		sprites[1] = animations.getSprite("pipo-charachip001b.png");
+		sprites[2] = animations.getSprite("pipo-charachip028d.png");
 
 		for (int i = 0; i < players.size(); i++) {
 			players.get(i).graphics.setAnimatedSprite(sprites[i % 3]);
@@ -134,12 +134,12 @@ public class CombatPrototyping {
 		if (players.size() < 3) {
 			return;
 		}
-		AnimatedSprites animations = mapInstance.getAnimations();
+		Animations animations = mapInstance.getAnimations();
 
 		{
 			var u = players.get(0);
 			u.setName("Lecia");
-			u.graphics.setAnimatedSprite(animations.get("pipo-charachip030e.png"));
+			u.graphics.setAnimatedSprite(animations.getSprite("pipo-charachip030e.png"));
 
 			u.stats.self.skills.addSkill(PassiveSkills.basicCombatTraining);
 			u.skills.addSkills(Skills.warriorSkills);
@@ -149,7 +149,7 @@ public class CombatPrototyping {
 		{
 			var u = players.get(1);
 			u.setName("Elvin");
-			u.graphics.setAnimatedSprite(animations.get("pipo-charachip001b.png"));
+			u.graphics.setAnimatedSprite(animations.getSprite("pipo-charachip001b.png"));
 
 			u.skills.addSkill(PassiveSkills.basicCombatTraining);
 			u.skills.addSkills(Skills.warriorSkills);
@@ -159,7 +159,7 @@ public class CombatPrototyping {
 		{
 			var u = players.get(2);
 			u.setName("Sonia");
-			u.graphics.setAnimatedSprite(animations.get("pipo-charachip028d.png"));
+			u.graphics.setAnimatedSprite(animations.getSprite("pipo-charachip028d.png"));
 
 			u.skills.addSkills(Skills.mageSkills);
 			u.skills.slotSkills(
