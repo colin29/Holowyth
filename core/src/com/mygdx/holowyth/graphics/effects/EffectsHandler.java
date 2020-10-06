@@ -1,8 +1,13 @@
 package com.mygdx.holowyth.graphics.effects;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -11,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.game.MapInstance;
+import com.mygdx.holowyth.graphics.effects.animated.GraphicEffect;
 import com.mygdx.holowyth.graphics.effects.texteffect.DamageEffect;
 import com.mygdx.holowyth.graphics.effects.texteffect.FastDamageEffect;
 import com.mygdx.holowyth.graphics.effects.texteffect.MissEffect;
@@ -19,7 +25,10 @@ import com.mygdx.holowyth.graphics.effects.texteffect.SkillNameEffects;
 import com.mygdx.holowyth.graphics.effects.texteffect.DamageEffect.PresetType;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.DataUtil;
+import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
+
+import space.earlygrey.shapedrawer.ShapeDrawer;
 
 /**
  * Manages all gfx effects displayed in-game <br>
@@ -28,32 +37,49 @@ import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
  * @author Colin Ta
  *
  */
+@NonNullByDefault
 public class EffectsHandler {
 
 	private final SpriteBatch batch;
 	OrthographicCamera worldCamera;
 
+	private final AssetManager assets;
+	private final ShapeDrawerPlus shapeDrawer;
+	
 	private Skin skin;
 
 	private final Stage stage;
 
 	SparksEffectHandler sparksManager;
 
-	ArrayList<DamageEffect> damageEffects = new ArrayList<DamageEffect>();
+	private final List<DamageEffect> damageEffects = new ArrayList<DamageEffect>();
+	private final List<GraphicEffect> graphicEffects = new ArrayList<>();
+	
+	
+	
+	
 
 	SkillNameEffects skillNameEffects = new SkillNameEffects();
 
-	public EffectsHandler(SpriteBatch batch, OrthographicCamera camera, Stage stage, Skin skin, DebugStore debugStore) {
+	public EffectsHandler(SpriteBatch batch, OrthographicCamera camera, ShapeDrawerPlus shapeDrawer, AssetManager assets, Stage stage, Skin skin, DebugStore debugStore) {
 		this.batch = batch;
 		this.worldCamera = camera;
 
 		this.stage = stage;
 		this.skin = skin;
+		
+		this.shapeDrawer = shapeDrawer;
+		this.assets = assets;
 
 		// DebugValues debugValues = debugStore.registerComponent("Effects");
 		// debugValues.add("damageEffect count", () -> damageEffects.size());
 
 		sparksManager = new SparksEffectHandler(batch, camera, debugStore);
+	}
+	
+	public void addGraphicEffect(GraphicEffect e) {
+		graphicEffects.add(e);
+		e.begin();
 	}
 
 	public void renderDamageEffects() {
@@ -94,6 +120,11 @@ public class EffectsHandler {
 		}
 		batch.end();
 	}
+	public void renderGraphicEffects() {
+		for(var effect : graphicEffects) {
+			effect.render(batch, shapeDrawer, assets);
+		}
+	}
 
 	/**
 	 * Ticks effects which operate based on the game logic clock. Vfx particle effects may run independently using delta t
@@ -109,7 +140,21 @@ public class EffectsHandler {
 		}
 
 		skillNameEffects.tick();
+		tickAndCleanupGraphicEffects();
+		
 	}
+	public void tickAndCleanupGraphicEffects() {
+		for(var effect : graphicEffects) {
+			effect.tick();
+		}
+		var iter = graphicEffects.iterator();
+		while(iter.hasNext()) {
+			if(iter.next().isComplete()) {
+				iter.remove();
+			}
+		}
+	}
+	
 
 	public void makeSkillNameEffect(String text, UnitInfo unit) {
 		var effect = new SkillNameEffect(text, unit, worldCamera, (MapInstance) unit.getMapInstance(), stage, skin);

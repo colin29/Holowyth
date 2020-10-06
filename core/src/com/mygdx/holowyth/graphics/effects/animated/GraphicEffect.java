@@ -14,7 +14,7 @@ import com.mygdx.holowyth.util.ShapeDrawerPlus;
  * This class is basically identical to #Effect in structure.
  */
 @NonNullByDefault
-public abstract class GraphicalEffect {
+public abstract class GraphicEffect {
 
 	/**
 	 * The default marker for complete status. A subclass can override isComplete and define their own
@@ -26,7 +26,7 @@ public abstract class GraphicalEffect {
 	protected final MapInstanceInfo mapInstance;
 	protected final Animations animations;
 
-	public GraphicalEffect(MapInstanceInfo world, Animations animations) {
+	public GraphicEffect(MapInstanceInfo world, Animations animations) {
 		this.mapInstance = world;
 		this.animations = animations;
 	}

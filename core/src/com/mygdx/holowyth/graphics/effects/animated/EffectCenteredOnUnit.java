@@ -15,7 +15,7 @@ import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.tools.Timer;
 
 @NonNullByDefault
-public class EffectCenteredOnUnit extends GraphicalEffect {
+public class EffectCenteredOnUnit extends GraphicEffect {
 
 	UnitInfo unit;
 	Animation<TextureRegion> anim;
@@ -45,7 +45,6 @@ public class EffectCenteredOnUnit extends GraphicalEffect {
 	@Override
 	public void begin() {
 		timer.start(0);
-		anim.setPlayMode(PlayMode.LOOP);
 	}
 
 	@Override
@@ -60,9 +59,9 @@ public class EffectCenteredOnUnit extends GraphicalEffect {
 				width, height);
 		batch.setColor(1, 1, 1, 1f);
 		batch.end();
-//		if(anim.isAnimationFinished(timer.getTimeElapsedSeconds())) {
-//			markAsComplete();
-//		}
+		if(anim.isAnimationFinished(timer.getTimeElapsedSeconds())) {
+			markAsComplete();
+		}
 	}
 
 }

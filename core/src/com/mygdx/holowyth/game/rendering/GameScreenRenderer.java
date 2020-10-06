@@ -162,6 +162,7 @@ public class GameScreenRenderer {
 			renderEffects();
 			gfx.renderDamageEffects();
 			gfx.renderBlockEffects(delta);
+			gfx.renderGraphicEffects();
 		}
 
 		// UI
