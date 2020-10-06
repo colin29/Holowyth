@@ -51,5 +51,17 @@ public class Players {
 		headSpriteName = HEAD_SPRITE_DIR + "Sonia.png";
 		}
 	};
+	public static final UnitMarker renee = new TemplateUnitMarker() {
+		{
+		side = Side.PLAYER;
+		name = "Renee";
+		baseStats.set(MonsterStats.baseHuman);
+		wornEquips.equip(Weapons.staff);  
+		activeSkills.addAll(Skills.priestSkills);
+		
+		animatedSpriteName = "renee.png";
+		headSpriteName = HEAD_SPRITE_DIR + "Renee.png";
+		}
+	};
 
 }

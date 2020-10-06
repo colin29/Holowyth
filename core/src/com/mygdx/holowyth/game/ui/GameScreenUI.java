@@ -131,9 +131,8 @@ public class GameScreenUI extends InputProcessorAdapter {
 
 	public void render() {
 		onRenderUpdate();
-		skillBarUI.draw(game.getCameras(), game.batch, game.shapeDrawer, game.assets);
+		skillBarUI.drawCooldownOverlay(game.getCameras(), game.batch, game.shapeDrawer, game.assets);
 	}
-	
 	private void onRenderUpdate() {
 		stage.setDebugAll(Gdx.input.isKeyPressed(Keys.C));
 		

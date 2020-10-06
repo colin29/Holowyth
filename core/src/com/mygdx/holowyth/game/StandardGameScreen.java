@@ -77,7 +77,7 @@ public class StandardGameScreen extends GameScreen {
 		loadGameMapByName("forest1");
 
 		var spawnPos = map.getLocation("default_spawn_location").pos;
-		session.playerUnits.addAll(spawnThreeMemberParty(spawnPos));
+		session.playerUnits.addAll(spawnFourMemberParty(spawnPos));
 
 		// Setup inventory UI
 		lecia = session.playerUnits.get(0);
@@ -194,21 +194,22 @@ public class StandardGameScreen extends GameScreen {
 	}
 
 	@SuppressWarnings("null")
-	private List<@NonNull Unit> spawnThreeMemberParty(Point spawnPos) {
+	private List<@NonNull Unit> spawnFourMemberParty(Point spawnPos) {
+		
+		final int numUnits = 4;
+		
 		// fetch locations
-		final List<Point> unitPlacements = pathingModule.findPathablePlacements(spawnPos, 3, mapInstance.getUnits());
-		if (unitPlacements.size() != 3) {
-			logger.warn("Expected {} placements, but got {} locations. Not all units may be placed.", 3,
+		final List<Point> unitPlacements = pathingModule.findPathablePlacements(spawnPos, numUnits, mapInstance.getUnits());
+		if (unitPlacements.size() != numUnits) {
+			logger.warn("Expected {} placements, but got {} locations. Not all units may be placed.", numUnits,
 					unitPlacements.size());
 		}
 		final List<@NonNull Unit> units = new ArrayList<@NonNull Unit>();
 
-//		for (int i = 0; i < Math.min(numUnits, unitPlacements.size()); i++) {
-//			units.add(testSpawnLecia(unitPlacements.get(i)));
-//		}
 		units.add(mapInstance.addUnit(Players.lecia, unitPlacements.get(0)));
 		units.add(mapInstance.addUnit(Players.sonia, unitPlacements.get(1)));
 		units.add(mapInstance.addUnit(Players.elvin, unitPlacements.get(2)));
+		units.add(mapInstance.addUnit(Players.renee, unitPlacements.get(3)));
 
 		return units;
 	}
@@ -314,8 +315,6 @@ public class StandardGameScreen extends GameScreen {
 		super.render(delta);
 		if (vn != null)
 			vn.updateAndRenderIfVisible(delta); // render vn ui on top
-
-		
 	}
 
 	@Override

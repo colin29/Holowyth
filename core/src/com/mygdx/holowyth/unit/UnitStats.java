@@ -270,6 +270,12 @@ public class UnitStats implements UnitStatsInfo {
 		return postArmorDamage;
 	}
 
+	public void applyHeal(float amount) {
+		if(!isDead()) {
+			hp += amount;
+		}
+	}
+	
 	/**
 	 * Applies damage with armor dmg reduction as normal
 	 */

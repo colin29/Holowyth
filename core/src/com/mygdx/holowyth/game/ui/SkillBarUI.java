@@ -76,6 +76,7 @@ public class SkillBarUI {
 		stage.addActor(root);
 		root.bottom();
 
+		skillBar.setZIndex(0);
 		root.add(skillBar);
 	}
 
@@ -224,11 +225,9 @@ public class SkillBarUI {
 	private Color skillCdOverlayColor = new Color(1, 1, 1, 0.25f);
 	private Color globalCdOverlayColor = new Color(1, 1, 0, 0.3f);
 
-	public void draw(Cameras cameras, SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
+	public void drawCooldownOverlay(Cameras cameras, SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
 		batch.begin();
 		batch.setProjectionMatrix(cameras.fixedCamera.combined);
-
-		
 
 		for (SkillButton button : skillButtons) {
 			var skill = button.skill;

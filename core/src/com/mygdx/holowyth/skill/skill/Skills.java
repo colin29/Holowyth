@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import com.mygdx.holowyth.gamedata.skillsandeffects.MageSkills;
+import com.mygdx.holowyth.gamedata.skillsandeffects.PriestSkills;
 import com.mygdx.holowyth.gamedata.skillsandeffects.WarriorSkills;
 import com.mygdx.holowyth.skill.ActiveSkill;
 
@@ -31,5 +32,9 @@ public class Skills {
 					new MageSkills.Hydroblast(),
 					new MageSkills.Thunderclap(),
 					new MageSkills.BlindingFlash()));
+	
+	public static final List<ActiveSkill> priestSkills = Collections.unmodifiableList(
+			Arrays.asList(new PriestSkills.HealSkill())
+			);
 
 }

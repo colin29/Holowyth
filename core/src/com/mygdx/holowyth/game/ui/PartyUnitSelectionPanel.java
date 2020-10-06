@@ -51,6 +51,7 @@ public class PartyUnitSelectionPanel extends SingleUseUIWidget {
 		createPanel();
 		root.left().bottom();
 		root.debugAll();
+		root.setZIndex(2);
 		
 		// Add input to highest priority
 		multiplexer.addProcessor(0, new InputProcessorAdapter() {
