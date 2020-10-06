@@ -49,6 +49,7 @@ public class Animations {
 		loadEffect("img/effects/dark_spike.png", 192, 192, 0.10f);
 		loadEffect("img/effects/holy_cross.png", 192, 192, 0.10f);
 		loadEffect("img/effects/casting_glow.png", 120, 120, 0.10f, true);
+		loadEffect("img/effects/lightning_ball.png", 192, 192, 0.10f);
 	}
 	
 	

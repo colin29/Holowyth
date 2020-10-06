@@ -33,7 +33,7 @@ public class Casting implements Cloneable, CastingInfo {
 
 	public void begin(Unit caster) {
 
-		if (Holo.debugFastCastEnbabled) {
+		if (Holo.debugFastCastEnabled) {
 			castTime = castTime / 10;
 		}
 		castTimeRemaining = castTime;

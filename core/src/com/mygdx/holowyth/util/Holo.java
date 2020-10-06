@@ -42,7 +42,7 @@ public class Holo {
 	public static boolean debugRenderMapObstaclesEdges = false;
 
 	// Debug Cheats
-	public static boolean debugFastCastEnbabled = false;
+	public static boolean debugFastCastEnabled = true;
 	public static boolean debugSkillCooldownDisabled = true;
 	public static boolean debugHighHpUnits = false;
 	public static boolean debugNoManaCost = false;
@@ -80,7 +80,7 @@ public class Holo {
 	
 	static {
 		if (releaseMode) {
-			debugFastCastEnbabled = false;
+			debugFastCastEnabled = false;
 			debugSkillCooldownDisabled = false;
 			debugHighHpUnits = false;
 			debugNoManaCost = false;
