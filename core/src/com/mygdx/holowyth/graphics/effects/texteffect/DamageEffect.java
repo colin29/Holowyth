@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.graphics.effects;
+package com.mygdx.holowyth.graphics.effects.texteffect;
 
 import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.util.dataobjects.Point;
@@ -20,17 +20,18 @@ public class DamageEffect {
 	protected int duration;
 	protected int durationLeft;
 
-	String text;
+	public String text;
 	float origX, origY;
-	float x, y;
+	public float x;
+	public float y;
 
-	Color color = Color.WHITE; // color only applies if presetType is null
+	public Color color = Color.WHITE; // color only applies if presetType is null
 
-	enum PresetType {
+	public enum PresetType {
 		PLAYER, ENEMY;
 	}
 
-	PresetType presetType;
+	public PresetType presetType;
 
 	DamageEffect(String text, float x, float y) {
 		this.text = text;
@@ -47,7 +48,7 @@ public class DamageEffect {
 		this(text, pos.x, pos.y);
 	}
 
-	DamageEffect(String text, Point pos, PresetType presetType) {
+	public DamageEffect(String text, Point pos, PresetType presetType) {
 		this(text, pos);
 		this.presetType = presetType;
 	}

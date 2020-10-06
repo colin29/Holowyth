@@ -3,12 +3,14 @@ package com.mygdx.holowyth.unit.sprite;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
@@ -25,7 +27,7 @@ public class Animations {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final Map<String, AnimatedSprite> sprites = new LinkedHashMap<>();
-	private final Map<String, Animation<TextureRegion>> effects = new LinkedHashMap<>();
+	private final Map<String,  Animation<@NonNull TextureRegion>> effects = new LinkedHashMap<>();
 
 	public Animations() {
 		loadAnimatedSprites();
@@ -44,18 +46,20 @@ public class Animations {
 	
 	private void loadEffects() {
 		loadEffect("img/effects/dark_spike.png", 192, 192, 0.10f);
+		loadEffect("img/effects/holy_cross.png", 192, 192, 0.10f);
 	}
 	
 	private void loadEffect(String path, int frameWidth, int frameHeight, float timePerFrame) {
 		var effect = fetchEffect(path, frameWidth, frameHeight, timePerFrame);
+		effect.setPlayMode(PlayMode.NORMAL);   // Default, can change
 		var parts = path.split("/");
 		String name = parts[parts.length - 1];
 		logger.debug("Added effect with name {}", name);
 		effects.put(name, effect);
 	}
 	
-	private Animation<TextureRegion> fetchEffect(String path, int frameWidth, int frameHeight, float timePerFrame) {
-		return new Animation<TextureRegion>(timePerFrame, getKeyFrames(path, frameWidth, frameHeight));
+	private @NonNull Animation<@NonNull TextureRegion> fetchEffect(String path, int frameWidth, int frameHeight, float timePerFrame) {
+		return new Animation<@NonNull TextureRegion>(timePerFrame, getKeyFrames(path, frameWidth, frameHeight));
 	}
 
 	private void loadAnimatedSprite(String path) {
@@ -80,8 +84,8 @@ public class Animations {
 		}
 
 	}
-	public Animation<TextureRegion> getEffect(String name){
-		Animation<TextureRegion> value = effects.get(name);
+	public @NonNull Animation<@NonNull TextureRegion> getEffect(String name){
+		Animation<@NonNull TextureRegion> value = effects.get(name);
 		if (value == null) {
 			throw new HoloResourceNotFoundException("Effect '" + name + "' not found");
 		} else {
@@ -89,11 +93,12 @@ public class Animations {
 		}
 	}
 	
-	private static TextureRegion[] getKeyFrames(String path, int frameWidth, int frameHeight) {
+	private static @NonNull TextureRegion[] getKeyFrames(String path, int frameWidth, int frameHeight) {
 		
 		Texture origTexture  = new Texture(Gdx.files.internal(Holowyth.ASSETS_DISK_PATH + path));
 		
-		TextureRegion[][] tex = TextureRegion.split(origTexture,
+		@SuppressWarnings("null")
+		@NonNull TextureRegion[][] tex = TextureRegion.split(origTexture,
 				frameWidth,
 				frameHeight);
 		
@@ -107,7 +112,7 @@ public class Animations {
 		// Place the regions into a 1D array in the correct order, starting from the top
 		// left, going across first. The Animation constructor requires a 1D array.
 
-		TextureRegion[] keyFrames = new TextureRegion[FRAME_ROWS*FRAME_COLS];
+		@NonNull TextureRegion[] keyFrames = new @NonNull TextureRegion[FRAME_ROWS*FRAME_COLS];
 
 		for (int i = 0; i < FRAME_ROWS; i++) {
 			for (int j = 0; j < FRAME_COLS; j++) {

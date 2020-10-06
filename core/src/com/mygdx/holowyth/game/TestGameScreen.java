@@ -2,6 +2,7 @@ package com.mygdx.holowyth.game;
 
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.gamedata.items.Weapons;
+import com.mygdx.holowyth.unit.Unit;
 
 public class TestGameScreen extends StandardGameScreen {
 
@@ -12,7 +13,9 @@ public class TestGameScreen extends StandardGameScreen {
 		
 		addTestWeaponsToInventory();
 		
-		gfxTest = new GfxTest(batch, game.animations);
+		gfxTest = new GfxTest(batch, animations, shapeDrawer, assets);
+		Unit unit = session.playerUnits.get(0);
+		gfxTest.playEffectOverUnit(unit, "holy_cross.png", mapInstance, animations);
 	}
 
 	@Override

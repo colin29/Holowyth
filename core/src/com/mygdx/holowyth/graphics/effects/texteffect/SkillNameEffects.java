@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.graphics.effects;
+package com.mygdx.holowyth.graphics.effects.texteffect;
 
 import java.util.HashMap;
 import java.util.Map;

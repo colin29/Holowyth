@@ -1,30 +1,41 @@
 package com.mygdx.holowyth.game;
 
-import com.badlogic.gdx.graphics.g2d.Animation;
+import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.mygdx.holowyth.graphics.effects.animated.EffectCenteredOnUnit;
+import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.sprite.Animations;
-import com.mygdx.holowyth.util.tools.Timer;
+import com.mygdx.holowyth.util.ShapeDrawerPlus;
 
+
+@NonNullByDefault
 public class GfxTest {
-
 	
+	private @Nullable EffectCenteredOnUnit effect;
+	private ShapeDrawerPlus shapeDrawer;
+	private AssetManager assets;
 	private SpriteBatch batch;
-	private Timer timer;
-	
-	Animation<TextureRegion> darkSpike;
-	
-	public GfxTest(SpriteBatch batch, Animations animations) {
+
+	public GfxTest(SpriteBatch batch, Animations animations, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
 		this.batch = batch;
-		timer = new Timer();
-		timer.start(0);
-		
-		darkSpike = animations.getEffect("dark_spike.png");
+		this.shapeDrawer = shapeDrawer;
+		this.assets = assets;
+	}
+
+	public void playEffectOverUnit(UnitInfo unit, String effectName, MapInstanceInfo mapInstance, Animations anims) {
+		effect = new EffectCenteredOnUnit(unit, effectName, mapInstance, anims);	
+		effect.setSize(72, 72);
+		effect.setAlpha(0.85f);
+		effect.begin();
 	}
 	
+	@SuppressWarnings("null")
 	public void render() {
-		batch.begin();
-		batch.draw(darkSpike.getKeyFrame(timer.getTimeElapsedSeconds(), true), 200, 200);
-		batch.end();
+		if(effect != null && !effect.isComplete()) {
+			effect.render(batch, shapeDrawer, assets);
+		}
 	}
 }

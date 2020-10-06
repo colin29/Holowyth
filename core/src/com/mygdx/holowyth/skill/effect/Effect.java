@@ -46,7 +46,6 @@ public abstract class Effect {
 	}
 
 	public void render(SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
-
 	}
 
 }

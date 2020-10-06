@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.graphics.effects;
+package com.mygdx.holowyth.graphics.effects.texteffect;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;

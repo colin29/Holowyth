@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.graphics.effects;
+package com.mygdx.holowyth.graphics.effects.texteffect;
 
 import org.apache.commons.lang3.RandomUtils;
 
@@ -9,7 +9,7 @@ public class FastDamageEffect extends DamageEffect {
 
 	float angleOfMotion = RandomUtils.nextFloat(90, 90);
 
-	FastDamageEffect(String text, Point pos, PresetType presetType) {
+	public FastDamageEffect(String text, Point pos, PresetType presetType) {
 		super(text, pos, presetType);
 		setStartingDuration(80);
 		setInitialSpeed(3);

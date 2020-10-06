@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.graphics.effects;
+package com.mygdx.holowyth.graphics.effects.texteffect;
 
 import com.badlogic.gdx.graphics.Color;
 
@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.Color;
  */
 public class MissEffect extends DamageEffect {
 
-	MissEffect(float x, float y) {
+	public MissEffect(float x, float y) {
 		super("Miss", x, y, Color.WHITE);
 	}
 

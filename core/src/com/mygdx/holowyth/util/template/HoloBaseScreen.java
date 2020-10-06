@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.graphics.Cameras;
+import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 
@@ -43,6 +44,8 @@ public abstract class HoloBaseScreen implements Screen, InputProcessor {
 	public final ShapeRenderer shapeRenderer;
 	public final ShapeDrawerPlus shapeDrawer;
 
+	public final Animations animations;
+	
 	public final AssetManager assets;
 
 	public HoloBaseScreen(final Holowyth game) {
@@ -62,6 +65,12 @@ public abstract class HoloBaseScreen implements Screen, InputProcessor {
 		if(game.shapeDrawer!=null) {
 			@NonNull ShapeDrawerPlus o = game.shapeDrawer;
 			shapeDrawer = o;
+		}else {
+			throw new HoloResourceNotFoundException();
+		}
+		if(game.animations!=null) {
+			@NonNull Animations o = game.animations;
+			animations = o;
 		}else {
 			throw new HoloResourceNotFoundException();
 		}
