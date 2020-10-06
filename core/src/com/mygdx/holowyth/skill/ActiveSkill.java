@@ -52,7 +52,7 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 	Unit caster;
 
 	// References
-	MapInstance mapInstance;
+	protected MapInstance mapInstance;
 
 	// Components
 	public Casting casting = new Casting(this); // default behaviour, can assign over this from a sub class.

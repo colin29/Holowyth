@@ -1,6 +1,8 @@
 package com.mygdx.holowyth.gamedata.skillsandeffects;
 
 import com.mygdx.holowyth.game.rendering.aiminggraphic.SkillsAimingGraphics;
+import com.mygdx.holowyth.graphics.effects.animated.EffectCenteredOnUnit;
+import com.mygdx.holowyth.skill.Casting;
 import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
@@ -153,18 +155,29 @@ public class MageSkills {
 		public BlindingFlash() {
 			super();
 			name = "Blinding Flash";
-			casting.castTime = 60 * 1.8f;
 			spCost = 18;
 			cooldown = 60 * 24;
 			globalCooldown = 60 * 3;
 			addTag(Tag.RANGED_MAGIC);
 			defaultAimingHelperRadius = MageEffects.BlindingFlashEffect.aoeRadius;
-
 		}
 
 		@Override
 		public void pluginTargeting(Unit caster, float x, float y) {
 			setEffects(new MageEffects.BlindingFlashEffect(caster, x, y));
+			
+			casting = new Casting(this) {
+				{
+				castTime = 60 * 1.8f;
+				}
+				@Override
+				protected void onFinishCast() {
+					var effect = new EffectCenteredOnUnit(caster, "casting_glow.png", mapInstance, mapInstance.getAnimations());	
+					effect.setSize(72, 72);
+					effect.setAlpha(0.85f);
+					mapInstance.getGfx().addGraphicEffect(effect);
+				}
+			};
 		}
 
 		@Override

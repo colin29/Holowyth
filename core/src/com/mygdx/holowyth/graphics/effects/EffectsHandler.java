@@ -6,8 +6,10 @@ import java.util.ListIterator;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.lwjgl.opengl.GL11;
 
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -121,6 +123,7 @@ public class EffectsHandler {
 		batch.end();
 	}
 	public void renderGraphicEffects() {
+		
 		for(var effect : graphicEffects) {
 			effect.render(batch, shapeDrawer, assets);
 		}

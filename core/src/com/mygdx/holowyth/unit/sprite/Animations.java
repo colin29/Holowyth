@@ -27,7 +27,7 @@ public class Animations {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final Map<String, AnimatedSprite> sprites = new LinkedHashMap<>();
-	private final Map<String,  Animation<@NonNull TextureRegion>> effects = new LinkedHashMap<>();
+	private final Map<String,  AnimatedEffect> effects = new LinkedHashMap<>();
 
 	public Animations() {
 		loadAnimatedSprites();
@@ -48,15 +48,25 @@ public class Animations {
 	private void loadEffects() {
 		loadEffect("img/effects/dark_spike.png", 192, 192, 0.10f);
 		loadEffect("img/effects/holy_cross.png", 192, 192, 0.10f);
+		loadEffect("img/effects/casting_glow.png", 120, 120, 0.10f, true);
 	}
 	
-	private void loadEffect(String path, int frameWidth, int frameHeight, float timePerFrame) {
-		var effect = fetchEffect(path, frameWidth, frameHeight, timePerFrame);
-		effect.setPlayMode(PlayMode.NORMAL);   // Default, can change
+	
+	private AnimatedEffect loadEffect(String path, int frameWidth, int frameHeight, float timePerFrame) {
+		return loadEffect(path, frameWidth, frameHeight, timePerFrame, false);
+	}
+	
+	private AnimatedEffect loadEffect(String path, int frameWidth, int frameHeight, float timePerFrame, boolean additiveBlending) {
+		var anim = fetchEffect(path, frameWidth, frameHeight, timePerFrame);
+		anim.setPlayMode(PlayMode.NORMAL);   // Default, can change
 		var parts = path.split("/");
 		String name = parts[parts.length - 1];
 		logger.debug("Added effect with name {}", name);
+		
+		var effect = new AnimatedEffect(anim);
+		effect.additiveBlending = additiveBlending;
 		effects.put(name, effect);
+		return effect;
 	}
 	
 	private @NonNull Animation<@NonNull TextureRegion> fetchEffect(String path, int frameWidth, int frameHeight, float timePerFrame) {
@@ -85,8 +95,8 @@ public class Animations {
 		}
 
 	}
-	public @NonNull Animation<@NonNull TextureRegion> getEffect(String name){
-		Animation<@NonNull TextureRegion> value = effects.get(name);
+	public @NonNull AnimatedEffect getEffect(String name){
+		AnimatedEffect value = effects.get(name);
 		if (value == null) {
 			throw new HoloResourceNotFoundException("Effect '" + name + "' not found");
 		} else {
