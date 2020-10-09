@@ -74,9 +74,6 @@ public class PartyUnitSelectionPanel extends SingleUseUIWidget {
 	private void regeneratePanel() {
 		panel.clear();
 		for(Unit u : units) {
-			String headSpriteName = u.graphics.getHeadSpriteName();
-			logger.debug("Unit '{}' headsprite name: '{}'", u.getName(), headSpriteName);
-			
 			Image image = u.graphics.getHeadSprite(); 
 			panel.add(image);
 			image.addListener(new ClickListener() {

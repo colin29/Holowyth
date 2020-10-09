@@ -300,7 +300,7 @@ public abstract class GameScreen extends MapLoadingScreen {
 	}
 
 	private void setupAppLifetimeComponentsForNewMap(final int mapWidth, final int mapHeight) {
-		pathingModule.initForTiledMap(map.getTilemap(), mapWidth, mapHeight);
+		pathingModule.initForTiledMap(map, mapWidth, mapHeight);
 		
 		renderer.setMap(map, mapWidth, mapHeight);
 		renderer.setMapLifeTimeComponentsRefs(mapInstance, controls, gfx);

@@ -5,13 +5,13 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.maps.tiled.AtlasTmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.utils.Array;
 import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.tiled.MyAtlasTmxMapLoader;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.exceptions.HoloException;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;
@@ -45,7 +45,7 @@ public abstract class TiledMapLoadingScreen extends HoloBaseScreen  {
 	 * Though, if you call from a leaf class constructor, and mark mapStartup() as final it is okay.
 	 */
 	protected void loadMapFromDisk(String pathname) {
-		TiledMap loadedMap = new MyAtlasTmxMapLoader().load(pathname);
+		TiledMap loadedMap = new AtlasTmxMapLoader().load(pathname);
 		logger.debug(pathname);
 		loadMap(loadedMap);
 	}

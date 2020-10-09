@@ -9,6 +9,9 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.PolylineMapObject;
@@ -16,13 +19,15 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Polyline;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Queue;
-import com.mygdx.holowyth.world.map.simplemap.SimpleMap;
 import com.mygdx.holowyth.pathfinding.PathSmoother.PathsInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Coord;
 import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.world.map.GameMap;
+import com.mygdx.holowyth.world.map.Location;
 import com.mygdx.holowyth.world.map.obstacle.OrientedPoly;
 import com.mygdx.holowyth.world.map.obstacle.OrientedSeg;
+import com.mygdx.holowyth.world.map.simplemap.SimpleMap;
 
 /**
  * Handles pathfinding for the app's needs <br>
@@ -37,6 +42,8 @@ import com.mygdx.holowyth.world.map.obstacle.OrientedSeg;
  */
 public class PathingModule {
 
+	private Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	private AStarSearch astar;
 
 	private PathSmoother smoother = new PathSmoother();
@@ -58,7 +65,7 @@ public class PathingModule {
 	int graphWidth;
 	int graphHeight;
 	Vertex[][] dynamicGraph;
-
+	
 	/**
 	 * @Lifetime can be from app start to app shutdown. Call initFormap() whenever a new map is loaded.
 	 * @param camera
@@ -79,27 +86,34 @@ public class PathingModule {
 		initExpandedObstacleSegs(polys);
 		addCollisionForMapBoundary();
 
-		initCommonItems();
+		initCommonItems(null);
 	}
 
 	/*
 	 * Re-inits for the given map.
 	 */
-	public void initForTiledMap(TiledMap map, int width, int height) {
+	public void initForTiledMap(GameMap map, int width, int height) {
 		mapWidth = width;
 		mapHeight = height;
 
-		readObstaclesFromTiledMap(map);
+		readObstaclesFromTiledMap(map.getTilemap());
 		addCollisionForMapBoundary();
 
-		initCommonItems();
+		Location startLoc  = map.getLocation("default_start_location");
+		Point startPos = null;
+		if(startLoc == null) {
+			logger.warn("Tiled map should provide a 'default_start_location' for where to begin floodfill");
+		}else {
+			startPos = new Point(startLoc.getX(), startLoc.getY());
+		}
+		initCommonItems(startPos);
 
 	}
 
 	/** Init items that don't vary based on map source */
-	private void initCommonItems() {
+	private void initCommonItems(@Nullable Point startPos) {
 		initGraphs();
-		floodFillGraph();
+		floodFillGraph(startPos);
 
 		astar = new AStarSearch(graphWidth, graphHeight, graph, CELL_SIZE, mapWidth, mapHeight);
 
@@ -276,18 +290,37 @@ public class PathingModule {
 		}
 	}
 
-	private void floodFillGraph() {
+	private int nodesExpanded;
+	private void floodFillGraph(Point startPos) {
 
+		
+		if(!HoloPF.isPointInMap(startPos, mapWidth, mapHeight)) {
+			logger.warn("Given startPos {} is outside of map bounds", startPos);
+			startPos = null;
+		}
+		
+		Coord startNode;
+		
+		if(startPos != null) {
+			startNode = new Coord((int) startPos.x / CELL_SIZE, (int) startPos.y / CELL_SIZE);
+		}else {
+			startNode = new Coord(2, 2); // Fallback
+		}
+		
+		
 		Queue<Coord> q = new Queue<Coord>();
 		q.ensureCapacity(graphWidth);
 
-		q.addLast(new Coord(2, 2)); // start flood fill from this position
+		q.addLast(startNode); // start flood fill from this position
 
 		Coord c;
 		Vertex vertex;
 		Vertex suc;
+		nodesExpanded = -1;
+		
 		while (q.size > 0) {
 			c = q.removeFirst();
+			nodesExpanded +=1;
 			vertex = graph[c.y][c.x];
 
 			vertex.reachable = true;
@@ -332,6 +365,9 @@ public class PathingModule {
 				q.addLast(new Coord(c.x + 1, c.y - 1));
 				suc.reachable = true;
 			}
+		}
+		if(nodesExpanded < 200) {
+			logger.warn("Only {} nodes expanded, floodfill start location not connected to rest of map?", nodesExpanded);
 		}
 	}
 

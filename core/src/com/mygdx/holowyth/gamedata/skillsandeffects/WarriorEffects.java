@@ -47,6 +47,7 @@ public class WarriorEffects {
 			}
 			var knockbackVec = new Vector2(1, 0).setAngle(angleFromCasterToTarget()).setLength(1.5f);
 			target.stats.doKnockBackRollAgainst(15, 60 * 1, knockbackVec);
+			
 			markAsComplete();
 		}
 	}

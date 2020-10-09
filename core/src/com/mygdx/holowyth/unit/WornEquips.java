@@ -130,7 +130,6 @@ public class WornEquips {
 		if(removed2 != null)
 			itemsRemoved.add(removed2);
 		
-		logger.debug("Removed {} items while equiping '{}'", itemsRemoved.size(), item.name);
 		return new EquipResult(true, itemsRemoved);
 	}
 

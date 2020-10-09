@@ -76,7 +76,7 @@ public class StandardGameScreen extends GameScreen {
 
 		loadGameMapByName("forest1");
 
-		var spawnPos = map.getLocation("default_spawn_location").pos;
+		var spawnPos = map.getLocation("default_start_location").pos;
 		session.playerUnits.addAll(spawnFourMemberParty(spawnPos));
 
 		// Setup inventory UI
@@ -124,11 +124,11 @@ public class StandardGameScreen extends GameScreen {
 
 	@SuppressWarnings("unused")
 	private Unit spawnPlayerAtDefaultLocation() {
-		Point pos = map.getLocations().get("default_spawn_location").pos;
+		Point pos = map.getLocations().get("default_start_location").pos;
 		if (pos != null) {
 			return testSpawnLecia(pos);
 		} else {
-			logger.error("Couldn't spawn player, map has no default_spawn_location");
+			logger.error("Couldn't spawn player, map has no default_start_location");
 			return null;
 		}
 	}
@@ -257,7 +257,7 @@ public class StandardGameScreen extends GameScreen {
 
 		if (lecia != null && isMapLoaded()) {
 			if (lecia.getMapInstance() == null) {
-				Point pos = map.getLocations().get("default_spawn_location").pos;
+				Point pos = map.getLocations().get("default_start_location").pos;
 				((Unit) lecia).x = pos.x + 200;
 				((Unit) lecia).y = pos.y;
 				mapInstance.addPreExistingUnit(lecia);

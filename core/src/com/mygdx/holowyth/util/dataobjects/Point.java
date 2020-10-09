@@ -71,4 +71,7 @@ public class Point {
 	public Vector2 toVector() {
 		return new Vector2(x, y);
 	}
+	public String toString() {
+		return String.format("(%f,%f)", x, y);
+	}
 }

@@ -14,7 +14,7 @@ allprojects {
     version = '1.0'
     ext {
         appName = "Holowyth"
-        gdxVersion =  '1.9.10'
+        gdxVersion =  '1.9.11'
         box2DLightsVersion = '1.4'
         visuiVersion = '1.4.4'
         gdxAIVersion = '1.8.2'

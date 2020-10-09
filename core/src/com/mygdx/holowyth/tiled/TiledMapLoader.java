@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.maps.tiled.AtlasTmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
@@ -35,7 +36,7 @@ public class TiledMapLoader  {
 	}
 
 	public TiledMap getTiledMapFromTMXFile(String pathname) {
-		return new MyAtlasTmxMapLoader().load(pathname);
+		return new AtlasTmxMapLoader().load(pathname);
 	}
 	@SuppressWarnings("unused")
 	private void getTiledMapFromTMXFileUsingFileChooser(Consumer<TiledMap> callback, Runnable onCanceled) {

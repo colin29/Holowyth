@@ -23,10 +23,11 @@ public class Forest1 extends GameMap {
 
 	{
 		tilemapPath = Holo.mapsDirectory + "/forest1.tmx";
+//		tilemapPath = Holo.mapsDirectory + "/forest2.1.tmx";
 		setName("forest1");
 
 		{
-			locations.add(new Location("default_spawn_location", 350, 350));
+			locations.add(new Location("default_start_location", 350, 350));
 			locations.add(new Entrance("entrance_1", 35, 215).setDestToTown("testTown"));
 			locations.add(new Entrance("entrance_2", 1150, 635).setDestToMap("forest2", "entrance_1"));
 		}

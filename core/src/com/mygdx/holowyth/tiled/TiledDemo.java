@@ -12,6 +12,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.maps.MapObjects;
 import com.badlogic.gdx.maps.objects.PolylineMapObject;
+import com.badlogic.gdx.maps.tiled.AtlasTmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Polyline;
@@ -41,7 +42,7 @@ public class TiledDemo extends HoloBaseScreen implements InputProcessor {
 	}
 
 	public TiledMap loadMap() {
-		TiledMap map = new MyAtlasTmxMapLoader().load("assets/maps/forest1.tmx");
+		TiledMap map = new AtlasTmxMapLoader().load("assets/maps/forest1.tmx");
 		if(map != null) {
 			readCollisionObjectsFromMap();
 			return map;

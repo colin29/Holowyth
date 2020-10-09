@@ -24,7 +24,11 @@ sourceSets {
         }
         resources {
             srcDirs = ['resources']
-            exclude 'assets/maps/Tilesets/raw/**'
+            exclude 'assets/maps/Tilesets/aside/**'
+            exclude 'assets/maps/Tilesets/backup/**'
+            exclude 'assets/maps/Tilesets/output/**'
+            exclude 'assets/maps/Tilesets/temp/**'
+
         }
     }
 }
