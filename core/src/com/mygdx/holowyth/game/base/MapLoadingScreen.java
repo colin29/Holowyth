@@ -12,13 +12,13 @@ import com.kotcrab.vis.ui.widget.file.FileChooser.Mode;
 import com.kotcrab.vis.ui.widget.file.FileChooser.SelectionMode;
 import com.kotcrab.vis.ui.widget.file.FileChooserAdapter;
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.tiled.TiledMapLoader;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 import com.mygdx.holowyth.util.exceptions.HoloException;
 import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;
 import com.mygdx.holowyth.world.map.GameMap;
+import com.mygdx.holowyth.world.tiled.TiledMapLoader;
 
 /**
  * A Screen that can load a GameMap (which contains a tmx map and more)

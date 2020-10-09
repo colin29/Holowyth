@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.tiled;
+package com.mygdx.holowyth.world.tiled;
 
 import java.util.ArrayList;
 import java.util.List;
