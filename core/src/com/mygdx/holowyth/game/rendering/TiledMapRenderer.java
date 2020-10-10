@@ -6,30 +6,35 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.mygdx.holowyth.game.rendering.tiled.YSortingTiledMapRenderer;
 
 public class TiledMapRenderer extends SubRenderer {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private OrthogonalTiledMapRenderer tiledMapRenderer;
+	private YSortingTiledMapRenderer mapRenderer;
 
+	
 	TiledMap map;
 
 	public TiledMapRenderer(GameScreenRenderer renderer) {
 		super(renderer);
 	}
 
-	public void renderMap() {
+	public void renderBaseLayers() {
 		if (map != null) {
-			tiledMapRenderer.setView((OrthographicCamera) worldCamera);
-			tiledMapRenderer.render();
+			mapRenderer.setView((OrthographicCamera) worldCamera);
+			mapRenderer.renderBaseLayers();
 		}
+	}
+	public void renderTreeLayersWithYIndex(int yIndex) {
+		mapRenderer.renderAllTreeTilesWithYIndex(yIndex);
 	}
 
 	public void setMap(TiledMap map) {
 		this.map = map;
 		if (map != null) {
-			tiledMapRenderer = new OrthogonalTiledMapRenderer(map);
+			mapRenderer = new YSortingTiledMapRenderer(map);
 		}
 	}
 

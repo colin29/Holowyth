@@ -131,7 +131,7 @@ public class GameScreenRenderer {
 
 		if (map != null) {
 			// Tiled map
-			tiled.renderMap();
+			tiled.renderBaseLayers();
 
 			renderUnitHpSpBars(); // render unit bars low as to not obscure more important info
 
@@ -141,6 +141,10 @@ public class GameScreenRenderer {
 
 			// Units
 			renderUnitsAndOutlines(delta);
+//			renderTreeTilesAndUnits();
+			
+			renderSelectionBox();
+			
 			// debug.renderUnitIdsOnUnits();
 
 			// Skill Aiming Graphics
@@ -168,6 +172,17 @@ public class GameScreenRenderer {
 		// UI
 		stage.draw();
 
+	}
+
+	private void renderSelectionBox() {
+		if (controls != null) {
+			controls.renderSelectionBox(Controls.defaultSelectionBoxColor);
+		}
+	}
+	
+	private void renderTreeTilesAndUnits() {
+//		renderUnitsAndOutlines(delta);
+		
 	}
 
 	private boolean renderMapRegions;
@@ -217,11 +232,8 @@ public class GameScreenRenderer {
 
 		renderUnits(delta);
 
-		if (controls != null) {
-			controls.renderSelectionBox(Controls.defaultSelectionBoxColor);
-			renderOutlineAroundBusyRetreatingUnits();
-			renderOutlineAroundBusyCastingUnits();
-		}
+		renderOutlineAroundBusyRetreatingUnits();
+		renderOutlineAroundBusyCastingUnits();
 
 		renderOutlineAroundKnockbackedUnits();
 		renderOutlineAroundReeledUnits();
@@ -320,31 +332,27 @@ public class GameScreenRenderer {
 	}
 
 	private void renderUnits(float delta) {
-
+		for (Unit unit : mapInstance.getUnits()) {
+			renderUnit(unit, delta);
+		}
+	}
+	private void renderUnit(Unit unit, float delta) {
+			if (unit.graphics.getAnimatedSprite() != null) {
+				unit.graphics.updateAndRender(delta, batch);	
+			}else {
+				renderUnitCircleAsFallBack(unit);
+			}
+	}
+	private void renderUnitCircleAsFallBack(Unit unit) {
 		batch.begin();
-
-		// Render unit circles as a fallback (if they don't have a sprite)
-		for (Unit unit : mapInstance.getUnits()) {
-			if (unit.graphics.getAnimatedSprite() != null)
-				continue;
-			shapeDrawer.setColor(unit.isAPlayerCharacter() ? Color.PURPLE : Color.YELLOW);
-			shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
-			shapeDrawer.filledCircle(unit.x, unit.y, Holo.UNIT_RADIUS);
-
-		}
-		for (Unit unit : mapInstance.getUnits()) {
-			if (unit.graphics.getAnimatedSprite() != null)
-				continue;
-			shapeDrawer.setColor(Color.BLACK);
-			shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
-			shapeDrawer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
-		}
+		shapeDrawer.setColor(unit.isAPlayerCharacter() ? Color.PURPLE : Color.YELLOW);
+		shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
+		shapeDrawer.filledCircle(unit.x, unit.y, Holo.UNIT_RADIUS);
+		
+		shapeDrawer.setColor(Color.BLACK);
+		shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
+		shapeDrawer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
 		batch.end();
-
-		for (Unit unit : mapInstance.getUnits()) {
-			unit.graphics.updateAndRender(delta, batch);
-		}
-
 	}
 
 	private void renderMapObstaclesEdges() {

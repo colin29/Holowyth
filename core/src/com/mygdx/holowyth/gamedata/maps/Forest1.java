@@ -22,8 +22,8 @@ public class Forest1 extends GameMap {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	{
-		tilemapPath = Holo.mapsDirectory + "/forest1.tmx";
-//		tilemapPath = Holo.mapsDirectory + "/forest2.1.tmx";
+//		tilemapPath = Holo.mapsDirectory + "/forest1.tmx";
+		tilemapPath = Holo.mapsDirectory + "/forest2.1.tmx";
 		setName("forest1");
 
 		{
