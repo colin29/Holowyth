@@ -75,7 +75,8 @@ public class PartyUnitSelectionPanel extends SingleUseUIWidget {
 		panel.clear();
 		for(Unit u : units) {
 			Image image = u.graphics.getHeadSprite(); 
-			panel.add(image);
+			panel.add(image).size(50);
+			image.getColor().a = 0.75f;
 			image.addListener(new ClickListener() {
 				@Override
 				public void clicked(@Nullable InputEvent event, float x, float y) {

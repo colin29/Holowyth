@@ -2,6 +2,7 @@ package com.mygdx.holowyth.pathfinding;
 
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -10,10 +11,12 @@ import java.util.function.Consumer;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
+import org.lwjgl.opencl.APPLESetMemObjectDestructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Polyline;
@@ -33,7 +36,9 @@ import com.mygdx.holowyth.world.map.simplemap.SimpleMap;
  * Handles pathfinding for the app's needs <br>
  * Exposes extracted obstacle information about the loaded map
  * 
- * Multiple unit sizes are NOT supported at the moment. Some methods assume that unit radius is {@link Holo#CELL_SIZE} <br><br>
+ * Multiple unit sizes are NOT supported at the moment. Some methods assume that unit radius is
+ * {@link Holo#CELL_SIZE} <br>
+ * <br>
  * 
  * Has application lifetime.
  * 
@@ -43,7 +48,7 @@ import com.mygdx.holowyth.world.map.simplemap.SimpleMap;
 public class PathingModule {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
-	
+
 	private AStarSearch astar;
 
 	private PathSmoother smoother = new PathSmoother();
@@ -65,7 +70,7 @@ public class PathingModule {
 	int graphWidth;
 	int graphHeight;
 	Vertex[][] dynamicGraph;
-	
+
 	/**
 	 * @Lifetime can be from app start to app shutdown. Call initFormap() whenever a new map is loaded.
 	 * @param camera
@@ -99,11 +104,11 @@ public class PathingModule {
 		readObstaclesFromTiledMap(map.getTilemap());
 		addCollisionForMapBoundary();
 
-		Location startLoc  = map.getLocation("default_start_location");
+		Location startLoc = map.getLocation("default_start_location");
 		Point startPos = null;
-		if(startLoc == null) {
+		if (startLoc == null) {
 			logger.warn("Tiled map should provide a 'default_start_location' for where to begin floodfill");
-		}else {
+		} else {
 			startPos = new Point(startLoc.getX(), startLoc.getY());
 		}
 		initCommonItems(startPos);
@@ -130,34 +135,47 @@ public class PathingModule {
 
 		MapObjects objects = collisionLayer.getObjects();
 
+		// It's easy to mix up polygons and polylines in Tiled, but we support both anyways.
+		for (var object : objects.getByType(PolygonMapObject.class)) {
+			var origVertices = object.getPolygon().getTransformedVertices();
+			float[] vertices = Arrays.copyOf(origVertices, origVertices.length + 2); // Explicitly add the final point
+			vertices[vertices.length - 2] = vertices[0];
+			vertices[vertices.length - 1] = vertices[1];
+			addObstacle(vertices);
+		}
 		for (PolylineMapObject object : objects.getByType(PolylineMapObject.class)) {
-
-			Polyline polyline = object.getPolyline();
-			float[] vertices = polyline.getTransformedVertices();
-
-			Vector2 end = new Vector2(vertices[0], vertices[1]);
-			Vector2 start = new Vector2();
-
-			// i represent the current line segment (for example with 6 floats, there are 3 points, and 2 total
-			// line segments)
-			for (int i = 1; i < vertices.length / 2; i += 1) {
-
-				start.set(end);
-				end.set(vertices[i * 2], vertices[i * 2 + 1]);
-
-				var seg = new OrientedSeg(start.x, start.y, end.x, end.y);
-				seg.isClockwise = false; // In the editor we draw segs so that right is the "outside".
-
-				if (i == 1) {
-					obstaclePoints.add(new Point(start.x, start.y));
-				}
-				obstaclePoints.add(new Point(end.x, end.y));
-				obstacleSegs.add(seg);
-				obstacleExpandedSegs.add(seg.getOutwardlyDisplacedSegment(Holo.UNIT_RADIUS));
-			}
-
+			addObstacle(object.getPolyline().getTransformedVertices());
 		}
 
+	}
+
+	/**
+	 * @param vertices End point should be explicitly defined
+	 */
+	private void addObstacle(float[] vertices) {
+		if (vertices == null) {
+			logger.warn("Obstacle vertices were null, skipping");
+			return;
+		}
+		Vector2 end = new Vector2(vertices[0], vertices[1]);
+		Vector2 start = new Vector2();
+
+		// i represent the current line segment (for example with 6 floats, there are 3 points, and 2 total
+		// line segments)
+		for (int i = 1; i < vertices.length / 2; i += 1) {
+			start.set(end);
+			end.set(vertices[i * 2], vertices[i * 2 + 1]);
+
+			var seg = new OrientedSeg(start.x, start.y, end.x, end.y);
+			seg.isClockwise = false; // In the editor we draw segs so that right is the "outside".
+
+			if (i == 1) {
+				obstaclePoints.add(new Point(start.x, start.y));
+			}
+			obstaclePoints.add(new Point(end.x, end.y));
+			obstacleSegs.add(seg);
+			obstacleExpandedSegs.add(seg.getOutwardlyDisplacedSegment(Holo.UNIT_RADIUS));
+		}
 	}
 
 	private void addCollisionForMapBoundary() {
@@ -209,8 +227,6 @@ public class PathingModule {
 			obstacleExpandedSegs.addAll(poly.segments);
 		}
 	}
-
-	
 
 	// Unit pathfinding
 
@@ -291,23 +307,22 @@ public class PathingModule {
 	}
 
 	private int nodesExpanded;
+
 	private void floodFillGraph(Point startPos) {
 
-		
-		if(!HoloPF.isPointInMap(startPos, mapWidth, mapHeight)) {
+		if (!HoloPF.isPointInMap(startPos, mapWidth, mapHeight)) {
 			logger.warn("Given startPos {} is outside of map bounds", startPos);
 			startPos = null;
 		}
-		
+
 		Coord startNode;
-		
-		if(startPos != null) {
+
+		if (startPos != null) {
 			startNode = new Coord((int) startPos.x / CELL_SIZE, (int) startPos.y / CELL_SIZE);
-		}else {
+		} else {
 			startNode = new Coord(2, 2); // Fallback
 		}
-		
-		
+
 		Queue<Coord> q = new Queue<Coord>();
 		q.ensureCapacity(graphWidth);
 
@@ -317,10 +332,10 @@ public class PathingModule {
 		Vertex vertex;
 		Vertex suc;
 		nodesExpanded = -1;
-		
+
 		while (q.size > 0) {
 			c = q.removeFirst();
-			nodesExpanded +=1;
+			nodesExpanded += 1;
 			vertex = graph[c.y][c.x];
 
 			vertex.reachable = true;
@@ -366,8 +381,9 @@ public class PathingModule {
 				suc.reachable = true;
 			}
 		}
-		if(nodesExpanded < 200) {
-			logger.warn("Only {} nodes expanded, floodfill start location not connected to rest of map?", nodesExpanded);
+		if (nodesExpanded < 200) {
+			logger.warn("Only {} nodes expanded, floodfill start location not connected to rest of map?",
+					nodesExpanded);
 		}
 	}
 
@@ -421,7 +437,7 @@ public class PathingModule {
 	 *              information.
 	 * @param u     The radius of the pathing unit (has to match the radius of the base graph though)
 	 */
-	private void setDynamicGraph(List<@NonNull  ? extends UnitPF> infos, float unitRadius) {
+	private void setDynamicGraph(List<@NonNull ? extends UnitPF> infos, float unitRadius) {
 
 		for (UnitPF cb : infos) {
 			prospects = new ArrayList<Vertex>();
@@ -512,17 +528,19 @@ public class PathingModule {
 	 *         is unpathable, returns empty list. If only a partial number of placements could be found,
 	 *         returns that partial list.
 	 */
-	public List<Point> findPathablePlacements(Point spawnPoint, int numPlacements, List<@NonNull ? extends UnitPF> existingUnits) {
+	public List<Point> findPathablePlacements(Point spawnPoint, int numPlacements,
+			List<@NonNull ? extends UnitPF> existingUnits) {
 		List<Point> placements = new ArrayList<>();
 
 		revertDynamicGraph();
 		setDynamicGraph(existingUnits, Holo.UNIT_RADIUS);
-		
+
 		Vertex initialVertex;
-		final List<Vertex> validInitialVertexes = HoloPF.findNearbyReachableVertexes(spawnPoint, dynamicGraph, graphWidth, graphHeight, 2);
-		if(validInitialVertexes.isEmpty()) {
+		final List<Vertex> validInitialVertexes = HoloPF.findNearbyReachableVertexes(spawnPoint, dynamicGraph,
+				graphWidth, graphHeight, 2);
+		if (validInitialVertexes.isEmpty()) {
 			return placements; // empty list
-		}else {
+		} else {
 			initialVertex = validInitialVertexes.get(0);
 		}
 
@@ -537,20 +555,17 @@ public class PathingModule {
 
 		return placements;
 	}
-	
-	
 
-
-	private static void addPlacementIfNotConflicting(Point p, List<Point> placements, List<@NonNull  ? extends UnitPF> existingUnits) {
+	private static void addPlacementIfNotConflicting(Point p, List<Point> placements,
+			List<@NonNull ? extends UnitPF> existingUnits) {
 		if (!placementConflicts(p, placements, existingUnits)) {
 			placements.add(new Point(p));
 		}
 	}
 
-
 	private static boolean placementConflicts(Point placement, List<Point> prevPlacements,
-			List<@NonNull  ? extends UnitPF> existingUnits) {
-		
+			List<@NonNull ? extends UnitPF> existingUnits) {
+
 		for (Point other : prevPlacements) {
 			if (Point.dist(placement, other) < Holo.UNIT_RADIUS * 2 + Holo.epsilon)
 				return true;
@@ -638,7 +653,6 @@ public class PathingModule {
 		q.addLast(new Coord(ix, iy));
 		visited[iy][ix] = true;
 	}
-
 
 	public List<Point> getObstaclePoints() {
 		return Collections.unmodifiableList(obstaclePoints);

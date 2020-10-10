@@ -90,7 +90,9 @@ public class YSortingTiledMapRenderer extends OrthogonalTiledMapRenderer {
 		// Delegate to TiledMapRenderer
 		ArrayList<Integer> indexes = new ArrayList<>();
 		for (MapLayer layer : map.getLayers()) {
-			getBaseIndexes(layer, indexes);
+			if (!layer.getName().toLowerCase().startsWith("trees")) { // this just excludes via root level groups and layers
+				indexes.add(map.getLayers().getIndex(layer));
+			}
 		}
 		// Convert to array
 		int[] baseLayerIndexes = new int[indexes.size()];
@@ -98,13 +100,6 @@ public class YSortingTiledMapRenderer extends OrthogonalTiledMapRenderer {
 			baseLayerIndexes[i] = indexes.get(i);
 		render(baseLayerIndexes);
 	}
-
-	private void getBaseIndexes(MapLayer layer, ArrayList<Integer> indexes) {
-		if (!layer.getName().toLowerCase().startsWith("trees")) { // this just excludes via root level groups and layers
-			indexes.add(map.getLayers().getIndex(layer));
-		}
-	}
-
 	private void collectTreeLayers() {
 		treeLayers.clear();
 		for (MapLayer layer : map.getLayers()) {

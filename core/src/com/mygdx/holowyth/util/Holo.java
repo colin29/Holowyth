@@ -38,16 +38,15 @@ public class Holo {
 
 	public static float UNIT_RADIUS = 17; // 13
 
-	// Debug Rendering
-	public static boolean debugRenderMapObstaclesEdges = false;
+	public static boolean debugRenderMapObstaclesEdges = true;
 
-	// Debug Cheats
+	// Gameplay Cheats
 	public static boolean debugFastCastEnabled = false;
 	public static boolean debugSkillCooldownDisabled = true;
 	public static boolean debugHighHpUnits = false;
 	public static boolean debugNoManaCost = false;
-
 	public static boolean debugAllowSelectEnemyUnits = true;
+	
 	public static boolean debugDisplayEnemyCastingProgress = true;
 
 	// Combat movement
