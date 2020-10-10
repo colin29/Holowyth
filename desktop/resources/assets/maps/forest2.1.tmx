@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="60" height="30" tilewidth="24" tileheight="24" infinite="0" nextlayerid="34" nextobjectid="20">
+<map version="1.4" tiledversion="1.4.2" orientation="orthogonal" renderorder="right-down" width="60" height="30" tilewidth="24" tileheight="24" infinite="0" nextlayerid="34" nextobjectid="75">
  <properties>
   <property name="atlas" value="Tilesets/tileset.atlas"/>
  </properties>
@@ -461,7 +461,7 @@
 </data>
   </layer>
  </group>
- <group id="27" name="Trees" opacity="0.94">
+ <group id="27" name="Trees">
   <layer id="5" name="Trees" width="60" height="30">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -580,6 +580,117 @@
   </object>
   <object id="19" x="936" y="624">
    <polygon points="0,0 -24,-24 -48,0 -24,24"/>
+  </object>
+  <object id="31" x="84" y="540">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="32" x="228" y="540">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="33" x="300" y="540">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="34" x="372" y="540">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="35" x="444" y="540">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="36" x="516" y="540">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="37" x="588" y="540">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="38" x="660" y="540">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="39" x="805" y="540">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="40" x="876" y="540">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="41" x="948" y="540">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="42" x="564" y="228">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="43" x="660" y="156">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="44" x="564" y="60">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="45" x="500" y="59">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="46" x="492" y="228">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="47" x="420" y="228">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="48" x="276" y="228">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="49" x="209" y="226">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="50" x="132" y="228">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="53" x="72" y="168">
+   <polygon points="0,0 0,-24 -72,0 -72,24"/>
+  </object>
+  <object id="54" x="12" y="228">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="55" x="949" y="263">
+   <polygon points="0,0 0.5,13.5 24.5,13.5 24,0"/>
+  </object>
+  <object id="59" x="1067" y="168">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="60" x="1091" y="120">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="61" x="1392" y="360">
+   <polygon points="0,0 0,24 48,24 48,0"/>
+  </object>
+  <object id="62" x="1392" y="480">
+   <polygon points="0,0 0,24 48,24 48,0"/>
+  </object>
+  <object id="63" x="1260" y="660">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="64" x="1332" y="660">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="65" x="1404" y="660">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="66" x="1284" y="564">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="67" x="1380" y="276">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="69" x="1308" y="228">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="70" x="1404" y="108">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="71" x="1308" y="156">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="72" x="216" y="24">
+   <polygon points="0,0 0,24 24,24 24,0"/>
+  </object>
+  <object id="74" x="960" y="720">
+   <polyline points="0,0 0,-24 -24,-24 -24,0"/>
   </object>
  </objectgroup>
 </map>
