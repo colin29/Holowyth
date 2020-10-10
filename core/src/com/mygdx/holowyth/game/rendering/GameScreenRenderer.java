@@ -1,8 +1,11 @@
 package com.mygdx.holowyth.game.rendering;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+import org.apache.commons.collections4.iterators.PeekingIterator;
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +72,7 @@ public class GameScreenRenderer {
 	private UnitMotionRenderer unitMotion;
 	private TiledMapRenderer tiled;
 	private PathingRenderer basicPathing;
-	
+
 	// Screen lifetime components
 	private Stage stage;
 	private PathingModule pathingModule;
@@ -140,11 +143,11 @@ public class GameScreenRenderer {
 			unitMotion.renderUnitDestinations(Color.GREEN);
 
 			// Units
-			renderUnitsAndOutlines(delta);
-//			renderTreeTilesAndUnits();
-			
+//			renderUnitsAndOutlines(delta);
+			renderTreeTilesAndUnits(delta);
+
 			renderSelectionBox();
-			
+
 			// debug.renderUnitIdsOnUnits();
 
 			// Skill Aiming Graphics
@@ -158,7 +161,7 @@ public class GameScreenRenderer {
 
 			// Obstacle Edges
 			renderMapObstacleEdges();
-			
+
 			// Debug Map Visualizations
 			renderMapDebugVisualizationsIfKeysPressed();
 
@@ -179,10 +182,29 @@ public class GameScreenRenderer {
 			controls.renderSelectionBox(Controls.defaultSelectionBoxColor);
 		}
 	}
+
 	
-	private void renderTreeTilesAndUnits() {
-//		renderUnitsAndOutlines(delta);
+	private void renderTreeTilesAndUnits(float delta) {
+		renderUnitsAndOutlines(delta);
+
+		// Sort units in descending Y order
+		@NonNull ArrayList<@NonNull Unit> sortedByY = new ArrayList<>(mapInstance.getUnits());
+		sortedByY.sort((u1, u2) -> u1.getY() < u2.getY() ? 1 : -1);
+		var units = new PeekingIterator<Unit>(sortedByY.iterator());
+
+		int tileHeight = map.getTilemap().getProperties().get("tileheight", Integer.class);
 		
+		var tiles = tiled.getYSortedCells().iterator();
+		while(tiles.hasNext()) {
+			var tile = tiles.next();
+			while(units.hasNext() && units.peek().y > tile.baseYIndex * tileHeight + tileHeight/2) {
+				renderUnit(units.next(), delta);
+			}
+			tiled.renderTreeTile(tile.xIndex, tile.yIndex, tile.layer);
+		}
+		// Render remaining units
+		while (units.hasNext())
+			renderUnit(units.next(), delta);
 	}
 
 	private boolean renderMapRegions;
@@ -197,10 +219,10 @@ public class GameScreenRenderer {
 
 		if (renderMapRegions)
 			GameMapRenderer.renderMapRegions(Holowyth.fonts.debugFont(), map, shapeDrawer, batch);
-		if(renderMapLocations)
+		if (renderMapLocations)
 			GameMapRenderer.renderLocations(Holowyth.fonts.debugFont(), map, shapeDrawer, batch);
 		GameMapRenderer.renderEntrances(Holowyth.fonts.debugFont(), map, shapeDrawer, batch);
-		
+
 		if (Gdx.input.isKeyPressed(showMapPathingGraphKey)) {
 			basicPathing.renderGraph(true);
 			HoloGL.renderSegs(pathingModule.getObstacleExpandedSegs(), Color.PINK);
@@ -336,19 +358,21 @@ public class GameScreenRenderer {
 			renderUnit(unit, delta);
 		}
 	}
+
 	private void renderUnit(Unit unit, float delta) {
-			if (unit.graphics.getAnimatedSprite() != null) {
-				unit.graphics.updateAndRender(delta, batch);	
-			}else {
-				renderUnitCircleAsFallBack(unit);
-			}
+		if (unit.graphics.getAnimatedSprite() != null) {
+			unit.graphics.updateAndRender(delta, batch);
+		} else {
+			renderUnitCircleAsFallBack(unit);
+		}
 	}
+
 	private void renderUnitCircleAsFallBack(Unit unit) {
 		batch.begin();
 		shapeDrawer.setColor(unit.isAPlayerCharacter() ? Color.PURPLE : Color.YELLOW);
 		shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
 		shapeDrawer.filledCircle(unit.x, unit.y, Holo.UNIT_RADIUS);
-		
+
 		shapeDrawer.setColor(Color.BLACK);
 		shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
 		shapeDrawer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
