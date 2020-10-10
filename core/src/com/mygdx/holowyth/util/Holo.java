@@ -29,16 +29,14 @@ public class Holo {
 	public static final int GAME_FPS = 60;
 
 	// Pathfinding and collision detection
-	public static float defaultUnitMoveSpeed = 2; //6f; //0.8 // world units per frame
+	public static float defaultUnitMoveSpeed = 1.2f; //6f; //0.8 // world units per frame
 	public static float collisionClearanceDistance = defaultUnitMoveSpeed / 5; // extra distance "pushed out" by the
 																				// collision detection upon collision
 	public static float epsilon = 0.001f;
-
 	public static final int CELL_SIZE = 15; // size in world units
-
 	public static float UNIT_RADIUS = 17; // 13
 
-	public static boolean debugRenderMapObstaclesEdges = true;
+	public static boolean debugRenderMapObstaclesEdges = false;
 
 	// Gameplay Cheats
 	public static boolean debugFastCastEnabled = false;

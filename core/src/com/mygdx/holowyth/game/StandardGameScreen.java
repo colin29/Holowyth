@@ -60,8 +60,7 @@ public class StandardGameScreen extends GameScreen {
 //		vn = new VNController(new Stage(), batch, fixedCamera, multiplexer); // have vn draw using its OWN stage
 //		startConversation("myConv.conv", "default");
 
-		functionBindings.bindFunctionToKey(this::addLeciaToMapInstance, Keys.Z);
-		functionBindings.bindFunctionToKey(this::removeLeciaFromMapInstance, Keys.X);
+		functionBindings.bindFunctionToKey(()->{controls.clearSelectedUnits();}, Keys.X);
 		functionBindings.bindFunctionToKey(() -> {
 //			goToMap("forest2", "entrance_1");
 			goToTown("testTown");

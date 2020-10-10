@@ -13,6 +13,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Texture.TextureFilter;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -25,6 +26,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.game.Controls;
 import com.mygdx.holowyth.game.MapInstanceInfo;
+import com.mygdx.holowyth.game.rendering.tiled.YSortingTiledMapRenderer;
 import com.mygdx.holowyth.game.Controls.Context;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.graphics.HoloSprite;
@@ -70,7 +72,7 @@ public class GameScreenRenderer {
 	private DebugRenderer debug;
 	private GamePathingRenderer gamePathing;
 	private UnitMotionRenderer unitMotion;
-	private TiledMapRenderer tiled;
+	private YSortingTiledMapRenderer tiled;
 	private PathingRenderer basicPathing;
 
 	// Screen lifetime components
@@ -120,7 +122,6 @@ public class GameScreenRenderer {
 		basicPathing = new PathingRenderer(pathingModule, shapeRenderer);
 		gamePathing = new GamePathingRenderer(this, basicPathing);
 		unitMotion = new UnitMotionRenderer(this);
-		tiled = new TiledMapRenderer(this);
 	}
 
 	/*
@@ -133,6 +134,7 @@ public class GameScreenRenderer {
 		batch.setProjectionMatrix(worldCamera.combined);
 
 		if (map != null) {
+			tiled.setView((OrthographicCamera) worldCamera);
 			// Tiled map
 			tiled.renderBaseLayers();
 
@@ -143,9 +145,13 @@ public class GameScreenRenderer {
 			unitMotion.renderUnitDestinations(Color.GREEN);
 
 			// Units
-//			renderUnitsAndOutlines(delta);
-			renderYSortedTilesAndUnits(delta);
-
+			renderUnitOutlines();
+			renderUnitsAndYSortedTiles(delta);
+			
+			if (controls != null) {
+				controls.renderUnitUnderCursor(Color.GREEN, Color.RED);
+			}
+			
 			renderSelectionBox();
 
 			// debug.renderUnitIdsOnUnits();
@@ -184,9 +190,8 @@ public class GameScreenRenderer {
 	}
 
 	
-	private void renderYSortedTilesAndUnits(float delta) {
-		renderUnitsAndOutlines(delta);
-
+	private void renderUnitsAndYSortedTiles(float delta) {
+		
 		// Sort units in descending Y order
 		@NonNull ArrayList<@NonNull Unit> sortedByY = new ArrayList<>(mapInstance.getUnits());
 		sortedByY.sort((u1, u2) -> u1.getY() < u2.getY() ? 1 : -1);
@@ -194,17 +199,32 @@ public class GameScreenRenderer {
 
 		int tileHeight = map.getTilemap().getProperties().get("tileheight", Integer.class);
 		
-		var tiles = tiled.getYSortedCells().iterator();
-		while(tiles.hasNext()) {
-			var tile = tiles.next();
-			while(units.hasNext() && units.peek().y - units.peek().getRadius() + 4 > tile.baseYIndex * tileHeight + tileHeight/2) {
+		var cells = tiled.getYSortedCells().iterator();
+		while(cells.hasNext()) {
+			var cell = cells.next();
+			while(units.hasNext() && units.peek().y - units.peek().getRadius() + 4 > cell.baseYIndex * tileHeight + tileHeight/2) {
 				renderUnit(units.next(), delta);
 			}
-			tiled.renderYSortedTile(tile.xIndex, tile.yIndex, tile.layer);
+			tiled.renderCell(cell.xIndex, cell.yIndex, cell.layer);
 		}
 		// Render remaining units
 		while (units.hasNext())
 			renderUnit(units.next(), delta);
+	}
+	private void renderUnitOutlines(){
+		renderOutlineAroundSlowedUnits(); // lower priority indicators are drawn first
+		if (controls != null) {
+			controls.renderCirclesOnSelectedUnits();
+		}
+		renderOutlineAroundBusyRetreatingUnits();
+		renderOutlineAroundBusyCastingUnits();
+		
+		
+		renderOutlineAroundKnockbackedUnits();
+		renderOutlineAroundReeledUnits();
+		renderOutlineAroundBlindedUnits();
+		renderOutlineAroundTauntedUnits();
+		renderOutlineAroundStunnedUnits();
 	}
 
 	private boolean renderMapRegions;
@@ -231,9 +251,8 @@ public class GameScreenRenderer {
 	}
 
 	private void renderMapObstacleEdges() {
-		if (tiled.isMapLoaded()) {
+		if (this.map != null) {
 			renderMapObstaclesEdges();
-			// renderMapBoundaries();
 		}
 	}
 
@@ -245,28 +264,6 @@ public class GameScreenRenderer {
 		}
 	}
 
-	private void renderUnitsAndOutlines(float delta) {
-		renderOutlineAroundSlowedUnits(); // lower priority indicators are drawn first
-
-		if (controls != null) {
-			controls.renderCirclesOnSelectedUnits();
-		}
-
-		renderUnits(delta);
-
-		renderOutlineAroundBusyRetreatingUnits();
-		renderOutlineAroundBusyCastingUnits();
-
-		renderOutlineAroundKnockbackedUnits();
-		renderOutlineAroundReeledUnits();
-		renderOutlineAroundBlindedUnits();
-		renderOutlineAroundTauntedUnits();
-		renderOutlineAroundStunnedUnits();
-
-		if (controls != null) {
-			controls.renderUnitUnderCursor(Color.GREEN, Color.RED);
-		}
-	}
 
 	/**
 	 * Draws simple circle
@@ -350,12 +347,6 @@ public class GameScreenRenderer {
 	private void renderEffects() {
 		for (Effect effect : mapInstance.getEffects()) {
 			effect.render(batch, shapeDrawer, game.assets);
-		}
-	}
-
-	private void renderUnits(float delta) {
-		for (Unit unit : mapInstance.getUnits()) {
-			renderUnit(unit, delta);
 		}
 	}
 
@@ -556,7 +547,7 @@ public class GameScreenRenderer {
 		this.map = map;
 		this.mapWidth = mapWidth;
 		this.mapHeight = mapHeight;
-		tiled.setMap(map.getTilemap());
+		tiled = new YSortingTiledMapRenderer(map.getTilemap());
 	}
 
 	public void setMapLifeTimeComponentsRefs(MapInstanceInfo world, Controls controls, EffectsHandler gfx) {
