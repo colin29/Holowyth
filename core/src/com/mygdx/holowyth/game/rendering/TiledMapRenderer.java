@@ -37,7 +37,7 @@ public class TiledMapRenderer extends SubRenderer {
 	public void renderTreeLayersWithYIndex(int yIndex) {
 		mapRenderer.renderTreeTilesWithYIndex(yIndex);
 	}
-	public void renderTreeTile(int xIndex, int yIndex, TiledMapTileLayer layer) {
+	public void renderYSortedTile(int xIndex, int yIndex, TiledMapTileLayer layer) {
 		mapRenderer.renderTreeTile(xIndex, yIndex, layer);
 	}
 

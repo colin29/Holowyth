@@ -921,6 +921,12 @@ public class Controls extends InputProcessorAdapter {
 		return selectedUnits;
 	}
 
+	public void setSelectedUnits(@NonNull List<@NonNull Unit> newSelection) {
+		selectedUnits.clear();
+		selectedUnits.addAll(newSelection);
+	}
+
+	
 	/**
 	 * @return A seperate copy
 	 */

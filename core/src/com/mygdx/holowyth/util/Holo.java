@@ -19,7 +19,7 @@ public class Holo {
 
 	// Initial Settings (only apply at startup)
 	public static boolean enableCursorGrabbing = false;
-	public static boolean mouseScrollEnabled = false;
+	public static boolean mouseScrollEnabled = true;
 	
 	public static String titleName = "Holowyth";
 
@@ -29,7 +29,7 @@ public class Holo {
 	public static final int GAME_FPS = 60;
 
 	// Pathfinding and collision detection
-	public static float defaultUnitMoveSpeed = 6f; //0.8 // world units per frame
+	public static float defaultUnitMoveSpeed = 2; //6f; //0.8 // world units per frame
 	public static float collisionClearanceDistance = defaultUnitMoveSpeed / 5; // extra distance "pushed out" by the
 																				// collision detection upon collision
 	public static float epsilon = 0.001f;

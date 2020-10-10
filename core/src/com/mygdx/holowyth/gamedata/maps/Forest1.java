@@ -22,8 +22,7 @@ public class Forest1 extends GameMap {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	{
-//		tilemapPath = Holo.mapsDirectory + "/forest1.tmx";
-		tilemapPath = Holo.mapsDirectory + "/forest2.1.tmx";
+		tilemapPath = Holo.mapsDirectory + "/forest1.tmx";
 		setName("forest1");
 
 		{
@@ -43,27 +42,9 @@ public class Forest1 extends GameMap {
 			addTrigger(t);
 		}
 
-//		{
-//			UnitMarker m = new UnitMarker();
-//			m.pos.set(100, 400);
-//			m.side = Side.PLAYER;
-//			m.name = "Sally";
-//			m.baseStats.set(MonsterStats.baseHuman);
-//			m.animatedSpriteName = "pipo-charachip028d.png";
-//			m.activeSkills.addAll(Skills.mageSkills);
-//			unitMarkers.add(m);
-//		}
-		
-		{
-			UnitMarker m = new UnitMarker(Monsters.goblin);
-			m.pos.set(400, 400);
-			unitMarkers.add(m);
-		}
-		{
-			UnitMarker m = new UnitMarker(Monsters.goblin);
-			m.pos.set(400, 450);
-			unitMarkers.add(m);
-		}
+//		addUnitMarker(400, 400,  Monsters.goblin);
+//		addUnitMarker(400, 450,  Monsters.goblin);
+
 
 	}
 }

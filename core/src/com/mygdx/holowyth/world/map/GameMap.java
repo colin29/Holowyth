@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.mygdx.holowyth.gamedata.units.Monsters;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 import com.mygdx.holowyth.world.MapOfMapLocations;
@@ -155,6 +156,11 @@ public class GameMap {
 	}
 	public @NonNull GameMap cloneObject() {
 		return new GameMap(this);
+	}
+	public void addUnitMarker(int x, int y, UnitMarker template) {
+		UnitMarker m = new UnitMarker(Monsters.goblin);
+		m.pos.set(400, 450);
+		unitMarkers.add(m);
 	}
 	
 }

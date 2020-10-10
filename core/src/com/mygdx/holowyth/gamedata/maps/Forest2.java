@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.gamedata.units.MonsterStats;
-import com.mygdx.holowyth.gamedata.units.Monsters;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.world.map.Entrance;
@@ -18,15 +17,11 @@ public class Forest2 extends GameMap {
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	{
-		tilemapPath = Holo.mapsDirectory + "/forest1.tmx"; // re-use the same tilemap
-		locations.add(new Location("default_spawn_location", 100, 300));
+		tilemapPath = Holo.mapsDirectory + "/forest2.1.tmx";
+		locations.add(new Location("default_start_location", 350, 350));
 		setName("forest2");
 
-		{
-			UnitMarker m = new UnitMarker(Monsters.goblin);
-			m.pos.set(500, 700);
-			unitMarkers.add(m);
-		}
+
 		{
 			UnitMarker m = new UnitMarker();
 			m.pos.set(60, 245);
@@ -37,7 +32,8 @@ public class Forest2 extends GameMap {
 			unitMarkers.add(m);
 		}
 
-		locations.add(new Entrance("entrance_1", 50, 220).setDestToMap("forest1", "entrance_2"));
+		locations.add(new Entrance("entrance_1", 30, 325).setDestToMap("forest1", "entrance_2"));
+		locations.add(new Entrance("entrance_2", 1420, 290));
 
 	}
 }

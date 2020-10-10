@@ -144,7 +144,7 @@ public class GameScreenRenderer {
 
 			// Units
 //			renderUnitsAndOutlines(delta);
-			renderTreeTilesAndUnits(delta);
+			renderYSortedTilesAndUnits(delta);
 
 			renderSelectionBox();
 
@@ -184,7 +184,7 @@ public class GameScreenRenderer {
 	}
 
 	
-	private void renderTreeTilesAndUnits(float delta) {
+	private void renderYSortedTilesAndUnits(float delta) {
 		renderUnitsAndOutlines(delta);
 
 		// Sort units in descending Y order
@@ -197,10 +197,10 @@ public class GameScreenRenderer {
 		var tiles = tiled.getYSortedCells().iterator();
 		while(tiles.hasNext()) {
 			var tile = tiles.next();
-			while(units.hasNext() && units.peek().y > tile.baseYIndex * tileHeight + tileHeight/2) {
+			while(units.hasNext() && units.peek().y - units.peek().getRadius() + 4 > tile.baseYIndex * tileHeight + tileHeight/2) {
 				renderUnit(units.next(), delta);
 			}
-			tiled.renderTreeTile(tile.xIndex, tile.yIndex, tile.layer);
+			tiled.renderYSortedTile(tile.xIndex, tile.yIndex, tile.layer);
 		}
 		// Render remaining units
 		while (units.hasNext())

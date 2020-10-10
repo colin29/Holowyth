@@ -74,7 +74,7 @@ public class StandardGameScreen extends GameScreen {
 		DebugValues debugValues = debugStore.registerComponent(this.getClass().getSimpleName());
 		debugValues.add("Map name", () -> map != null ? map.getName() : "No map loaded");
 
-		loadGameMapByName("forest1");
+		loadGameMapByName("forest2");
 
 		var spawnPos = map.getLocation("default_start_location").pos;
 		session.playerUnits.addAll(spawnFourMemberParty(spawnPos));
@@ -147,6 +147,8 @@ public class StandardGameScreen extends GameScreen {
 		camera.position.set(arrivalLoc.getX(), arrivalLoc.getY(), 0);
 		if (arrivalLoc instanceof Entrance)
 			((Entrance) arrivalLoc).disableTemporarily();
+		
+		controls.setSelectedUnits(session.playerUnits);
 	}
 
 	public void goToTown(String townName) {
@@ -170,27 +172,6 @@ public class StandardGameScreen extends GameScreen {
 		}
 
 		return null;
-	}
-
-	/**
-	 * @return a list of units that were actually spawned
-	 */
-	@SuppressWarnings("unused")
-	private List<@NonNull Unit> testSpawnMultipleLecias(int numUnits, Point spawnPos) {
-		// fetch locations
-		final List<Point> unitPlacements = pathingModule.findPathablePlacements(spawnPos, numUnits,
-				mapInstance.getUnits());
-		if (unitPlacements.size() != numUnits) {
-			logger.warn("Expected {} placements, but got {} locations. Not all units may be placed.", numUnits,
-					unitPlacements.size());
-		}
-
-		final List<@NonNull Unit> units = new ArrayList<@NonNull Unit>();
-
-		for (int i = 0; i < Math.min(numUnits, unitPlacements.size()); i++) {
-			units.add(testSpawnLecia(unitPlacements.get(i)));
-		}
-		return units;
 	}
 
 	@SuppressWarnings("null")
