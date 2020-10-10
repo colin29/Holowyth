@@ -22,7 +22,6 @@ import static com.badlogic.gdx.graphics.g2d.Batch.Y3;
 import static com.badlogic.gdx.graphics.g2d.Batch.Y4;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -30,11 +29,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapGroupLayer;
 import com.badlogic.gdx.maps.MapLayer;
-import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -46,51 +43,54 @@ public class YSortingTiledMapRenderer extends OrthogonalTiledMapRenderer {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final TiledMap map;
-	ArrayList<TiledMapTileLayer> treeLayers = new ArrayList<>();
+	/**
+	 * Layers which to render using cell-specific y sorting
+	 */
+	ArrayList<TiledMapTileLayer> ySortedLayers = new ArrayList<>();
 	ArrayList<YSortedCell> ySortedCells = new ArrayList<>();
-	
+
 	public YSortingTiledMapRenderer(TiledMap map) {
 		super(map);
 		this.map = map;
 
-		collectTreeLayers();
+		fetchYSortedLayers();
 		calculateAndSortYTiles();
 	}
-	
+
 	private void calculateAndSortYTiles() {
 		ySortedCells.clear();
 		// First, get all non-null tree tiles.
-		for(var layer : treeLayers) {
-			for(int x=0;x<layer.getWidth();x++) {
-				for(int y=0;y<layer.getHeight();y++) {
-					if(layer.getCell(x, y) != null && layer.getCell(x, y).getTile() != null) {
+		for (var layer : ySortedLayers) {
+			for (int x = 0; x < layer.getWidth(); x++) {
+				for (int y = 0; y < layer.getHeight(); y++) {
+					if (layer.getCell(x, y) != null && layer.getCell(x, y).getTile() != null) {
 						ySortedCells.add(new YSortedCell(x, y, layer));
 					}
 				}
 			}
 		}
-		
+
 		// Calculate baseYIndex values
-		
-		for(var cell : ySortedCells) {
+
+		for (var cell : ySortedCells) {
 			// baseIndexY is the yIndex of the bottom-most consecutive non-empty cell, starting from here
-			while(cell.baseYIndex>0 && cell.layer.getCell(cell.xIndex, cell.baseYIndex-1) != null) {
-				cell.baseYIndex -=1;
+			while (cell.baseYIndex > 0 && cell.layer.getCell(cell.xIndex, cell.baseYIndex - 1) != null) {
+				cell.baseYIndex -= 1;
 			}
 		}
-		
-		//sort the list in decreasing baseYIndex 
+
+		// sort the list in decreasing baseYIndex
 		ySortedCells.sort((c1, c2) -> c2.baseYIndex - c1.baseYIndex);
 	}
+
 	public List<YSortedCell> getYSortedTiles() {
 		return Collections.unmodifiableList(ySortedCells);
 	}
 
 	public void renderBaseLayers() {
-		// Delegate to TiledMapRenderer
 		ArrayList<Integer> indexes = new ArrayList<>();
 		for (MapLayer layer : map.getLayers()) {
-			if (!layer.getName().toLowerCase().startsWith("trees")) { // this just excludes via root level groups and layers
+			if (!ySortedLayers.contains(layer)) {
 				indexes.add(map.getLayers().getIndex(layer));
 			}
 		}
@@ -100,32 +100,31 @@ public class YSortingTiledMapRenderer extends OrthogonalTiledMapRenderer {
 			baseLayerIndexes[i] = indexes.get(i);
 		render(baseLayerIndexes);
 	}
-	private void collectTreeLayers() {
-		treeLayers.clear();
+
+	private void fetchYSortedLayers() {
 		for (MapLayer layer : map.getLayers()) {
-			collectTreeLayers(layer);
+			if (layer instanceof MapGroupLayer) {
+				var group = (MapGroupLayer) layer;
+				var name = group.getName().toLowerCase();
+				if (name.startsWith("trees") || name.startsWith("raised objects") || name.startsWith("buildings")) {
+					fetchAllLayersIn(group);
+				}
+			}
+		}
+	}
+	private void fetchAllLayersIn(MapGroupLayer group) {
+		for (var layer : group.getLayers()) {
+			if (layer instanceof MapGroupLayer) {
+				fetchAllLayersIn((MapGroupLayer) layer);
+			} else if (layer instanceof TiledMapTileLayer) {
+				ySortedLayers.add((TiledMapTileLayer) layer);
+			}
 		}
 	}
 
-	private void collectTreeLayers(MapLayer layer) {
-		if (layer instanceof MapGroupLayer) {
-			var group = (MapGroupLayer) layer;
-			for (var subLayer : group.getLayers()) {
-				collectTreeLayers(subLayer);
-			}
-		} else if (layer instanceof TiledMapTileLayer) {
-			var tileLayer = (TiledMapTileLayer) layer;
-			if (tileLayer.getName().toLowerCase().startsWith("trees")) { // this just excludes via root level groups and
-																			// layers
-				treeLayers.add(tileLayer);
-			}
-		}
-	}
 	public List<TiledMapTileLayer> getTreeLayers() {
-		return Collections.unmodifiableList(treeLayers);
+		return Collections.unmodifiableList(ySortedLayers);
 	}
-
-
 
 	/**
 	 * Test method
@@ -137,7 +136,7 @@ public class YSortingTiledMapRenderer extends OrthogonalTiledMapRenderer {
 	}
 
 	public void renderTreeTilesWithYIndex(int yIndex) {
-		for (var layer : treeLayers) {
+		for (var layer : ySortedLayers) {
 			renderAllTreeTilesWithYIndex(layer, yIndex);
 		}
 	}
