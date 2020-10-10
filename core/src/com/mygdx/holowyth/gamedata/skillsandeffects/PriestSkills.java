@@ -4,8 +4,8 @@ import com.mygdx.holowyth.skill.skill.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
 
 public class PriestSkills {
-	public static class HealSkill extends UnitSkill {
-		public HealSkill() {
+	public static class Heal extends UnitSkill {
+		public Heal() {
 			super();
 			name = "Heal";
 			casting.castTime = 60 * 1.5f;

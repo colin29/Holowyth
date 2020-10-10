@@ -296,5 +296,4 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 	protected void addTag(Tag tag) {
 		tags.add(tag);
 	}
-
 }

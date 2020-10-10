@@ -3,9 +3,9 @@ package com.mygdx.holowyth.gamedata.maps;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.mygdx.holowyth.gamedata.skillsandeffects.Skills;
 import com.mygdx.holowyth.gamedata.units.MonsterStats;
 import com.mygdx.holowyth.gamedata.units.Monsters;
-import com.mygdx.holowyth.skill.skill.Skills;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.world.map.Entrance;
