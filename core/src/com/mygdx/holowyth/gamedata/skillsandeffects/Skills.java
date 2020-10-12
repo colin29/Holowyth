@@ -22,11 +22,18 @@ public class Skills {
 	public static final List<ActiveSkill> warriorSkills = Collections
 			.unmodifiableList(Arrays.asList(new WarriorSkills.RageBlow(), new WarriorSkills.Bash(),
 					new WarriorSkills.Taunt(), new WarriorSkills.DeafeningCry()));
+	
+	public static final List<ActiveSkill> swordsmanSkills = Collections
+			.unmodifiableList(Arrays.asList(new SwordsmanSkills.TripleStrike()));
 
 	public static final List<ActiveSkill> mageSkills = Collections
-			.unmodifiableList(Arrays.asList(new MageSkills.Fireball(), new MageSkills.MagicMissile(),
-					new MageSkills.ArcaneBolt(), new MageSkills.WindBlades(), new MageSkills.Hydroblast(),
-					new MageSkills.Thunderclap(), new MageSkills.BlindingFlash()));
+			.unmodifiableList(Arrays.asList(new MageSkills.Fireball(), 
+					new MageSkills.MagicMissile(),
+					new MageSkills.ArcaneBolt(), 
+					new MageSkills.WindBlades(), 
+					new MageSkills.Hydroblast(),
+					new MageSkills.Thunderclap(), 
+					new MageSkills.BlindingFlash()));
 
 	public static final List<ActiveSkill> rangerSkills = Collections
 			.unmodifiableList(Arrays.asList(new RangerSkills.CrossSlash()));

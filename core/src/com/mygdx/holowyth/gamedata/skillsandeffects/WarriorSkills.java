@@ -12,7 +12,6 @@ public class WarriorSkills {
 
 	public static class RageBlow extends NoneSkill {
 		public RageBlow() {
-			super();
 			name = "Rage Blow";
 			casting.castTime = 60 * 1f;
 			casting.isInterruptedByDamageOrReel = false;
@@ -40,7 +39,6 @@ public class WarriorSkills {
 
 	public static class Bash extends NoneSkill {
 		public Bash() {
-			super();
 			name = "Bash";
 			casting.castTime = 60 * 0.7f;
 			casting.isInterruptedByDamageOrReel = false;
@@ -66,7 +64,6 @@ public class WarriorSkills {
 
 	public static class Taunt extends NoneSkill {
 		public Taunt() {
-			super();
 			name = "Taunt";
 			casting.castTime = 0;
 			spCost = 5;
@@ -90,7 +87,6 @@ public class WarriorSkills {
 
 	public static class DeafeningCry extends NoneSkill {
 		public DeafeningCry() {
-			super();
 			name = "Deafening Cry";
 			casting.castTime = 60 * 0.9f;
 			casting.isInterruptedByDamageOrReel = false;

@@ -160,9 +160,6 @@ public class EffectsHandler {
 		skillNameEffects.addSkillTextOn(unit, effect);
 	}
 
-	public boolean useScatteringDamageEffect = false;
-
-	
 	public static class DamageEffectParams {
 		public boolean useFastEffect;
 	}

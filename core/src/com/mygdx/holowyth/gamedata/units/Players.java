@@ -20,7 +20,7 @@ public class Players {
 		name = "Lecia";
 		baseStats.set(MonsterStats.baseHuman);
 		wornEquips.equip(Weapons.shortSword);  // weapon will be copied anyways, no need to clone
-		activeSkills.addAll(Skills.warriorSkills);
+		activeSkills.addAll(Skills.swordsmanSkills);
 		passiveSkills.add(PassiveSkills.basicCombatTraining);
 		
 		animatedSpriteName = "pipo-charachip030e.png";
