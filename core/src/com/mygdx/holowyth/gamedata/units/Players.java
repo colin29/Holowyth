@@ -5,6 +5,7 @@ import org.eclipse.jdt.annotation.NonNullByDefault;
 import com.mygdx.holowyth.gamedata.items.Weapons;
 import com.mygdx.holowyth.gamedata.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.gamedata.skillsandeffects.Skills;
+import com.mygdx.holowyth.gamedata.skillsandeffects.SwordsmanSkills;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.world.map.UnitMarker;
 import com.mygdx.holowyth.world.map.UnitMarker.TemplateUnitMarker;
@@ -22,6 +23,7 @@ public class Players {
 		wornEquips.equip(Weapons.shortSword);  // weapon will be copied anyways, no need to clone
 		activeSkills.addAll(Skills.swordsmanSkills);
 		passiveSkills.add(PassiveSkills.basicCombatTraining);
+		passiveSkills.add(SwordsmanSkills.swiftness);
 		
 		animatedSpriteName = "pipo-charachip030e.png";
 		headSpriteName = HEAD_SPRITE_DIR + "Lecia.png";

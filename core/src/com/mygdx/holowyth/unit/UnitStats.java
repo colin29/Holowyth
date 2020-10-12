@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler.DamageEffectParams;
+import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.unit.UnitStats.DamageInstance;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.unit.item.Equip;
@@ -131,6 +132,7 @@ public class UnitStats implements UnitStatsInfo {
 		if (!isAttackRollSuccessful(enemy, atkBonus, false)) {
 			gfx.makeBlockEffect(this.self, enemy.self);
 			// System.out.printf("%s's attack was blocked by %s %n", this.name, enemy.name);
+			onAttack(enemy);
 			return;
 		}
 
@@ -141,11 +143,19 @@ public class UnitStats implements UnitStatsInfo {
 		// 5. Apply damage
 		logger.trace("{}'s attack hit and did {} damage to {}", this.name, DataUtil.getRoundedString(damage), enemy.name);
 
-		enemy.applyExactDamage(damage);
+		enemy.applyExactDamage(damage, null);
 		if (damage > 0) {
 			enemy.self.interruptSoft();
 		}
+		onAttack(enemy);
 
+	}
+
+	//** Notify skills, etc. that trigger on attack
+	private void onAttack(UnitStats enemy) {
+		for(Skill s : self.skills.getSkills()) {
+			s.onUnitAttack(self, enemy.self);
+		}
 	}
 
 	public boolean isAttackRollSuccessful(UnitStats enemy, int atkBonus) {
@@ -292,27 +302,31 @@ public class UnitStats implements UnitStatsInfo {
 		applyDamage(temp, effectParams);
 	}
 	public void applyDamage(DamageInstance d) {
-		processDamage(d);
-		gfx.makeDamageEffect(d.damage, this.self);
+		processDamage(d, null);
 	}
 	public void applyDamage(DamageInstance d, DamageEffectParams effectParams) {
-		processDamage(d);
-		gfx.makeDamageEffect(d.damage, this.self, effectParams);
+		processDamage(d, effectParams);
 	}
 	
-	private void processDamage(DamageInstance d) {
-		applyExactDamage(calculatePostArmorDamage(d.damage, d.armorPiercing, d.armorNegation));
+	private void processDamage(DamageInstance d, DamageEffectParams effectParams) {
+		applyExactDamage(calculatePostArmorDamage(d.damage, d.armorPiercing, d.armorNegation), effectParams);
 	}
 
 	/**
 	 * Ignores all damage reduction, internal method
 	 */
-	private void applyExactDamage(float damage) {
+	private void applyExactDamage(float damage,  DamageEffectParams effectParams) {
 		hp -= damage;
 		if (hp <= 0) {
 			hp = 0;
 			self.unitDies();
 		}
+		if(effectParams == null) {
+			gfx.makeDamageEffect(damage, self);
+		}else {
+			gfx.makeDamageEffect(damage, self, effectParams);
+		}
+		
 	}
 
 	/**

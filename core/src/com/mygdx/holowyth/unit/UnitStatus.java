@@ -12,6 +12,7 @@ import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitStatusInfo;
 import com.mygdx.holowyth.unit.statuseffect.BasicAttackSlowEffect;
 import com.mygdx.holowyth.unit.statuseffect.SlowEffect;
+import com.mygdx.holowyth.unit.statuseffect.SpeedIncreaseEffect;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 
 /**
@@ -32,6 +33,7 @@ public class UnitStatus implements UnitStatusInfo {
 	
 	// Status effects
 	private final List<SlowEffect> slowEffects = new LinkedList<SlowEffect>();
+	private final List<SpeedIncreaseEffect> speedIncreaseEffects = new LinkedList<SpeedIncreaseEffect>();
 	private float blindDurationRemaining;
 
 	private float tauntDurationRemaining = 0;
@@ -68,6 +70,16 @@ public class UnitStatus implements UnitStatusInfo {
 	 */
 	public void applySlow(float slowAmount, int duration) {
 		slowEffects.add(new SlowEffect(duration, slowAmount));
+	}
+	
+	/**
+	 * @param speedIncreaseAmount
+	 *            A non-negative number. 0.3f represents a 30% speed increase.
+	 * @param duration
+	 *            in frames
+	 */
+	public void applySpeedIncrease(float speedIncreaseAmount, int duration) {
+		speedIncreaseEffects.add(new SpeedIncreaseEffect(duration, speedIncreaseAmount));
 	}
 
 	/**
@@ -215,16 +227,25 @@ public class UnitStatus implements UnitStatusInfo {
 	@Override
 	public float getMoveSpeed() {
 	
+		float reelingMoveSlow = isReeled() ? REEL_SLOW_AMOUNT : 0;
+		return self.stats.getBaseMoveSpeed() * ((1 -  getLargestSlow()) * (1 - reelingMoveSlow) + getLargestSpeedIncrease());
+	}
+	private float getLargestSlow() {
 		float largestSlow = 0;
 		for (var effect : slowEffects) {
 			largestSlow = Math.max(largestSlow, effect.getSlowAmount());
 		}
-	
-		float reelingMoveSlow = isReeled() ? REEL_SLOW_AMOUNT : 0;
-	
-		return self.stats.getBaseMoveSpeed() * (1 - largestSlow) * (1 - reelingMoveSlow);
+		return largestSlow;
 	}
 
+	private float getLargestSpeedIncrease() {
+		float largestSpeedIncrease = 0;
+		for (var effect : speedIncreaseEffects) {
+			largestSpeedIncrease = Math.max(largestSpeedIncrease, effect.getSpeedIncrease());
+		}
+		return largestSpeedIncrease;
+	}
+	
 	/**
 	 * @returns movespeed / baseMoveSpeed. For example if a unit was slowed by 30%, it would return 0.7
 	 */
@@ -241,6 +262,9 @@ public class UnitStatus implements UnitStatusInfo {
 	public void tick() {
 		slowEffects.forEach((effect) -> effect.tickDuration());
 		slowEffects.removeIf((effect) -> effect.isExpired());
+		speedIncreaseEffects.forEach((effect) -> effect.tickDuration());
+		speedIncreaseEffects.removeIf((effect) -> effect.isExpired());
+		
 	
 		blindDurationRemaining = Math.max(0, blindDurationRemaining - 1);
 	

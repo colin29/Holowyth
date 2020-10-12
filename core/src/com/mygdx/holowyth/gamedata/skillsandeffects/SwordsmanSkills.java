@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.gamedata.skillsandeffects;
 
 import com.mygdx.holowyth.gamedata.skillsandeffects.RangerEffects.CrossSlashEffect;
+import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.DataUtil;
@@ -31,4 +32,15 @@ public class SwordsmanSkills {
 		}
 
 	}
+	
+	public final static Skill swiftness = new Skill() {
+		{
+			name = "Swiftness";
+		}
+
+		@Override
+		public void onUnitAttack(Unit parent, Unit target) {
+			parent.status.applySpeedIncrease(0.25f, 4 * 60);
+		}
+	};
 }

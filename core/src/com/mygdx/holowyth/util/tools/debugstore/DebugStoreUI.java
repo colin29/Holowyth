@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label.LabelStyle;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.HoloUI;
 
 /**
  * Is used as a common UI submodule. When created, it exposes a table which the caller can place where desired
@@ -121,6 +122,7 @@ public class DebugStoreUI {
 
 		debugTable.defaults().spaceRight(20).left();
 		debugTable.setVisible(Holo.debugPanelShowAtStartup);
+		debugTable.setBackground(HoloUI.getSolidBG(Color.WHITE, 0.4f));
 	}
 
 }
