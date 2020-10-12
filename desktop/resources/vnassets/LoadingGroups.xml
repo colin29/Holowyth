@@ -3,21 +3,13 @@
 	<group name="common">
 		
 <load>myConv.conv</load>
-<load>lecia</load>
 <load>testbackground</load>
-	
+
+<load>lecia1.conv</load>
+<load>lecia</load>
+<load>elvin</load>
 
 
-
-		<load>demonstration.conv</load>
-		<load>demobackground</load>
-		<load>Edgeworth</load>
-		<load>icon</load>
-		<load>testicon2.png</load>
-		<load>discussion.mp3</load>
-		<load>intense.wav</load>
-		<load>talksoundmale.wav</load>
-		<load>talksoundfemale.wav</load>
 		
 	</group>
 </groups>

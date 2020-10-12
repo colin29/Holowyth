@@ -41,7 +41,7 @@ public class Skills {
 			Arrays.asList(new PriestSkills.Heal())
 			);
 	
-	private static final String headerText = "Skill name; SP cost; Cast time (frames); Cooldown; Global CD; Description";
+	private static final String headerText = "Skill name; SP cost; Cast time (sec); Cooldown (sec); Global CD; Description";
 	public static void main(String[] args) { // For output into external google sheets for easy viewing
 		printSemiColonSeperatedTableOfSkills(warriorSkills, "Warrior Skills");
 		printSemiColonSeperatedTableOfSkills(mageSkills, "Mage Skills");
@@ -54,9 +54,10 @@ public class Skills {
 		for(ActiveSkill s : skills) {
 			System.out.println(getSkillInfoAsString(s));
 		}
+		System.out.println();
 	}
 	private static String getSkillInfoAsString(ActiveSkill s) {
-		return String.format("%s; %d; %s; %s; %s; %s", s.name, s.spCost, DataUtil.roundFully(s.casting.castTime), DataUtil.roundFully(s.cooldown),  DataUtil.roundFully(s.globalCooldown), s.getDescription());
+		return String.format("%s; %d; %s; %s; %s; %s", s.name, s.spCost,  s.getDescription(), DataUtil.getRoundedString(s.casting.castTime/60), DataUtil.getRoundedString(s.cooldown/60),  DataUtil.getRoundedString(s.globalCooldown/60));
 	}
 
 }

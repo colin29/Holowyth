@@ -26,8 +26,8 @@ public class VNTestScreen extends HoloBaseScreen {
 		multiplexer = new InputMultiplexer();
 		
 		Stage vnStage = new Stage(); 
-		
 		vn = new VNController(vnStage, batch, camera, multiplexer);
+		
 		multiplexer.addProcessor(stage);
 		
 		vn.setConvoExitListener(()->{

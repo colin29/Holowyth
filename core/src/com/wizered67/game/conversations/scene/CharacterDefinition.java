@@ -1,5 +1,7 @@
 package com.wizered67.game.conversations.scene;
 
+import com.wizered67.game.conversations.ConversationController;
+
 /**
  * Defines a base of a character that SceneCharacters can be created from.
  * @author Adam Victor
@@ -18,7 +20,7 @@ public class CharacterDefinition {
     public CharacterDefinition(String identifier, String knownName, String speakingSound) {
         this.identifier = identifier;
         this.knownName = knownName;
-        this.speakingSound = speakingSound != null ? speakingSound : DEFAULT_SPEAKING_SOUND;
+        this.speakingSound = speakingSound != null ? speakingSound : ConversationController.NO_SPEAKING_SOUND;
     }
 
     public String getIdentifier() {

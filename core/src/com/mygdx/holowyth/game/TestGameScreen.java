@@ -10,18 +10,17 @@ public class TestGameScreen extends StandardGameScreen {
 	public TestGameScreen(Holowyth game) {
 		super(game);
 		
-		addTestWeaponsToInventory();
+		vn.startConversation("lecia1.conv", "default");
+		vn.show();
+		
+		vn.setConvoExitListener(()->{
+			vn.hide();
+		});
 	}
 
 	@Override
 	public void render(float delta) {
 		super.render(delta);
-	}
-	private void addTestWeaponsToInventory() {
-		session.ownedItems.addItem(Weapons.spear.cloneObject());
-		session.ownedItems.addItem(Weapons.club.cloneObject());
-		session.ownedItems.addItem(Weapons.dagger.cloneObject());
-		session.ownedCurrency.add(50);
 	}
 
 

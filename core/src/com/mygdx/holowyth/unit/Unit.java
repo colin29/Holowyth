@@ -109,7 +109,6 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	public Unit(float x, float y, Side side, MapInstanceInfo world) {
 		this.id = Unit.getNextId();
 		idToUnit.put(id, this);
-		logger.debug("Placed unit id [{}]: ", id);
 
 		this.x = x;
 		this.y = y;

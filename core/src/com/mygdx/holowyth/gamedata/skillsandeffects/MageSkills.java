@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.gamedata.skillsandeffects;
 
 import com.mygdx.holowyth.game.rendering.aiminggraphic.SkillsAimingGraphics;
+import com.mygdx.holowyth.gamedata.skillsandeffects.MageEffects.MagicMissileEffect;
 import com.mygdx.holowyth.graphics.effects.animated.EffectCenteredOnFixedPos;
 import com.mygdx.holowyth.graphics.effects.animated.EffectCenteredOnUnit;
 import com.mygdx.holowyth.skill.Casting;
@@ -27,7 +28,7 @@ public class MageSkills {
 
 		@Override
 		public String getDescription() {
-			return "Fires 3 missiles which knockback the enemy target. A basic mage skill.";
+			return String.format("Fires 3 missiles that do %s damage and knock the target back. A basic mage skill.", MagicMissileEffect.damage);
 		}
 
 	}

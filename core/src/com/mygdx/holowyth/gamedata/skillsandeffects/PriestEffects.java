@@ -2,7 +2,6 @@ package com.mygdx.holowyth.gamedata.skillsandeffects;
 
 import com.mygdx.holowyth.graphics.effects.animated.EffectCenteredOnUnit;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
-import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;
 
 public class PriestEffects {

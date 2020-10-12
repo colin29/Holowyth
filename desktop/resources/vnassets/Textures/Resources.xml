@@ -1,17 +1,15 @@
 <resources xmlns="urn:resourceConfig">
-	<resource name="Lecia.png" identifier="lecia">
-		<texture genMipMaps="false" minFilter="Nearest" magFilter="Nearest" wrapU="ClampToEdge" wrapV="ClampToEdge"/>
-	</resource>
+	
 	<resource name="testbackground.jpg" identifier="testbackground">
 		<texture genMipMaps="false" minFilter="Nearest" magFilter="Nearest" wrapU="ClampToEdge" wrapV="ClampToEdge"/>
 	</resource>
-	<resource name="demoBackground.png" identifier="demobackground">
+
+
+
+	<resource name="Lecia.png" identifier="lecia">
 		<texture genMipMaps="false" minFilter="Nearest" magFilter="Nearest" wrapU="ClampToEdge" wrapV="ClampToEdge"/>
 	</resource>
-	<resource name="testicon.png" identifier="icon">
-		<texture genMipMaps="false" minFilter="Nearest" magFilter="Nearest" wrapU="ClampToEdge" wrapV="ClampToEdge"/>
-	</resource>
-	<resource name="testicon2.png" identifier="testicon2.png">
+	<resource name="Elvin.png" identifier="elvin">
 		<texture genMipMaps="false" minFilter="Nearest" magFilter="Nearest" wrapU="ClampToEdge" wrapV="ClampToEdge"/>
 	</resource>
 	

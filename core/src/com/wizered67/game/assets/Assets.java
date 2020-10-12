@@ -177,7 +177,7 @@ public class Assets {
             Element character = root.getChild(c);
             String id = character.getAttribute("id");
             String name = character.getAttribute("name");
-            String sound = character.getAttribute("sound", SceneCharacter.DEFAULT_SPEAKING_SOUND);
+            String sound = character.getAttribute("sound", null);
             SceneManager.createCharacter(id, name, sound);
         }
     }
@@ -262,6 +262,7 @@ public class Assets {
     }
 
     public synchronized <T> T get(String identifier, Class<T> type) {
+    	logger.debug("getting resource: '{}' of type {}", identifier, type.getSimpleName());
         return assetManager.get(assetIdentifiers.get(identifier).fileName, type);
     }
 

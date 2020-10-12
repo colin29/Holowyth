@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.gamedata.units.MonsterStats;
+import com.mygdx.holowyth.gamedata.units.Monsters;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.world.map.Entrance;
@@ -34,6 +35,8 @@ public class Forest2 extends GameMap {
 
 		locations.add(new Entrance("entrance_1", 30, 325).setDestToMap("forest1", "entrance_2"));
 		locations.add(new Entrance("entrance_2", 1420, 290));
+		
+		addUnitMarker(400, 400, Monsters.goblin);
 
 	}
 }

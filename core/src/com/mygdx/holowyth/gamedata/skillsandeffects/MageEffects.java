@@ -37,7 +37,7 @@ public class MageEffects {
 			super(caster, target);
 		}
 
-		int damage = 5;
+		public static int damage = 5;
 		List<MagicMissileBolt> missiles;
 
 		float missileVfxRadius = 5;
@@ -81,7 +81,7 @@ public class MageEffects {
 
 		ProjectileBase projectile;
 
-		int damage = 24;
+		public static int damage = 24;
 		private static float missileVfxRadius = 6;
 
 		@Override
@@ -399,6 +399,7 @@ public class MageEffects {
 		static float aoeRadius = 80f;
 
 		static float stunDuration = 60 * 1.5f;
+		static int forceValue = 18;
 
 		protected ThunderclapEffect(Unit caster, float x, float y) {
 			super(caster, x, y);
@@ -409,9 +410,9 @@ public class MageEffects {
 			for (Unit unit : mapInstance.getUnits()) {
 				if (Point.dist(ground, unit.getPos()) <= aoeRadius + unit.getRadius()) {
 					if (unit.getSide() != caster.getSide()) {
-						unit.stats.doStunRollAgainst(18, stunDuration);
+						unit.stats.doStunRollAgainst(forceValue, stunDuration);
 					} else {
-						unit.stats.doStunRollAgainst(8, stunDuration);
+						unit.stats.doStunRollAgainst(forceValue-10, stunDuration);
 					}
 				}
 			}

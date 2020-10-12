@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.game.base.GameScreen;
 import com.mygdx.holowyth.game.session.SessionData;
@@ -47,7 +48,7 @@ public class StandardGameScreen extends GameScreen {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	private VNController vn;
+	protected final VNController vn;
 
 	private Unit lecia;
 
@@ -57,8 +58,7 @@ public class StandardGameScreen extends GameScreen {
 
 	public StandardGameScreen(Holowyth game) {
 		super(game);
-//		vn = new VNController(new Stage(), batch, fixedCamera, multiplexer); // have vn draw using its OWN stage
-//		startConversation("myConv.conv", "default");
+		vn = new VNController(new Stage(), batch, fixedCamera, multiplexer); // have vn draw using its OWN stage
 
 		functionBindings.bindFunctionToKey(()->{controls.clearSelectedUnits();}, Keys.X);
 		functionBindings.bindFunctionToKey(() -> {

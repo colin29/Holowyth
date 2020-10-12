@@ -1,0 +1,55 @@
+<conversation xmlns="urn:conversations">
+	<branch name="default">
+		<!-- <bg id="testbackground"/>-->
+		<position id="Lecia" x="0" y="0"/>
+		<animation animation="lecia" id="Lecia"/>
+		<scale id="Lecia" xScale="0.5" yScale="0.5"/>
+		<visible id="Lecia" visible="true"/>
+
+<position id="Elvin" x="500" y="0"/>
+        <animation id="Elvin" animation="elvin"/>
+        <scale id="Elvin" xScale="0.5" yScale="0.5" />
+        <visible id="Elvin" visible="true"/>
+
+Lecia: *Haa!!*
+
+todo: {3x slash}
+
+
+ 
+
+Elvin: Ghh!
+
+Elvin: (There's an opening when she strikes sideways, her grip finishes weak, if I can counter then!)
+
+todo: {Slash sound}
+
+Elvin: (Ah...)
+
+Lecia: Haaa!
+
+Elvin: ...I yield.
+
+Lecia: ...It's my win again! Yippee!  
+
+Elvin: What is it now, 7-2 this month?
+
+Lecia: Are you sure you haven't been slacking off? You don't attack back at all.
+
+Elvin: Give me a break... Do you hard it is to look for an opening while defending?
+
+Lecia: Well defending's not really my style... Just get them before they get you!
+
+Elvin: That doesn't work if you're faster than me. Not everyone has talent like you, Lecia.
+
+Lecia: You just need to practice and find what you're good at.
+
+Elvin: I guess... Oh, it's Master.
+		
+		<visible fadeTime="0.5" id="Lecia" visible="false" wait="true"/>
+		<!--        <script>playerName="Spinaria"</script>-->
+		<!-- 
+        Lecia: {COLOR=PINK}hello!
+        <visible id="Lecia" visible="false"/><visible id="Detective" visible="true"/>Detective: Hello. The clues are located in the {COLOR=YELLOW}Goblin Ruins{CLEAR_COLOR}.
+ --></branch>
+</conversation>
