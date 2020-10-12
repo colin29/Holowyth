@@ -5,12 +5,12 @@ import org.slf4j.LoggerFactory;
 
 public class SpeedIncreaseEffect {
 
-	private int duration;
+	private float duration;
 	private float speedIncrease;
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	public SpeedIncreaseEffect(int duration, float speedIncrease) {
+	public SpeedIncreaseEffect(float duration, float speedIncrease) {
 		this.duration = duration;
 
 		if (speedIncrease < 0) {
@@ -21,7 +21,7 @@ public class SpeedIncreaseEffect {
 		this.speedIncrease = speedIncrease;
 	}
 
-	public int getDuration() {
+	public float getDuration() {
 		return duration;
 	}
 

@@ -52,9 +52,9 @@ class World {
 		debugValues.add("Initial", () -> DataUtil.getRoundedString(new Vector2(segment.x1, segment.y1)));
 		debugValues.add("Final", () -> DataUtil.getRoundedString(new Vector2(segment.x2, segment.y2)));
 		debugValues.add("Delta", () -> DataUtil.getRoundedString(delta));
-		debugValues.add("P of Intersect point", () -> DataUtil.getRoundedString(pOfIntersectPoint));
+		debugValues.add("P of Intersect point", () -> DataUtil.round(pOfIntersectPoint));
 		debugValues.add("Angle at intersect (degrees)",
-				() -> DataUtil.getRoundedString(angleOfCircleAtIntersect * RADS_TO_DEGREES));
+				() -> DataUtil.round(angleOfCircleAtIntersect * RADS_TO_DEGREES));
 
 	}
 

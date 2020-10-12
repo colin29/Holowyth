@@ -30,7 +30,6 @@ public class SwordsmanSkills {
 		public String getDescription() {
 			return String.format("Strike the enemy rapidly, dealing 3x%s damage", DataUtil.percentage(atkdmgMultiplier));
 		}
-
 	}
 	
 	public final static Skill swiftness = new Skill() {

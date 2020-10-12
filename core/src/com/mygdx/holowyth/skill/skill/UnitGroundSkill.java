@@ -12,6 +12,6 @@ public abstract class UnitGroundSkill extends ActiveSkill {
 		super(Targeting.UNIT_GROUND);
 	}
 
-	public abstract void pluginTargeting(Unit caster, Unit target, float x, float y);
+	public abstract boolean pluginTargeting(Unit caster, Unit target, float x, float y);
 
 }

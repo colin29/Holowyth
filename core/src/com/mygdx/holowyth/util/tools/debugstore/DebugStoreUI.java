@@ -2,7 +2,7 @@
 package com.mygdx.holowyth.util.tools.debugstore;
 
 import static com.mygdx.holowyth.util.DataUtil.percentage;
-import static com.mygdx.holowyth.util.DataUtil.getRoundedString;
+import static com.mygdx.holowyth.util.DataUtil.round;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -88,7 +88,7 @@ public class DebugStoreUI {
 			if (v.shouldDisplayAsPercentage()) {
 				str = percentage(v.getFloatValue());
 			} else {
-				str = getRoundedString(v.getFloatValue());
+				str = round(v.getFloatValue());
 			}
 			break;
 		case INT:

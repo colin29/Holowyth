@@ -123,8 +123,9 @@ public class MageSkills {
 		}
 
 		@Override
-		public void pluginTargeting(Unit caster, float x, float y) {
+		public boolean pluginTargeting(Unit caster, float x, float y) {
 			setEffects(new MageEffects.HydroblastEffect(caster, x, y));
+			return true;
 		}
 
 		@Override
@@ -150,8 +151,9 @@ public class MageSkills {
 		}
 
 		@Override
-		public void pluginTargeting(Unit caster, float x, float y) {
+		public boolean pluginTargeting(Unit caster, float x, float y) {
 			setEffects(new MageEffects.ThunderclapEffect(caster, x, y));
+			return true;
 		}
 
 		@Override
@@ -175,7 +177,7 @@ public class MageSkills {
 		}
 
 		@Override
-		public void pluginTargeting(Unit caster, float x, float y) {
+		public boolean pluginTargeting(Unit caster, float x, float y) {
 			setEffects(new MageEffects.BlindingFlashEffect(caster, x, y));
 			
 			casting = new Casting(this) {
@@ -196,6 +198,7 @@ public class MageSkills {
 				}
 				
 			};
+			return true;
 		}
 
 		@Override

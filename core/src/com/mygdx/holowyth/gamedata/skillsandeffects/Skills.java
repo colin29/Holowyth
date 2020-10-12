@@ -39,6 +39,11 @@ public class Skills {
 			.unmodifiableList(Arrays.asList(new RangerSkills.CrossSlash()));
 	public static final List<ActiveSkill> priestSkills = Collections
 			.unmodifiableList(Arrays.asList(new PriestSkills.Heal(), new PriestSkills.StaffStrike()));
+	
+	public static final List<ActiveSkill> darkKnightSkills = Collections
+			.unmodifiableList(Arrays.asList(new DarkKnightSkills.BladeInTheDark(), 
+					new DarkKnightSkills.ThrowSand()));
+	
 
 	private static final String headerText = "Skill name; SP cost; Cast time (sec); Cooldown (sec); Global CD; Description";
 
@@ -60,8 +65,8 @@ public class Skills {
 
 	private static String getSkillInfoAsString(ActiveSkill s) {
 		return String.format("%s; %d; %s; %s; %s; %s", s.name, s.spCost, s.getDescription(),
-				DataUtil.getRoundedString(s.casting.castTime / 60), DataUtil.getRoundedString(s.cooldown / 60),
-				DataUtil.getRoundedString(s.globalCooldown / 60));
+				DataUtil.round(s.casting.castTime / 60), DataUtil.round(s.cooldown / 60),
+				DataUtil.round(s.globalCooldown / 60));
 	}
 
 }

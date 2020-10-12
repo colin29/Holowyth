@@ -13,7 +13,7 @@ import com.mygdx.holowyth.util.dataobjects.Point;
  * @author Colin
  *
  */
-class UnitCombat {
+public class UnitCombat {
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -79,6 +79,15 @@ class UnitCombat {
 	}
 
 	void retreat(float x, float y) {
+		retreat(x, y, false);
+	}
+	public void retreatAvoidAOPfromTarget(float x, float y) {
+		retreat(x, y, true);
+	}
+	private void retreat(float x, float y, boolean avoidAOPfromTarget) {
+		
+		Unit oldTarget = attacking;
+		
 		retreatDurationRemaining = retreatDuration;
 		if (self.getMotion().pathFindTowardsPoint(x, y)) {
 			stopAttacking();
@@ -87,6 +96,8 @@ class UnitCombat {
 
 			var attackers = self.getUnitsAttackingThis();
 			for (Unit attacker : attackers) {
+				if(attacker == oldTarget && avoidAOPfromTarget)
+					continue;
 				attacker.stats.attackOfOpportunity(self.stats);
 				attacker.combat.attackOfOpportunityCooldownRemaining = attacker.combat.attackOfOpportunityCooldown;
 			}

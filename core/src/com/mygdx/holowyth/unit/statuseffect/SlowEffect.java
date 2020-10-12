@@ -5,12 +5,12 @@ import org.slf4j.LoggerFactory;
 
 public class SlowEffect {
 
-	private int duration;
+	private float duration;
 	private float slowAmount;
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	public SlowEffect(int duration, float slowAmount) {
+	public SlowEffect(float duration, float slowAmount) {
 		this.duration = duration;
 
 		if (slowAmount > 1) {
@@ -25,7 +25,7 @@ public class SlowEffect {
 		this.slowAmount = slowAmount;
 	}
 
-	public int getDuration() {
+	public float getDuration() {
 		return duration;
 	}
 

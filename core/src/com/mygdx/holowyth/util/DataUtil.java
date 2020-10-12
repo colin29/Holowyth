@@ -16,13 +16,13 @@ import com.badlogic.gdx.math.Vector2;
 public class DataUtil {
 
 	public static String getRoundedString(Vector2 point) {
-		return String.format("%s %s", DataUtil.getRoundedString(point.x), DataUtil.getRoundedString(point.y));
+		return String.format("%s %s", DataUtil.round(point.x), DataUtil.round(point.y));
 	}
 
 	/**
 	 * Rounds to 2 places
 	 */
-	public static String getRoundedString(float value) {
+	public static String round(float value) {
 		if (isNotFinite(value))
 			return getNonFiniteString(value);
 		DecimalFormat df = new DecimalFormat("#.##");
@@ -52,7 +52,7 @@ public class DataUtil {
 	public static String percentage(float value) {
 		if (isNotFinite(value))
 			return getNonFiniteString(value);
-		return getRoundedString(value * 100) + "%";
+		return round(value * 100) + "%";
 	}
 
 	private static boolean isNotFinite(float f) {

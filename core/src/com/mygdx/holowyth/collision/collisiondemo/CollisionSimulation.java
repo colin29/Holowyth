@@ -58,7 +58,7 @@ public class CollisionSimulation {
 		debugValues.space();
 
 		debugValues.add("intersectPoint", () -> DataUtil.getRoundedString(intersectDebugInfo.intersectPoint));
-		debugValues.add("pOfIntersectPoint", () -> DataUtil.getRoundedString(intersectDebugInfo.pOfIntersectPoint));
+		debugValues.add("pOfIntersectPoint", () -> DataUtil.round(intersectDebugInfo.pOfIntersectPoint));
 		debugValues.space();
 
 		debugValues.add("angleOfCircleAtIntersect", () -> intersectDebugInfo.angleOfCircleAtIntersectDegrees);

@@ -41,6 +41,8 @@ public class Animations {
 		loadAnimatedSprite("img/sprites/pipo/pipo-charachip028d.png");
 		loadAnimatedSprite("img/sprites/pipo/pipo-charachip030e.png");
 		loadAnimatedSprite("img/sprites/pipo/renee.png");
+		loadAnimatedSprite("img/sprites/pipo/seth.png");
+		loadAnimatedSprite("img/sprites/pipo/mikal.png");
 
 		loadAnimatedSprite("img/sprites/pipo/goblin1.png");
 	}

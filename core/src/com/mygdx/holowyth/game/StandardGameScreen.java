@@ -78,7 +78,7 @@ public class StandardGameScreen extends GameScreen {
 		loadGameMapByName("forest2");
 
 		var spawnPos = map.getLocation("default_start_location").pos;
-		session.playerUnits.addAll(spawnFourMemberParty(spawnPos));
+		session.playerUnits.addAll(spawnParty(spawnPos));
 
 		// Setup inventory UI
 		lecia = session.playerUnits.get(0);
@@ -176,9 +176,9 @@ public class StandardGameScreen extends GameScreen {
 	}
 
 	@SuppressWarnings("null")
-	private List<@NonNull Unit> spawnFourMemberParty(Point spawnPos) {
+	private List<@NonNull Unit> spawnParty(Point spawnPos) {
 		
-		final int numUnits = 4;
+		final int numUnits = 6;
 		
 		// fetch locations
 		final List<Point> unitPlacements = pathingModule.findPathablePlacements(spawnPos, numUnits, mapInstance.getUnits());
@@ -192,6 +192,8 @@ public class StandardGameScreen extends GameScreen {
 		units.add(mapInstance.addUnit(Players.sonia, unitPlacements.get(1)));
 		units.add(mapInstance.addUnit(Players.elvin, unitPlacements.get(2)));
 		units.add(mapInstance.addUnit(Players.renee, unitPlacements.get(3)));
+		units.add(mapInstance.addUnit(Players.seth, unitPlacements.get(4)));
+		units.add(mapInstance.addUnit(Players.mikal, unitPlacements.get(5)));
 
 		return units;
 	}

@@ -590,4 +590,8 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 		return orders.getEngageRange(unit);
 	}
 
+	public UnitCombat getCombat() {
+		return combat;
+	}
+
 }

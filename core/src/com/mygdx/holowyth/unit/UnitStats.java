@@ -1,6 +1,6 @@
 package com.mygdx.holowyth.unit;
 
-import static com.mygdx.holowyth.util.DataUtil.getRoundedString;
+import static com.mygdx.holowyth.util.DataUtil.round;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -141,7 +141,7 @@ public class UnitStats implements UnitStatsInfo {
 		float damage = enemy.calculatePostArmorDamage(getDamage(), getArmorPiercing(), getArmorNegation());
 
 		// 5. Apply damage
-		logger.trace("{}'s attack hit and did {} damage to {}", this.name, DataUtil.getRoundedString(damage), enemy.name);
+		logger.trace("{}'s attack hit and did {} damage to {}", this.name, DataUtil.round(damage), enemy.name);
 
 		enemy.applyExactDamage(damage, null);
 		if (damage > 0) {
@@ -174,20 +174,22 @@ public class UnitStats implements UnitStatsInfo {
 
 		chanceToHit = Math.min(atkChanceCeiling, chanceToHit);
 		chanceToHit = Math.max(atkChanceFloor, chanceToHit);
-
+		
+		final float randomRoll = (float) Math.random(); 
+		
 		if (isSkill) {
 			logger.debug("Skill atk roll: {}->{} {} {} ({} relative attack)", this.name, enemy.name,
-					Math.random() <= chanceToHit ? "SUCCESS" : "FAILURE",
-					getRoundedString(chanceToHit), atk - defEnemy);
+					randomRoll <= chanceToHit ? "SUCCESS" : "FAILURE",
+					round(chanceToHit), atk - defEnemy);
 		} else {
 			if (logBasicAttackInfo) {
 				logger.debug("{} -> {} {}  ({} relative attack) (+{} from multi-teaming)", this.name, enemy.name,
-						getRoundedString(chanceToHit), atk - defEnemy,
+						round(chanceToHit), atk - defEnemy,
 						getMultiTeamingAtkBonus(enemy));
 			}
 		}
 
-		return Math.random() <= chanceToHit;
+		return randomRoll <= chanceToHit;
 	}
 
 	void attackOfOpportunity(UnitStats target) {
@@ -460,7 +462,7 @@ public class UnitStats implements UnitStatsInfo {
 		recalculateStats();
 
 		String s = "";
-		s += String.format("Unit [%s]  hp: %s/%d  sp: %s/%d  <level %d>%n", name, getRoundedString(hp), getMaxHp(), getRoundedString(sp), getMaxSp(),
+		s += String.format("Unit [%s]  hp: %s/%d  sp: %s/%d  <level %d>%n", name, round(hp), getMaxHp(), round(sp), getMaxSp(),
 				level);
 		// s += String.format("Core stats: STR %d, AGI %d, FORT %d, PERCEP %d%n", getStr(), getAgi(), getFort(), getPercep());
 		s += String.format("Derived stats: Atk %d | Def %d | Force %d | Stab %d%n", getAtk(), getDef(), getForce(),

@@ -65,5 +65,28 @@ public class Players {
 		headSpriteName = HEAD_SPRITE_DIR + "Renee.png";
 		}
 	};
+	public static final UnitMarker seth = new TemplateUnitMarker() {
+		{
+		side = Side.PLAYER;
+		name = "Seth";
+		baseStats.set(MonsterStats.baseHuman);
+		wornEquips.equip(Weapons.dagger);  
+		activeSkills.addAll(Skills.darkKnightSkills);
+		
+		animatedSpriteName = "seth.png";
+		headSpriteName = HEAD_SPRITE_DIR + "seth.png";
+		}
+	};
+	public static final UnitMarker mikal = new TemplateUnitMarker() {
+		{
+		side = Side.PLAYER;
+		name = "Mikal";
+		baseStats.set(MonsterStats.baseHuman);
+		activeSkills.addAll(Skills.rangerSkills);
+		
+		animatedSpriteName = "mikal.png";
+		headSpriteName = HEAD_SPRITE_DIR + "mikal.png";
+		}
+	};
 
 }

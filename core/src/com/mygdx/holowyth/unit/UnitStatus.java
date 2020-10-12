@@ -78,7 +78,7 @@ public class UnitStatus implements UnitStatusInfo {
 	 * @param duration
 	 *            in frames
 	 */
-	public void applySpeedIncrease(float speedIncreaseAmount, int duration) {
+	public void applySpeedIncrease(float speedIncreaseAmount, float duration) {
 		speedIncreaseEffects.add(new SpeedIncreaseEffect(duration, speedIncreaseAmount));
 	}
 
