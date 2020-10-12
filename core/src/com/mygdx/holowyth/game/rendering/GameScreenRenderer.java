@@ -147,11 +147,9 @@ public class GameScreenRenderer {
 			// Units
 			renderUnitOutlines();
 			renderUnitsAndYSortedTiles(delta);
-			
-			if (controls != null) {
-				controls.renderUnitUnderCursor(Color.GREEN, Color.RED);
-			}
-			
+
+			controls.renderUnitUnderCursor(Color.GREEN, Color.RED);
+
 			renderSelectionBox();
 
 			// debug.renderUnitIdsOnUnits();
@@ -159,6 +157,7 @@ public class GameScreenRenderer {
 			// Skill Aiming Graphics
 			renderCastingCircleAimingHelperForGroundSkillThatDefineRadius();
 			renderCustomAimingHelperForGroundSkillThatDefine();
+			controls.renderMaxRangeIndicator();
 
 			// Misc. Combat Related
 			debug.renderUnitKnockbackVelocities();
@@ -189,20 +188,21 @@ public class GameScreenRenderer {
 		}
 	}
 
-	
 	private void renderUnitsAndYSortedTiles(float delta) {
-		
+
 		// Sort units in descending Y order
-		@NonNull ArrayList<@NonNull Unit> sortedByY = new ArrayList<>(mapInstance.getUnits());
+		@NonNull
+		ArrayList<@NonNull Unit> sortedByY = new ArrayList<>(mapInstance.getUnits());
 		sortedByY.sort((u1, u2) -> u1.getY() < u2.getY() ? 1 : -1);
 		var units = new PeekingIterator<Unit>(sortedByY.iterator());
 
 		int tileHeight = map.getTilemap().getProperties().get("tileheight", Integer.class);
-		
+
 		var cells = tiled.getYSortedCells().iterator();
-		while(cells.hasNext()) {
+		while (cells.hasNext()) {
 			var cell = cells.next();
-			while(units.hasNext() && units.peek().y - units.peek().getRadius() + 4 > cell.baseYIndex * tileHeight + tileHeight/2) {
+			while (units.hasNext()
+					&& units.peek().y - units.peek().getRadius() + 4 > cell.baseYIndex * tileHeight + tileHeight / 2) {
 				renderUnit(units.next(), delta);
 			}
 			tiled.renderCell(cell.xIndex, cell.yIndex, cell.layer);
@@ -211,15 +211,15 @@ public class GameScreenRenderer {
 		while (units.hasNext())
 			renderUnit(units.next(), delta);
 	}
-	private void renderUnitOutlines(){
+
+	private void renderUnitOutlines() {
 		renderOutlineAroundSlowedUnits(); // lower priority indicators are drawn first
 		if (controls != null) {
 			controls.renderCirclesOnSelectedUnits();
 		}
 		renderOutlineAroundBusyRetreatingUnits();
 		renderOutlineAroundBusyCastingUnits();
-		
-		
+
 		renderOutlineAroundKnockbackedUnits();
 		renderOutlineAroundReeledUnits();
 		renderOutlineAroundBlindedUnits();
@@ -263,7 +263,6 @@ public class GameScreenRenderer {
 			}
 		}
 	}
-
 
 	/**
 	 * Draws simple circle

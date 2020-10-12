@@ -119,7 +119,7 @@ public class Controls extends InputProcessorAdapter {
 		this.gameLog = gameLog;
 
 		labelStyle = new LabelStyle(Holowyth.fonts.debugFont(), Holo.debugFontColor);
-		
+
 		logger.debug("Controls initialized");
 
 		DebugValues debugValues = debugStore.registerComponent("Controls");
@@ -192,6 +192,7 @@ public class Controls extends InputProcessorAdapter {
 		functionBindings.bindFunctionToKey(() -> printInfoOfSelectedUnits(), Keys.I);
 
 	}
+
 	private void printInfoOfSelectedUnits() {
 		for (Unit unit : selectedUnits) {
 			unit.stats.printInfo(true);
@@ -202,9 +203,11 @@ public class Controls extends InputProcessorAdapter {
 
 		for (int offset = 0; offset < 9; offset++) { // bind keys 1-9
 			final int slotNumber = 1 + offset;
-			functionBindings.bindFunctionToKey(() -> orderSelectedUnitToUseSkillInSlot(slotNumber), Keys.NUM_1 + offset);
+			functionBindings.bindFunctionToKey(() -> orderSelectedUnitToUseSkillInSlot(slotNumber),
+					Keys.NUM_1 + offset);
 		}
-		functionBindings.bindFunctionToKey(() -> orderSelectedUnitToUseSkillInSlot(10), Keys.NUM_0); // also bind the 0 key
+		functionBindings.bindFunctionToKey(() -> orderSelectedUnitToUseSkillInSlot(10), Keys.NUM_0); // also bind the 0
+																										// key
 	}
 
 	ActiveSkill curSkill = null;
@@ -392,19 +395,46 @@ public class Controls extends InputProcessorAdapter {
 
 	private void handleSkillUnit(float x, float y) {
 		assertExactlyOneUnitSelected();
-		Unit clickedUnit = selectUnitAtClickedPoint(x, y);
+		Unit target = selectUnitAtClickedPoint(x, y);
 
-		if (clickedUnit != null) {
+		if (target != null) {
 			UnitSkill skill = (UnitSkill) this.curSkill;
 			Unit caster = selectedUnits.iterator().next();
 
-			if (skill.setTargeting(caster, clickedUnit)) {
-				caster.orderUseSkill(skill);
-			} else {
-				logger.info("Skill '{}' could not be used.", skill.name);
+			if (skill.usingMaxRange() && Unit.getDist(caster, target) > skill.getMaxRange()) {
+				logger.info("Skill '{}' could not be used, target out of range ({}>{})", skill.name,
+						Unit.getDist(caster, target), skill.getMaxRange());
+				gameLog.addErrorMessage("Target is out of range");
+				clearContext();
+				return;
 			}
+			if (!skill.setTargeting(caster, target)) {
+				logger.info("Skill '{}' could not be used.", skill.name);
+				clearContext();
+				return;
+			}
+			caster.orderUseSkill(skill);
 			clearContext();
 		}
+	}
+
+	private void handleSkillGround(float x, float y) {
+		assertExactlyOneUnitSelected();
+	
+		GroundSkill skill = (GroundSkill) this.curSkill;
+		
+		Unit caster = selectedUnits.iterator().next();
+		
+		if (skill.usingMaxRange() && Point.dist(caster.getPos(), new Point(x, y)) > skill.getMaxRange()) {
+			logger.info("Skill '{}' could not be used, point out of range ({})", skill.name, skill.getMaxRange());
+			gameLog.addErrorMessage("Point is out of range");
+			clearContext();
+			return;
+		}
+		
+		skill.pluginTargeting(caster, x, y);
+		caster.orderUseSkill(skill);
+		clearContext();
 	}
 
 	private Unit curSkillUnit; // used purely for storing skill parameters in multi-part targetings
@@ -426,16 +456,6 @@ public class Controls extends InputProcessorAdapter {
 		UnitGroundSkill skill = (UnitGroundSkill) this.curSkill;
 		Unit caster = selectedUnits.iterator().next();
 		skill.pluginTargeting(caster, curSkillUnit, x, y);
-		caster.orderUseSkill(skill);
-		clearContext();
-	}
-
-	private void handleSkillGround(float x, float y) {
-		assertExactlyOneUnitSelected();
-
-		GroundSkill skill = (GroundSkill) this.curSkill;
-		Unit caster = selectedUnits.iterator().next();
-		skill.pluginTargeting(caster, x, y);
 		caster.orderUseSkill(skill);
 		clearContext();
 	}
@@ -468,7 +488,8 @@ public class Controls extends InputProcessorAdapter {
 		Point p1 = new Point(x, y);
 		Point p2 = new Point();
 		float dist;
-		// select a unit if there is one underneath this point. If there are multiple units, select the one that
+		// select a unit if there is one underneath this point. If there are multiple units, select the one
+		// that
 		// occurs last (on top)
 		Unit target = null;
 
@@ -501,8 +522,8 @@ public class Controls extends InputProcessorAdapter {
 			if (u.getRetreatCooldownRemaining() > 0) { // specifically catch this condition and notify the user
 				logger.info("Unit {} can't retreat for another {} seconds", u.getStats().getName(),
 						DataUtil.round(u.getRetreatCooldownRemaining() / 60, 1));
-				gameLog.addErrorMessage(String.format("Unit \"%s\" can't retreat for another %s seconds", u.getStats().getName(),
-						DataUtil.round(u.getRetreatCooldownRemaining() / 60, 1)));
+				gameLog.addErrorMessage(String.format("Unit \"%s\" can't retreat for another %s seconds",
+						u.getStats().getName(), DataUtil.round(u.getRetreatCooldownRemaining() / 60, 1)));
 			} else {
 				u.orderRetreat(x, y);
 			}
@@ -539,7 +560,8 @@ public class Controls extends InputProcessorAdapter {
 	}
 
 	/**
-	 * Makes it so when you are part-way through an order, and then the start of a separate order, the game will stop waiting for the first one
+	 * Makes it so when you are part-way through an order, and then the start of a separate order, the
+	 * game will stop waiting for the first one
 	 */
 	private void clearContext() {
 		context = Context.NONE;
@@ -579,7 +601,8 @@ public class Controls extends InputProcessorAdapter {
 		Point p1 = new Point(x, y);
 		Point p2 = new Point();
 		float dist;
-		// select a unit if there is one underneath this point. If there are multiple units, select the one that
+		// select a unit if there is one underneath this point. If there are multiple units, select the one
+		// that
 		// occurs last (on top)
 		Unit target = null;
 
@@ -615,7 +638,8 @@ public class Controls extends InputProcessorAdapter {
 	}
 
 	/**
-	 * Select a unit if there is one underneath this point. If there are multiple units, select the one that occurs last
+	 * Select a unit if there is one underneath this point. If there are multiple units, select the one
+	 * that occurs last
 	 * 
 	 * Like the majority of Control methods, accepts world coordinates
 	 */
@@ -642,7 +666,7 @@ public class Controls extends InputProcessorAdapter {
 	public void tick() {
 		clearDeadUnitsFromSelection();
 	}
-	
+
 	private void clearDeadUnitsFromSelection() {
 		Iterator<Unit> iter = selectedUnits.iterator();
 		while (iter.hasNext()) {
@@ -657,7 +681,7 @@ public class Controls extends InputProcessorAdapter {
 	public boolean removeUnitFromSelection(UnitInfo u) {
 		return selectedUnits.remove(u);
 	}
-	
+
 	public void clearSelectedUnits() {
 		selectedUnits.clear();
 	}
@@ -758,10 +782,18 @@ public class Controls extends InputProcessorAdapter {
 			shapeRenderer.end();
 		}
 	}
+	public void renderMaxRangeIndicator() {
+		if(context == Context.SKILL_GROUND || context == Context.SKILL_UNIT) {
+			if(curSkill.usingMaxRange()) {
+				Unit caster = selectedUnits.first();
+				HoloGL.renderCircleOutline(caster.x, caster.y, curSkill.getMaxRange(), Color.GRAY);
+			}
+		}
+	}
 
 	/**
-	 * Is guaranteed to be called when selectedUnits is modified Is called immediately after a modifiying action, if that action actually changed the
-	 * set.
+	 * Is guaranteed to be called when selectedUnits is modified Is called immediately after a
+	 * modifiying action, if that action actually changed the set.
 	 */
 	private void onUnitSelectionModified() {
 		if (context == Context.SKILL_GROUND || context == Context.SKILL_UNIT) {
@@ -782,8 +814,7 @@ public class Controls extends InputProcessorAdapter {
 
 	public interface UnitSelectionListener {
 		/**
-		 * @param list
-		 *            of units is unmodifiable
+		 * @param list of units is unmodifiable
 		 */
 		public abstract void unitSelectionModified(List<UnitInfo> selectedUnits);
 	}
@@ -872,7 +903,7 @@ public class Controls extends InputProcessorAdapter {
 				selected.clear();
 			}
 		}
-		
+
 		@Override
 		public boolean isEmpty() {
 			return selected.isEmpty();
@@ -886,8 +917,8 @@ public class Controls extends InputProcessorAdapter {
 		@Override
 		public <T> T[] toArray(T[] a) {
 			return selected.toArray(a);
-			}
-		
+		}
+
 		@Override
 		public Object[] toArray() {
 			return selected.toArray();
@@ -927,7 +958,6 @@ public class Controls extends InputProcessorAdapter {
 		selectedUnits.addAll(newSelection);
 	}
 
-	
 	/**
 	 * @return A seperate copy
 	 */

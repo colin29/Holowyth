@@ -18,7 +18,8 @@ public class MageSkills {
 			casting.castTime = 60 * 0.8f;
 			spCost = 12;
 			cooldown = 60 * 12;
-			addTag(Tag.RANGED_MAGIC);
+			setMaxRange(450);
+			addTag(Tag.MAGIC, Tag.RANGED);
 		}
 
 		@Override
@@ -41,7 +42,8 @@ public class MageSkills {
 			casting.castTime = 60 * 1.3f;
 			spCost = 22;
 			cooldown = 60 * 18;
-			addTag(Tag.RANGED_MAGIC);
+			setMaxRange(550);
+			addTag(Tag.MAGIC, Tag.RANGED);
 
 		}
 
@@ -64,7 +66,8 @@ public class MageSkills {
 			casting.castTime = 60 * 0.5f;
 			spCost = 10;
 			cooldown = 60 * 8;
-			addTag(Tag.RANGED_MAGIC);
+			setMaxRange(400);
+			addTag(Tag.MAGIC, Tag.RANGED);
 		}
 
 		@Override
@@ -86,7 +89,8 @@ public class MageSkills {
 			casting.castTime = 60 * 1.3f;
 			spCost = 16;
 			cooldown = 60 * 16;
-			addTag(Tag.RANGED_MAGIC);
+			setMaxRange(400);
+			addTag(Tag.MAGIC, Tag.RANGED);
 		}
 
 		@Override
@@ -110,7 +114,7 @@ public class MageSkills {
 			casting.castTime = 60 * 1.2f;
 			spCost = 14;
 			cooldown = 60 * 16;
-			addTag(Tag.RANGED_MAGIC);
+			addTag(Tag.MAGIC, Tag.RANGED);
 
 			aimingGraphic = new SkillsAimingGraphics.HydroblastAimingGraphic(MageEffects.HydroblastEffect.coneLength,
 					MageEffects.HydroblastEffect.coneInnerLength,
@@ -138,7 +142,8 @@ public class MageSkills {
 			casting.castTime = 60 * 1.6f;
 			spCost = 16;
 			cooldown = 60 * 18;
-			addTag(Tag.RANGED_MAGIC);
+			setMaxRange(600);
+			addTag(Tag.MAGIC, Tag.RANGED);
 
 			defaultAimingHelperRadius = MageEffects.ThunderclapEffect.aoeRadius;
 
@@ -164,7 +169,8 @@ public class MageSkills {
 			spCost = 18;
 			cooldown = 60 * 24;
 			globalCooldown = 60 * 3;
-			addTag(Tag.RANGED_MAGIC);
+			setMaxRange(600);
+			addTag(Tag.MAGIC, Tag.RANGED);
 			defaultAimingHelperRadius = MageEffects.BlindingFlashEffect.aoeRadius;
 		}
 

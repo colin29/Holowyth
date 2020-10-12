@@ -38,7 +38,9 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 
 	public float globalCooldown = 60 * 2; // default
 	public float cooldown; // in game frames
-
+	/** To enable maxRange checking, call setMaxRange with a non-negative number
+	 */
+	private float maxRange = -1;
 	/**
 	 * The slotted skill that this skill was copied from <br>
 	 * If this is a slotted skill, is null;
@@ -63,7 +65,7 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 	public boolean hasChannelingBehaviour = false;
 
 	public enum Tag {
-		MAGIC, RANGED_MAGIC, RANGED,
+		MAGIC, RANGED,
 		/**
 		 * Can be used on allies and only allies. Normal skills cannot be used on allies.
 		 */
@@ -293,16 +295,18 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 		return mapInstance;
 	}
 
-	public boolean isRangedPhysicalOrMagicSkill() {
-		return tags.contains(Tag.RANGED) || tags.contains(Tag.RANGED_MAGIC);
+	public boolean isRangedSkill() {
+		return tags.contains(Tag.RANGED);
 	}
 
 	public boolean isOnCooldown() {
 		return curCooldown > 0;
 	}
 
-	protected void addTag(Tag tag) {
-		tags.add(tag);
+	protected void addTag(Tag... newTags) {
+		for(Tag t: newTags) {
+			tags.add(t);
+		}
 	}
 
 	protected void setCooldownSec(float sec) {
@@ -326,5 +330,27 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 	}
 	public void setGameLog(@NonNull GameLogDisplay gamelog) {
 		this.gamelog = gamelog;
+	}
+
+	public float getMaxRange() {
+		return maxRange;
+	}
+
+
+	public void setMaxRange(float maxRange) {
+		if(maxRange == 0) {
+			logger.info("Setting maxRange to 0 is unusual. To disable range checking, call disableMaxRange()");
+		}
+		if(maxRange < 0) {
+			logger.warn("Max Range can't be negative {}", maxRange);
+			return;
+		}
+		this.maxRange = maxRange;
+	}
+	public void disableMaxRange() {
+		maxRange = -1;
+	}
+	public boolean usingMaxRange() {
+		return maxRange >= 0;
 	}
 }

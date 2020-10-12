@@ -24,5 +24,4 @@ public abstract class UnitSkill extends ActiveSkill {
 	}
 
 	protected abstract boolean pluginTargeting(Unit caster, Unit target);
-
 }

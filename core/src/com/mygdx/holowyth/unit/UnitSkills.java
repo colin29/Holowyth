@@ -67,7 +67,7 @@ public class UnitSkills {
 
 	public void interruptRangedSkills() {
 		if (isCasting() || isChannelling()) {
-			if (activeSkill != null && activeSkill.isRangedPhysicalOrMagicSkill()) {
+			if (activeSkill != null && activeSkill.isRangedSkill()) {
 				activeSkill.interrupt(false);
 			}
 		}
