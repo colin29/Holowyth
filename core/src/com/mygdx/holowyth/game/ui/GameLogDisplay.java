@@ -42,7 +42,7 @@ public class GameLogDisplay {
 	}
 	
 
-	public void addMessage(String str, boolean isErrorMessage) {
+	private void addMessage(String str, boolean isErrorMessage) {
 		var msg = new GameLogMessage(str, isErrorMessage);
 		logPanel.addActor(msg);
 		msg.addAction(Actions.sequence(Actions.delay(7f), Actions.fadeOut(0.5f), Actions.removeActor()));

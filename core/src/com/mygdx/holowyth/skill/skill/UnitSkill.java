@@ -20,10 +20,9 @@ public abstract class UnitSkill extends ActiveSkill {
 				return false;
 			}
 		}
-		pluginTargeting(caster, target);
-		return true;
+		return pluginTargeting(caster, target);
 	}
 
-	protected abstract void pluginTargeting(Unit caster, Unit target);
+	protected abstract boolean pluginTargeting(Unit caster, Unit target);
 
 }

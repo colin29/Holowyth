@@ -20,6 +20,7 @@ import com.mygdx.holowyth.collision.CollisionInfo;
 import com.mygdx.holowyth.collision.ObstaclePoint;
 import com.mygdx.holowyth.collision.ObstacleSeg;
 import com.mygdx.holowyth.collision.UnitAdapterCircleCB;
+import com.mygdx.holowyth.game.ui.GameLogDisplay;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.pathfinding.UnitPF;
 import com.mygdx.holowyth.pathfinding.HoloPF;
@@ -58,6 +59,7 @@ public class MapInstance implements MapInstanceInfo {
 	final Animations animations;
 	final DebugStore debugStore;
 	final AssetManager assets;
+	public final GameLogDisplay gamelog; 
 
 	private final UnitCollection units = new UnitCollection();
 
@@ -74,13 +76,14 @@ public class MapInstance implements MapInstanceInfo {
 	 */
 	private final Map<Unit, Set<Unit>> unitsAttackingThis = new HashMap<Unit, Set<Unit>>();
 
-	public MapInstance(PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects, Animations animations, AssetManager assets) {
+	public MapInstance(PathingModule pathingModule, DebugStore debugStore, EffectsHandler effects, Animations animations, AssetManager assets, GameLogDisplay gamelog) {
 		this.pathing = pathingModule;
 		this.gfx = effects;
 		this.animations = animations;
 		this.assets = assets;
 
 		this.debugStore = debugStore;
+		this.gamelog = gamelog;
 	}
 
 	/** Evaluates one frame of the game world */

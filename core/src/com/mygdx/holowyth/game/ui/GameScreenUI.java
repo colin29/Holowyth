@@ -2,6 +2,7 @@ package com.mygdx.holowyth.game.ui;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ public class GameScreenUI extends InputProcessorAdapter {
 	// App-lifetime UI components
 	private final DebugStoreUI debugStoreUI;
 	private final MouseCoordLabel mouseCoordLabel;
-	private final GameLogDisplay gameLogDisplay;
+	private final @NonNull GameLogDisplay gameLogDisplay;
 
 	// Map-lifetime UI components
 	private SkillBarUI skillBarUI;
@@ -160,7 +161,7 @@ public class GameScreenUI extends InputProcessorAdapter {
 	/**
 	 * Gets the game log which can be used to display messages
 	 */
-	public GameLogDisplay getGameLog() {
+	public @NonNull GameLogDisplay getGameLog() {
 		return gameLogDisplay; 
 	}
 	

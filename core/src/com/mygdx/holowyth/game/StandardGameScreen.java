@@ -60,6 +60,8 @@ public class StandardGameScreen extends GameScreen {
 		super(game);
 		vn = new VNController(new Stage(), batch, fixedCamera, multiplexer); // have vn draw using its OWN stage
 
+		
+		functionBindings.bindFunctionToKey(()->{goToMap("forest2", "entrance_1");}, Keys.Z); 
 		functionBindings.bindFunctionToKey(()->{controls.clearSelectedUnits();}, Keys.X);
 		functionBindings.bindFunctionToKey(() -> {
 //			goToMap("forest2", "entrance_1");

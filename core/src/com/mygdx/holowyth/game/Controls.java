@@ -102,10 +102,10 @@ public class Controls extends InputProcessorAdapter {
 	Skin skin;
 	LabelStyle labelStyle;
 
-	private GameLogDisplay gameLog;
+	private final @NonNull GameLogDisplay gameLog;
 
 	public Controls(Holowyth game, Camera camera, Camera fixedCam, List<@NonNull Unit> units, DebugStore debugStore,
-			MapInstanceInfo world, GameLogDisplay gameLog) {
+			MapInstanceInfo world, @NonNull GameLogDisplay gameLog) {
 		this.shapeRenderer = game.shapeRenderer;
 		this.camera = camera;
 		this.fixedCam = fixedCam;
@@ -255,6 +255,7 @@ public class Controls extends InputProcessorAdapter {
 				gameLog.addErrorMessage("Not enough sp!");
 				return;
 			}
+			curSkill.setGameLog(gameLog);
 
 			switch (curSkill.getTargeting()) {
 			case GROUND:

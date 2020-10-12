@@ -574,6 +574,9 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	public static float getDist(Unit u1, Unit u2) {
 		return Point.dist(u1.getPos(), u2.getPos());
 	}
+	public boolean inRange(Unit other, float range) {
+		return Point.dist(this.getPos(), other.getPos())  <= range;
+	}
 
 	@Override
 	public UnitStatusInfo getStatus() {
@@ -581,6 +584,10 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	}
 	public void setInventory(@NonNull OwnedItems owned) {
 		equip.getWornEquips().setInventory(owned);
+	}
+	
+	public float getEngageRange(Unit unit) {
+		return orders.getEngageRange(unit);
 	}
 
 }

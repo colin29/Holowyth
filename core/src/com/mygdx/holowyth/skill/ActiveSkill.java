@@ -5,11 +5,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.game.MapInstance;
 import com.mygdx.holowyth.game.MapInstanceInfo;
+import com.mygdx.holowyth.game.ui.GameLogDisplay;
 import com.mygdx.holowyth.skill.effect.CasterEffect;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;
@@ -18,10 +20,11 @@ import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 import com.mygdx.holowyth.util.exceptions.HoloException;
 
 /**
- * Represents a skill instance that is cast and then produces effects. A skill manages its effects through it's lifetime.
+ * Represents a skill instance that is cast and then produces effects. A skill manages its effects
+ * through it's lifetime.
  * 
- * A skill instance also functions as a identifier (ie. that for marking that key is bound to that particular skill) (When the skill is actually to be
- * used, a clone should be used)
+ * A skill instance also functions as a identifier (ie. that for marking that key is bound to that
+ * particular skill) (When the skill is actually to be used, a clone should be used)
  * 
  * Usage: creation --> set effect --> begin() --> effects start running
  * 
@@ -33,7 +36,7 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 
 	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	public float globalCooldown = 60 * 2; // default 
+	public float globalCooldown = 60 * 2; // default
 	public float cooldown; // in game frames
 
 	/**
@@ -70,8 +73,8 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 	protected Set<Tag> tags = new LinkedHashSet<Tag>();
 
 	/**
-	 * Channeled *effects* is not implemented yet. Those effects need to be specially marked 'channeling', and when the skill channel is interrupted
-	 * they should be interrupted/removed.
+	 * Channeled *effects* is not implemented yet. Those effects need to be specially marked
+	 * 'channeling', and when the skill channel is interrupted they should be interrupted/removed.
 	 *
 	 */
 	public enum Status {
@@ -81,7 +84,8 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 	private Status status = Status.INIT;
 
 	/**
-	 * Represents the type of input the spell takes. (e.g. explosion is cast on the ground, whereas backstab targets a unit)
+	 * Represents the type of input the spell takes. (e.g. explosion is cast on the ground, whereas
+	 * backstab targets a unit)
 	 * 
 	 * @author Colin Ta
 	 *
@@ -95,6 +99,8 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 	private List<CasterEffect> effects = new ArrayList<CasterEffect>();
 	private boolean effectsSet = false;
 
+	private GameLogDisplay gamelog;
+	
 	// if this is set, then all the effects are instantiated and the skill is fully defined.
 
 	public ActiveSkill(Targeting targeting) {
@@ -126,7 +132,8 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 	}
 
 	/**
-	 * Tick happens every frame, and continues as long as the unit remains casting or channeling the skill
+	 * Tick happens every frame, and continues as long as the unit remains casting or channeling the
+	 * skill
 	 */
 	public void tick() {
 
@@ -163,7 +170,7 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 
 				for (Effect effect : effects) {
 					effect.begin();
-					mapInstance.addEffect(effect);
+					mapInstance.addEffect(effect);  // actually add the effect to be ticked
 				}
 				onFinishCasting();
 			}
@@ -200,8 +207,9 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 	}
 
 	/**
-	 * Override this if special behaviour is required (like making a particular effect fizzle out 1 second after interrupt) By default all channeling
-	 * effects are removed immediately when channeling is interrupted.
+	 * Override this if special behaviour is required (like making a particular effect fizzle out 1
+	 * second after interrupt) By default all channeling effects are removed immediately when channeling
+	 * is interrupted.
 	 */
 	public void onChannellingInterrupt() {
 	}
@@ -295,5 +303,28 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 
 	protected void addTag(Tag tag) {
 		tags.add(tag);
+	}
+
+	protected void setCooldownSec(float sec) {
+		cooldown = sec * Holo.GAME_FPS;
+	}
+	/**
+	 * Log a message to the gamelog, if set
+	 */
+	protected void logMessage(String message) {
+		if(gamelog != null) {
+			gamelog.addMessage(message);
+		}
+	}
+	/**
+	 * Log an error message to the gamelog, if set
+	 */
+	protected void logErrorMessage(String message) {
+		if(gamelog != null) {
+			gamelog.addErrorMessage(message);
+		}
+	}
+	public void setGameLog(@NonNull GameLogDisplay gamelog) {
+		this.gamelog = gamelog;
 	}
 }

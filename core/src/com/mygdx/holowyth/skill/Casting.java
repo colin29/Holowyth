@@ -93,5 +93,8 @@ public class Casting implements Cloneable, CastingInfo {
 		}
 
 	}
+	public void setCastTimeSec(float sec) {
+		castTime = sec/Holo.GAME_FPS;
+	}
 
 }

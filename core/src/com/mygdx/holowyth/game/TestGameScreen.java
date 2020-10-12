@@ -1,9 +1,6 @@
 package com.mygdx.holowyth.game;
 
 import com.mygdx.holowyth.Holowyth;
-import com.mygdx.holowyth.gamedata.items.Weapons;
-import com.mygdx.holowyth.graphics.effects.animated.EffectCenteredOnUnit;
-import com.mygdx.holowyth.unit.Unit;
 
 public class TestGameScreen extends StandardGameScreen {
 
