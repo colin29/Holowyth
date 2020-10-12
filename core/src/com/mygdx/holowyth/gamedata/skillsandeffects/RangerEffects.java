@@ -1,5 +1,6 @@
 package com.mygdx.holowyth.gamedata.skillsandeffects;
 
+import com.mygdx.holowyth.graphics.effects.EffectsHandler.DamageEffectParams;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
 import com.mygdx.holowyth.unit.Unit;
 
@@ -28,7 +29,10 @@ public class RangerEffects {
 						framesElapsed == delayBetweenStrikesInX ||
 						framesElapsed == secondStrikeDelay ||
 						framesElapsed == secondStrikeDelay + delayBetweenStrikesInX) {
-					target.stats.applyDamage(strikeDamage, true);
+					DamageEffectParams params = new DamageEffectParams();
+					params.useFastEffect = true;
+					target.stats.applyDamage(strikeDamage, params);
+
 				}
 			} else {
 				if (framesElapsed == delayBetweenStrikesInX) {

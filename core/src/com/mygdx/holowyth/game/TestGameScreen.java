@@ -7,15 +7,20 @@ import com.mygdx.holowyth.unit.Unit;
 
 public class TestGameScreen extends StandardGameScreen {
 
+	boolean loadVN = false;
+	
 	public TestGameScreen(Holowyth game) {
 		super(game);
 		
-		vn.startConversation("lecia1.conv", "default");
-		vn.show();
+		if(loadVN) {
+			vn.startConversation("lecia1.conv", "default");
+			vn.show();
+			
+			vn.setConvoExitListener(()->{
+				vn.hide();
+			});	
+		}
 		
-		vn.setConvoExitListener(()->{
-			vn.hide();
-		});
 	}
 
 	@Override

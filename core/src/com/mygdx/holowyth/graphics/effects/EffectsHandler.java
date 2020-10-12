@@ -21,6 +21,7 @@ import com.mygdx.holowyth.graphics.effects.texteffect.MissEffect;
 import com.mygdx.holowyth.graphics.effects.texteffect.SkillNameEffect;
 import com.mygdx.holowyth.graphics.effects.texteffect.SkillNameEffects;
 import com.mygdx.holowyth.graphics.effects.texteffect.DamageEffect.PresetType;
+import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
@@ -161,15 +162,23 @@ public class EffectsHandler {
 
 	public boolean useScatteringDamageEffect = false;
 
-	public void makeDamageEffect(float damage, UnitInfo unit, boolean useScatteringDamageEffect) {
+	
+	public static class DamageEffectParams {
+		public boolean useFastEffect;
+	}
+	
+	private static final DamageEffectParams DEFAULT_DAMAGE_EFFECT_PARAMS = new DamageEffectParams();
+	public void makeDamageEffect(float damage, UnitInfo unit) {
+		makeDamageEffect(damage, unit, DEFAULT_DAMAGE_EFFECT_PARAMS);
+	}
+	public void makeDamageEffect(float damage, UnitInfo unit, DamageEffectParams params) {
 		PresetType damageEffectType = unit.isAPlayerCharacter() ? PresetType.PLAYER : PresetType.ENEMY;
-		if (useScatteringDamageEffect) {
+		if (params.useFastEffect) {
 			damageEffects.add(new FastDamageEffect(DataUtil.roundFully(damage), unit.getPos(), damageEffectType));
 		} else {
 			damageEffects.add(new DamageEffect(DataUtil.roundFully(damage), unit.getPos(), damageEffectType));
 		}
 	}
-
 	/**
 	 * 
 	 * @param unit

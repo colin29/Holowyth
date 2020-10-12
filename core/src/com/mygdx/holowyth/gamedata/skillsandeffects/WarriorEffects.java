@@ -14,14 +14,14 @@ public class WarriorEffects {
 			super(caster, target);
 		}
 
-		static float attackDamageMultiple = 3;
+		static float damageMultiplier = 3;
 		static float slowAmount = 0.6f;
 		static int slowDuration = 60 * 2;
 
 		@Override
 		public void tick() {
 			if (caster.stats.isAttackRollSuccessful(target.stats, 10)) {
-				target.stats.applyDamage(caster.stats.getDamage() * attackDamageMultiple);
+				target.stats.applyDamage(caster.stats.getDamage() * damageMultiplier);
 			} else {
 				mapInstance.getGfx().makeBlockEffect(caster, target);
 			}

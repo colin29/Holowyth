@@ -80,9 +80,9 @@ public class FireballBolt extends ProjectileBase {
 		for (var unit : mapInstance.getUnits()) {
 			if (Point.dist(pos, unit.getPos()) <= explosionRadius + unit.getRadius()) {
 				if (isAEnemy(unit)) {
-					unit.stats.applyMagicDamage(damage);
+					unit.stats.applyDamage(damage);
 				} else {
-					unit.stats.applyMagicDamage(damage / 2);
+					unit.stats.applyDamage(damage/2);
 				}
 			}
 		}

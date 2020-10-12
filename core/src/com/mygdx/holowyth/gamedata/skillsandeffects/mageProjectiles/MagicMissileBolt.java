@@ -144,7 +144,8 @@ public class MagicMissileBolt extends ProjectileBase {
 
 	@Override
 	protected void onCollision(Unit enemy) {
-		enemy.stats.applyMagicDamage(damage);
+		enemy.stats.applyDamage(damage);
+		
 
 		// Apply knockback stun in direction missile was travelling
 		Vector2 knockBackVec = getVelocity().setLength(0.5f);

@@ -31,7 +31,7 @@ public class WarriorSkills {
 		@Override
 		public String getDescription() {
 			return String.format("Strikes the enemy, doing %s attack damage and slowing the enemy for %s for %s seconds",
-					DataUtil.percentage(RageBlowEffect.attackDamageMultiple),
+					DataUtil.percentage(RageBlowEffect.damageMultiplier),
 					DataUtil.percentage(RageBlowEffect.slowAmount),
 					DataUtil.asSeconds(RageBlowEffect.slowDuration));
 		}

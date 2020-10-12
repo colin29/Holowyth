@@ -6,11 +6,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.RandomUtils;
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
+import com.mygdx.holowyth.graphics.effects.EffectsHandler.DamageEffectParams;
+import com.mygdx.holowyth.unit.UnitStats.DamageInstance;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.util.DataUtil;
@@ -132,12 +136,12 @@ public class UnitStats implements UnitStatsInfo {
 
 		// 3. Calculate damage and reduction from armor
 
-		float damage = enemy.calculateDamageThroughArmor(getDamage(), getArmorPiercing(), getArmorNegation());
+		float damage = enemy.calculatePostArmorDamage(getDamage(), getArmorPiercing(), getArmorNegation());
 
 		// 5. Apply damage
 		logger.trace("{}'s attack hit and did {} damage to {}", this.name, DataUtil.getRoundedString(damage), enemy.name);
 
-		enemy.applyDamageIgnoringArmor(damage);
+		enemy.applyExactDamage(damage);
 		if (damage > 0) {
 			enemy.self.interruptSoft();
 		}
@@ -256,7 +260,7 @@ public class UnitStats implements UnitStatsInfo {
 	 * 
 	 * @return
 	 */
-	public float calculateDamageThroughArmor(float damage, int atkerArmorPiercing, float atkerArmorNegation) {
+	public float calculatePostArmorDamage(float damage, float atkerArmorPiercing, float atkerArmorNegation) {
 		float damageMitgated = Math.max(getArmor() - atkerArmorPiercing, damage * getPercentageArmor());
 		damageMitgated *= (1 - atkerArmorNegation);
 
@@ -276,48 +280,35 @@ public class UnitStats implements UnitStatsInfo {
 		}
 	}
 	
-	/**
-	 * Applies damage with armor dmg reduction as normal
-	 */
+	private final DamageInstance temp = new DamageInstance();
 	public void applyDamage(float damage) {
-		applyDamage(damage, false);
+		temp.clear();
+		temp.damage = damage;
+		applyDamage(temp);
 	}
-
-	public void applyDamage(float damage, boolean useFastDamageEffect) {
-		applyDamage(damage, 0, 0, useFastDamageEffect);
+	public void applyDamage(float damage, DamageEffectParams effectParams) {
+		temp.clear();
+		temp.damage = damage;
+		applyDamage(temp, effectParams);
 	}
-
-	public void applyDamage(float damage, int atkerArmorPiercing, float atkerArmorNegation) {
-		applyDamage(damage, atkerArmorPiercing, atkerArmorNegation, false);
+	public void applyDamage(DamageInstance d) {
+		processDamage(d);
+		gfx.makeDamageEffect(d.damage, this.self);
 	}
-
-	public void applyDamage(float damage, int atkerArmorPiercing, float atkerArmorNegation, boolean useFastDamageEffect) {
-		applyDamageIgnoringArmor(calculateDamageThroughArmor(damage, atkerArmorPiercing, atkerArmorNegation), useFastDamageEffect);
+	public void applyDamage(DamageInstance d, DamageEffectParams effectParams) {
+		processDamage(d);
+		gfx.makeDamageEffect(d.damage, this.self, effectParams);
 	}
-
-	public void applyMagicDamage(float damage) {
-		applyDamageIgnoringArmor(damage);
-	}
-
-	public void applyMagicDamage(float damage, boolean useFastDamageEffect) {
-		applyDamageIgnoringArmor(damage, useFastDamageEffect);
-	}
-
-	public void applyDamageIgnoringArmor(float damage) {
-		applyDamageIgnoringArmor(damage, false);
+	
+	private void processDamage(DamageInstance d) {
+		applyExactDamage(calculatePostArmorDamage(d.damage, d.armorPiercing, d.armorNegation));
 	}
 
 	/**
-	 * Applies the damage, doesn't do any damage reduction
-	 * 
-	 * @param damage
-	 * @return
+	 * Ignores all damage reduction, internal method
 	 */
-	public void applyDamageIgnoringArmor(float damage, boolean useFastDamageEffect) {
-		gfx.makeDamageEffect(damage, self, useFastDamageEffect);
-
+	private void applyExactDamage(float damage) {
 		hp -= damage;
-
 		if (hp <= 0) {
 			hp = 0;
 			self.unitDies();
@@ -679,6 +670,27 @@ public class UnitStats implements UnitStatsInfo {
 			return 0.85f;
 		} else { // 4 or more
 			return 0.82f;
+		}
+	}
+	
+	public enum DamageType{
+		NORMAL, MAGIC
+	}
+	@NonNullByDefault
+	public static class DamageInstance {
+		float armorPiercing = 0;
+		float armorNegation = 0;
+		float damage = 0;
+		DamageType type = DamageType.NORMAL;
+		public DamageInstance() {
+		}
+		public DamageInstance(float damage) {
+			this.damage = damage;
+		}
+		public void clear() {
+			armorPiercing = 0;
+			armorNegation = 0;
+			damage = 0;
 		}
 	}
 }
