@@ -39,6 +39,10 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 	public float globalCooldown = 60 * 2; // default
 	public float cooldown; // in game frames
 	public float addedAttackCooldown; // using this skill delays next attack
+	/**
+	 * Line of sight. This is enforced by controls, only certain skill types will check this setting
+	 */
+	public boolean requiresLOS; 
 	/** To enable maxRange checking, call setMaxRange with a non-negative number
 	 */
 	private float maxRange = -1;

@@ -105,7 +105,7 @@ public class GameScreenRenderer {
 	private final int renderMapLocationsKey = Keys.B;
 	private final int renderMapRegionsKey = Keys.N;
 	private final int renderTileGridKey = Keys.COMMA;
-	
+
 	private boolean renderMapRegions;
 	private boolean renderMapLocations;
 	private boolean renderTileGrid;
@@ -170,6 +170,7 @@ public class GameScreenRenderer {
 			renderCastingCircleAimingHelperForGroundSkillThatDefineRadius();
 			renderCustomAimingHelperForGroundSkillThatDefine();
 			controls.renderMaxRangeIndicator();
+			controls.renderLOSIndicator();
 
 			// Misc. Combat Related
 			debug.renderUnitKnockbackVelocities();
@@ -177,7 +178,7 @@ public class GameScreenRenderer {
 			renderCastingBars();
 
 			// Obstacle Edges
-			renderMapObstacleEdges();
+			renderMapObstacleEdgesIfKeyPressed();
 
 			// Debug Map Visualizations
 			renderMapDebugVisualizationsIfKeysPressed();
@@ -196,10 +197,10 @@ public class GameScreenRenderer {
 	}
 
 	private void renderTileGridIfToggled() {
-		if(Gdx.input.isKeyJustPressed(renderTileGridKey)) {
+		if (Gdx.input.isKeyJustPressed(renderTileGridKey)) {
 			renderTileGrid ^= true;
 		}
-		if(renderTileGrid)
+		if (renderTileGrid)
 			renderTileGrid();
 	}
 
@@ -260,9 +261,9 @@ public class GameScreenRenderer {
 		for (var unit : renderedUnits) {
 			// ignore units that are not a full tile within the bounding box (this prevents hiding of small
 			// objects too)
-			 float factor = 0.6f;
-			if (!((unit.x > object.x1 + tileWidth * factor) && (unit.x < object.x2 - tileWidth* factor)
-					&& (unit.y > object.y1 + tileHeight* factor) && (unit.y < object.y2 - tileHeight* factor))) {
+			float factor = 0.6f;
+			if (!((unit.x > object.x1 + tileWidth * factor) && (unit.x < object.x2 - tileWidth * factor)
+					&& (unit.y > object.y1 + tileHeight * factor) && (unit.y < object.y2 - tileHeight * factor))) {
 				continue;
 			}
 
@@ -291,7 +292,6 @@ public class GameScreenRenderer {
 		renderOutlineAroundTauntedUnits();
 		renderOutlineAroundStunnedUnits();
 	}
-
 
 	private void renderUnit(Unit unit, float delta) {
 		if (unit.graphics.getAnimatedSprite() != null) {
@@ -330,12 +330,6 @@ public class GameScreenRenderer {
 			basicPathing.renderGraph(true);
 			HoloGL.renderSegs(pathingModule.getObstacleExpandedSegs(), Color.PINK);
 			renderCircles(pathingModule.getObstaclePoints(), Holo.UNIT_RADIUS, Color.PINK);
-		}
-	}
-
-	private void renderMapObstacleEdges() {
-		if (this.map != null) {
-			renderMapObstaclesEdges();
 		}
 	}
 
@@ -432,12 +426,17 @@ public class GameScreenRenderer {
 		}
 	}
 
-	private void renderMapObstaclesEdges() {
+	private void renderMapObstacleEdgesIfKeyPressed() {
 		if (Holo.debugRenderMapObstaclesEdges || Gdx.input.isKeyPressed(showMapPathingGraphKey)) {
+			renderMapObstacleEdges();
+		}
+	}
+
+	private void renderMapObstacleEdges() {
+		if (this.map != null) {
 			shapeRenderer.setProjectionMatrix(worldCamera.combined);
 			HoloGL.renderSegs(pathingModule.getObstacleSegs(), Color.GRAY);
 			HoloGL.renderPoints(pathingModule.getObstaclePoints(), Color.GRAY);
-
 		}
 	}
 

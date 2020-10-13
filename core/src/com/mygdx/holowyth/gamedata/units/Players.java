@@ -25,7 +25,7 @@ public class Players {
 		passiveSkills.add(PassiveSkills.basicCombatTraining);
 		passiveSkills.add(SwordsmanSkills.swiftness);
 		
-		animatedSpriteName = "pipo-charachip030e.png";
+		animatedSpriteName = "lecia.png";
 		headSpriteName = HEAD_SPRITE_DIR + "Lecia.png";
 		}
 	};
@@ -37,7 +37,7 @@ public class Players {
 		activeSkills.addAll(Skills.warriorSkills);
 		passiveSkills.add(PassiveSkills.basicCombatTraining);
 		
-		animatedSpriteName = "pipo-charachip001b.png";
+		animatedSpriteName = "elvin.png";
 		headSpriteName = HEAD_SPRITE_DIR + "Elvin.png";
 		}
 	};
@@ -49,7 +49,7 @@ public class Players {
 		wornEquips.equip(Weapons.staff);  
 		activeSkills.addAll(Skills.mageSkills);
 		
-		animatedSpriteName = "pipo-charachip017c.png";
+		animatedSpriteName = "sonia.png";
 		headSpriteName = HEAD_SPRITE_DIR + "Sonia.png";
 		}
 	};

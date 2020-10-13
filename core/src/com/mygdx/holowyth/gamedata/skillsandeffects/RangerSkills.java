@@ -36,19 +36,21 @@ public class RangerSkills {
 					DataUtil.roundFully(CrossSlashEffect.strikeDamage));
 		}
 	}
-	
+
 	public static class Archery extends UnitSkill {
-		
+
 		public static float atkDamageMultiplier = 1.25f;
+		public static int atkBonus = 10;
 		public static float slowAmount = 0.4f;
-		public static float slowDuration = 3*60;
-		
+		public static float slowDuration = 3 * 60;
+
 		public Archery() {
 			super();
 			name = "Archery";
 			casting.castTime = 0.6f * 60;
 			spCost = 8;
 			cooldown = 60 * 10;
+			requiresLOS = true;
 			setMaxRange(600);
 			addTag(Tag.RANGED);
 		}
@@ -56,7 +58,7 @@ public class RangerSkills {
 		@Override
 		protected boolean pluginTargeting(Unit caster, Unit target) {
 			setEffects(new RangerEffects.ArcheryEffect(caster, target));
-			if(!caster.equip.hasWeaponTypeEquipped(WeaponType.BOW)) {
+			if (!caster.equip.hasWeaponTypeEquipped(WeaponType.BOW)) {
 				logErrorMessage("Unit must have a bow equipped");
 				return false;
 			}
@@ -65,7 +67,9 @@ public class RangerSkills {
 
 		@Override
 		public String getDescription() {
-			return String.format("Fires an arrow dealing %s damage and slowing the target by %s for %s seconds", DataUtil.percentage(atkDamageMultiplier), DataUtil.percentage(slowAmount),  DataUtil.asSeconds(slowDuration));
+			return String.format("Fires an arrow dealing %s damage and slowing the target by %s for %s seconds",
+					DataUtil.percentage(atkDamageMultiplier), DataUtil.percentage(slowAmount),
+					DataUtil.asSeconds(slowDuration));
 		}
 
 	}

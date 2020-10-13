@@ -79,7 +79,7 @@ public class RangerEffects {
 			
 			missiles = new ArrayList<ProjectileBase>();
 			var arrow = new ArcheryArrow(caster.x, caster.y,  caster.stats.getRangedDamage() * Archery.atkDamageMultiplier, caster, target);
-			arrow.atkRollSucceeded = caster.stats.isRangedAttackRollSuccessful(target.stats, 0);
+			arrow.atkRollSucceeded = caster.stats.isRangedAttackRollSuccessful(target.stats, Archery.atkBonus);
 			missiles.add(arrow);
 		}
 

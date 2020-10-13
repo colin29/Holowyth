@@ -30,6 +30,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.game.ui.GameLogDisplay;
 import com.mygdx.holowyth.graphics.HoloGL;
+import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
@@ -41,11 +42,13 @@ import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.Holo;
+import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.template.adapters.InputProcessorAdapter;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
+import com.mygdx.holowyth.pathfinding.PathingModule;
 
 import org.eclipse.jdt.annotation.NonNull;
 
@@ -61,6 +64,8 @@ public class Controls extends InputProcessorAdapter {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	Holowyth game;
+
+	private final PathingModule pathing;
 
 	Camera camera;
 	Camera fixedCam;
@@ -104,8 +109,11 @@ public class Controls extends InputProcessorAdapter {
 
 	private final @NonNull GameLogDisplay gameLog;
 
-	public Controls(Holowyth game, Camera camera, Camera fixedCam, List<@NonNull Unit> units, DebugStore debugStore,
-			MapInstanceInfo world, @NonNull GameLogDisplay gameLog) {
+	public Controls(Holowyth game, @NonNull PathingModule pathing, Camera camera, Camera fixedCam,
+			List<@NonNull Unit> units, DebugStore debugStore, MapInstanceInfo world, @NonNull GameLogDisplay gameLog) {
+
+		this.pathing = pathing;
+
 		this.shapeRenderer = game.shapeRenderer;
 		this.camera = camera;
 		this.fixedCam = fixedCam;
@@ -416,6 +424,20 @@ public class Controls extends InputProcessorAdapter {
 				clearContext();
 				return;
 			}
+
+			// Only units in LOS can be targeted
+			if (curSkill.requiresLOS) {
+				@NonNull
+				List<@NonNull Unit> otherUnits = new ArrayList<>(mapInstance.getUnits());
+				otherUnits.remove(caster);
+				otherUnits.remove(target);
+				if (!HoloPF.isSegmentPathable(caster.x, caster.y, unitUnderCursor.x, unitUnderCursor.y,
+						pathing.getObstacleSegs(), pathing.getObstaclePoints(), otherUnits, 0)) {
+					logger.info("Target is not in LOS");
+					return;
+				}
+			}
+
 			if (!skill.setTargeting(caster, target)) {
 				logger.info("Skill '{}' could not be used.", skill.name);
 				clearContext();
@@ -428,18 +450,18 @@ public class Controls extends InputProcessorAdapter {
 
 	private void handleSkillGround(float x, float y) {
 		assertExactlyOneUnitSelected();
-	
+
 		GroundSkill skill = (GroundSkill) this.curSkill;
-		
+
 		Unit caster = selectedUnits.iterator().next();
-		
+
 		if (skill.usingMaxRange() && Point.dist(caster.getPos(), new Point(x, y)) > skill.getMaxRange()) {
 			logger.info("Skill '{}' could not be used, point out of range ({})", skill.name, skill.getMaxRange());
 			gameLog.addErrorMessage("Point is out of range");
 			clearContext();
 			return;
 		}
-		
+
 		skill.pluginTargeting(caster, x, y);
 		caster.orderUseSkill(skill);
 		clearContext();
@@ -790,12 +812,79 @@ public class Controls extends InputProcessorAdapter {
 			shapeRenderer.end();
 		}
 	}
+
 	public void renderMaxRangeIndicator() {
-		if(context == Context.SKILL_GROUND || context == Context.SKILL_UNIT) {
-			if(curSkill.usingMaxRange()) {
+		if (context == Context.SKILL_GROUND || context == Context.SKILL_UNIT) {
+			if (curSkill.usingMaxRange()) {
 				Unit caster = selectedUnits.first();
 				HoloGL.renderCircleOutline(caster.x, caster.y, curSkill.getMaxRange(), Color.GRAY);
 			}
+		}
+	}
+
+	public void renderLOSIndicator() {
+		if(curSkill == null || !curSkill.requiresLOS) {
+			return;
+		}
+		if (context == Context.SKILL_UNIT) {
+			if (unitUnderCursor != null) { // render line from unit to target, and render a red circle around any
+											// colliding units
+				@NonNull
+				Unit target = unitUnderCursor;
+				Unit caster = selectedUnits.iterator().next();
+
+				@NonNull
+				List<@NonNull Unit> otherUnits = new ArrayList<>(mapInstance.getUnits());
+				otherUnits.remove(caster);
+				otherUnits.remove(target);
+				renderObstaclesEdges();
+				renderUnitCircles(otherUnits);
+
+				if (HoloPF.isSegmentPathable(caster.x, caster.y, unitUnderCursor.x, unitUnderCursor.y,
+						pathing.getObstacleSegs(), pathing.getObstaclePoints(), otherUnits, 0)) {
+					shapeRenderer.setColor(Color.GREEN);
+				} else {
+					shapeRenderer.setColor(Color.RED);
+				}
+
+				shapeRenderer.begin(ShapeType.Line);
+				shapeRenderer.line(caster.x, caster.y, target.x, target.y);
+				shapeRenderer.end();
+			}
+		}
+		if (context == Context.SKILL_GROUND) {
+			Point cursor = MiscUtil.getCursorInWorldCoords(camera);
+			Unit caster = selectedUnits.iterator().next();
+
+			// Render line from caster to target point
+			@NonNull
+			List<@NonNull Unit> otherUnits = new ArrayList<>(mapInstance.getUnits());
+			otherUnits.remove(caster);
+
+			renderObstaclesEdges();
+			renderUnitCircles(otherUnits);
+
+			if (HoloPF.isSegmentPathable(caster.x, caster.y, cursor.x, cursor.y, pathing.getObstacleSegs(),
+					pathing.getObstaclePoints(), otherUnits, 0)) {
+				shapeRenderer.setColor(Color.GREEN);
+			} else {
+				shapeRenderer.setColor(Color.RED);
+			}
+			shapeRenderer.begin(ShapeType.Line);
+			shapeRenderer.line(caster.x, caster.y, cursor.x, cursor.y);
+			shapeRenderer.end();
+		}
+	}
+
+	private void renderObstaclesEdges() {
+		HoloGL.renderSegs(pathing.getObstacleSegs(), Color.OLIVE);
+		HoloGL.renderPoints(pathing.getObstaclePoints(), Color.OLIVE);
+	}
+
+	private void renderUnitCircles(@NonNull List<@NonNull Unit> units) {
+		for (var unit : units) {
+			HoloGL.renderCircleOutline(unit.x, unit.y, unit.getRadius(), Color.OLIVE);
+			HoloGL.renderCircleOutline(unit.x, unit.y, unit.getRadius() - 1, Color.OLIVE);
 		}
 	}
 

@@ -295,7 +295,7 @@ public abstract class GameScreen extends MapLoadingScreen {
 		gfx = new EffectsHandler(game.batch, camera, shapeDrawer, assets, stage, skin, debugStore);
 		
 		mapInstance = new MapInstance(pathingModule, debugStore, gfx, game.animations, assets, getGameLog());
-		controls = new Controls(game, camera, fixedCamera, mapInstance.getUnits(), debugStore, mapInstance, ui.getGameLog());
+		controls = new Controls(game, pathingModule, camera, fixedCamera, mapInstance.getUnits(), debugStore, mapInstance, ui.getGameLog());
 		triggers = new TriggersHandler(mapInstance);
 	}
 

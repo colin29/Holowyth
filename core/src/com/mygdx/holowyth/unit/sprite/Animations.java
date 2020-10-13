@@ -34,17 +34,20 @@ public class Animations {
 		loadEffects();
 	}
 
+	private static String WALKING_DIR = "img/sprites/walking/";
+	
 	private void loadAnimatedSprites() {
 
-		loadAnimatedSprite("img/sprites/pipo/pipo-charachip001b.png");
-		loadAnimatedSprite("img/sprites/pipo/pipo-charachip017c.png");
-		loadAnimatedSprite("img/sprites/pipo/pipo-charachip028d.png");
-		loadAnimatedSprite("img/sprites/pipo/pipo-charachip030e.png");
-		loadAnimatedSprite("img/sprites/pipo/renee.png");
-		loadAnimatedSprite("img/sprites/pipo/seth.png");
-		loadAnimatedSprite("img/sprites/pipo/mikal.png");
-
-		loadAnimatedSprite("img/sprites/pipo/goblin1.png");
+		loadAnimatedSprite(WALKING_DIR + "lecia.png");
+		loadAnimatedSprite(WALKING_DIR + "elvin.png");
+		loadAnimatedSprite(WALKING_DIR + "sonia.png");
+		loadAnimatedSprite(WALKING_DIR + "renee.png");
+		loadAnimatedSprite(WALKING_DIR + "seth.png");
+		loadAnimatedSprite(WALKING_DIR + "mikal.png");
+		
+		loadAnimatedSprite(WALKING_DIR + "sally.png"); // unused
+		
+		loadAnimatedSprite(WALKING_DIR + "goblin1.png");
 	}
 	
 	private void loadEffects() {
