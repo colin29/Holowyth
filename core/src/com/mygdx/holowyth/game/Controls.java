@@ -177,6 +177,14 @@ public class Controls extends InputProcessorAdapter {
 				return "N/A";
 			}
 		});
+		debugValues.add("rangedDamage of one unit", () -> {
+			if (selectedUnits.size() == 1) {
+				Unit u = selectedUnits.first();
+				return DataUtil.round(u.stats.getRangedDamage());
+			} else {
+				return "N/A";
+			}
+		});
 		debugValues.add("Btree last task", () -> {
 			if (selectedUnits.size() == 1) {
 				Unit u = selectedUnits.first();

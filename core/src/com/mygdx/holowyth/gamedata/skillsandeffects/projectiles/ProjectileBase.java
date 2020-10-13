@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.eclipse.jdt.annotation.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +47,7 @@ public abstract class ProjectileBase {
 	private float collisionRadius = 0;
 
 	// Extra info for sub-classes
-	protected Unit caster;
+	@NonNull protected Unit caster;
 
 	public ProjectileBase(float x, float y, float speed, float rotation, float maxDuration, Unit caster) {
 		pos = new Point(x, y);

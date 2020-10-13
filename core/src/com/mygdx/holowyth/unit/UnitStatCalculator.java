@@ -154,8 +154,20 @@ public class UnitStatCalculator {
 	public float getDamage() {
 		return my.damage;
 	}
+	public float getRangedDamage() {
+		return my.rangedDamage;
+	}
 	public float getAtkspd() {
 		return my.atkspd;
 	}
+
+	public int getRangedAtk() {
+		return my.rangedAtk;
+	}
+
+	public int getRangedForce() {
+		return my.rangedForce;
+	}
+
 
 }

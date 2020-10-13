@@ -8,7 +8,7 @@ public class MonsterStats {
 		{
 			maxHp = 100;
 			maxSp = 100;
-			damage = 2;
+			setGeneralDamage(2);
 
 			atk = 3;
 			def = 4;
@@ -23,8 +23,7 @@ public class MonsterStats {
 		{
 			maxHp = 80;
 			maxSp = 50;
-
-			damage = 2;
+			setGeneralDamage(2);
 			
 			atk = 3;
 			def = 4;

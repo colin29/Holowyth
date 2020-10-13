@@ -22,7 +22,8 @@ import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.Holo;
 
 /**
- * Simple stat fields are exposed public, while those which may trigger extra handling will be exposed through getters and setters
+ * Simple stat fields are exposed public, while those which may trigger extra handling will be
+ * exposed through getters and setters
  * 
  * @author Colin Ta
  *
@@ -42,7 +43,7 @@ public class UnitStats implements UnitStatsInfo {
 
 	// General
 	private String name = "DefaultName";
-	
+
 	// Stats
 	float hp;
 	float sp;
@@ -50,14 +51,11 @@ public class UnitStats implements UnitStatsInfo {
 	/** A character's base stat values, before equipment and skill bonuses */
 	public final UnitStatValues base = new UnitStatValues();
 	/** Unused atm, UnitMotion just uses the default movespeed */
-	private float baseMoveSpeed = Holo.defaultUnitMoveSpeed;  // Is this actually unused?
+	private float baseMoveSpeed = Holo.defaultUnitMoveSpeed; // Is this actually unused?
 
-	
 	// Map-lifetime components
 	private EffectsHandler gfx;
-	
-	
-	
+
 	public UnitStats(Unit unit) {
 		this.self = unit;
 		this.gfx = unit.getMapInstance().getGfx();
@@ -71,27 +69,30 @@ public class UnitStats implements UnitStatsInfo {
 			this.name = name;
 		}
 	}
+
 	public void reinitializeForWorld() {
 		gfx = self.getMapInstance().getGfx();
 	}
-	
+
 	public void clearMapLifetimeData() {
 		gfx = null;
 	}
 
 	/**
 	 * 
-	 * Calculates correct calculated stats. The base stats should be modified and status effects set before
-	 * calling this
+	 * Calculates correct calculated stats. The base stats should be modified and status effects set
+	 * before calling this
 	 * 
-	 * Call before anytime you have to read stats from Unit e.g combat calculations or a debug print or displaying on UI
+	 * Call before anytime you have to read stats from Unit e.g combat calculations or a debug print or
+	 * displaying on UI
 	 */
 	public void recalculateStats() {
 		calc.recalculateStats();
 	}
 
 	/**
-	 * Preps the unit for use in the game world by setting the transient fields to an appropriate starting value. Idempotent (can call >=1 times)
+	 * Preps the unit for use in the game world by setting the transient fields to an appropriate
+	 * starting value. Idempotent (can call >=1 times)
 	 */
 	public void prepareUnit() {
 		recalculateStats();
@@ -123,13 +124,14 @@ public class UnitStats implements UnitStatsInfo {
 			return;
 		}
 
-		// Add a slow effect, regardless of block or hit. This is for balancing fleeing enemies without engaging.
+		// Add a slow effect, regardless of block or hit. This is for balancing fleeing enemies without
+		// engaging.
 		enemy.self.status.applyBasicAttackSlow(0.4f, 90);
 		enemy.self.status.applyBasicAttackSlow(0.2f, 150);
 
 		// 2. Simulate block chance
 
-		if (!isAttackRollSuccessful(enemy, atkBonus, false)) {
+		if (!isBasicAttackRollSuccessful(enemy, atkBonus)) {
 			gfx.makeBlockEffect(this.self, enemy.self);
 			// System.out.printf("%s's attack was blocked by %s %n", this.name, enemy.name);
 			onAttack(enemy);
@@ -151,41 +153,49 @@ public class UnitStats implements UnitStatsInfo {
 
 	}
 
-	//** Notify skills, etc. that trigger on attack
+	// ** Notify skills, etc. that trigger on attack
 	private void onAttack(UnitStats enemy) {
-		for(Skill s : self.skills.getSkills()) {
+		for (Skill s : self.skills.getSkills()) {
 			s.onUnitAttack(self, enemy.self);
 		}
 	}
 
 	public boolean isAttackRollSuccessful(UnitStats enemy, int atkBonus) {
-		return isAttackRollSuccessful(enemy, atkBonus, true);
+		return isAttackRollSuccessful(enemy, atkBonus, false, true);
+	}
+	public boolean isRangedAttackRollSuccessful(UnitStats enemy, int atkBonus) {
+		return isAttackRollSuccessful(enemy, atkBonus, true, true);
 	}
 
-	/**
-	 * Does an attack roll on enemy and returns whether attack was successful or not
-	 */
-	public boolean isAttackRollSuccessful(UnitStats enemy, int atkBonus, boolean isSkill) {
+	public boolean isBasicAttackRollSuccessful(UnitStats enemy, int atkBonus) {
+		return isAttackRollSuccessful(enemy, atkBonus, false, false);
+	}
+
+	private boolean isAttackRollSuccessful(UnitStats enemy, int atkBonus, boolean isRanged, boolean isSkill) {
 		float chanceToHit;
-		int atk = getAtk() + atkBonus + getMultiTeamingAtkBonus(enemy) - getReelAtkPenalty();
+		int atk;
+		if (isRanged) {
+			atk = getRangedAtk() + atkBonus - getReelAtkPenalty();
+		} else {
+			atk = getAtk() + atkBonus - getReelAtkPenalty() + getMultiTeamingAtkBonus(enemy);
+		}
+
 		int defEnemy = enemy.getDef() - enemy.getStunDefPenalty() - enemy.getReelDefPenalty();
 
 		chanceToHit = (float) (0.4 * (1 + (atk - defEnemy) * 0.05));
 
 		chanceToHit = Math.min(atkChanceCeiling, chanceToHit);
 		chanceToHit = Math.max(atkChanceFloor, chanceToHit);
-		
-		final float randomRoll = (float) Math.random(); 
-		
+
+		final float randomRoll = (float) Math.random();
+
 		if (isSkill) {
 			logger.debug("Skill atk roll: {}->{} {} {} ({} relative attack)", this.name, enemy.name,
-					randomRoll <= chanceToHit ? "SUCCESS" : "FAILURE",
-					round(chanceToHit), atk - defEnemy);
+					randomRoll <= chanceToHit ? "SUCCESS" : "FAILURE", round(chanceToHit), atk - defEnemy);
 		} else {
 			if (logBasicAttackInfo) {
 				logger.debug("{} -> {} {}  ({} relative attack) (+{} from multi-teaming)", this.name, enemy.name,
-						round(chanceToHit), atk - defEnemy,
-						getMultiTeamingAtkBonus(enemy));
+						round(chanceToHit), atk - defEnemy, getMultiTeamingAtkBonus(enemy));
 			}
 		}
 
@@ -287,29 +297,33 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	public void applyHeal(float amount) {
-		if(!isDead()) {
+		if (!isDead()) {
 			hp += amount;
 		}
 	}
-	
+
 	private final DamageInstance temp = new DamageInstance();
+
 	public void applyDamage(float damage) {
 		temp.clear();
 		temp.damage = damage;
 		applyDamage(temp);
 	}
+
 	public void applyDamage(float damage, DamageEffectParams effectParams) {
 		temp.clear();
 		temp.damage = damage;
 		applyDamage(temp, effectParams);
 	}
+
 	public void applyDamage(DamageInstance d) {
 		processDamage(d, null);
 	}
+
 	public void applyDamage(DamageInstance d, DamageEffectParams effectParams) {
 		processDamage(d, effectParams);
 	}
-	
+
 	private void processDamage(DamageInstance d, DamageEffectParams effectParams) {
 		applyExactDamage(calculatePostArmorDamage(d.damage, d.armorPiercing, d.armorNegation), effectParams);
 	}
@@ -317,22 +331,23 @@ public class UnitStats implements UnitStatsInfo {
 	/**
 	 * Ignores all damage reduction, internal method
 	 */
-	private void applyExactDamage(float damage,  DamageEffectParams effectParams) {
+	private void applyExactDamage(float damage, DamageEffectParams effectParams) {
 		hp -= damage;
 		if (hp <= 0) {
 			hp = 0;
 			self.unitDies();
 		}
-		if(effectParams == null) {
+		if (effectParams == null) {
 			gfx.makeDamageEffect(damage, self);
-		}else {
+		} else {
 			gfx.makeDamageEffect(damage, self, effectParams);
 		}
-		
+
 	}
 
 	/**
-	 * Makes a stun roll against this unit, the result depends on the unit's stability plus a random roll
+	 * Makes a stun roll against this unit, the result depends on the unit's stability plus a random
+	 * roll
 	 * 
 	 * @param force
 	 * @param stunDuration
@@ -349,46 +364,51 @@ public class UnitStats implements UnitStatsInfo {
 	 * @param force
 	 * @param stunDuration
 	 * @param knockbackVel
-	 * @param maxKnockbackVel
-	 *            The max knockback speed the unit can be pushed, no matter how many consecutive knockbacks there are. <br>
-	 *            Affects velocity proration
+	 * @param maxKnockbackVel The max knockback speed the unit can be pushed, no matter how many
+	 *                        consecutive knockbacks there are. <br>
+	 *                        Affects velocity proration
 	 */
 	public void doKnockBackRollAgainst(int force, float stunDuration, Vector2 knockbackVel, float maxKnockbackVel) {
-		doStunRollAgainst(force, stunDuration, stunDuration + UnitStatus.defaultStunProration, true, knockbackVel, maxKnockbackVel);
+		doStunRollAgainst(force, stunDuration, stunDuration + UnitStatus.defaultStunProration, true, knockbackVel,
+				maxKnockbackVel);
 	}
 
 	public void doKnockBackRollAgainst(int force, float stunDuration, Vector2 knockbackVel) {
-		doStunRollAgainst(force, stunDuration, stunDuration + UnitStatus.defaultStunProration, true, knockbackVel, knockbackVel.len() + 1);
+		doStunRollAgainst(force, stunDuration, stunDuration + UnitStatus.defaultStunProration, true, knockbackVel,
+				knockbackVel.len() + 1);
 	}
 
 	/**
-	 * Even if the stun is partially resisted, the max stun duration remains original -- thus successive stuns can add up
+	 * Even if the stun is partially resisted, the max stun duration remains original -- thus successive
+	 * stuns can add up
 	 */
-	private void doStunRollAgainst(int force, float stunDuration, float maxStunDuration, boolean isKnockback, Vector2 knockbackVel,
-			float maxKnockbackVel) {
+	private void doStunRollAgainst(int force, float stunDuration, float maxStunDuration, boolean isKnockback,
+			Vector2 knockbackVel, float maxKnockbackVel) {
 
 		int attackerRoll = RandomUtils.nextInt(1, 7); // 1d6
 
 		int attackerResult = force + attackerRoll - getStab();
 
-		logger.debug("{} roll made against {}. Attacker Result: {} + ({}) - {} = {}", isKnockback ? "knockback" : "stun",
-				getName(), force, attackerRoll, this.getStab(), attackerResult);
+		logger.debug("{} roll made against {}. Attacker Result: {} + ({}) - {} = {}",
+				isKnockback ? "knockback" : "stun", getName(), force, attackerRoll, this.getStab(), attackerResult);
 
 		if (attackerResult >= 10) { // apply full effect
 			if (isKnockback) {
-			self.status.applyKnockbackStun(stunDuration, maxStunDuration, knockbackVel, maxKnockbackVel);
+				self.status.applyKnockbackStun(stunDuration, maxStunDuration, knockbackVel, maxKnockbackVel);
 			} else {
-			self.status.applyStun(stunDuration, maxStunDuration);
+				self.status.applyStun(stunDuration, maxStunDuration);
 			}
 		} else if (attackerResult > 0) { // reduced stun and/or knockback
 			float factor = attackerResult * 0.1f;
 			if (isKnockback) {
-			self.status.applyKnockbackStun(stunDuration * factor, maxStunDuration, knockbackVel.scl(factor), maxKnockbackVel);
+				self.status.applyKnockbackStun(stunDuration * factor, maxStunDuration, knockbackVel.scl(factor),
+						maxKnockbackVel);
 			} else {
-			self.status.applyStun(stunDuration * factor, maxStunDuration);
+				self.status.applyStun(stunDuration * factor, maxStunDuration);
 			}
 		} else if (attackerResult > -10) {
-		self.status.applyReel(stunDuration * (attackerResult + 10) * 0.1f, stunDuration + UnitStatus.defaultReelProration);
+			self.status.applyReel(stunDuration * (attackerResult + 10) * 0.1f,
+					stunDuration + UnitStatus.defaultReelProration);
 		}
 
 	}
@@ -403,8 +423,8 @@ public class UnitStats implements UnitStatsInfo {
 
 		int attackerResult = force + attackerRoll - getStab();
 
-		logger.debug("Reel roll made against {}. Attacker Result: {} ({} + ({}) - {})",
-				getName(), attackerResult, force, attackerRoll, getStab());
+		logger.debug("Reel roll made against {}. Attacker Result: {} ({} + ({}) - {})", getName(), attackerResult,
+				force, attackerRoll, getStab());
 
 		if (attackerResult >= 10) { // apply full effect
 			self.status.applyReel(reelDuration, maxReelDuration);
@@ -416,9 +436,6 @@ public class UnitStats implements UnitStatsInfo {
 		}
 
 	}
-
-
-
 
 	public void addSp(float amount) {
 		sp = Math.min(sp + amount, getMaxSp());
@@ -443,7 +460,6 @@ public class UnitStats implements UnitStatsInfo {
 		hp = value;
 	}
 
-
 	// Printing Info Methods
 
 	public void printInfo() {
@@ -462,16 +478,19 @@ public class UnitStats implements UnitStatsInfo {
 		recalculateStats();
 
 		String s = "";
-		s += String.format("Unit [%s]  hp: %s/%d  sp: %s/%d  <level %d>%n", name, round(hp), getMaxHp(), round(sp), getMaxSp(),
-				level);
-		// s += String.format("Core stats: STR %d, AGI %d, FORT %d, PERCEP %d%n", getStr(), getAgi(), getFort(), getPercep());
+		s += String.format("Unit [%s]  hp: %s/%d  sp: %s/%d  <level %d>%n", name, round(hp), getMaxHp(), round(sp),
+				getMaxSp(), level);
+		// s += String.format("Core stats: STR %d, AGI %d, FORT %d, PERCEP %d%n", getStr(), getAgi(),
+		// getFort(), getPercep());
 		s += String.format("Derived stats: Atk %d | Def %d | Force %d | Stab %d%n", getAtk(), getDef(), getForce(),
 				getStab());
 		s += String.format(" -Damage: %s%n", getDamage());
 		// s += "Other stats: \n";
-		// s += String.format(" -AP %d, Armor Negation %s %n", getArmorPiercing(), DataUtil.getAsPercentage(getArmorNegation()));
+		// s += String.format(" -AP %d, Armor Negation %s %n", getArmorPiercing(),
+		// DataUtil.getAsPercentage(getArmorNegation()));
 		//
-		// s += String.format(" -Armor %d + %s %n", getArmor(), DataUtil.getAsPercentage(getPercentageArmor()));
+		// s += String.format(" -Armor %d + %s %n", getArmor(),
+		// DataUtil.getAsPercentage(getPercentageArmor()));
 
 		if (includeEquipmentInfo) {
 			s += "Equipped Items:\n";
@@ -503,7 +522,7 @@ public class UnitStats implements UnitStatsInfo {
 
 		final var equip = self.equip;
 		for (Equip item : equip.getEquipped().values()) {
-			if (distinctItems.stream().noneMatch(i -> i==item)) {
+			if (distinctItems.stream().noneMatch(i -> i == item)) {
 				distinctItems.add(item);
 			}
 		}
@@ -571,10 +590,24 @@ public class UnitStats implements UnitStatsInfo {
 		return baseMoveSpeed;
 	}
 
-
 	@Override
 	public float getDamage() {
 		return calc.getDamage();
+	}
+
+	@Override
+	public float getRangedDamage() {
+		return calc.getRangedDamage();
+	}
+
+	@Override
+	public int getRangedAtk() {
+		return calc.getRangedAtk();
+	}
+
+	@Override
+	public int getRangedForce() {
+		return calc.getRangedForce();
 	}
 
 	@Override
@@ -673,13 +706,14 @@ public class UnitStats implements UnitStatsInfo {
 			throw new RuntimeException(e);
 		}
 	}
+
 	public float getAtkspd() {
 		return calc.getAtkspd();
 	}
-	public float getAttackCooldown(){
+
+	public float getAttackCooldown() {
 		return 60f / getAtkspd();
 	}
-
 
 	float getMultiTeamingAtkspdPenalty(Unit target) {
 		int n = self.getUnitsAttackingThis().size();
@@ -694,21 +728,25 @@ public class UnitStats implements UnitStatsInfo {
 			return 0.82f;
 		}
 	}
-	
-	public enum DamageType{
+
+	public enum DamageType {
 		NORMAL, MAGIC
 	}
+
 	@NonNullByDefault
 	public static class DamageInstance {
 		float armorPiercing = 0;
 		float armorNegation = 0;
 		float damage = 0;
 		DamageType type = DamageType.NORMAL;
+
 		public DamageInstance() {
 		}
+
 		public DamageInstance(float damage) {
 			this.damage = damage;
 		}
+
 		public void clear() {
 			armorPiercing = 0;
 			armorNegation = 0;

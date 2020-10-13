@@ -6,6 +6,7 @@ import java.util.List;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.mygdx.holowyth.game.ui.StatsPanelUI;
 import com.mygdx.holowyth.gamedata.skillsandeffects.RangerSkills.Archery;
 import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.ArcheryArrow;
 import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.MagicMissileBolt;
@@ -74,10 +75,12 @@ public class RangerEffects {
 
 		@Override
 		public void begin() {
+			
+			
 			missiles = new ArrayList<ProjectileBase>();
-			for (int i = 0; i < 1; i++) {
-				missiles.add(new ArcheryArrow(caster.x, caster.y + 18 * i,  caster.stats.getDamage()* Archery.atkDamageMultiplier, caster, target));
-			}
+			var arrow = new ArcheryArrow(caster.x, caster.y,  caster.stats.getRangedDamage() * Archery.atkDamageMultiplier, caster, target);
+			arrow.atkRollSucceeded = caster.stats.isRangedAttackRollSuccessful(target.stats, 0);
+			missiles.add(arrow);
 		}
 
 		@Override

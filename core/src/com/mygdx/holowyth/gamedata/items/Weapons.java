@@ -67,7 +67,8 @@ public class Weapons {
 	};
 	public final static Equip bow = new TemplateEquip("Bow", WeaponType.BOW) {
 		{
-			setBasicBonuses(6, 3, 5, 0, 1);
+			bonus.rangedDamage = 5;
+			bonus.rangedAtk = 5;
 			is2HWeapon = true;
 		}
 	};

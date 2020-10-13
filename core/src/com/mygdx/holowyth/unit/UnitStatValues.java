@@ -9,6 +9,9 @@ public class UnitStatValues implements Cloneable {
 	public float damage;
 	public int atk, def, force, stab, dodge;
 	public float atkspd;
+	
+	public int rangedAtk, rangedForce;
+	public float rangedDamage;
 
 	/** Flat armor */
 	public int armor;
@@ -30,6 +33,11 @@ public class UnitStatValues implements Cloneable {
 		maxSp = src.maxSp;
 
 		damage = src.damage;
+		
+		
+		rangedDamage = src.rangedDamage;
+		rangedAtk = src.rangedAtk;
+		rangedForce = src.rangedForce;
 
 		atk = src.atk;
 		def = src.def;
@@ -68,6 +76,11 @@ public class UnitStatValues implements Cloneable {
 		armorNegate = 0;
 
 		damage = 0;
+		
+		
+		rangedDamage = 0;
+		rangedAtk = 0;
+		rangedForce = 0;
 	}
 
 	/**
@@ -96,8 +109,20 @@ public class UnitStatValues implements Cloneable {
 		armorPiercing += other.armorPiercing;
 		percentArmor += other.percentArmor;
 		armorNegate += other.armorNegate;
+		
+		rangedDamage += other.rangedDamage;
+		rangedAtk  += other.rangedAtk;
+		rangedForce += other.rangedForce;
 
 		return this;
+	}
+	
+	/**
+	 * Sets both damage and ranged damage to value
+	 */
+	public void setGeneralDamage(float value) {
+		damage = value;
+		rangedDamage = value;
 	}
 
 	@Override

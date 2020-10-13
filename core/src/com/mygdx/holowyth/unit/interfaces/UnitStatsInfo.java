@@ -67,5 +67,11 @@ public interface UnitStatsInfo {
 
 	float getDamage();
 
+	float getRangedDamage();
+
+	int getRangedAtk();
+
+	int getRangedForce();
+
 
 }
