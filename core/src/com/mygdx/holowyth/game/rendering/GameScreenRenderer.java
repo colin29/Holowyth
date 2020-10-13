@@ -26,6 +26,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.game.Controls;
 import com.mygdx.holowyth.game.MapInstanceInfo;
+import com.mygdx.holowyth.game.rendering.tiled.TileObject;
+import com.mygdx.holowyth.game.rendering.tiled.YSortedCell;
 import com.mygdx.holowyth.game.rendering.tiled.YSortingTiledMapRenderer;
 import com.mygdx.holowyth.game.Controls.Context;
 import com.mygdx.holowyth.graphics.HoloGL;
@@ -190,26 +192,44 @@ public class GameScreenRenderer {
 
 	private void renderUnitsAndYSortedTiles(float delta) {
 
+		
+		int tileWidth = map.getTilemap().getProperties().get("tilewidth", Integer.class);
+		int tileHeight = map.getTilemap().getProperties().get("tileheight", Integer.class);
+		
 		// Sort units in descending Y order
 		@NonNull
 		ArrayList<@NonNull Unit> sortedByY = new ArrayList<>(mapInstance.getUnits());
 		sortedByY.sort((u1, u2) -> u1.getY() < u2.getY() ? 1 : -1);
 		var units = new PeekingIterator<Unit>(sortedByY.iterator());
 
-		int tileHeight = map.getTilemap().getProperties().get("tileheight", Integer.class);
-
-		var cells = tiled.getYSortedCells().iterator();
-		while (cells.hasNext()) {
-			var cell = cells.next();
+		var tileObjects = tiled.getTileObjects().iterator();
+		List<Unit> renderedUnits = new ArrayList<>();
+		while (tileObjects.hasNext()){
+			var tileObject = tileObjects.next();
 			while (units.hasNext()
-					&& units.peek().y - units.peek().getRadius() + 4 > cell.baseYIndex * tileHeight + tileHeight / 2) {
-				renderUnit(units.next(), delta);
+					&& units.peek().y - units.peek().getRadius() + 4 > tileObject.baseYIndex * tileHeight + tileHeight / 2) {
+				var u = units.next();
+				renderUnit(u, delta);
+				renderedUnits.add(u);
 			}
-			tiled.renderCell(cell.xIndex, cell.yIndex, cell.layer);
+			float opacity = determineTileObjectOpacity(tileObject, renderedUnits, tileWidth, tileHeight);
+			tiled.renderTileObject(tileObject, opacity);
 		}
+
 		// Render remaining units
 		while (units.hasNext())
 			renderUnit(units.next(), delta);
+	}
+	
+	private float determineTileObjectOpacity(TileObject tileObject, List<Unit> renderedUnits, int tileWidth, int tileHeight) {
+		for(var cell : tileObject.cells) {
+			for(var unit : renderedUnits) {
+				if(Math.abs(unit.x - cell.getX()) <= tileWidth && Math.abs(unit.y - cell.getY()) <= tileHeight) { // if unit is within the tile bounds
+					return 0.4f;
+				}
+			}
+		}
+		return 1;
 	}
 
 	private void renderUnitOutlines() {
@@ -229,6 +249,26 @@ public class GameScreenRenderer {
 
 	private boolean renderMapRegions;
 	private boolean renderMapLocations;
+
+	private void renderUnit(Unit unit, float delta) {
+		if (unit.graphics.getAnimatedSprite() != null) {
+			unit.graphics.updateAndRender(delta, batch);
+		} else {
+			renderUnitCircleAsFallBack(unit);
+		}
+	}
+
+	private void renderUnitCircleAsFallBack(Unit unit) {
+		batch.begin();
+		shapeDrawer.setColor(unit.isAPlayerCharacter() ? Color.PURPLE : Color.YELLOW);
+		shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
+		shapeDrawer.filledCircle(unit.x, unit.y, Holo.UNIT_RADIUS);
+
+		shapeDrawer.setColor(Color.BLACK);
+		shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
+		shapeDrawer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
+		batch.end();
+	}
 
 	private void renderMapDebugVisualizationsIfKeysPressed() {
 		if (Gdx.input.isKeyJustPressed(renderMapRegionsKey))
@@ -347,26 +387,6 @@ public class GameScreenRenderer {
 		for (Effect effect : mapInstance.getEffects()) {
 			effect.render(batch, shapeDrawer, game.assets);
 		}
-	}
-
-	private void renderUnit(Unit unit, float delta) {
-		if (unit.graphics.getAnimatedSprite() != null) {
-			unit.graphics.updateAndRender(delta, batch);
-		} else {
-			renderUnitCircleAsFallBack(unit);
-		}
-	}
-
-	private void renderUnitCircleAsFallBack(Unit unit) {
-		batch.begin();
-		shapeDrawer.setColor(unit.isAPlayerCharacter() ? Color.PURPLE : Color.YELLOW);
-		shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
-		shapeDrawer.filledCircle(unit.x, unit.y, Holo.UNIT_RADIUS);
-
-		shapeDrawer.setColor(Color.BLACK);
-		shapeDrawer.setAlpha(unit.stats.isDead() ? 0.5f : 1);
-		shapeDrawer.circle(unit.x, unit.y, Holo.UNIT_RADIUS);
-		batch.end();
 	}
 
 	private void renderMapObstaclesEdges() {

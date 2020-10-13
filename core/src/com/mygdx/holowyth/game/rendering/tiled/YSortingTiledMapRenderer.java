@@ -23,8 +23,12 @@ import static com.badlogic.gdx.graphics.g2d.Batch.Y4;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,62 +47,135 @@ public class YSortingTiledMapRenderer extends OrthogonalTiledMapRenderer {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	private final TiledMap map;
+	private final int mapWidth;
+	private final int mapHeight;
+	private final int tileHeight;
 	/**
 	 * Layers which to render using cell-specific y sorting
 	 */
-	ArrayList<TiledMapTileLayer> ySortedLayers = new ArrayList<>();
-	ArrayList<YSortedCell> ySortedCells = new ArrayList<>();
+	List<TiledMapTileLayer> ySortedLayers = new ArrayList<>();
+	List<@NonNull YSortedCell> ySortedCells = new ArrayList<>();
+	Map<TiledMapTileLayer, YSortedCell[][]> ySortedGrid = new LinkedHashMap<>();
+	List<@NonNull TileObject> tileObjects = new ArrayList<>();
 
 	public YSortingTiledMapRenderer(TiledMap map) {
 		super(map);
 		this.map = map;
+		
+		mapWidth = map.getProperties().get("width", Integer.class);
+		mapHeight = map.getProperties().get("height", Integer.class);
+		tileHeight = map.getProperties().get("tileheight", Integer.class);
 
 		fetchYSortedLayers();
+		initYSortedCells();
+		initYSortedGrid();
 		calculateAndSortYCells();
+		generateAndSetCellParentObjects();
+		calculateAndSortTileObjectsByBaseYIndex();
 	}
+	
+	private void initYSortedGrid() {
+		for (var layer : ySortedLayers) {
+			var gridLayer = new YSortedCell[mapHeight][];
+			for(int i=0;i<mapHeight;i++) {
+				gridLayer[i] = new YSortedCell[mapWidth];
+			}
+			ySortedGrid.put(layer, gridLayer);
+		}
+		for(YSortedCell cell : ySortedCells) {
+			ySortedGrid.get(cell.layer)[cell.yIndex][cell.xIndex] = cell;
+		}
+	}		
 
-	private void calculateAndSortYCells() {
+	private void initYSortedCells() {
 		ySortedCells.clear();
 		// First, get all non-null tree tiles.
 		for (var layer : ySortedLayers) {
 			for (int x = 0; x < layer.getWidth(); x++) {
 				for (int y = 0; y < layer.getHeight(); y++) {
 					if (layer.getCell(x, y) != null && layer.getCell(x, y).getTile() != null) {
-						ySortedCells.add(new YSortedCell(x, y, layer));
+						YSortedCell cell = new YSortedCell(x, y, layer);
+						ySortedCells.add(cell);
 					}
 				}
 			}
 		}
-
-		// Calculate baseYIndex values
-
+	}
+	
+	private void calculateAndSortTileObjectsByBaseYIndex() {
+		for(var tileObjects : tileObjects) {
+			tileObjects.calculateBaseYIndex();
+		}
+		tileObjects.sort((o1, o2) -> o2.baseYIndex - o1.baseYIndex); //  in decreasing order
+	}
+	
+	private void calculateAndSortYCells() {
 		for (var cell : ySortedCells) {
 			// baseIndexY is the yIndex of the bottom-most consecutive non-empty cell, starting from here
 			while (cell.baseYIndex > 0 && cell.layer.getCell(cell.xIndex, cell.baseYIndex - 1) != null) {
 				cell.baseYIndex -= 1;
 			}
 		}
-
-		// sort the list in decreasing baseYIndex
 		ySortedCells.sort((c1, c2) -> c2.baseYIndex - c1.baseYIndex);
 	}
-
-	public List<YSortedCell> getYSortedCells() {
-		return Collections.unmodifiableList(ySortedCells);
-	}
-
-	public void renderBaseLayers() {
-		ArrayList<Integer> indexes = new ArrayList<>();
-		for (MapLayer layer : map.getLayers()) {
-			if (!ySortedLayers.contains(layer)) {
-				indexes.add(map.getLayers().getIndex(layer));
+	private void generateAndSetCellParentObjects() {
+		tileObjects.clear();
+		for (var gridLayer : ySortedGrid.values()) {
+			for(int y = 0; y<mapHeight;y++) {
+				for(int x= 0; x<mapWidth;x++) {
+					setAllConnectedCellsToSameParent(x, y, gridLayer, null, true);
+				}
 			}
 		}
-		// Convert to array
-		int[] baseLayerIndexes = new int[indexes.size()];
-		for (int i = 0; i < indexes.size(); i++)
-			baseLayerIndexes[i] = indexes.get(i);
-		render(baseLayerIndexes);
+	}
+	/**
+	 * Look at adjacent tiles for tells
+	 */
+	private void setAllConnectedCellsToSameParent(int x, int y, YSortedCell[][]gridLayer, @Nullable TileObject existingParent, boolean warnOnBounds) {
+		
+		
+		if(x < 0 || x>=mapWidth) {
+			if(warnOnBounds)
+				logger.warn("X {} is outside grid bounds {}x{}", x, mapWidth, mapHeight);
+			return;
+		}
+		if(y < 0 || y>=mapHeight) {
+			if(warnOnBounds)
+				logger.warn("Y {} is outside grid bounds {}x{}", x, mapWidth, mapHeight);
+			return;
+		}
+		
+		var cell = gridLayer[y][x];
+		if(cell==null)
+			return;
+		if(cell.getParent() != null) { // already handled
+			return; 
+		}
+		if(existingParent != null) {
+			cell.setParent(existingParent);
+		}else {
+			var newObject = new TileObject(tileHeight, mapHeight);
+			cell.setParent(newObject);
+			tileObjects.add(newObject);
+		}
+		setAllConnectedCellsToSameParent(x+1, y, gridLayer, cell.getParent(), false);
+		setAllConnectedCellsToSameParent(x-1, y, gridLayer, cell.getParent(), false);
+		setAllConnectedCellsToSameParent(x, y+1, gridLayer, cell.getParent(), false);
+		setAllConnectedCellsToSameParent(x, y-1, gridLayer, cell.getParent(), false);
+	}
+
+//	public List<YSortedCell> getYSortedCells() {
+//		return Collections.unmodifiableList(ySortedCells);
+//	}
+
+	public void renderBaseLayers() {
+		List<TiledMapTileLayer> layers = getAllTileLayersInMap(map);
+		layers.removeIf((layer) -> ySortedLayers.contains(layer));
+		beginRender();
+		for (TiledMapTileLayer layer : layers) {
+			renderMapLayer(layer);
+		}
+		endRender();
 	}
 
 	private void fetchYSortedLayers() {
@@ -107,25 +184,53 @@ public class YSortingTiledMapRenderer extends OrthogonalTiledMapRenderer {
 				var group = (MapGroupLayer) layer;
 				var name = group.getName().toLowerCase();
 				if (name.startsWith("trees") || name.startsWith("raised objects") || name.startsWith("buildings")) {
-					fetchAllLayersIn(group);
+					ySortedLayers.addAll(getAllTileLayersIn(group));
 				}
 			}
 		}
 	}
-	private void fetchAllLayersIn(MapGroupLayer group) {
+
+	private static List<TiledMapTileLayer> getAllTileLayersInMap(TiledMap map) {
+		List<TiledMapTileLayer> layers = new ArrayList<>();
+		for (MapLayer layer : map.getLayers()) {
+			if (layer instanceof MapGroupLayer) {
+				var group = (MapGroupLayer) layer;
+				layers.addAll(getAllTileLayersIn(group));
+			} else if (layer instanceof TiledMapTileLayer) {
+				layers.add((TiledMapTileLayer) layer);
+			}
+		}
+		return layers;
+	}
+
+	private static List<TiledMapTileLayer> getAllTileLayersIn(MapGroupLayer group) {
+		List<TiledMapTileLayer> layers = new ArrayList<>();
+		accumulateAllTileLayersIn(group, layers);
+		return layers;
+	}
+
+	private static void accumulateAllTileLayersIn(MapGroupLayer group, @NonNull List<TiledMapTileLayer> layers) {
 		for (var layer : group.getLayers()) {
 			if (layer instanceof MapGroupLayer) {
-				fetchAllLayersIn((MapGroupLayer) layer);
+				accumulateAllTileLayersIn((MapGroupLayer) layer, layers);
 			} else if (layer instanceof TiledMapTileLayer) {
-				ySortedLayers.add((TiledMapTileLayer) layer);
+				layers.add((TiledMapTileLayer) layer);
 			}
 		}
 	}
-	public void renderCell(int xIndex, int yIndex, TiledMapTileLayer layer) {
+
+	
+	public void renderTileObject(TileObject tileObject, float opacity) {
+		for(var cell : tileObject.cells) {
+			renderCell(cell.xIndex, cell.yIndex, opacity, cell.layer);
+		}
+	}
+	
+	private void renderCell(int xIndex, int yIndex, float opacity, TiledMapTileLayer layer) {
 
 		final Color batchColor = batch.getColor();
 		final float color = Color.toFloatBits(batchColor.r, batchColor.g, batchColor.b,
-				batchColor.a * layer.getOpacity());
+				batchColor.a * layer.getOpacity() * opacity);
 
 		final int layerWidth = layer.getWidth();
 		final int layerHeight = layer.getHeight();
@@ -267,6 +372,10 @@ public class YSortingTiledMapRenderer extends OrthogonalTiledMapRenderer {
 			batch.end();
 		}
 
+	}
+
+	public List<@NonNull TileObject> getTileObjects() {
+		return Collections.unmodifiableList(tileObjects);
 	}
 
 }

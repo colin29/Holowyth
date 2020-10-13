@@ -22,17 +22,6 @@ public class Forest2 extends GameMap {
 		locations.add(new Location("default_start_location", 350, 350));
 		setName("forest2");
 
-
-		{
-			UnitMarker m = new UnitMarker();
-			m.pos.set(60, 245);
-			m.name = "Sally";
-			m.baseStats.set(MonsterStats.baseHuman);
-			m.side = Side.PLAYER;
-			m.animatedSpriteName = "pipo-charachip028d.png";
-			unitMarkers.add(m);
-		}
-
 		locations.add(new Entrance("entrance_1", 30, 325).setDestToMap("forest1", "entrance_2"));
 		locations.add(new Entrance("entrance_2", 1420, 290));
 		
