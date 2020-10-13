@@ -86,6 +86,8 @@ public class Players {
 		
 		animatedSpriteName = "mikal.png";
 		headSpriteName = HEAD_SPRITE_DIR + "Mikal.png";
+		
+		wornEquips.equip(Weapons.bow);
 		}
 	};
 

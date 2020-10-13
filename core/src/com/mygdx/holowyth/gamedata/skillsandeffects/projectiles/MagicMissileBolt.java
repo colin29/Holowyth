@@ -1,4 +1,4 @@
-package com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles;
+package com.mygdx.holowyth.gamedata.skillsandeffects.projectiles;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class MagicMissileBolt extends ProjectileBase {
 
 	Unit target; // target is allowed to be null;
 
-	public MagicMissileBolt(float x, float y, float damage, Unit target, Unit caster, List<@NonNull Unit> units) {
+	public MagicMissileBolt(float x, float y, float damage, Unit target, Unit caster) {
 		super(x, y, intialSpeed, Point.getAngleInDegrees(caster.getPos(), target.getPos()), maxDuration, caster);
 		this.damage = damage;
 		this.target = target;

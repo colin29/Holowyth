@@ -158,7 +158,7 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 					return;
 				}
 
-				if (parent == null) {
+				if (parent != null) {
 					parent.curCooldown = cooldown;
 					caster.skills.setCurGlobalCooldown(globalCooldown);
 				} else {

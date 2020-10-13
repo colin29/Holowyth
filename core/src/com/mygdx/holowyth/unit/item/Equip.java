@@ -21,8 +21,12 @@ public class Equip extends Item {
 	public enum EquipType {
 		HEADGEAR, ARMOR, WEAPON, SHIELD, ACCESSORY, FOOTWEAR
 	}
+	public enum WeaponType{ // NONE should only be used if the item is not a weapon
+		CLUB, SWORD, BOW, STAFF, DAGGER, POLEARM, OTHER, NONE
+	}
 
 	public @NonNull EquipType equipType;
+	public @NonNull WeaponType weaponType;
 	public final UnitStatValues bonus = new UnitStatValues();
 	public boolean is2HWeapon;
 	/** Only applies for weapons. This is a relative value, 1 is the standard */
@@ -32,13 +36,19 @@ public class Equip extends Item {
 		super(name);
 		this.itemType = ItemType.EQUIP;
 		this.equipType = equipType;
+		if(equipType == EquipType.WEAPON) {
+			weaponType = WeaponType.OTHER;
+		}else {
+			weaponType = WeaponType.NONE;
+		}
 	}
 	public Equip(Equip src) {
 		super(src);
-		this.itemType = ItemType.EQUIP;
-		this.equipType = src.equipType;
-		this.baseAtkSpd = src.baseAtkSpd;
-		
+		itemType = ItemType.EQUIP;
+		equipType = src.equipType;
+		weaponType = src.weaponType;
+		baseAtkSpd = src.baseAtkSpd;
+				
 		bonus.set(src.bonus);
 		is2HWeapon = src.is2HWeapon;
 		baseAtkSpd = src.baseAtkSpd;
@@ -139,6 +149,11 @@ public class Equip extends Item {
 		public TemplateEquip(@NonNull String name, @NonNull EquipType equipType) {
 			super(name, equipType);
 			markAsTemplate();
+		}
+		public TemplateEquip(@NonNull String name, @NonNull WeaponType weaponType) {
+			super(name, EquipType.WEAPON);
+			markAsTemplate();
+			this.weaponType = weaponType; 
 		}
 	}
 	public @NonNull Equip cloneObject() {

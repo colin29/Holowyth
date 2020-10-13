@@ -1,5 +1,5 @@
 
-package com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles;
+package com.mygdx.holowyth.gamedata.skillsandeffects.projectiles;
 
 import org.apache.commons.lang3.RandomUtils;
 import org.slf4j.Logger;

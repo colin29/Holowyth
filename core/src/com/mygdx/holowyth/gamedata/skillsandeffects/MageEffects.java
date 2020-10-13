@@ -13,11 +13,11 @@ import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.holowyth.game.MapInstance;
-import com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles.ArcaneBoltBolt;
-import com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles.FireballBolt;
-import com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles.MagicMissileBolt;
-import com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles.ProjectileBase;
-import com.mygdx.holowyth.gamedata.skillsandeffects.mageProjectiles.WindBladeBolt;
+import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.ArcaneBoltBolt;
+import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.FireballBolt;
+import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.MagicMissileBolt;
+import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.ProjectileBase;
+import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.WindBladeBolt;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.skill.effect.CasterGroundEffect;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
@@ -46,7 +46,7 @@ public class MageEffects {
 		public void begin() {
 			missiles = new ArrayList<MagicMissileBolt>();
 			for (int i = 0; i < 3; i++) {
-				missiles.add(new MagicMissileBolt(caster.x, caster.y + 18 * i, damage, target, caster, mapInstance.getUnits()));
+				missiles.add(new MagicMissileBolt(caster.x, caster.y + 18 * i, damage, target, caster));
 			}
 		}
 

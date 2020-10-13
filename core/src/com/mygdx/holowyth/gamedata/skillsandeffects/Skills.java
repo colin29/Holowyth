@@ -36,7 +36,7 @@ public class Skills {
 					new MageSkills.BlindingFlash()));
 
 	public static final List<ActiveSkill> rangerSkills = Collections
-			.unmodifiableList(Arrays.asList(new RangerSkills.CrossSlash()));
+			.unmodifiableList(Arrays.asList(new RangerSkills.CrossSlash(), new RangerSkills.Archery()));
 	public static final List<ActiveSkill> priestSkills = Collections
 			.unmodifiableList(Arrays.asList(new PriestSkills.Heal(), new PriestSkills.StaffStrike()));
 	

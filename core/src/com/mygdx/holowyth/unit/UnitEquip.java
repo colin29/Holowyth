@@ -11,13 +11,14 @@ import org.slf4j.LoggerFactory;
 import com.mygdx.holowyth.unit.WornEquips.EquipResult;
 import com.mygdx.holowyth.unit.WornEquips.Slot;
 import com.mygdx.holowyth.unit.item.Equip;
+import com.mygdx.holowyth.unit.item.Equip.WeaponType;
 
 /**
  * @author Colin Ta
  */
 @NonNullByDefault
 public class UnitEquip {
-	
+
 	@SuppressWarnings("null")
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -40,23 +41,23 @@ public class UnitEquip {
 	 */
 	public EquipResult equip(Equip item) {
 		EquipResult result = worn.equip(item);
-		
-		if(result.success)
+
+		if (result.success)
 			self.stats.recalculateStats();
 		return result;
 	}
 
 	public boolean unequip(Equip item) {
 		boolean isSuccess = worn.unequip(item);
-		if(isSuccess) {
+		if (isSuccess) {
 			self.stats.recalculateStats();
 		}
-		return isSuccess; 
+		return isSuccess;
 	}
-	
+
 	public boolean unequip(Slot slot) {
 		boolean isSuccess = worn.unequip(slot);
-		if(isSuccess) {
+		if (isSuccess) {
 			self.stats.recalculateStats();
 		}
 		return false;
@@ -64,6 +65,16 @@ public class UnitEquip {
 
 	public boolean hasEquipped(Equip equip) {
 		return worn.hasEquipped(equip);
+	}
+
+	public boolean hasWeaponTypeEquipped(WeaponType weaponType) {
+		var mainhand = getEquip(Slot.MAIN_HAND);
+		var offhand = getEquip(Slot.OFF_HAND);
+		if (mainhand != null && mainhand.weaponType == weaponType)
+			return true;
+		if (offhand != null && offhand.weaponType == weaponType)
+			return true;
+		return false;
 	}
 
 	public @Nullable Equip getEquip(WornEquips.Slot slot) {

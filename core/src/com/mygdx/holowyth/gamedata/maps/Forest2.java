@@ -25,7 +25,7 @@ public class Forest2 extends GameMap {
 		locations.add(new Entrance("entrance_1", 30, 325).setDestToMap("forest1", "entrance_2"));
 		locations.add(new Entrance("entrance_2", 1420, 290));
 		
-		addUnitMarker(400, 400, Monsters.goblin);
+		addUnitMarker(720, 400, Monsters.goblin);
 
 	}
 }

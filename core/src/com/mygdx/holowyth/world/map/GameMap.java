@@ -159,7 +159,7 @@ public class GameMap {
 	}
 	public void addUnitMarker(int x, int y, UnitMarker template) {
 		UnitMarker m = new UnitMarker(Monsters.goblin);
-		m.pos.set(400, 450);
+		m.pos.set(x, y);
 		unitMarkers.add(m);
 	}
 	
