@@ -49,6 +49,7 @@ public class YSortingTiledMapRenderer extends OrthogonalTiledMapRenderer {
 	private final TiledMap map;
 	private final int mapWidth;
 	private final int mapHeight;
+	private final int tileWidth;
 	private final int tileHeight;
 	/**
 	 * Layers which to render using cell-specific y sorting
@@ -64,6 +65,7 @@ public class YSortingTiledMapRenderer extends OrthogonalTiledMapRenderer {
 		
 		mapWidth = map.getProperties().get("width", Integer.class);
 		mapHeight = map.getProperties().get("height", Integer.class);
+		tileWidth = map.getProperties().get("tileheight", Integer.class);
 		tileHeight = map.getProperties().get("tileheight", Integer.class);
 
 		fetchYSortedLayers();
@@ -72,6 +74,7 @@ public class YSortingTiledMapRenderer extends OrthogonalTiledMapRenderer {
 		calculateAndSortYCells();
 		generateAndSetCellParentObjects();
 		calculateAndSortTileObjectsByBaseYIndex();
+		calculateTileObjectBoundingBoxes();
 	}
 	
 	private void initYSortedGrid() {
@@ -108,6 +111,12 @@ public class YSortingTiledMapRenderer extends OrthogonalTiledMapRenderer {
 		}
 		tileObjects.sort((o1, o2) -> o2.baseYIndex - o1.baseYIndex); //  in decreasing order
 	}
+	private void calculateTileObjectBoundingBoxes() {
+		for(var tileObjects : tileObjects) {
+			tileObjects.calculateBoundingBox();
+		}
+	}
+	
 	
 	private void calculateAndSortYCells() {
 		for (var cell : ySortedCells) {
@@ -154,7 +163,7 @@ public class YSortingTiledMapRenderer extends OrthogonalTiledMapRenderer {
 		if(existingParent != null) {
 			cell.setParent(existingParent);
 		}else {
-			var newObject = new TileObject(tileHeight, mapHeight);
+			var newObject = new TileObject(tileWidth, tileHeight, mapHeight);
 			cell.setParent(newObject);
 			tileObjects.add(newObject);
 		}

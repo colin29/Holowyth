@@ -85,8 +85,13 @@ public class GameScreenRenderer {
 	private GameMap map;
 
 	// Map Info
+	/**
+	 * In world units (not tiles)
+	 */
 	private int mapWidth;
 	private int mapHeight;
+	private int tileWidth;
+	private int tileHeight;
 
 	// Map lifetime components
 	private MapInstanceInfo mapInstance;
@@ -99,6 +104,11 @@ public class GameScreenRenderer {
 	private final int showMapPathingGraphKey = Keys.M;
 	private final int renderMapLocationsKey = Keys.B;
 	private final int renderMapRegionsKey = Keys.N;
+	private final int renderTileGridKey = Keys.COMMA;
+	
+	private boolean renderMapRegions;
+	private boolean renderMapLocations;
+	private boolean renderTileGrid;
 
 	/**
 	 * The game, worldCamera, and other screen-lifetime modules are passed in.
@@ -171,6 +181,7 @@ public class GameScreenRenderer {
 
 			// Debug Map Visualizations
 			renderMapDebugVisualizationsIfKeysPressed();
+			renderTileGridIfToggled();
 
 			// Effects
 			renderEffects();
@@ -184,18 +195,39 @@ public class GameScreenRenderer {
 
 	}
 
+	private void renderTileGridIfToggled() {
+		if(Gdx.input.isKeyJustPressed(renderTileGridKey)) {
+			renderTileGrid ^= true;
+		}
+		if(renderTileGrid)
+			renderTileGrid();
+	}
+
 	private void renderSelectionBox() {
 		if (controls != null) {
 			controls.renderSelectionBox(Controls.defaultSelectionBoxColor);
 		}
 	}
 
+	private void renderTileGrid() {
+		shapeDrawer.setColor(Color.BLACK);
+		shapeDrawer.setAlpha(1);
+		float lineWidth = 0.5f;
+		batch.begin();
+		for (int x = 0; x <= mapWidth; x += tileWidth) { // draw columns
+			shapeDrawer.line(x, 0, x, mapHeight, lineWidth);
+		}
+		for (int y = 0; y <= mapHeight; y += tileHeight) {
+			shapeDrawer.line(0, y, mapWidth, y, lineWidth);
+		}
+		batch.end();
+	}
+
 	private void renderUnitsAndYSortedTiles(float delta) {
 
-		
 		int tileWidth = map.getTilemap().getProperties().get("tilewidth", Integer.class);
 		int tileHeight = map.getTilemap().getProperties().get("tileheight", Integer.class);
-		
+
 		// Sort units in descending Y order
 		@NonNull
 		ArrayList<@NonNull Unit> sortedByY = new ArrayList<>(mapInstance.getUnits());
@@ -204,28 +236,41 @@ public class GameScreenRenderer {
 
 		var tileObjects = tiled.getTileObjects().iterator();
 		List<Unit> renderedUnits = new ArrayList<>();
-		while (tileObjects.hasNext()){
+		while (tileObjects.hasNext()) {
 			var tileObject = tileObjects.next();
-			while (units.hasNext()
-					&& units.peek().y - units.peek().getRadius() + 4 > tileObject.baseYIndex * tileHeight + tileHeight / 2) {
+			while (units.hasNext() && units.peek().y - units.peek().getRadius() + 4 > tileObject.baseYIndex * tileHeight
+					+ tileHeight / 2) {
 				var u = units.next();
 				renderUnit(u, delta);
 				renderedUnits.add(u);
 			}
-			float opacity = determineTileObjectOpacity(tileObject, renderedUnits, tileWidth, tileHeight);
-			tiled.renderTileObject(tileObject, opacity);
+			tileObject.opacity = determineTileObjectOpacity(tileObject, renderedUnits, tileWidth, tileHeight);
+			tileObject.tickFade();
+			tiled.renderTileObject(tileObject, tileObject.getFadingOpacity());
 		}
 
 		// Render remaining units
 		while (units.hasNext())
 			renderUnit(units.next(), delta);
 	}
-	
-	private float determineTileObjectOpacity(TileObject tileObject, List<Unit> renderedUnits, int tileWidth, int tileHeight) {
-		for(var cell : tileObject.cells) {
-			for(var unit : renderedUnits) {
-				if(Math.abs(unit.x - cell.getX()) <= tileWidth && Math.abs(unit.y - cell.getY()) <= tileHeight) { // if unit is within the tile bounds
-					return 0.4f;
+
+	private float determineTileObjectOpacity(TileObject object, List<Unit> renderedUnits, int tileWidth,
+			int tileHeight) {
+
+		for (var unit : renderedUnits) {
+			// ignore units that are not a full tile within the bounding box (this prevents hiding of small
+			// objects too)
+			 float factor = 0.6f;
+			if (!((unit.x > object.x1 + tileWidth * factor) && (unit.x < object.x2 - tileWidth* factor)
+					&& (unit.y > object.y1 + tileHeight* factor) && (unit.y < object.y2 - tileHeight* factor))) {
+				continue;
+			}
+
+			// If unit center is inside tile bounds
+			for (var cell : object.cells) {
+				if (Math.abs(unit.x - cell.getX()) <= tileWidth / 2
+						&& Math.abs(unit.y - cell.getY()) <= tileHeight / 2) {
+					return 0.5f;
 				}
 			}
 		}
@@ -247,8 +292,6 @@ public class GameScreenRenderer {
 		renderOutlineAroundStunnedUnits();
 	}
 
-	private boolean renderMapRegions;
-	private boolean renderMapLocations;
 
 	private void renderUnit(Unit unit, float delta) {
 		if (unit.graphics.getAnimatedSprite() != null) {
@@ -566,6 +609,9 @@ public class GameScreenRenderer {
 		this.map = map;
 		this.mapWidth = mapWidth;
 		this.mapHeight = mapHeight;
+		tileWidth = map.getTilemap().getProperties().get("tilewidth", Integer.class);
+		tileHeight = map.getTilemap().getProperties().get("tileheight", Integer.class);
+
 		tiled = new YSortingTiledMapRenderer(map.getTilemap());
 	}
 

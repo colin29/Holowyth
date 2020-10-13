@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 @NonNullByDefault
 public class TileObject {
 	
-	public final int tileHeight;
+	private final int tileHeight, tileWidth;
 	private final int mapHeight;
 	
 	@SuppressWarnings("null")
@@ -21,8 +21,18 @@ public class TileObject {
 	public int baseYIndex = 0;
 
 	
+	public float opacity = 1;
+	private float fadingOpacity = opacity;
+
+	private static float fadeRate = 0.015f;
 	
-	public TileObject(int tileHeight, int mapHeight) {
+	// bounding-box coordinates
+	public float x1, x2, y1, y2;
+	
+	
+	
+	public TileObject(int tileWidth, int tileHeight, int mapHeight) {
+		this.tileWidth = tileWidth;
 		this.tileHeight = tileHeight;
 		this.mapHeight = mapHeight;
 	}
@@ -50,5 +60,47 @@ public class TileObject {
 			yIndexMin = Math.min(yIndexMin, cell.yIndex);
 		}
 		baseYIndex = yIndexMin;
+	}
+	
+	public void calculateBoundingBox() {
+		
+		float minX, maxX, minY, maxY;
+		if(cells.isEmpty()) {
+			logger.info("Can't calculate bounding box, tileObject has no cells");
+			return;
+		}
+		var first = cells.get(0);
+		minX = first.xIndex;
+		maxX = first.xIndex;
+		minY = first.yIndex;
+		maxY = first.yIndex;
+		
+		for(var cell : cells) {
+			minX = Math.min(minX, cell.xIndex);
+			minY = Math.min(minY, cell.yIndex);
+			
+			maxX = Math.max(maxX, cell.xIndex);
+			maxY = Math.max(maxY, cell.yIndex);
+		}
+		
+		x1 = minX * tileWidth;
+		y1 = minY * tileHeight;
+		
+		x2 = maxX * tileWidth + tileWidth;
+		y2 = maxY * tileHeight + tileHeight;
+	}
+	public void tickFade() {
+		if(Math.abs(opacity-fadingOpacity) < fadeRate) {
+			fadingOpacity = opacity;
+		}else {
+			if(fadingOpacity < opacity) {
+				fadingOpacity += fadeRate;
+			}else {
+				fadingOpacity-= fadeRate;
+			}
+		}
+	}
+	public float getFadingOpacity() {
+		return fadingOpacity;
 	}
 }
