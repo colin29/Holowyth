@@ -26,7 +26,7 @@ public class Equip extends Item {
 	public final UnitStatValues bonus = new UnitStatValues();
 	public boolean is2HWeapon;
 	/** Only applies for weapons. This is a relative value, 1 is the standard */
-	public float baseAtkSpd = 1; 
+	public float baseAtkSpd = 1;  // Weapons don't just have an atkspd bonus, a unit's base atkspd comes from weapon
 
 	public Equip(@NonNull String name, @NonNull EquipType equipType) {
 		super(name);
@@ -37,6 +37,7 @@ public class Equip extends Item {
 		super(src);
 		this.itemType = ItemType.EQUIP;
 		this.equipType = src.equipType;
+		this.baseAtkSpd = src.baseAtkSpd;
 		
 		bonus.set(src.bonus);
 		is2HWeapon = src.is2HWeapon;

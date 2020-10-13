@@ -1,14 +1,16 @@
 package com.mygdx.holowyth.unit;
 
 import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 
 import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.unit.WornEquips.Slot;
 import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.util.Holo;
 
 public class UnitStatCalculator {
-	private final UnitStatValues my;
 	private final UnitStats self;
+	private final UnitStatValues my;
 
 	// After recalculateStats() is called, these will accurately reflect the combined skill and equip bonuses
 	final UnitStatValues skillBonus = new UnitStatValues();
@@ -16,7 +18,7 @@ public class UnitStatCalculator {
 
 	UnitStatCalculator(UnitStats self) {
 		this.self = self;
-		this.my = new UnitStatValues();
+		my = new UnitStatValues();
 	}
 
 	/**
@@ -29,8 +31,11 @@ public class UnitStatCalculator {
 		calculateSkillStatBonuses(skillBonus);
 		calculateEquipStatBonuses(equipBonus, WornEquips.Slot.HEAD, WornEquips.Slot.BODY, WornEquips.Slot.MAIN_HAND, WornEquips.Slot.ACCESSORY);
 
-		if (equip.getEquip(WornEquips.Slot.MAIN_HAND) != equip.getEquip(WornEquips.Slot.OFF_HAND)) // don't count a 2H weapon twice
-			addEquipStatBonuses(equipBonus, WornEquips.Slot.OFF_HAND);
+		final @Nullable Equip mainHand = equip.getEquip(WornEquips.Slot.MAIN_HAND);
+		final @Nullable Equip offHand = equip.getEquip(WornEquips.Slot.OFF_HAND);
+		 
+		if (mainHand != offHand) // don't count a 2H weapon twice
+			addEquipStatBonuses(equipBonus, Slot.OFF_HAND);
 
 		my.set(self.base);
 		my.add(skillBonus);
@@ -38,6 +43,14 @@ public class UnitStatCalculator {
 
 		// By default bonuses are simply added, overwrite the value if desired
 
+		if(mainHand != null) {
+			my.atkspd = mainHand.baseAtkSpd; 
+		}else if(offHand != null) {
+			my.atkspd = offHand.baseAtkSpd;
+		}else {
+			my.atkspd = 1;	
+		}
+		
 		my.maxHp = Holo.debugHighHpUnits ? self.base.maxHp * 10 : self.base.maxHp;
 		my.maxSp = self.base.maxSp;
 	}
@@ -140,6 +153,9 @@ public class UnitStatCalculator {
 
 	public float getDamage() {
 		return my.damage;
+	}
+	public float getAtkspd() {
+		return my.atkspd;
 	}
 
 }

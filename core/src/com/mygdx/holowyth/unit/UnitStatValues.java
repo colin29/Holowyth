@@ -8,6 +8,7 @@ public class UnitStatValues implements Cloneable {
 	public int maxHp, maxSp;
 	public float damage;
 	public int atk, def, force, stab, dodge;
+	public float atkspd;
 
 	/** Flat armor */
 	public int armor;
@@ -35,6 +36,8 @@ public class UnitStatValues implements Cloneable {
 		force = src.force;
 		stab = src.stab;
 		dodge = src.dodge;
+		
+		atkspd = src.atkspd;
 
 		armor = src.armor;
 		armorPiercing = src.armorPiercing;
@@ -56,6 +59,8 @@ public class UnitStatValues implements Cloneable {
 		force = 0;
 		stab = 0;
 		dodge = 0;
+		
+		atkspd = 0;
 
 		armor = 0;
 		armorPiercing = 0;
@@ -66,7 +71,7 @@ public class UnitStatValues implements Cloneable {
 	}
 
 	/**
-	 * adds the given values to the first set of values
+	 * Adds the given values to the first set of values. One of the UnitStatValues should represent a bonus (e.g. it doesn't max sense to add 2 unit's hps together)
 	 */
 	public UnitStatValues add(UnitStatValues other) {
 		str += other.str;
@@ -78,6 +83,8 @@ public class UnitStatValues implements Cloneable {
 		maxSp += other.maxSp;
 
 		damage += other.damage;
+		
+		atkspd += other.atkspd;
 		
 		atk += other.atk;
 		def += other.def;

@@ -169,12 +169,12 @@ public class Controls extends InputProcessorAdapter {
 				return "N/A";
 			}
 		});
-		debugValues.add("curGlobalCooldown of one unit", () -> {
+		debugValues.add("atkspd of one unit", () -> {
 			if (selectedUnits.size() == 1) {
 				Unit u = selectedUnits.first();
-				return u.skills.getCurGlobalCooldown();
+				return DataUtil.round(u.stats.getAtkspd());
 			} else {
-				return 0;
+				return "N/A";
 			}
 		});
 		debugValues.add("Btree last task", () -> {

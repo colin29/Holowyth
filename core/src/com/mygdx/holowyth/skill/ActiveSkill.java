@@ -38,6 +38,7 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 
 	public float globalCooldown = 60 * 2; // default
 	public float cooldown; // in game frames
+	public float addedAttackCooldown; // using this skill delays next attack
 	/** To enable maxRange checking, call setMaxRange with a non-negative number
 	 */
 	private float maxRange = -1;
@@ -157,18 +158,22 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 					return;
 				}
 
-				if (parent != null) {
+				if (parent == null) {
 					parent.curCooldown = cooldown;
 					caster.skills.setCurGlobalCooldown(globalCooldown);
 				} else {
 					throw new HoloException("Skill used but parent field false");
 				}
+				
+				// Casting a success, carry out effects
 
 				if (hasChannelingBehaviour) {
 					status = Status.CHANNELING;
 				} else {
 					status = Status.DONE;
 				}
+				
+				caster.getCombat().addAttackCooldown(addedAttackCooldown);
 
 				for (Effect effect : effects) {
 					effect.begin();

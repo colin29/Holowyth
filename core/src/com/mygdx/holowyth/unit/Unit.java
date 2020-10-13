@@ -342,7 +342,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 
 	@Override
 	public float getAttackCooldown() {
-		return combat.getAttackCooldown();
+		return stats.getAttackCooldown();
 	}
 
 	@Override

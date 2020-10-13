@@ -24,7 +24,6 @@ public class UnitCombat {
 	/** The unit this unit is attacking. Attacking a unit <--> being engaged. */
 	private Unit attacking;
 
-	private float attackCooldown = 60;
 	private float attackCooldownRemaining = 0;
 
 	/** Time in frames. When a unit engages it cannot retreat for a certain amount of time. */
@@ -69,7 +68,7 @@ public class UnitCombat {
 						&& attacking.isAttackOrderAllowed()) {
 					attacking.orderAttackUnit(self, false);
 				}
-				attackCooldownRemaining = attackCooldown / stats.getMultiTeamingAtkspdPenalty(attacking);
+				attackCooldownRemaining = stats.getAttackCooldown() / stats.getMultiTeamingAtkspdPenalty(attacking);
 			}
 		}
 
@@ -137,7 +136,7 @@ public class UnitCombat {
 		self.getMapInstanceMutable().onUnitStartsAttacking(self, attacking);
 
 		// Attack cooldown may be artificially higher because of a recent stun/reel
-		attackCooldownRemaining = Math.max(attackCooldownRemaining, attackCooldown / 4);
+		attackCooldownRemaining = Math.max(attackCooldownRemaining, stats.getAttackCooldown() / 4);
 		retreatCooldownRemaining = retreatCooldown;
 	}
 
@@ -155,10 +154,6 @@ public class UnitCombat {
 		attackCooldownRemaining += value;
 	}
 
-	float getAttackCooldown() {
-		return attackCooldown;
-	}
-
 	float getAttackCooldownRemaining() {
 		return attackCooldownRemaining;
 	}
@@ -169,6 +164,20 @@ public class UnitCombat {
 
 	float getRetreatCooldownRemaining() {
 		return retreatCooldownRemaining;
+	}
+	public void addAttackCooldownMultiple(float multiple) {
+		if(multiple<0) {
+			logger.warn("Can't add negative attack cooldown multiple");
+			return;
+		}
+		attackCooldownRemaining += multiple * stats.getAttackCooldown();
+	}
+	public void addAttackCooldown(float frames) {
+		if(frames<0) {
+			logger.warn("Can't add negative attack cooldown");
+			return;
+		}
+		attackCooldownRemaining += frames;
 	}
 
 	int getRetreatDurationRemaining() {

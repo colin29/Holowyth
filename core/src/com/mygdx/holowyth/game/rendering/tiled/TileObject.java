@@ -48,7 +48,7 @@ public class TileObject {
 	
 	private static int nextId = 0;
 	private static int getNextId() {
-		logger.debug("Tile object created id= {}", nextId);
+//		logger.debug("Tile object created id= {}", nextId);
 		return nextId++;
 	}
 	public float getBaseY() {

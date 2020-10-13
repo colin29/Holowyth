@@ -74,7 +74,7 @@ public class Players {
 		activeSkills.addAll(Skills.darkKnightSkills);
 		
 		animatedSpriteName = "seth.png";
-		headSpriteName = HEAD_SPRITE_DIR + "seth.png";
+		headSpriteName = HEAD_SPRITE_DIR + "Seth.png";
 		}
 	};
 	public static final UnitMarker mikal = new TemplateUnitMarker() {
@@ -85,7 +85,7 @@ public class Players {
 		activeSkills.addAll(Skills.rangerSkills);
 		
 		animatedSpriteName = "mikal.png";
-		headSpriteName = HEAD_SPRITE_DIR + "mikal.png";
+		headSpriteName = HEAD_SPRITE_DIR + "Mikal.png";
 		}
 	};
 

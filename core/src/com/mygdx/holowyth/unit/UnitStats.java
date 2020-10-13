@@ -81,7 +81,7 @@ public class UnitStats implements UnitStatsInfo {
 
 	/**
 	 * 
-	 * Calculates correct calculated stats as well as movement speed, movementSpeed. The base stats should be modified and status effects set before
+	 * Calculates correct calculated stats. The base stats should be modified and status effects set before
 	 * calling this
 	 * 
 	 * Call before anytime you have to read stats from Unit e.g combat calculations or a debug print or displaying on UI
@@ -672,6 +672,12 @@ public class UnitStats implements UnitStatsInfo {
 		} catch (CloneNotSupportedException e) {
 			throw new RuntimeException(e);
 		}
+	}
+	public float getAtkspd() {
+		return calc.getAtkspd();
+	}
+	public float getAttackCooldown(){
+		return 60f / getAtkspd();
 	}
 
 
