@@ -12,7 +12,8 @@ public class DarkKnightSkills {
 		public static float atkdmgMultiplier = 1.25f;
 		public static int atkBonus = 6;
 		public static float movementSpeedBuff = 0.25f;
-		public static float  movementSpeedBuffDuration = 5*60;
+		public static float movementSpeedBuffDuration = 5 * 60;
+
 		public BladeInTheDark() {
 			name = "Blade in the Dark";
 			casting.castTime = 0.3f * 60;
@@ -26,7 +27,7 @@ public class DarkKnightSkills {
 		public boolean pluginTargeting(Unit caster, float x, float y) {
 			if (!caster.isAttacking()) {
 				return false;
-			}else {
+			} else {
 				setEffects(new DarkKnightEffects.BladeInTheDarkEffect(caster, caster.getAttacking(), x, y));
 				return true;
 			}
@@ -34,32 +35,45 @@ public class DarkKnightSkills {
 
 		@Override
 		public String getDescription() {
-			return String.format("Strike the enemy for %s damage and disengage without penalty, gaining %s movement speed for %s seconds.", DataUtil.percentage(atkdmgMultiplier), DataUtil.percentage(movementSpeedBuff), DataUtil.asSeconds(movementSpeedBuffDuration));
+			return String.format(
+					"Strike the enemy for %s damage and disengage without penalty, gaining %s movement speed for %s seconds.",
+					DataUtil.percentage(atkdmgMultiplier), DataUtil.percentage(movementSpeedBuff),
+					DataUtil.asSeconds(movementSpeedBuffDuration));
 		}
 	}
-	
-	public static class ThrowSand extends UnitSkill {
-		
-		public static float blindDuration = 2*60;
-		public static int atkRollBonus = 10;
-		
-		public ThrowSand() {
+
+	public static class ThrowKnife extends UnitSkill {
+
+		public static float atkDamageMultiplier = 1.25f;
+		public static int atkBonus = 15;
+		public static int knifeDamage = 5;
+
+		public static float bleedDamageRatio = 1f;
+		public static int bleedTickInterval = 2 * 60;
+		public static int bleedTotalTicks = 5;
+
+		public ThrowKnife() {
 			super();
-			name = "Throw Sand";
-			casting.castTime = 0.3f * 60;
+			name = "Throw Knife";
+			casting.castTime = 0.4f * 60;
 			spCost = 8;
-			cooldown = 15 * 60;
+			cooldown = 10 * 60;
+			requiresLOS = true;
+			setMaxRange(300);
 		}
 
 		@Override
 		protected boolean pluginTargeting(Unit caster, Unit target) {
-			setEffects(new DarkKnightEffects.ThrowSandEffect(caster, target));
+			setEffects(new DarkKnightEffects.ThrowKnifeEffect(caster, target));
 			return true;
 		}
 
 		@Override
 		public String getDescription() {
-			return String.format("Blind the target enemy for %s seconds", DataUtil.asSeconds(blindDuration));
+			return String.format(
+					"Throw a knife at the target dealing %s+%s damage, and inflicting 'Bleeding' for %s of damage dealt over %s seconds. Does not benefit from weapons or shields.",
+					DataUtil.percentage(atkDamageMultiplier), knifeDamage, DataUtil.percentage(bleedDamageRatio),
+					DataUtil.asSeconds(bleedTickInterval * bleedTotalTicks));
 		}
 
 	}

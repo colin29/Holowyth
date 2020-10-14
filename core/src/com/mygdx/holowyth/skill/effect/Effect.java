@@ -1,5 +1,8 @@
 package com.mygdx.holowyth.skill.effect;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.holowyth.game.MapInstance;
@@ -8,6 +11,8 @@ import com.mygdx.holowyth.util.ShapeDrawerPlus;
 
 public abstract class Effect {
 
+	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
+	
 	/**
 	 * The default marker for complete status. A subclass can override isComplete and define their own definition
 	 */
@@ -16,7 +21,7 @@ public abstract class Effect {
 
 	protected final MapInstance mapInstance;
 	protected final EffectsHandler gfx;
-
+	
 	public Effect(MapInstance world) {
 		this.mapInstance = world;
 		gfx = world.getGfx();

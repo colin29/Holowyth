@@ -11,6 +11,7 @@ import com.mygdx.holowyth.unit.UnitOrders.Order;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitStatusInfo;
 import com.mygdx.holowyth.unit.statuseffect.BasicAttackSlowEffect;
+import com.mygdx.holowyth.unit.statuseffect.BleedEffect;
 import com.mygdx.holowyth.unit.statuseffect.SlowEffect;
 import com.mygdx.holowyth.unit.statuseffect.SpeedIncreaseEffect;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
@@ -34,6 +35,8 @@ public class UnitStatus implements UnitStatusInfo {
 	// Status effects
 	private final List<SlowEffect> slowEffects = new LinkedList<SlowEffect>();
 	private final List<SpeedIncreaseEffect> speedIncreaseEffects = new LinkedList<SpeedIncreaseEffect>();
+	private final List<BleedEffect> bleedEffects = new LinkedList<BleedEffect>();
+	
 	private float blindDurationRemaining;
 
 	private float tauntDurationRemaining = 0;
@@ -62,6 +65,10 @@ public class UnitStatus implements UnitStatusInfo {
 	
 	
 
+	public void applyBleed(float damagePerTick, int totalTicks, int totalFrames) {
+		bleedEffects.add(new BleedEffect(self, damagePerTick, totalTicks, totalFrames));
+	}
+	
 	/**
 	 * @param slowAmount
 	 *            from 0 to 1, 1 being a total slow
@@ -264,7 +271,8 @@ public class UnitStatus implements UnitStatusInfo {
 		slowEffects.removeIf((effect) -> effect.isExpired());
 		speedIncreaseEffects.forEach((effect) -> effect.tickDuration());
 		speedIncreaseEffects.removeIf((effect) -> effect.isExpired());
-		
+		bleedEffects.forEach((effect) -> effect.tick());
+		bleedEffects.removeIf((effect) -> effect.isExpired());
 	
 		blindDurationRemaining = Math.max(0, blindDurationRemaining - 1);
 	

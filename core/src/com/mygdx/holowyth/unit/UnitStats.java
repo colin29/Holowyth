@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.RandomUtils;
-import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler.DamageEffectParams;
 import com.mygdx.holowyth.skill.Skill;
-import com.mygdx.holowyth.unit.UnitStats.DamageInstance;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.util.DataUtil;
@@ -123,7 +121,9 @@ public class UnitStats implements UnitStatsInfo {
 			logger.warn("Cannot attack a dead target");
 			return;
 		}
-
+		
+		onAttack(enemy);
+		
 		// Add a slow effect, regardless of block or hit. This is for balancing fleeing enemies without
 		// engaging.
 		enemy.self.status.applyBasicAttackSlow(0.4f, 90);
@@ -140,17 +140,10 @@ public class UnitStats implements UnitStatsInfo {
 
 		// 3. Calculate damage and reduction from armor
 
-		float damage = enemy.calculatePostArmorDamage(getDamage(), getArmorPiercing(), getArmorNegation());
-
-		// 5. Apply damage
-		logger.trace("{}'s attack hit and did {} damage to {}", this.name, DataUtil.round(damage), enemy.name);
-
-		enemy.applyExactDamage(damage, null);
-		if (damage > 0) {
+		float damageDealt = enemy.applyDamage(getDamage());
+		if (damageDealt > 0) {
 			enemy.self.interruptSoft();
 		}
-		onAttack(enemy);
-
 	}
 
 	// ** Notify skills, etc. that trigger on attack
@@ -163,12 +156,37 @@ public class UnitStats implements UnitStatsInfo {
 	public boolean isAttackRollSuccessful(UnitStats enemy, int atkBonus) {
 		return isAttackRollSuccessful(enemy, atkBonus, false, true);
 	}
+
 	public boolean isRangedAttackRollSuccessful(UnitStats enemy, int atkBonus) {
 		return isAttackRollSuccessful(enemy, atkBonus, true, true);
 	}
 
 	public boolean isBasicAttackRollSuccessful(UnitStats enemy, int atkBonus) {
 		return isAttackRollSuccessful(enemy, atkBonus, false, false);
+	}
+
+	public boolean isAttackRollSuccessfulCustomAtkValue(int attackValue, UnitStats enemy, boolean isRanged) {
+		float chanceToHit;
+		int atk;
+		if (isRanged) {
+			atk = attackValue - getReelAtkPenalty();
+		} else {
+			atk = attackValue - getReelAtkPenalty() + getMultiTeamingAtkBonus(enemy);
+		}
+
+		int defEnemy = enemy.getDef() - enemy.getStunDefPenalty() - enemy.getReelDefPenalty();
+
+		chanceToHit = chanceToHitFormula(atk, defEnemy);
+
+		chanceToHit = Math.min(atkChanceCeiling, chanceToHit);
+		chanceToHit = Math.max(atkChanceFloor, chanceToHit);
+
+		final float randomRoll = (float) Math.random();
+
+		logger.debug("Custom atk roll: {}->{} {} {} ({} relative attack)", this.name, enemy.name,
+				randomRoll <= chanceToHit ? "SUCCESS" : "FAILURE", round(chanceToHit), atk - defEnemy);
+
+		return randomRoll <= chanceToHit;
 	}
 
 	private boolean isAttackRollSuccessful(UnitStats enemy, int atkBonus, boolean isRanged, boolean isSkill) {
@@ -182,7 +200,7 @@ public class UnitStats implements UnitStatsInfo {
 
 		int defEnemy = enemy.getDef() - enemy.getStunDefPenalty() - enemy.getReelDefPenalty();
 
-		chanceToHit = (float) (0.4 * (1 + (atk - defEnemy) * 0.05));
+		chanceToHit = chanceToHitFormula(atk, defEnemy);
 
 		chanceToHit = Math.min(atkChanceCeiling, chanceToHit);
 		chanceToHit = Math.max(atkChanceFloor, chanceToHit);
@@ -200,6 +218,10 @@ public class UnitStats implements UnitStatsInfo {
 		}
 
 		return randomRoll <= chanceToHit;
+	}
+
+	private static float chanceToHitFormula(int atk, int defEnemy) {
+		return (float) (0.4 * (1 + (atk - defEnemy) * 0.05));
 	}
 
 	void attackOfOpportunity(UnitStats target) {
@@ -304,45 +326,57 @@ public class UnitStats implements UnitStatsInfo {
 
 	private final DamageInstance temp = new DamageInstance();
 
-	public void applyDamage(float damage) {
+	/**
+	 * 
+	 * @return The final amount of damage dealt, after modifications
+	 */
+	public float applyDamage(float damage) {
 		temp.clear();
 		temp.damage = damage;
-		applyDamage(temp);
+		return applyDamage(temp);
 	}
 
-	public void applyDamage(float damage, DamageEffectParams effectParams) {
+	public float applyDamage(float damage, DamageEffectParams effectParams) {
 		temp.clear();
 		temp.damage = damage;
-		applyDamage(temp, effectParams);
+		return applyDamage(temp, effectParams);
 	}
 
-	public void applyDamage(DamageInstance d) {
-		processDamage(d, null);
+	/**
+	 * DamageInstance is not modified, can reuse if you want
+	 */
+	public float applyDamage(DamageInstance d) {
+		return processDamage(d, null);
 	}
 
-	public void applyDamage(DamageInstance d, DamageEffectParams effectParams) {
-		processDamage(d, effectParams);
+	public float applyDamage(DamageInstance d, DamageEffectParams effectParams) {
+		return processDamage(d, effectParams);
 	}
 
-	private void processDamage(DamageInstance d, DamageEffectParams effectParams) {
-		applyExactDamage(calculatePostArmorDamage(d.damage, d.armorPiercing, d.armorNegation), effectParams);
+	private float processDamage(DamageInstance d, DamageEffectParams effectParams) {
+		if (d.type == DamageType.BLEED) {
+			subtractHp(d.damage);
+			gfx.makeDamageEffect(d, self, effectParams);
+			return d.damage;
+		} else {
+			final float actualDamage = calculatePostArmorDamage(d.damage, d.armorPiercing, d.armorNegation);
+			subtractHp(actualDamage);
+			DamageInstance actual = new DamageInstance(d);
+			actual.damage = actualDamage;
+			gfx.makeDamageEffect(d, self, effectParams);
+			return actualDamage;
+		}
 	}
 
 	/**
 	 * Ignores all damage reduction, internal method
 	 */
-	private void applyExactDamage(float damage, DamageEffectParams effectParams) {
+	private void subtractHp(float damage) {
 		hp -= damage;
 		if (hp <= 0) {
 			hp = 0;
 			self.unitDies();
 		}
-		if (effectParams == null) {
-			gfx.makeDamageEffect(damage, self);
-		} else {
-			gfx.makeDamageEffect(damage, self, effectParams);
-		}
-
 	}
 
 	/**
@@ -689,10 +723,22 @@ public class UnitStats implements UnitStatsInfo {
 		}
 	}
 
+	/**
+	 * Returns a copy, safe to modify. Since equip bonuses is a calculated value, you can't modify it
+	 * directly
+	 */
 	@Override
 	public UnitStatValues getEquipBonuses() {
 		try {
 			return (UnitStatValues) calc.equipBonus.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public UnitStatValues getEquipBonusesHands() {
+		try {
+			return (UnitStatValues) calc.equipBonusHands.clone();
 		} catch (CloneNotSupportedException e) {
 			throw new RuntimeException(e);
 		}
@@ -705,6 +751,11 @@ public class UnitStats implements UnitStatsInfo {
 		} catch (CloneNotSupportedException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	@Override
+	public UnitStatValues getFinalStats() {
+		return calc.getFinalStats();
 	}
 
 	public float getAtkspd() {
@@ -730,15 +781,15 @@ public class UnitStats implements UnitStatsInfo {
 	}
 
 	public enum DamageType {
-		NORMAL, MAGIC
+		NORMAL, MAGIC, BLEED
 	}
 
 	@NonNullByDefault
 	public static class DamageInstance {
-		float armorPiercing = 0;
-		float armorNegation = 0;
-		float damage = 0;
-		DamageType type = DamageType.NORMAL;
+		public float armorPiercing = 0;
+		public float armorNegation = 0;
+		public float damage = 0;
+		public DamageType type = DamageType.NORMAL;
 
 		public DamageInstance() {
 		}
@@ -746,11 +797,18 @@ public class UnitStats implements UnitStatsInfo {
 		public DamageInstance(float damage) {
 			this.damage = damage;
 		}
+		public DamageInstance(DamageInstance src) {
+			armorPiercing = src.armorPiercing;
+			armorNegation = src.armorNegation;
+			damage = src.damage;
+			type  = src.type;
+		}
 
 		public void clear() {
 			armorPiercing = 0;
 			armorNegation = 0;
 			damage = 0;
+			type = DamageType.NORMAL;
 		}
 	}
 }

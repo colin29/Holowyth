@@ -15,6 +15,8 @@ public class UnitStatCalculator {
 	// After recalculateStats() is called, these will accurately reflect the combined skill and equip bonuses
 	final UnitStatValues skillBonus = new UnitStatValues();
 	final UnitStatValues equipBonus = new UnitStatValues();
+	
+	final UnitStatValues equipBonusHands = new UnitStatValues(); // from main hands only
 
 	UnitStatCalculator(UnitStats self) {
 		this.self = self;
@@ -30,12 +32,16 @@ public class UnitStatCalculator {
 
 		calculateSkillStatBonuses(skillBonus);
 		calculateEquipStatBonuses(equipBonus, WornEquips.Slot.HEAD, WornEquips.Slot.BODY, WornEquips.Slot.MAIN_HAND, WornEquips.Slot.ACCESSORY);
+		equipBonusHands.zero();
+		addEquipStatBonuses(equipBonusHands, Slot.MAIN_HAND);
 
 		final @Nullable Equip mainHand = equip.getEquip(WornEquips.Slot.MAIN_HAND);
 		final @Nullable Equip offHand = equip.getEquip(WornEquips.Slot.OFF_HAND);
 		 
-		if (mainHand != offHand) // don't count a 2H weapon twice
+		if (mainHand != offHand) { // don't count a 2H weapon twice
 			addEquipStatBonuses(equipBonus, Slot.OFF_HAND);
+			addEquipStatBonuses(equipBonusHands, Slot.OFF_HAND);
+		}
 
 		my.set(self.base);
 		my.add(skillBonus);
@@ -167,6 +173,16 @@ public class UnitStatCalculator {
 
 	public int getRangedForce() {
 		return my.rangedForce;
+	}
+	/**
+	 * Returns a copy
+	 */
+	public UnitStatValues getFinalStats() {
+		try {
+			return (UnitStatValues) my.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 

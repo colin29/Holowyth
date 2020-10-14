@@ -73,5 +73,7 @@ public interface UnitStatsInfo {
 
 	int getRangedForce();
 
+	UnitStatValues getFinalStats();
+
 
 }

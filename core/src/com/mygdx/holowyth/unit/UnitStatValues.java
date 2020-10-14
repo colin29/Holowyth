@@ -118,6 +118,40 @@ public class UnitStatValues implements Cloneable {
 	}
 	
 	/**
+	 * Subtracts from the second set of values from the first
+	 */
+	public UnitStatValues subtract(UnitStatValues other) {
+		str -= other.str;
+		agi -= other.agi;
+		fort -= other.fort;
+		percep -= other.percep;
+
+		maxHp -= other.maxHp;
+		maxSp -= other.maxSp;
+
+		damage -= other.damage;
+		
+		atkspd -= other.atkspd;
+		
+		atk -= other.atk;
+		def -= other.def;
+		force -= other.force;
+		stab -= other.stab;
+		dodge -= other.dodge;
+
+		armor -= other.armor;
+		armorPiercing -= other.armorPiercing;
+		percentArmor -= other.percentArmor;
+		armorNegate -= other.armorNegate;
+		
+		rangedDamage -= other.rangedDamage;
+		rangedAtk  -= other.rangedAtk;
+		rangedForce -= other.rangedForce;
+
+		return this;
+	}
+	
+	/**
 	 * Sets both damage and ranged damage to value
 	 */
 	public void setGeneralDamage(float value) {

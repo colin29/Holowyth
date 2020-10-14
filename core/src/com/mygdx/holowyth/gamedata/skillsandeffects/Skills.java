@@ -42,7 +42,7 @@ public class Skills {
 	
 	public static final List<ActiveSkill> darkKnightSkills = Collections
 			.unmodifiableList(Arrays.asList(new DarkKnightSkills.BladeInTheDark(), 
-					new DarkKnightSkills.ThrowSand()));
+					new DarkKnightSkills.ThrowKnife()));
 	
 
 	private static final String headerText = "Skill name; SP cost; Cast time (sec); Cooldown (sec); Global CD; Description";

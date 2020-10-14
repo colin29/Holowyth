@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
+import org.eclipse.jdt.annotation.Nullable;
+
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -20,6 +22,8 @@ import com.mygdx.holowyth.graphics.effects.texteffect.DamageEffect;
 import com.mygdx.holowyth.graphics.effects.texteffect.SkillNameEffect;
 import com.mygdx.holowyth.graphics.effects.texteffect.SkillNameEffectsMap;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.UnitStats.DamageInstance;
+import com.mygdx.holowyth.unit.UnitStats.DamageType;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
@@ -131,6 +135,10 @@ public class EffectsHandler {
 		skillNameEffects.addSkillTextOn(unit, effect);
 	}
 
+	public enum DamageEffectType {
+		NORMAL, DAMAGE_OVER_TIME;
+	}
+
 	public static class DamageEffectParams {
 		public boolean useFastEffect;
 	}
@@ -138,15 +146,31 @@ public class EffectsHandler {
 	private static final DamageEffectParams DEFAULT_DAMAGE_EFFECT_PARAMS = new DamageEffectParams();
 
 	private static float verticalOffset = 5;
-	
+
 	public void makeDamageEffect(float damage, UnitInfo unit) {
 		makeDamageEffect(damage, unit, DEFAULT_DAMAGE_EFFECT_PARAMS);
 	}
 
 	public void makeDamageEffect(float damage, UnitInfo unit, DamageEffectParams params) {
-		BitmapFont font = unit.isAPlayerCharacter() ? Holowyth.fonts.alliedDamageEffectFont
-				: Holowyth.fonts.regularDamageEffectFont;
-		var effect = new DamageEffect(DataUtil.roundFully(damage), unit.getPos(), font);
+		makeDamageEffect(new DamageInstance(damage), unit, params);
+	}
+
+	/**
+	 * If you are using a non-standard damage type you should call this method to get the right font
+	 */
+	public void makeDamageEffect(DamageInstance d, UnitInfo unit, @Nullable DamageEffectParams params) {
+		if(params == null) {
+			params = DEFAULT_DAMAGE_EFFECT_PARAMS;
+		}
+		
+		BitmapFont font;
+		if(d.type == DamageType.BLEED) {
+			font = Holowyth.fonts.dmgOverTimeEffectFont;
+		}else {
+			font = unit.isAPlayerCharacter() ? Holowyth.fonts.alliedDamageEffectFont
+					: Holowyth.fonts.regularDamageEffectFont;	
+		}
+		var effect = new DamageEffect(DataUtil.roundFully(d.damage), unit.getPos(), font);
 		if (params.useFastEffect) {
 			effect.setInitialSpeed(3);
 			effect.setDuration(80);

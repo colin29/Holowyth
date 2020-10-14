@@ -23,6 +23,8 @@ public class Fonts {
 	public final BitmapFont alliedDamageEffectFont = border("fonts/OpenSans.ttf", DARK_RED, 19, Color.BLACK, 1.5f);
 	public final BitmapFont missEffectFont = border("fonts/OpenSans.ttf", Color.WHITE, 17, Color.GRAY, 0.5f);
 	public final BitmapFont healEffectFont = border("fonts/OpenSans.ttf", Color.LIME, 19, Color.BLACK, 0.8f);
+	private static Color PURPLE = HoloGL.rgb(205, 71, 193);
+	public final BitmapFont dmgOverTimeEffectFont = border("fonts/OpenSans.ttf", PURPLE, 19, Color.BLACK, 0.8f);
 	
 
 	BitmapFont normal(String path, Color color, int size) {
