@@ -32,8 +32,8 @@ public class GameLogDisplay {
 
 		root.left().bottom();
 
-		debugStyleNormal = new LabelStyle(Holowyth.fonts.debugFont(), Color.WHITE);
-		debugStyleError = new LabelStyle(Holowyth.fonts.debugFont(), Color.RED);
+		debugStyleNormal = new LabelStyle(Holowyth.fonts.debugFont, Color.WHITE);
+		debugStyleError = new LabelStyle(Holowyth.fonts.debugFont, Color.RED);
 
 		logPanel.left();
 		logPanel.fill();

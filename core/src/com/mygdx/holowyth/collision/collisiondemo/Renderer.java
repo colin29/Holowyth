@@ -74,7 +74,7 @@ public class Renderer {
 	private void renderObjectIds() {
 		batch.begin();
 		for (CircleObject o : simulation.getCircleObjects()) {
-			Holowyth.fonts.borderedMediumFont().draw(batch, String.valueOf(o.id), o.getX(), o.getY());
+			Holowyth.fonts.mediumUIFont.draw(batch, String.valueOf(o.id), o.getX(), o.getY());
 		}
 		batch.end();
 	}

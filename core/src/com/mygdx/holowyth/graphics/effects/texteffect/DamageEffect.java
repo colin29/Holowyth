@@ -4,7 +4,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
- * An effect that displays a number that slides upwards and eventually fades
+ * An effect that displays a number that slides upwards and eventually fades. Used for displaying damage numbers, but also healing and misses
  * 
  * @author Colin Ta
  *

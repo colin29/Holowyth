@@ -321,10 +321,10 @@ public class GameScreenRenderer {
 			renderMapLocations ^= true;
 
 		if (renderMapRegions)
-			GameMapRenderer.renderMapRegions(Holowyth.fonts.debugFont(), map, shapeDrawer, batch);
+			GameMapRenderer.renderMapRegions(Holowyth.fonts.debugFont, map, shapeDrawer, batch);
 		if (renderMapLocations)
-			GameMapRenderer.renderLocations(Holowyth.fonts.debugFont(), map, shapeDrawer, batch);
-		GameMapRenderer.renderEntrances(Holowyth.fonts.debugFont(), map, shapeDrawer, batch);
+			GameMapRenderer.renderLocations(Holowyth.fonts.debugFont, map, shapeDrawer, batch);
+		GameMapRenderer.renderEntrances(Holowyth.fonts.debugFont, map, shapeDrawer, batch);
 
 		if (Gdx.input.isKeyPressed(showMapPathingGraphKey)) {
 			basicPathing.renderGraph(true);

@@ -97,8 +97,8 @@ public class CombatDemo extends GameScreen implements Screen, InputProcessor {
 	}
 
 	private void createVictoryPanel() {
-		var largeStyle = new LabelStyle(Holowyth.fonts.borderedLargeFont(), Color.WHITE);
-		var medStyle = new LabelStyle(Holowyth.fonts.borderedMediumFont(), Color.WHITE);
+		var largeStyle = new LabelStyle(Holowyth.fonts.largeUIFont, Color.WHITE);
+		var medStyle = new LabelStyle(Holowyth.fonts.mediumUIFont, Color.WHITE);
 
 		Table frame = new Table();
 		Label mainText = new Label("Victory!", largeStyle);
@@ -118,8 +118,8 @@ public class CombatDemo extends GameScreen implements Screen, InputProcessor {
 	}
 
 	private void createDefeatPanel() {
-		var largeStyle = new LabelStyle(Holowyth.fonts.borderedLargeFont(), Color.WHITE);
-		var medStyle = new LabelStyle(Holowyth.fonts.borderedMediumFont(), Color.WHITE);
+		var largeStyle = new LabelStyle(Holowyth.fonts.largeUIFont, Color.WHITE);
+		var medStyle = new LabelStyle(Holowyth.fonts.mediumUIFont, Color.WHITE);
 
 		Table frame = new Table();
 		Label mainText = new Label("Defeat", largeStyle);
@@ -157,7 +157,7 @@ public class CombatDemo extends GameScreen implements Screen, InputProcessor {
 			"Blind: Prevents units from casting skills, and also interrupts ranged skills.";
 
 	private void createInstructionsPanel() {
-		var style = new LabelStyle(Holowyth.fonts.debugFont(), Color.WHITE);
+		var style = new LabelStyle(Holowyth.fonts.debugFont, Color.WHITE);
 		var panel = instructionsPanel;
 
 		Table frame = new Table();

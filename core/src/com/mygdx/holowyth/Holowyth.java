@@ -44,8 +44,7 @@ public class Holowyth extends Game {
 
 	/* Fonts */
 
-	public final static MyFonts fonts = new MyFonts();
-
+	public static Fonts fonts;
 	/* Skins */
 	public Skin skin;
 
@@ -133,7 +132,7 @@ public class Holowyth extends Game {
 	}
 
 	private void initFonts() {
-		fonts.init();
+		fonts = new Fonts();
 	}
 
 	private void createAndSetToScreen(Class<? extends Screen> clazz) {

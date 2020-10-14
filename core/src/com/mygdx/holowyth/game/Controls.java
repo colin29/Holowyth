@@ -120,13 +120,13 @@ public class Controls extends InputProcessorAdapter {
 		this.mapInstance = world;
 		this.units = units;
 
-		this.font = Holowyth.fonts.debugFont();
+		this.font = Holowyth.fonts.debugFont;
 		this.game = game;
 		this.skin = game.skin;
 
 		this.gameLog = gameLog;
 
-		labelStyle = new LabelStyle(Holowyth.fonts.debugFont(), Holo.debugFontColor);
+		labelStyle = new LabelStyle(Holowyth.fonts.debugFont, Holo.debugFontColor);
 
 		logger.debug("Controls initialized");
 

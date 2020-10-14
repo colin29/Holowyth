@@ -9,6 +9,9 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
@@ -31,8 +34,12 @@ public class ButtonsDemo extends HoloBaseScreen {
 	InputMultiplexer multiplexer = new InputMultiplexer();
 	private Label coordInfo;
 
+	public final BitmapFont goth24;
+	
 	public ButtonsDemo(Holowyth game) {
 		super(game);
+		goth24 = normal("fonts/MS_Gothic.ttf", Color.WHITE, 24);
+		
 		createUIElements();
 		multiplexer.addProcessor(stage);
 		multiplexer.addProcessor(inputProcessor);
@@ -65,7 +72,7 @@ public class ButtonsDemo extends HoloBaseScreen {
 
 		TextButtonStyle style = new TextButtonStyle(VisUI.getSkin().get(TextButtonStyle.class));
 
-		style.font = Holowyth.fonts.moderateFont();
+		style.font = goth24;
 		style.fontColor = Color.FOREST;
 
 		TextButton b1 = new TextButton("test button", game.skin);
@@ -93,6 +100,20 @@ public class ButtonsDemo extends HoloBaseScreen {
 		});
 	}
 
+	
+	BitmapFont normal(String path, Color color, int size) {
+		FreeTypeFontGenerator.setMaxTextureSize(FreeTypeFontGenerator.NO_MAXIMUM);
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(Holowyth.ASSETS_PATH + path));
+		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
+		parameter.size = size;
+		// HoloUI.addJapaneseCharacters(parameter);
+		parameter.color = color;
+		BitmapFont font = generator.generateFont(parameter);
+		generator.dispose();
+		return font;
+	}
+
+	
 	/**
 	 * Adds a small coordinate text that displays the mouse cursor position in world coordinates
 	 */

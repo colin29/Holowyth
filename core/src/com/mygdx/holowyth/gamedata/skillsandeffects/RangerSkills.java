@@ -49,7 +49,7 @@ public class RangerSkills {
 			name = "Archery";
 			casting.castTime = 0.6f * 60;
 			spCost = 8;
-			cooldown = 60 * 10;
+			cooldown = 10 * 60;
 			requiresLOS = true;
 			setMaxRange(600);
 			addTag(Tag.RANGED);

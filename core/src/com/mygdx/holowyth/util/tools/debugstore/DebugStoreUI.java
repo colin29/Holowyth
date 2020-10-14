@@ -51,7 +51,7 @@ public class DebugStoreUI {
 		valueLabelMapping = new ValueLabelMapping();
 		debugTable.clear();
 
-		LabelStyle debugStyle = new LabelStyle(Holowyth.fonts.debugFont(), Color.BLACK);
+		LabelStyle debugStyle = new LabelStyle(Holowyth.fonts.debugFont, Color.BLACK);
 
 		for (Map.Entry<String, DebugValues> entry : debugStore.getStore().entrySet()) {
 			String componentName = entry.getKey();

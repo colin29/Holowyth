@@ -86,21 +86,21 @@ public class EffectsHandler {
 		for (DamageEffect d : damageEffects) {
 			BitmapFont font;
 			if (d instanceof MissEffect) {
-				font = Holowyth.fonts.missEffectFont();
+				font = Holowyth.fonts.missEffectFont;
 			} else {
 				if (d.isUsingPreset()) {
 					switch (d.presetType) {
 					case ENEMY:
-						font = Holowyth.fonts.damageEffectRegular();
+						font = Holowyth.fonts.regularDamageEffectFont;
 						break;
 					case PLAYER:
-						font = Holowyth.fonts.damageEffectPlayer();
+						font = Holowyth.fonts.alliedDamageEffectFont;
 						break;
 					default:
 						throw new IllegalStateException("Unhandled DamageEffect preset");
 					}
 				} else {
-					font = Holowyth.fonts.damageEffectRegular();
+					font = Holowyth.fonts.regularDamageEffectFont;
 					font.setColor(d.color);
 				}
 			}
