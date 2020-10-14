@@ -1,6 +1,9 @@
 package com.mygdx.holowyth.game;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.util.Holo;
 
 public class TestGameScreen extends StandardGameScreen {
 
@@ -17,6 +20,10 @@ public class TestGameScreen extends StandardGameScreen {
 				vn.hide();
 			});	
 		}
+		
+		
+		Music music = Gdx.audio.newMusic(Gdx.files.internal(Holo.BGM_DISK_PATH + "Peritune_Wonder2.mp3"));
+		music.play();
 		
 	}
 

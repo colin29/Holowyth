@@ -13,6 +13,7 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.mygdx.holowyth.test.demos.combatdemo.CombatDemo;
+import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;
 
 public class LoadingScreen extends HoloBaseScreen {
@@ -74,7 +75,7 @@ public class LoadingScreen extends HoloBaseScreen {
 
 	private void loadAllImagesInDirectory(String dirPath) {
 //		listFiles(Holowyth.ASSETS_DISK_PATH + dirPath);
-		loadAllImagesInDirectory(new File(Holowyth.ASSETS_DISK_PATH + dirPath));
+		loadAllImagesInDirectory(new File(Holo.ASSETS_DISK_PATH + dirPath));
 	}
 	private void listFiles(String dirPath){
 		FileHandle[] files = Gdx.files.internal(dirPath).list();
@@ -87,7 +88,7 @@ public class LoadingScreen extends HoloBaseScreen {
 	private void loadAllImagesInDirectory(File dir) {
 		
 		 logger.debug("Loaded images in directory: {}" , StringUtils.removeStart(dir.getPath().replace("\\",
-		 "/"), Holowyth.ASSETS_DISK_PATH));
+		 "/"), Holo.ASSETS_DISK_PATH));
 
 		File[] images = dir.listFiles(new FilenameFilter() {
 			@Override
@@ -105,7 +106,7 @@ public class LoadingScreen extends HoloBaseScreen {
 			TextureParameter param = new TextureParameter();
 			param.genMipMaps = true;
 
-			String dirPath = StringUtils.removeStart(dir.getPath().replace("\\", "/"), Holowyth.ASSETS_DISK_PATH);
+			String dirPath = StringUtils.removeStart(dir.getPath().replace("\\", "/"), Holo.ASSETS_DISK_PATH);
 			// System.out.println("loaded: " + dirPath + "/" + image.getName());
 			game.assets.load(dirPath + "/" + image.getName(), Texture.class, param);
 		}

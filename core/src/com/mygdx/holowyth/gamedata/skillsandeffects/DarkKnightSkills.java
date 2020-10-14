@@ -71,7 +71,7 @@ public class DarkKnightSkills {
 		@Override
 		public String getDescription() {
 			return String.format(
-					"Throw a knife at the target dealing %s+%s damage, and inflicting 'Bleeding' for %s of damage dealt over %s seconds. Does not benefit from weapons or shields.",
+					"Throw a knife at the target dealing %s+%s damage, and inflicting 'Bleeding' for %s of damage dealt, over %s seconds. Does not benefit from weapons or shields.",
 					DataUtil.percentage(atkDamageMultiplier), knifeDamage, DataUtil.percentage(bleedDamageRatio),
 					DataUtil.asSeconds(bleedTickInterval * bleedTotalTicks));
 		}

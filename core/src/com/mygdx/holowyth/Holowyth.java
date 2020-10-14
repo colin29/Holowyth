@@ -26,6 +26,7 @@ import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.test.demos.combatdemo.CombatDemo;
 import com.mygdx.holowyth.town.TownScreen;
 import com.mygdx.holowyth.unit.sprite.Animations;
+import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.world.World;
 
@@ -38,8 +39,6 @@ public class Holowyth extends Game {
 	public SpriteBatch batch;
 	public ShapeRenderer shapeRenderer;
 
-	public static final String ASSETS_DISK_PATH = "./resources/assets/";
-	public static final String ASSETS_PATH = "assets/";
 	public @NonNull AssetManager assets;
 
 	/* Fonts */
@@ -66,7 +65,7 @@ public class Holowyth extends Game {
 	}
 
 	public Holowyth(Class<? extends Screen> clazz) {
-		assets = new PrefixingAssetManager(ASSETS_PATH);
+		assets = new PrefixingAssetManager(Holo.ASSETS_PATH);
 		screenClassToLoad = clazz;
 	}
 

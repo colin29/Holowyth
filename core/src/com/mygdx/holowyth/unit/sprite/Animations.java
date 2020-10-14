@@ -12,7 +12,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Animation.PlayMode;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
 import com.mygdx.holowyth.util.exceptions.HoloResourceNotFoundException;
 
@@ -112,7 +112,7 @@ public class Animations {
 	
 	private static @NonNull TextureRegion[] getKeyFrames(String path, int frameWidth, int frameHeight) {
 		
-		Texture origTexture  = new Texture(Gdx.files.internal(Holowyth.ASSETS_DISK_PATH + path));
+		Texture origTexture  = new Texture(Gdx.files.internal(Holo.ASSETS_DISK_PATH + path));
 		
 		@SuppressWarnings("null")
 		@NonNull TextureRegion[][] tex = TextureRegion.split(origTexture,

@@ -6,11 +6,11 @@ import java.util.ListIterator;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.graphics.effects.particle.ParticleEffect;
 import com.mygdx.holowyth.graphics.effects.particle.ParticleEffectPool;
 import com.mygdx.holowyth.graphics.effects.particle.ParticleEffectPool.PooledEffect;
 import com.mygdx.holowyth.graphics.effects.particle.ParticleEmitter;
+import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
 public class SparksEffectHandler {
@@ -25,8 +25,8 @@ public class SparksEffectHandler {
 
 	SparksEffectHandler(SpriteBatch batch, OrthographicCamera camera, DebugStore debugStore) {
 		effectBlueprint = new ParticleEffect();
-		effectBlueprint.load(Gdx.files.internal(Holowyth.ASSETS_PATH + "vfx/sparks.p"),
-				Gdx.files.internal(Holowyth.ASSETS_PATH + "vfx"));
+		effectBlueprint.load(Gdx.files.internal(Holo.ASSETS_PATH + "vfx/sparks.p"),
+				Gdx.files.internal(Holo.ASSETS_PATH + "vfx"));
 		effectBlueprint.setPosition(300, 300);
 		effectPool = new ParticleEffectPool(effectBlueprint, 20, 20);
 

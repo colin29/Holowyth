@@ -12,8 +12,8 @@ import com.mygdx.holowyth.util.dataobjects.Point;
  */
 public class DamageEffect {
 	
-	private static int standardDuration = 110;
-	private static float standardInitialSpeed = 0.4f;
+	private static int standardDuration =  100; //130;
+	private static float standardInitialSpeed = 2f; //0.4f;
 
 	public int fullOpacityDuration;
 	
@@ -36,7 +36,7 @@ public class DamageEffect {
 		this.origY = y;
 		this.x = x;
 		this.y = y;
-		fullOpacityDuration = duration / 3;
+		fullOpacityDuration = duration / 4;
 		this.font = font;
 	}
 
@@ -83,6 +83,10 @@ public class DamageEffect {
 
 	public void setInitialSpeed(float value) {
 		initialSpeed = value;
+	}
+
+	public float getInitialSpeed() {
+		return initialSpeed;
 	}
 
 }

@@ -6,7 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.util.Holo;
 
 /**
  * 
@@ -27,7 +27,7 @@ public class AnimatedSprite {
 	private Texture walkSheet;
 
 	public AnimatedSprite(String path) {
-		walkSheet = new Texture(Gdx.files.internal(Holowyth.ASSETS_PATH + path));
+		walkSheet = new Texture(Gdx.files.internal(Holo.ASSETS_PATH + path));
 		TextureRegion[][] tex = TextureRegion.split(walkSheet,
 				32,
 				32);

@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator.FreeTypeFontParameter;
 import com.mygdx.holowyth.graphics.HoloGL;
+import com.mygdx.holowyth.util.Holo;
 
 public class Fonts {
 
@@ -29,7 +30,7 @@ public class Fonts {
 
 	BitmapFont normal(String path, Color color, int size) {
 		FreeTypeFontGenerator.setMaxTextureSize(FreeTypeFontGenerator.NO_MAXIMUM);
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(Holowyth.ASSETS_PATH + path));
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(Holo.ASSETS_PATH + path));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = size;
 		// HoloUI.addJapaneseCharacters(parameter);
@@ -41,7 +42,7 @@ public class Fonts {
 
 	BitmapFont border(String path, Color color, int size, Color borderColor, float borderWidth) {
 		FreeTypeFontGenerator.setMaxTextureSize(FreeTypeFontGenerator.NO_MAXIMUM);
-		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(Holowyth.ASSETS_PATH + path));
+		FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal(Holo.ASSETS_PATH + path));
 		FreeTypeFontParameter parameter = new FreeTypeFontParameter();
 		parameter.size = size;
 		parameter.borderWidth = borderWidth;

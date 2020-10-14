@@ -145,7 +145,7 @@ public class EffectsHandler {
 
 	private static final DamageEffectParams DEFAULT_DAMAGE_EFFECT_PARAMS = new DamageEffectParams();
 
-	private static float verticalOffset = 5;
+	private static float verticalOffset = -5;
 
 	public void makeDamageEffect(float damage, UnitInfo unit) {
 		makeDamageEffect(damage, unit, DEFAULT_DAMAGE_EFFECT_PARAMS);
@@ -168,7 +168,7 @@ public class EffectsHandler {
 			font = Holowyth.fonts.dmgOverTimeEffectFont;
 		}else {
 			font = unit.isAPlayerCharacter() ? Holowyth.fonts.alliedDamageEffectFont
-					: Holowyth.fonts.regularDamageEffectFont;	
+					: Holowyth.fonts.regularDamageEffectFont;
 		}
 		var effect = new DamageEffect(DataUtil.roundFully(d.damage), unit.getPos(), font);
 		if (params.useFastEffect) {
@@ -177,11 +177,15 @@ public class EffectsHandler {
 			effect.fullOpacityDuration = 50;
 		}
 		effect.y += verticalOffset;
+		if(unit.isAPlayerCharacter()) {
+			effect.setInitialSpeed(effect.getInitialSpeed()*0.65f);
+		}
 		damageEffects.add(effect);
 	}
 
 	public void makeHealEffect(float amount, UnitInfo unit) {
 		var effect = new DamageEffect(DataUtil.roundFully(amount), unit.getPos(), Holowyth.fonts.healEffectFont);
+		effect.setInitialSpeed(effect.getInitialSpeed()*0.65f);
 		effect.y += verticalOffset;
 		damageEffects.add(effect);
 	}

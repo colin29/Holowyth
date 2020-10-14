@@ -11,6 +11,10 @@ import com.badlogic.gdx.graphics.Color;
 public class Holo {
 
 	// Paths
+	public static final String ASSETS_PATH = "assets/";
+	public static final String ASSETS_DISK_PATH = "./resources/assets/";
+	public static final String BGM_DISK_PATH = ASSETS_DISK_PATH + "bgm/";
+	
 	public static String simpleMapsDirectory = "resources/assets/maps/old/";
 	public static String mapsDirectory = "assets/maps/";
 
@@ -29,7 +33,7 @@ public class Holo {
 	public static final int GAME_FPS = 60;
 
 	// Pathfinding and collision detection
-	public static float defaultUnitMoveSpeed = 1.2f; //6f; //0.8 // world units per frame
+	public static float defaultUnitMoveSpeed = 1f; //1.2f //6f; //0.8 // world units per frame
 	public static float collisionClearanceDistance = defaultUnitMoveSpeed / 5; // extra distance "pushed out" by the
 																				// collision detection upon collision
 	public static float epsilon = 0.001f;
@@ -94,5 +98,6 @@ public class Holo {
 		}
 
 	}
+
 
 }
