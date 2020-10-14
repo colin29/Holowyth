@@ -1,65 +1,56 @@
 package com.mygdx.holowyth.graphics.effects.texteffect;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
- * An effect that displays a number that slides upwards and eventually fades. Used for displaying damage numbers, but also healing and misses
+ * An effect that displays a number that slides upwards and eventually fades. Also used for showing healing numbers and misses
  * 
  * @author Colin Ta
  *
  */
 public class DamageEffect {
-
+	
 	private static int standardDuration = 110;
 	private static float standardInitialSpeed = 0.4f;
 
-	protected int fullOpacityDuration;
-
-	protected float initialSpeed;
-	protected int duration;
-	protected int durationLeft;
+	public int fullOpacityDuration;
+	
+	protected float initialSpeed = standardInitialSpeed;
+	protected int duration = standardDuration;
+	protected int durationLeft = duration;
 
 	public String text;
 	float origX, origY;
 	public float x;
 	public float y;
+	
+	public BitmapFont font;
 
 	public Color color = Color.WHITE; // color only applies if presetType is null
 
-	public enum PresetType {
-		PLAYER, ENEMY;
-	}
-
-	public PresetType presetType;
-
-	DamageEffect(String text, float x, float y) {
+	DamageEffect(String text, float x, float y, BitmapFont font) {
 		this.text = text;
 		this.origX = x;
 		this.origY = y;
 		this.x = x;
 		this.y = y;
-		setStartingDuration(standardDuration);
-		setInitialSpeed(standardInitialSpeed);
 		fullOpacityDuration = duration / 3;
+		this.font = font;
 	}
 
-	DamageEffect(String text, Point pos) {
-		this(text, pos.x, pos.y);
+	public DamageEffect(String text, Point pos, BitmapFont font) {
+		this(text, pos.x, pos.y, font);
 	}
 
-	public DamageEffect(String text, Point pos, PresetType presetType) {
-		this(text, pos);
-		this.presetType = presetType;
-	}
-
-	DamageEffect(String text, Point pos, Color color) {
-		this(text, pos);
+	DamageEffect(String text, Point pos, Color color, BitmapFont font) {
+		this(text, pos, font);
 		this.color = color;
 	}
 
-	public DamageEffect(String text, float x, float y, Color color) {
-		this(text, x, y);
+	public DamageEffect(String text, float x, float y, Color color, BitmapFont font) {
+		this(text, x, y, font);
 		this.color = color;
 	}
 
@@ -85,16 +76,12 @@ public class DamageEffect {
 		return durationLeft <= 0;
 	}
 
-	public boolean isUsingPreset() {
-		return presetType != null;
-	}
-
-	protected void setStartingDuration(int value) {
+	public void setDuration(int value) {
 		duration = value;
 		durationLeft = duration;
 	}
 
-	protected void setInitialSpeed(float value) {
+	public void setInitialSpeed(float value) {
 		initialSpeed = value;
 	}
 

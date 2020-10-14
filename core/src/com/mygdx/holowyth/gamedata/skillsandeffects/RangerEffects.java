@@ -6,10 +6,8 @@ import java.util.List;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.mygdx.holowyth.game.ui.StatsPanelUI;
 import com.mygdx.holowyth.gamedata.skillsandeffects.RangerSkills.Archery;
 import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.ArcheryArrow;
-import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.MagicMissileBolt;
 import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.ProjectileBase;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler.DamageEffectParams;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
@@ -23,43 +21,40 @@ public class RangerEffects {
 		}
 
 		int framesElapsed = 0;
-		static int secondStrikeDelay = 60 / 2;
-		static int delayBetweenStrikesInX = 6;
+		static int crossStrikeDelay = 30;
+		static int individualStrikeDelay = 6;
 		static float strikeDamage = 8;
-		boolean attackHits;
+		boolean attackRollSucceeded;
 
 		@Override
 		public void begin() {
-			attackHits = caster.stats.isAttackRollSuccessful(target.stats, 5);
+			attackRollSucceeded = caster.stats.isAttackRollSuccessful(target.stats, 5);
 		}
 
 		@Override
 		public void tick() {
 
-			if (attackHits) {
+			if (attackRollSucceeded) {
 				if (framesElapsed == 0 ||
-						framesElapsed == delayBetweenStrikesInX ||
-						framesElapsed == secondStrikeDelay ||
-						framesElapsed == secondStrikeDelay + delayBetweenStrikesInX) {
+						framesElapsed == individualStrikeDelay ||
+						framesElapsed == crossStrikeDelay ||
+						framesElapsed == crossStrikeDelay + individualStrikeDelay) {
 					DamageEffectParams params = new DamageEffectParams();
 					params.useFastEffect = true;
 					target.stats.applyDamage(strikeDamage, params);
-
 				}
 			} else {
-				if (framesElapsed == delayBetweenStrikesInX) {
+				if (framesElapsed == individualStrikeDelay) {
 					target.stats.doReelRollAgainst(15, 60 * 3);
 				}
-			}
+				if (framesElapsed == 0 || framesElapsed == crossStrikeDelay) {
+					gfx.makeBlockEffect(caster, target);
+				}
 
-			if (framesElapsed == 0 || framesElapsed == secondStrikeDelay) {
-				mapInstance.getGfx().makeBlockEffect(caster, target);
 			}
-
-			if (framesElapsed == secondStrikeDelay + delayBetweenStrikesInX) {
+			if (framesElapsed == crossStrikeDelay + individualStrikeDelay) {
 				markAsComplete();
 			}
-
 			framesElapsed += 1;
 		}
 	}

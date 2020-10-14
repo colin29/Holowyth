@@ -292,7 +292,7 @@ public abstract class GameScreen extends MapLoadingScreen {
 	
 	private void initializeMapLifetimeComponents(final int mapWidth, final int mapHeight) {
 
-		gfx = new EffectsHandler(game.batch, camera, shapeDrawer, assets, stage, skin, debugStore);
+		gfx = new EffectsHandler(game.batch, shapeDrawer, camera, assets, stage, skin, debugStore);
 		
 		mapInstance = new MapInstance(pathingModule, debugStore, gfx, game.animations, assets, getGameLog());
 		controls = new Controls(game, pathingModule, camera, fixedCamera, mapInstance.getUnits(), debugStore, mapInstance, ui.getGameLog());

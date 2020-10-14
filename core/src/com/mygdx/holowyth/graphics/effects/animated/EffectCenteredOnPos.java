@@ -12,7 +12,7 @@ import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.tools.Timer;
 
 @NonNullByDefault
-public class EffectCenteredOnPos extends GraphicEffect {
+public class EffectCenteredOnPos extends AnimatedEffects {
 
 	final AnimatedEffect effect;
 	private Timer timer = new Timer();
