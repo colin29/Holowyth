@@ -16,15 +16,13 @@ public class Fonts {
 	public final BitmapFont largeUIFont = border("fonts/OpenSans.ttf", Color.WHITE, 25, Color.BLACK, 1.5f);
 
 	// Damage effects
-	private static Color PALE_RED = HoloGL.rgb(255, 155, 155);
-	private static Color DARK_RED = HoloGL.rgb(255, 0, 0);
+//	private static Color PALE_RED = HoloGL.rgb(255, 200, 200);
+	private static Color DARK_RED = HoloGL.rgb(227, 20, 0);
 
-	public final BitmapFont regularDamageEffectFont = border("fonts/OpenSans.ttf", Color.WHITE, 16, Color.BLACK, 1.5f);
-	// Slightly larger cause the color is dimmer
-	public final BitmapFont alliedDamageEffectFont = border("fonts/OpenSans.ttf", DARK_RED, 17, PALE_RED, 1.5f);
-	public final BitmapFont missEffectFont = border("fonts/OpenSans.ttf", Color.WHITE, 15, Color.GRAY, 0.5f);
-	
-	public final BitmapFont healEffectFont = border("fonts/OpenSans.ttf", Color.LIME, 16, Color.BLACK, 0.5f);
+	public final BitmapFont regularDamageEffectFont = border("fonts/OpenSans.ttf", Color.WHITE, 18, Color.BLACK, 1.5f);
+	public final BitmapFont alliedDamageEffectFont = border("fonts/OpenSans.ttf", DARK_RED, 19, Color.BLACK, 1.5f);
+	public final BitmapFont missEffectFont = border("fonts/OpenSans.ttf", Color.WHITE, 17, Color.GRAY, 0.5f);
+	public final BitmapFont healEffectFont = border("fonts/OpenSans.ttf", Color.LIME, 19, Color.BLACK, 0.8f);
 	
 
 	BitmapFont normal(String path, Color color, int size) {

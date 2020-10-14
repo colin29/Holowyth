@@ -37,7 +37,9 @@ public class PriestEffects {
 			var effect = new EffectCenteredOnUnit(target, "holy_cross.png", mapInstance, mapInstance.getAnimations());	
 			effect.setSize(72, 72);
 			effect.setAlpha(0.85f);
-			mapInstance.getGfx().addGraphicEffect(effect);
+			gfx.addGraphicEffect(effect);
+			
+			gfx.makeHealEffect(Heal.healAmount, target);
 			markAsComplete();
 		}
 	}

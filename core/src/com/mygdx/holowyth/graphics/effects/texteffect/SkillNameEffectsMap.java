@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 
-public class SkillNameEffects {
+public class SkillNameEffectsMap {
 
 	private Map<UnitInfo, SkillNameEffect> effects = new HashMap<>();
 

@@ -18,7 +18,7 @@ import com.mygdx.holowyth.game.MapInstance;
 import com.mygdx.holowyth.graphics.effects.animated.AnimatedEffects;
 import com.mygdx.holowyth.graphics.effects.texteffect.DamageEffect;
 import com.mygdx.holowyth.graphics.effects.texteffect.SkillNameEffect;
-import com.mygdx.holowyth.graphics.effects.texteffect.SkillNameEffects;
+import com.mygdx.holowyth.graphics.effects.texteffect.SkillNameEffectsMap;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.util.DataUtil;
@@ -40,7 +40,7 @@ public class EffectsHandler {
 
 	private final AssetManager assets;
 	private final ShapeDrawerPlus shapeDrawer;
-	
+
 	private Skin skin;
 
 	private final Stage stage;
@@ -48,34 +48,34 @@ public class EffectsHandler {
 	private final SparksEffectHandler sparksManager;
 	private final List<DamageEffect> damageEffects = new ArrayList<DamageEffect>();
 	private final List<AnimatedEffects> animatedEffects = new ArrayList<>();
-	private final SkillNameEffects skillNameEffects = new SkillNameEffects();
+	private final SkillNameEffectsMap skillNameEffects = new SkillNameEffectsMap();
 
-	public EffectsHandler(SpriteBatch batch, ShapeDrawerPlus shapeDrawer, OrthographicCamera camera, AssetManager assets, Stage stage, Skin skin, DebugStore debugStore) {
+	public EffectsHandler(SpriteBatch batch, ShapeDrawerPlus shapeDrawer, OrthographicCamera camera,
+			AssetManager assets, Stage stage, Skin skin, DebugStore debugStore) {
 		this.batch = batch;
 		this.shapeDrawer = shapeDrawer;
 		this.worldCamera = camera;
 
 		this.stage = stage;
 		this.skin = skin;
-		
+
 		this.assets = assets;
 
 		sparksManager = new SparksEffectHandler(batch, camera, debugStore);
 	}
-	
+
 	public void addGraphicEffect(AnimatedEffects e) {
 		animatedEffects.add(e);
 		e.begin();
 	}
 
-	public void renderDamageEffects() {
+	public void renderDamageTextEffects() {
 		batch.setProjectionMatrix(worldCamera.combined);
 		batch.begin();
 
 		for (DamageEffect d : damageEffects) {
 			BitmapFont font = d.font;
 
-			
 			GlyphLayout glyphLayout = new GlyphLayout();
 			glyphLayout.setText(font, d.text);
 			float width = glyphLayout.width;
@@ -87,14 +87,16 @@ public class EffectsHandler {
 		}
 		batch.end();
 	}
+
 	public void renderAnimatedEffects() {
-		for(var effect : animatedEffects) {
+		for (var effect : animatedEffects) {
 			effect.render(batch, shapeDrawer, assets);
 		}
 	}
 
 	/**
-	 * Ticks effects which operate based on the game logic clock. Vfx particle effects may run independently using delta t
+	 * Ticks effects which operate based on the game logic clock. Vfx particle effects may run
+	 * independently using delta t
 	 */
 	public void tick() {
 		ListIterator<DamageEffect> iter = damageEffects.listIterator();
@@ -108,20 +110,20 @@ public class EffectsHandler {
 
 		skillNameEffects.tick();
 		tickAnimatedEffects();
-		
+
 	}
+
 	private void tickAnimatedEffects() {
-		for(var effect : animatedEffects) {
+		for (var effect : animatedEffects) {
 			effect.tick();
 		}
 		var iter = animatedEffects.iterator();
-		while(iter.hasNext()) {
-			if(iter.next().isComplete()) {
+		while (iter.hasNext()) {
+			if (iter.next().isComplete()) {
 				iter.remove();
 			}
 		}
 	}
-	
 
 	public void makeSkillNameEffect(String text, UnitInfo unit) {
 		var effect = new SkillNameEffect(text, unit, worldCamera, (MapInstance) unit.getMapInstance(), stage, skin);
@@ -132,31 +134,42 @@ public class EffectsHandler {
 	public static class DamageEffectParams {
 		public boolean useFastEffect;
 	}
-	
+
 	private static final DamageEffectParams DEFAULT_DAMAGE_EFFECT_PARAMS = new DamageEffectParams();
+
+	private static float verticalOffset = 5;
+	
 	public void makeDamageEffect(float damage, UnitInfo unit) {
 		makeDamageEffect(damage, unit, DEFAULT_DAMAGE_EFFECT_PARAMS);
 	}
+
 	public void makeDamageEffect(float damage, UnitInfo unit, DamageEffectParams params) {
-		BitmapFont font = unit.isAPlayerCharacter() ? Holowyth.fonts.alliedDamageEffectFont : Holowyth.fonts.regularDamageEffectFont;
+		BitmapFont font = unit.isAPlayerCharacter() ? Holowyth.fonts.alliedDamageEffectFont
+				: Holowyth.fonts.regularDamageEffectFont;
 		var effect = new DamageEffect(DataUtil.roundFully(damage), unit.getPos(), font);
 		if (params.useFastEffect) {
 			effect.setInitialSpeed(3);
 			effect.setDuration(80);
 			effect.fullOpacityDuration = 50;
 		}
+		effect.y += verticalOffset;
 		damageEffects.add(effect);
 	}
+
+	public void makeHealEffect(float amount, UnitInfo unit) {
+		var effect = new DamageEffect(DataUtil.roundFully(amount), unit.getPos(), Holowyth.fonts.healEffectFont);
+		effect.y += verticalOffset;
+		damageEffects.add(effect);
+	}
+
 	/**
-	 * 
-	 * @param unit
-	 *            The unit that missed
+	 * @param unit The unit that missed
 	 */
 	public void makeMissEffect(UnitInfo unit) {
 		float x = unit.getX();
 		float y = unit.getY() + unit.getRadius() / 2;
-		
-		var effect= new DamageEffect("Miss", x, y, Color.WHITE, Holowyth.fonts.missEffectFont);
+
+		var effect = new DamageEffect("Miss", x, y, Color.WHITE, Holowyth.fonts.missEffectFont);
 		damageEffects.add(effect);
 	}
 

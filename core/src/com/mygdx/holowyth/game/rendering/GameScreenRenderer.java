@@ -185,10 +185,10 @@ public class GameScreenRenderer {
 			renderTileGridIfToggled();
 
 			// Effects
-			renderEffects();
-			gfx.renderDamageEffects();
+			renderInGameEffects();
 			gfx.renderBlockEffects(delta);
 			gfx.renderAnimatedEffects();
+			gfx.renderDamageTextEffects();
 		}
 
 		// UI
@@ -420,7 +420,7 @@ public class GameScreenRenderer {
 		batch.end();
 	}
 
-	private void renderEffects() {
+	private void renderInGameEffects() {
 		for (Effect effect : mapInstance.getEffects()) {
 			effect.render(batch, shapeDrawer, game.assets);
 		}
