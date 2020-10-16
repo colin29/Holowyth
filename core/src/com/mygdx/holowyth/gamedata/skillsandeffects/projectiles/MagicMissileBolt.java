@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.holowyth.graphics.effects.animated.AnimEffectOnFixedPos;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
@@ -150,6 +151,7 @@ public class MagicMissileBolt extends ProjectileBase {
 		// Apply knockback stun in direction missile was travelling
 		Vector2 knockBackVec = getVelocity().setLength(0.5f);
 		enemy.stats.doKnockBackRollAgainst(15, 60 * 0.5f, knockBackVec, 1.5f);
+		gfx.addGraphicEffect(new AnimEffectOnFixedPos(pos.x, pos.y, "53.png", mapInstance, mapInstance.getAnimations()));
 
 	}
 }

@@ -13,7 +13,7 @@ import com.mygdx.holowyth.gamedata.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.gamedata.skillsandeffects.Skills;
 import com.mygdx.holowyth.gamedata.units.MonsterStats;
 import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.unit.sprite.AnimatedSprite;
+import com.mygdx.holowyth.unit.sprite.AnimatedUnitSprite;
 import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
@@ -116,7 +116,7 @@ public class CombatPrototyping {
 	}
 
 	private void setPlayerUnitSprites(List<Unit> players) {
-		AnimatedSprite[] sprites = new AnimatedSprite[3];
+		AnimatedUnitSprite[] sprites = new AnimatedUnitSprite[3];
 		Animations animations = mapInstance.getAnimations();
 
 		// default sprites

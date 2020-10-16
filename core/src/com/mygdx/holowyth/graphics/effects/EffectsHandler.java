@@ -17,7 +17,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.game.MapInstance;
-import com.mygdx.holowyth.graphics.effects.animated.AnimatedEffects;
+import com.mygdx.holowyth.graphics.effects.animated.AnimatedEffect;
 import com.mygdx.holowyth.graphics.effects.texteffect.DamageEffect;
 import com.mygdx.holowyth.graphics.effects.texteffect.SkillNameEffect;
 import com.mygdx.holowyth.graphics.effects.texteffect.SkillNameEffectsMap;
@@ -51,7 +51,7 @@ public class EffectsHandler {
 
 	private final SparksEffectHandler sparksManager;
 	private final List<DamageEffect> damageEffects = new ArrayList<DamageEffect>();
-	private final List<AnimatedEffects> animatedEffects = new ArrayList<>();
+	private final List<AnimatedEffect> animatedEffects = new ArrayList<>();
 	private final SkillNameEffectsMap skillNameEffects = new SkillNameEffectsMap();
 
 	public EffectsHandler(SpriteBatch batch, ShapeDrawerPlus shapeDrawer, OrthographicCamera camera,
@@ -68,7 +68,7 @@ public class EffectsHandler {
 		sparksManager = new SparksEffectHandler(batch, camera, debugStore);
 	}
 
-	public void addGraphicEffect(AnimatedEffects e) {
+	public void addGraphicEffect(AnimatedEffect e) {
 		animatedEffects.add(e);
 		e.begin();
 	}

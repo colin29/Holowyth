@@ -6,11 +6,11 @@ import com.mygdx.holowyth.game.MapInstanceInfo;
 import com.mygdx.holowyth.unit.sprite.Animations;
 
 @NonNullByDefault
-public class AnimEffectCenteredOnFixedPos extends AnimEffectCenteredOnPos {
+public class AnimEffectOnFixedPos extends AnimEffectOnPos {
 
-	public AnimEffectCenteredOnFixedPos(float x, float y, String animName, MapInstanceInfo world, Animations animations) {
+	public AnimEffectOnFixedPos(float x, float y, String animName, MapInstanceInfo mapInstance, Animations animations) {
 
-		super(new FixedPosSource(x, y), animName, world, animations);
+		super(new FixedPosSource(x, y), animName, mapInstance, animations);
 	}
 
 	private static class FixedPosSource implements PosSource {

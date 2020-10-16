@@ -8,12 +8,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
 
 @NonNullByDefault
-public class AnimatedEffect {
+public class AnimatedEffectSprite {
 
 	public Animation<@NonNull TextureRegion> anim;
 	public boolean additiveBlending = false;
 
-	public AnimatedEffect(Animation<@NonNull TextureRegion> anim) {
+	public AnimatedEffectSprite(Animation<@NonNull TextureRegion> anim) {
 		this.anim = anim;
 	}
 	

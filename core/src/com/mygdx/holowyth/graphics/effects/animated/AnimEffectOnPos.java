@@ -6,23 +6,24 @@ import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.mygdx.holowyth.game.MapInstanceInfo;
-import com.mygdx.holowyth.unit.sprite.AnimatedEffect;
+import com.mygdx.holowyth.unit.sprite.AnimatedEffectSprite;
 import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.tools.Timer;
 
 @NonNullByDefault
-public class AnimEffectCenteredOnPos extends AnimatedEffects {
+public class AnimEffectOnPos extends AnimatedEffect {
 
-	final AnimatedEffect effect;
+	final AnimatedEffectSprite effect;
 	private Timer timer = new Timer();
 
 	int width, height;
 	float alpha = 1;
+	public boolean loop;
 	
 	PosSource pos;
 
-	public AnimEffectCenteredOnPos(PosSource posSource, String animName, MapInstanceInfo world, Animations animations) {
+	public AnimEffectOnPos(PosSource posSource, String animName, MapInstanceInfo world, Animations animations) {
 		super(world, animations);
 		this.effect = animations.getEffect(animName);
 		
@@ -69,7 +70,12 @@ public class AnimEffectCenteredOnPos extends AnimatedEffects {
 		batch.setBlendFunction(origSrc, origDest);
 		
 		if(effect.anim.isAnimationFinished(timer.getTimeElapsedSeconds())) {
-			markAsComplete();
+			
+			if(loop) {
+				timer.restart();
+			}else {
+				markAsComplete();
+			}
 		}
 		
 	}

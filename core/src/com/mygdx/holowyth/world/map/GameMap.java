@@ -157,8 +157,8 @@ public class GameMap {
 	public @NonNull GameMap cloneObject() {
 		return new GameMap(this);
 	}
-	public void addUnitMarker(int x, int y, UnitMarker template) {
-		UnitMarker m = new UnitMarker(Monsters.goblin);
+	public void addUnitMarker(int x, int y, @NonNull UnitMarker template) {
+		UnitMarker m = new UnitMarker(template);
 		m.pos.set(x, y);
 		unitMarkers.add(m);
 	}

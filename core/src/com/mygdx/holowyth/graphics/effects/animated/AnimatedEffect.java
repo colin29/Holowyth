@@ -16,7 +16,7 @@ import com.mygdx.holowyth.util.ShapeDrawerPlus;
  * Graphics effects that are made up of playing animated sprites
  */
 @NonNullByDefault
-public abstract class AnimatedEffects {
+public abstract class AnimatedEffect {
 
 	/**
 	 * The default marker for complete status. A subclass can override isComplete and define their own
@@ -28,7 +28,7 @@ public abstract class AnimatedEffects {
 	protected final MapInstanceInfo mapInstance;
 	protected final Animations animations;
 
-	public AnimatedEffects(MapInstanceInfo world, Animations animations) {
+	public AnimatedEffect(MapInstanceInfo world, Animations animations) {
 		this.mapInstance = world;
 		this.animations = animations;
 	}

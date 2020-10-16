@@ -12,7 +12,6 @@ public class Timer {
 	
 	long timeOfLastFrame;
 	long timeSinceLastFrame;
-	long curFrame;
 	public long frameNumber = 0;
 	long intervalTimeMili; // in milliseconds
 	long extraTime; // in nanoseconds
@@ -37,6 +36,13 @@ public class Timer {
 			started = true;
 			timeInitial = System.nanoTime();
 		}
+	}
+	public void restart() {
+		timeOfLastFrame = System.nanoTime();
+		started = true;
+		timeInitial = System.nanoTime();
+		frameNumber = 0;
+		timeSinceLastFrame = 0;
 	}
 
 	public boolean taskReady() {

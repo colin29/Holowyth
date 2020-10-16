@@ -18,7 +18,7 @@ import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.test.Projectile;
 import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.test.ProjectileMotion;
 import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.test.ProjectileWithAtk;
 import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.test.StandardProjectileCollision;
-import com.mygdx.holowyth.graphics.effects.animated.AnimEffectCenteredOnUnit;
+import com.mygdx.holowyth.graphics.effects.animated.AnimEffectOnUnit;
 import com.mygdx.holowyth.skill.effect.CasterEffect;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
 import com.mygdx.holowyth.skill.effect.CasterUnitGroundEffect;

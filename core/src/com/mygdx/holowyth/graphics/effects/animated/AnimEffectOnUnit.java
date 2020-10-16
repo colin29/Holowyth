@@ -7,9 +7,9 @@ import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.sprite.Animations;
 
 @NonNullByDefault
-public class AnimEffectCenteredOnUnit extends AnimEffectCenteredOnPos {
+public class AnimEffectOnUnit extends AnimEffectOnPos {
 
-	public AnimEffectCenteredOnUnit(UnitInfo unit, String animName, MapInstanceInfo world, Animations animations) {
+	public AnimEffectOnUnit(UnitInfo unit, String animName, MapInstanceInfo world, Animations animations) {
 
 		super(new UnitPosSource(unit), animName, world, animations);
 	}

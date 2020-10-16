@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.gamedata.skillsandeffects.projectiles;
 
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.holowyth.graphics.effects.animated.AnimEffectOnFixedPos;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
@@ -70,6 +71,7 @@ public class ArcaneBoltBolt extends ProjectileBase {
 
 		Vector2 knockBackVec = getVelocity().setLength(1.5f);
 		enemy.stats.doKnockBackRollAgainst(25, 60 * 3f, knockBackVec);
+		gfx.addGraphicEffect(new AnimEffectOnFixedPos(pos.x, pos.y, "12.png", mapInstance, mapInstance.getAnimations()));
 	}
 
 	private void handleTargetDead() {

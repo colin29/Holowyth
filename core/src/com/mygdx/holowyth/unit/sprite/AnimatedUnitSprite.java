@@ -17,7 +17,7 @@ import com.mygdx.holowyth.util.Holo;
  * @author Colin Ta
  *
  */
-public class AnimatedSprite {
+public class AnimatedUnitSprite {
 
 	private final Animation<TextureRegion> down;
 	private final Animation<TextureRegion> left;
@@ -26,7 +26,7 @@ public class AnimatedSprite {
 
 	private Texture walkSheet;
 
-	public AnimatedSprite(String path) {
+	public AnimatedUnitSprite(String path) {
 		walkSheet = new Texture(Gdx.files.internal(Holo.ASSETS_PATH + path));
 		TextureRegion[][] tex = TextureRegion.split(walkSheet,
 				32,

@@ -30,7 +30,7 @@ public class UnitGraphics {
 	private final int SPRITE_WIDTH = 32;
 	private final int SPRITE_HEIGHT = 32;
 
-	private AnimatedSprite animatedSprite; // can be null
+	private AnimatedUnitSprite animatedSprite; // can be null
 	private @Nullable String headSpriteName;
 
 	private Animation<TextureRegion> activeAnimation;
@@ -104,7 +104,7 @@ public class UnitGraphics {
 		}
 	}
 
-	public void setAnimatedSprite(AnimatedSprite sprite) {
+	public void setAnimatedSprite(AnimatedUnitSprite sprite) {
 		animatedSprite = sprite;
 		if (animatedSprite != null) {
 			activeAnimation = animatedSprite.getDown();
@@ -112,7 +112,7 @@ public class UnitGraphics {
 		}
 	}
 
-	public AnimatedSprite getAnimatedSprite() {
+	public AnimatedUnitSprite getAnimatedSprite() {
 		return animatedSprite;
 	}
 
