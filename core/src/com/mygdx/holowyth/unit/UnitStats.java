@@ -318,7 +318,10 @@ public class UnitStats implements UnitStatsInfo {
 		return postArmorDamage;
 	}
 
-	public void applyHeal(float amount) {
+	public void applyHeal(float amount, boolean isSkill) {
+		if(isSkill) {
+			self.status.removeAllBleedEffects();
+		}
 		if (!isDead()) {
 			hp += amount;
 		}

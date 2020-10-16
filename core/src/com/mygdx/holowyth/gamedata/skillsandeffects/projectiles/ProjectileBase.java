@@ -32,19 +32,25 @@ public abstract class ProjectileBase {
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	protected final Point pos;
-
+	protected float duration;
+	
 	// Speed and Velocity
 	private float speed;
 	private float rotation;
-
-	// Duration
-	protected float duration;
+	/**
+	 * Use getVelocity() instead, this is lazily updated
+	 */
+	private final Vector2 velocity = new Vector2();
+	
+	
 
 	// Sides and Colliding
 	protected final Unit.Side side;
 	protected final MapInstanceInfo mapInstance;
 	protected final EffectsHandler gfx;
 	private float collisionRadius = 0;
+	private boolean collided;
+
 
 	// Extra info for sub-classes
 	@NonNull protected Unit caster;
@@ -86,6 +92,11 @@ public abstract class ProjectileBase {
 		pos.y += velocity.y;
 	}
 
+	private void calculateVelocity() {
+		velocity.set(speed, 0);
+		velocity.rotate(rotation);
+	}
+	
 	protected void setSpeed(float speed) {
 		if (speed < 0) {
 			throw new HoloIllegalArgumentsException("Speed must be non-negative");
@@ -119,13 +130,6 @@ public abstract class ProjectileBase {
 	}
 
 	/**
-	 * Use getVelocity() instead, this is lazily updated
-	 */
-	private final Vector2 velocity = new Vector2();
-
-	private boolean collided;
-
-	/**
 	 * Returns a new vector
 	 */
 	public Vector2 getVelocity() {
@@ -141,10 +145,7 @@ public abstract class ProjectileBase {
 		return getVelocity().y;
 	}
 
-	private void calculateVelocity() {
-		velocity.set(speed, 0);
-		velocity.rotate(rotation);
-	}
+	
 
 	///// Duration /////
 
@@ -182,7 +183,7 @@ public abstract class ProjectileBase {
 		final var motion = new Segment(pos.x, pos.y, pos.x + getVx(), pos.y + getVy());
 		if (!HoloPF.isSegmentPathableAgainstObstaclesNonExpandedSeg(motion, pathing.getObstacleSegs(), pathing.getObstaclePoints(),
 				collisionRadius)) {
-			onCollisionWithObstacle(getX(), getY());
+			onCollisionWithObstacle();
 			collided = true;
 		}
 	}
@@ -195,7 +196,7 @@ public abstract class ProjectileBase {
 	/**
 	 * Action that should happen when projectile collides with terrain.
 	 */
-	protected void onCollisionWithObstacle(float x, float y) {
+	protected void onCollisionWithObstacle() {
 	}
 
 	protected List<Unit> getCollisionTargets() {

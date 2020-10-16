@@ -3,15 +3,21 @@ package com.mygdx.holowyth.gamedata.skillsandeffects;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.mygdx.holowyth.gamedata.skillsandeffects.DarkKnightSkills.ThrowKnife;
 import com.mygdx.holowyth.gamedata.skillsandeffects.RangerSkills.Archery;
-import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.ArcheryArrow;
 import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.ProjectileBase;
+import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.test.HomingProjectileMotion;
+import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.test.Projectile;
+import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.test.StandardProjectileCollision;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler.DamageEffectParams;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.UnitStatValues;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
 
 public class RangerEffects {
@@ -64,16 +70,37 @@ public class RangerEffects {
 			super(caster, target);
 		}
 
-		List<ProjectileBase> missiles = new ArrayList<ProjectileBase>();
-
+		final List<Projectile> missiles = new ArrayList<Projectile>();
 		static float missileVfxRadius = 3;
 
 		@Override
 		public void begin() {
-			var arrow = new ArcheryArrow(caster.x, caster.y,  caster.stats.getRangedDamage() * Archery.atkDamageMultiplier, caster, target);
-			arrow.atkRollSucceeded = caster.stats.isRangedAttackRollSuccessful(target.stats, Archery.atkBonus);
-			missiles.add(arrow);
+			int atk = target.stats.getRangedAtk() + Archery.atkBonus;
+			float damage = caster.stats.getRangedDamage() * Archery.atkDamageMultiplier; 
+			Projectile proj = makeProjectile(atk, damage);
+			missiles.add(proj);
 		}
+	
+		
+		private Projectile makeProjectile(int atk, float damage) {
+			var proj = new Projectile(caster.x, caster.y, caster);
+			proj.setMotion(new HomingProjectileMotion(9f, Unit.getAngleInDegrees(caster, target), target, proj));
+			proj.setCollision(new StandardProjectileCollision(proj) {
+				@Override
+				protected void onCollision(@NonNull Unit enemy) {
+					if (caster.stats.isAttackRollSuccessfulCustomAtkValue(atk, enemy.stats, true)) {
+						enemy.stats.applyDamage(damage);
+						enemy.status.applySlow(0.5f, 3*60);
+					} else {
+						gfx.makeMissEffect(caster);
+						enemy.status.applySlow(0.3f, 3*60);
+					}
+
+				}
+			});
+			return proj;
+		}
+		
 
 		@Override
 		public void tick() {

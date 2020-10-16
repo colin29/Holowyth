@@ -1,5 +1,7 @@
 package com.mygdx.holowyth.unit.interfaces;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.mygdx.holowyth.game.MapInstanceInfo;
 import com.mygdx.holowyth.skill.SkillInfo;
 import com.mygdx.holowyth.unit.Unit.Side;
@@ -18,7 +20,7 @@ public interface UnitInfo {
 
 	public float getY();
 
-	public Side getSide();
+	public @NonNull Side getSide();
 
 	public UnitStatsInfo getStats();
 	

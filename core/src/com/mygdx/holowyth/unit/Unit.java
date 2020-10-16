@@ -74,7 +74,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	private final int id;
 
 	// Fields
-	Side side;
+	@NonNull Side side;
 	private float radius = Holo.UNIT_RADIUS;
 
 	/////////////// World specific state /////////////
@@ -101,12 +101,12 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	}
 
 
-	public Unit(float x, float y, MapInstanceInfo world, Side side, String name) {
+	public Unit(float x, float y, MapInstanceInfo world, @NonNull Side side, String name) {
 		this(x, y, side, world);
 		setName(name);
 	}
 
-	public Unit(float x, float y, Side side, MapInstanceInfo world) {
+	public Unit(float x, float y, @NonNull Side side, MapInstanceInfo world) {
 		this.id = Unit.getNextId();
 		idToUnit.put(id, this);
 
@@ -373,7 +373,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	}
 
 	@Override
-	public Side getSide() {
+	public @NonNull Side getSide() {
 		return side;
 	}
 
@@ -592,6 +592,10 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 
 	public UnitCombat getCombat() {
 		return combat;
+	}
+
+	public static float getAngleInDegrees(Unit u1, Unit u2) {
+		return Point.getAngleInDegrees(u1.getPos(), u2.getPos());
 	}
 
 }

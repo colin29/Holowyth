@@ -41,7 +41,8 @@ public class RangerSkills {
 
 		public static float atkDamageMultiplier = 1.25f;
 		public static int atkBonus = 10;
-		public static float slowAmount = 0.4f;
+		public static float slowAmount = 0.5f;
+		public static float slowAmountBlocked = 0.3f;
 		public static float slowDuration = 3 * 60;
 
 		public Archery() {
@@ -67,8 +68,8 @@ public class RangerSkills {
 
 		@Override
 		public String getDescription() {
-			return String.format("Fires an arrow dealing %s damage and slowing the target by %s for %s seconds",
-					DataUtil.percentage(atkDamageMultiplier), DataUtil.percentage(slowAmount),
+			return String.format("Fires an arrow dealing %s damage and slowing the target by %s~%s for %s seconds",
+					DataUtil.percentage(atkDamageMultiplier), DataUtil.percentage(slowAmountBlocked), DataUtil.percentage(slowAmount),
 					DataUtil.asSeconds(slowDuration));
 		}
 

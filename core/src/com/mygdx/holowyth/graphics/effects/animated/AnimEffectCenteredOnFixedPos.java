@@ -6,9 +6,9 @@ import com.mygdx.holowyth.game.MapInstanceInfo;
 import com.mygdx.holowyth.unit.sprite.Animations;
 
 @NonNullByDefault
-public class EffectCenteredOnFixedPos extends EffectCenteredOnPos {
+public class AnimEffectCenteredOnFixedPos extends AnimEffectCenteredOnPos {
 
-	public EffectCenteredOnFixedPos(float x, float y, String animName, MapInstanceInfo world, Animations animations) {
+	public AnimEffectCenteredOnFixedPos(float x, float y, String animName, MapInstanceInfo world, Animations animations) {
 
 		super(new FixedPosSource(x, y), animName, world, animations);
 	}

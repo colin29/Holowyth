@@ -23,10 +23,10 @@ public class UnitAI {
 	public UnitAI(UnitOrderable unit) {
 		self = unit;
 
-		if (unit.getSide() == Side.ENEMY) {
-			setBTree("enemy");
-			logger.debug(self.getName() + " New btree:" + btree);
-		}
+//		if (unit.getSide() == Side.ENEMY) {
+//			setBTree("enemy");
+//			logger.debug(self.getName() + " New btree:" + btree);
+//		}
 	}
 
 	public void clearMapLifetimeData() {

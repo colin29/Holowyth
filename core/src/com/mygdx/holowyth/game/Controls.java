@@ -431,7 +431,7 @@ public class Controls extends InputProcessorAdapter {
 				List<@NonNull Unit> otherUnits = new ArrayList<>(mapInstance.getUnits());
 				otherUnits.remove(caster);
 				otherUnits.remove(target);
-				if (!HoloPF.isSegmentPathable(caster.x, caster.y, unitUnderCursor.x, unitUnderCursor.y,
+				if (!HoloPF.isSegmentPathable(caster.x, caster.y, target.x, target.y,
 						pathing.getObstacleSegs(), pathing.getObstaclePoints(), otherUnits, 0)) {
 					logger.info("Target is not in LOS");
 					return;

@@ -12,7 +12,7 @@ import com.mygdx.holowyth.util.ShapeDrawerPlus;
 import com.mygdx.holowyth.util.tools.Timer;
 
 @NonNullByDefault
-public class EffectCenteredOnPos extends AnimatedEffects {
+public class AnimEffectCenteredOnPos extends AnimatedEffects {
 
 	final AnimatedEffect effect;
 	private Timer timer = new Timer();
@@ -22,7 +22,7 @@ public class EffectCenteredOnPos extends AnimatedEffects {
 	
 	PosSource pos;
 
-	public EffectCenteredOnPos(PosSource posSource, String animName, MapInstanceInfo world, Animations animations) {
+	public AnimEffectCenteredOnPos(PosSource posSource, String animName, MapInstanceInfo world, Animations animations) {
 		super(world, animations);
 		this.effect = animations.getEffect(animName);
 		

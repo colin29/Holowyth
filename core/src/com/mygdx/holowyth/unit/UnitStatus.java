@@ -68,7 +68,6 @@ public class UnitStatus implements UnitStatusInfo {
 	public void applyBleed(float damagePerTick, int totalTicks, int totalFrames) {
 		bleedEffects.add(new BleedEffect(self, damagePerTick, totalTicks, totalFrames));
 	}
-	
 	/**
 	 * @param slowAmount
 	 *            from 0 to 1, 1 being a total slow
@@ -118,6 +117,10 @@ public class UnitStatus implements UnitStatusInfo {
 		}
 		tauntDurationRemaining = duration;
 		tauntedTowards = tauntSource;
+	}
+
+	public void removeAllBleedEffects() {
+		bleedEffects.clear();
 	}
 
 	public void removeAllBasicAttackSlows() {

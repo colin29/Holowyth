@@ -72,7 +72,7 @@ public class FireballBolt extends ProjectileBase {
 	}
 
 	@Override
-	protected void onCollisionWithObstacle(float x, float y) {
+	protected void onCollisionWithObstacle() {
 		damageEnemiesInRange();
 	}
 
