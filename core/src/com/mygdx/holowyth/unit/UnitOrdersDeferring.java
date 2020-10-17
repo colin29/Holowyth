@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.unit.UnitOrders.Order;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.exceptions.HoloAssertException;
 
 /**
@@ -20,7 +21,7 @@ class UnitOrdersDeferring {
 	 * When a unit stops being stunned, the unit will try to adopt this order. Should not be null.
 	 */
 	private Order deferredOrder = Order.NONE;
-	private Unit deferredOrderTarget; // if the order specifies it
+	private UnitOrderable deferredOrderTarget; // if the order specifies it
 	private float deferredOrderX;
 	private float deferredOrderY;
 
@@ -69,7 +70,7 @@ class UnitOrdersDeferring {
 	 *            Optional
 	 * @param y
 	 */
-	void tryToDeferOrder(Order order, Unit target, float x, float y) {
+	void tryToDeferOrder(Order order, UnitOrderable target, float x, float y) {
 
 		logger.debug("{} Deferring order: {} {} {} {}", self.getName(), order.toString(), target != null ? target.getName() : "null", x, y);
 

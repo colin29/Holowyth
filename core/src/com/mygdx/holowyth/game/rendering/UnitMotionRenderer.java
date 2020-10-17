@@ -4,8 +4,8 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.Path;
-import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 class UnitMotionRenderer extends SubRenderer {
@@ -15,7 +15,7 @@ class UnitMotionRenderer extends SubRenderer {
 	}
 
 	void renderPlayerUnreachedWaypoints(Color color) {
-		for (Unit unit : getMapInstance().getUnits()) {
+		for (UnitOrderable unit : getMapInstance().getUnits()) {
 			if (unit.isAPlayerCharacter() && unit.getMotion().getPath() != null) {
 				Path path = unit.getMotion().getPath();
 				for (int i = unit.getMotion().getWayPointIndex(); i < path.size(); i++) {
@@ -45,7 +45,7 @@ class UnitMotionRenderer extends SubRenderer {
 
 	void renderUnitDestinations(Color color) {
 
-		for (Unit unit : getMapInstance().getUnits()) {
+		for (UnitOrderable unit : getMapInstance().getUnits()) {
 			if (unit.isAPlayerCharacter() && unit.getMotion().getPath() != null) {
 
 				Path path = unit.getMotion().getPath();

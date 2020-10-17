@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.skill;
 
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 
 public class Skill {
 	public String name = "Skill name";
@@ -14,7 +15,7 @@ public class Skill {
 	/**
 	 * Called if the parent unit attacks (doesn't matter success)
 	 */
-	public void onUnitAttack(Unit parent, Unit target) {
+	public void onUnitAttack(Unit parent, UnitOrderable target) {
 	}
 
 }

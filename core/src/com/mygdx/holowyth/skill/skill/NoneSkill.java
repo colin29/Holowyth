@@ -10,6 +10,12 @@ import com.mygdx.holowyth.unit.Unit;
  *
  */
 public abstract class NoneSkill extends ActiveSkill {
+	
+	/**
+	 * Whether the skill requires the unit be attacking
+	 */
+	public boolean isMeleeSkill;
+	
 	protected NoneSkill() {
 		super(Targeting.NONE);
 	}

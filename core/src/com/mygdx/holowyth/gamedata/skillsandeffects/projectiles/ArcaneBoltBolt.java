@@ -3,6 +3,7 @@ package com.mygdx.holowyth.gamedata.skillsandeffects.projectiles;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.graphics.effects.animated.AnimEffectOnFixedPos;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class ArcaneBoltBolt extends ProjectileBase {
@@ -14,9 +15,9 @@ public class ArcaneBoltBolt extends ProjectileBase {
 
 	private float damage;
 
-	private Unit target;
+	private UnitOrderable target;
 
-	public ArcaneBoltBolt(float damage, Unit caster, Unit target) {
+	public ArcaneBoltBolt(float damage, Unit caster, UnitOrderable target) {
 		super(caster.x, caster.y, speed, Point.getAngleInDegrees(caster.getPos(), target.getPos()), maxDuration, caster);
 		this.damage = damage;
 		this.target = target;

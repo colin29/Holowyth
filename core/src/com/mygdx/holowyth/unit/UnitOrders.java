@@ -1,9 +1,12 @@
 package com.mygdx.holowyth.unit;
 
+import org.eclipse.jdt.annotation.NonNull;
+import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.skill.ActiveSkill;
+import com.mygdx.holowyth.skill.skill.NoneSkill;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.interfaces.UnitStatusInfo;
@@ -12,6 +15,7 @@ import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
  * Handles unit ordering logic
+ * 
  */
 public class UnitOrders {
 
@@ -24,6 +28,11 @@ public class UnitOrders {
 	final UnitOrdersDeferring deffering;
 	
 	private Order order = Order.NONE;
+	
+	/**
+	 * Units can be ordered to use melee skills while still at range. The unit follows a hard-attack command as usual, and carries out the skill when it engages
+	 */
+	private @Nullable NoneSkill queuedMeleeSkill;
 	/** Target for the current command */
 	private Unit orderTarget;
 	private float attackMoveDestX;
@@ -65,7 +74,7 @@ public class UnitOrders {
 			if (order == Order.NONE) {
 
 				if (isAnyOrderAllowedIgnoringTaunt())
-					orderAttackUnit((Unit) status.getTauntAttackTarget(), true, true);
+					orderAttackUnit((UnitOrderable) status.getTauntAttackTarget(), true, true);
 			}
 		}
 
@@ -124,6 +133,18 @@ public class UnitOrders {
 	boolean orderAttackUnit(UnitOrderable unitOrd, boolean isHardOrder) {
 		return orderAttackUnit(unitOrd, isHardOrder, false);
 	}
+	
+	boolean orderAttackUnitQueueMeleeSkill(UnitOrderable unitOrd, @NonNull NoneSkill skill) {
+		if (self.combat.isAttacking()) {
+			logger.warn("orderAttackUnitQueueMeleeSkill shouldn't be called while unit is already attacking");
+			return false;
+		}
+		boolean result = orderAttackUnit(unitOrd, true);
+		if(result) {
+			queuedMeleeSkill = skill;
+		}
+		return result;
+	}
 
 	/**
 	 * 
@@ -143,7 +164,7 @@ public class UnitOrders {
 		if (isATauntedOrder ? isAnyOrderAllowedIgnoringTaunt() : isAttackOrderAllowed(unit)) {
 			if (status.isStunned()) {
 				deffering.tryToDeferOrder(isHardOrder ? Order.ATTACKUNIT_HARD : Order.ATTACKUNIT_SOFT,
-						(Unit) unitOrd, 0, 0);
+						(UnitOrderable) unitOrd, 0, 0);
 			}
 			if (self.combat.isAttacking())
 				return orderAttackUnitWhileAlreadyAttacking(unitOrd, isHardOrder);
@@ -258,7 +279,7 @@ public class UnitOrders {
 	}
 
 	// @formatter:off
-	public boolean isAttackOrderAllowed(Unit target) {
+	public boolean isAttackOrderAllowed(UnitOrderable target) {
 		return isGeneralOrderAllowed() && self.isEnemy(target);
 	}
 
@@ -321,6 +342,7 @@ public class UnitOrders {
 	void clearOrder() {
 		order = Order.NONE;
 		orderTarget = null;
+		queuedMeleeSkill = null;
 
 		attackMoveDestX = 0;
 		attackMoveDestY = 0;
@@ -369,6 +391,10 @@ public class UnitOrders {
 			float distToTarget = Point.dist(self.getPos(), orderTarget.getPos());
 			if (distToTarget <= getEngageRange(orderTarget)) {
 				self.combat.startAttacking(orderTarget);
+				if(queuedMeleeSkill != null) {
+					queuedMeleeSkill.pluginTargeting(self);
+					self.orderUseSkill(queuedMeleeSkill);
+				}
 			}
 		}
 	}

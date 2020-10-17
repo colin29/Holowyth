@@ -12,6 +12,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import com.mygdx.holowyth.collision.CircleCBInfo;
 import com.mygdx.holowyth.collision.UnitAdapterCircleCB;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.HoloAssert;
 
 /**
@@ -38,7 +39,7 @@ public class UnitCollection {
 		assertDataStructsAreEqualLength();
 	}
 
-	public boolean removeUnit(Unit u) {
+	public boolean removeUnit(UnitOrderable u) {
 		boolean wasPresent = false;
 
 		assertDataStructsAreEqualLength();

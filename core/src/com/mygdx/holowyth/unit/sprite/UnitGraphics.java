@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
@@ -89,7 +90,7 @@ public class UnitGraphics {
 
 	private float getUnitAngle() {
 		if (self.isAttacking()) {
-			var enemy = self.getAttacking();
+			UnitOrderable enemy = self.getAttacking();
 			return Point.getAngleInDegrees(self.getPos(), enemy.getPos());
 		} else {
 			Vector2 vel = self.getMotion().getVelocityRegardlessOfMode();

@@ -42,6 +42,7 @@ import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
@@ -334,7 +335,7 @@ public class GameScreenRenderer {
 	}
 
 	private void renderUnitAttackingArrows() {
-		for (Unit u : mapInstance.getUnits()) {
+		for (UnitOrderable u : mapInstance.getUnits()) {
 			if (u.isAttacking()) {
 				HoloGL.renderArrow(u, u.getAttacking(), Color.RED);
 			}
@@ -361,7 +362,7 @@ public class GameScreenRenderer {
 				return;
 
 			var cursorPos = getWorldCoordinatesOfMouseCursor();
-			var unit = controls.getSelectedUnits().first();
+			UnitOrderable unit = controls.getSelectedUnits().first();
 			curSkill.aimingGraphic.render(cursorPos, unit, mapInstance, batch, shapeDrawer, game.assets);
 		}
 

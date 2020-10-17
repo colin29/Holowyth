@@ -19,6 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.template.adapters.InputProcessorAdapter;
 
 /**
@@ -35,7 +36,7 @@ public class PartyUnitSelectionPanel extends SingleUseUIWidget {
 	Table panel = new Table();
 	List<@NonNull Unit> units;
 	
-	@Nullable Unit showingEquipsFor;
+	@Nullable UnitOrderable showingEquipsFor;
 	
 	
 	//Reference

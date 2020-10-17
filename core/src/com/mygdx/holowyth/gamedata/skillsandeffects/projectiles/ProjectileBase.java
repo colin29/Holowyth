@@ -15,6 +15,7 @@ import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
@@ -53,7 +54,7 @@ public abstract class ProjectileBase {
 
 
 	// Extra info for sub-classes
-	@NonNull protected Unit caster;
+	@NonNull protected UnitOrderable caster;
 
 	public ProjectileBase(float x, float y, float speed, float rotation, float maxDuration, Unit caster) {
 		pos = new Point(x, y);
@@ -210,7 +211,7 @@ public abstract class ProjectileBase {
 		return targets;
 	}
 
-	protected final boolean isAEnemy(Unit unit) {
+	protected final boolean isAEnemy(UnitOrderable unit) {
 		return side != unit.getSide();
 	}
 

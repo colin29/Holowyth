@@ -24,6 +24,7 @@ import com.mygdx.holowyth.town.TownScreen;
 import com.mygdx.holowyth.town.model.Town;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.tools.debugstore.DebugValues;
 import com.mygdx.holowyth.vn.VNController;
@@ -124,7 +125,7 @@ public class StandardGameScreen extends GameScreen {
 	}
 
 	@SuppressWarnings("unused")
-	private Unit spawnPlayerAtDefaultLocation() {
+	private UnitOrderable spawnPlayerAtDefaultLocation() {
 		Point pos = map.getLocations().get("default_start_location").pos;
 		if (pos != null) {
 			return testSpawnLecia(pos);
@@ -201,7 +202,7 @@ public class StandardGameScreen extends GameScreen {
 	/**
 	 * @param pos can't be null
 	 */
-	private @NonNull Unit testSpawnLecia(Point pos) {
+	private @NonNull UnitOrderable testSpawnLecia(Point pos) {
 		var u = new Unit(pos.x, pos.y, Unit.Side.PLAYER, mapInstance);
 		u.setName("Lecia");
 		u.graphics.setAnimatedSprite(game.animations.getSprite("pipo-charachip030e.png"));

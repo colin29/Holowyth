@@ -40,6 +40,7 @@ public class Animations {
 	}
 
 	private static String WALKING_DIR = "img/sprites/walking/";
+	private static String EFFECTS_DIR = "img/effects/";
 	
 	private void loadAnimatedSprites() {
 
@@ -61,7 +62,10 @@ public class Animations {
 		loadEffect("img/effects/casting_glow.png", 120, 120, 0.10f, true);
 		loadEffect("img/effects/lightning_ball.png", 192, 192, 0.10f);
 		
-		loadAllImagesInDirectoryAsEffects(new File(Holo.ASSETS_DISK_PATH + "img/effects/rixu/"), 64, 64, 0.02f);
+		loadEffect(EFFECTS_DIR + "rixu/12.png",  64, 64, 0.02f);
+		loadEffect(EFFECTS_DIR + "rixu/53.png",  64, 64, 0.02f);
+		
+//		loadAllImagesInDirectoryAsEffects(new File(Holo.ASSETS_DISK_PATH + "img/effects/rixu/"), 64, 64, 0.02f);
 	}
 	
 	
@@ -147,6 +151,7 @@ public class Animations {
 		return keyFrames;
 	}
 	
+	@SuppressWarnings("unused")
 	private void loadAllImagesInDirectoryAsEffects(File dir, int imageWidth, int imageHeight, float secPerFrame) {
 		
 		 logger.debug("Loaded images in directory: {}" , StringUtils.removeStart(dir.getPath().replace("\\",

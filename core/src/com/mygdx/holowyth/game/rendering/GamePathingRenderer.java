@@ -5,8 +5,8 @@ import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.PathingRenderer;
-import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.Holo;
 
 class GamePathingRenderer extends SubRenderer {
@@ -30,7 +30,7 @@ class GamePathingRenderer extends SubRenderer {
 		if (renderIntermediatePaths) {
 			basicRenderer.renderIntermediateAndFinalPaths(getMapInstance().getUnits());
 		} else {
-			for (Unit unit : getMapInstance().getUnits()) {
+			for (UnitOrderable unit : getMapInstance().getUnits()) {
 				if (unit.getSide().isEnemy() && !Holo.debugRenderEnemyPath)
 					continue;
 				if (unit.getMotion().getPath() != null) {
@@ -39,7 +39,7 @@ class GamePathingRenderer extends SubRenderer {
 			}
 		}
 
-		for (Unit u : getMapInstance().getUnits()) {
+		for (UnitOrderable u : getMapInstance().getUnits()) {
 			u.getMotion().renderNextWayPoint();
 		}
 

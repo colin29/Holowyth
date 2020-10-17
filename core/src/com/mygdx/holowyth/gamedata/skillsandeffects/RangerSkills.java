@@ -19,6 +19,7 @@ public class RangerSkills {
 			casting.isInterruptedByDamageOrReel = false;
 			spCost = 14;
 			cooldown = 60 * 10;
+			isMeleeSkill = true;
 		}
 
 		@Override

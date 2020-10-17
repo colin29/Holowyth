@@ -1,7 +1,7 @@
 package com.mygdx.holowyth.skill;
 
-import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.Holo;
 
 /**
@@ -31,7 +31,7 @@ public class Casting implements Cloneable, CastingInfo {
 		this.parent = parent;
 	}
 
-	public void begin(Unit caster) {
+	public void begin(UnitOrderable caster) {
 
 		if (Holo.debugFastCastEnabled) {
 			castTime = castTime / 10;
@@ -43,7 +43,7 @@ public class Casting implements Cloneable, CastingInfo {
 	public void tick() {
 		castTimeRemaining -= 1;
 
-		Unit caster = parent.caster;
+		UnitOrderable caster = parent.caster;
 		if (castTimeRemaining <= 25 && !displayedSkillName) {
 			if (caster.getSide() == Side.PLAYER || Holo.debugDisplayEnemyCastingProgress) {
 				caster.getMapInstance().getGfx().makeSkillNameEffect(parent.name + "!", caster);

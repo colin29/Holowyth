@@ -44,6 +44,7 @@ import com.mygdx.holowyth.util.DataUtil;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.MiscUtil;
 import com.mygdx.holowyth.util.dataobjects.Point;
+import com.mygdx.holowyth.util.exceptions.HoloException;
 import com.mygdx.holowyth.util.template.adapters.InputProcessorAdapter;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
@@ -85,7 +86,7 @@ public class Controls extends InputProcessorAdapter {
 	boolean selectionBoxDragActive = false;
 
 	public enum Context {
-		NONE, ATTACK, RETREAT, SKILL_GROUND, SKILL_UNIT, SKILL_UNIT_GROUND_1, SKILL_UNIT_GROUND_2;
+		NONE, ATTACK, RETREAT, SKILL_GROUND, SKILL_UNIT, SKILL_UNIT_GROUND_1, SKILL_UNIT_GROUND_2, SKILL_NONE_QUEUE_MELEE_SKILL;
 
 		boolean isUsingSkill() {
 			switch (this) {
@@ -155,7 +156,7 @@ public class Controls extends InputProcessorAdapter {
 		});
 		debugValues.add("Current order of one unit", () -> {
 			if (selectedUnits.size() == 1) {
-				Unit u = selectedUnits.first();
+				UnitOrderable u = selectedUnits.first();
 				return u.getOrder().toString();
 			} else {
 				return "N/A";
@@ -163,7 +164,7 @@ public class Controls extends InputProcessorAdapter {
 		});
 		debugValues.add("Target ID of one unit", () -> {
 			if (selectedUnits.size() == 1) {
-				Unit u = selectedUnits.first();
+				UnitOrderable u = selectedUnits.first();
 				return u.getOrderTarget() != null ? String.valueOf(u.getOrderTarget().getID()) : "null";
 			} else {
 				return "N/A";
@@ -171,7 +172,7 @@ public class Controls extends InputProcessorAdapter {
 		});
 		debugValues.add("Attacking of one unit", () -> {
 			if (selectedUnits.size() == 1) {
-				Unit u = selectedUnits.first();
+				UnitOrderable u = selectedUnits.first();
 				return u.getAttacking() != null ? u.getAttacking().getName() : null;
 			} else {
 				return "N/A";
@@ -235,7 +236,7 @@ public class Controls extends InputProcessorAdapter {
 	}
 
 	private void orderSelectedUnitsToStop() {
-		for (Unit unit : selectedUnits) {
+		for (UnitOrderable unit : selectedUnits) {
 			unit.orderStop();
 		}
 	}
@@ -335,7 +336,7 @@ public class Controls extends InputProcessorAdapter {
 		String cursorPath = null;
 		int offsetX = 0, offsetY = 0;
 
-		if (context == Context.ATTACK) {
+		if (context == Context.ATTACK || context == Context.SKILL_NONE_QUEUE_MELEE_SKILL) {
 			cursorPath = "img/cursors/AttackCursor.png";
 		} else if (context.isUsingSkill()) {
 			cursorPath = "img/cursors/MagicCursor.png";
@@ -360,8 +361,8 @@ public class Controls extends InputProcessorAdapter {
 	public boolean touchDown(int touchX, int touchY, int pointer, int button) {
 		selectionBoxDragActive = false;
 
-		Vector3 world = new Vector3(); // World coordinates of the click.
-		world = camera.unproject(world.set(touchX, touchY, 0));
+		Vector3 click = new Vector3(); // World coordinates of the click.
+		click = camera.unproject(click.set(touchX, touchY, 0));
 
 		// Handle Left Click
 		if (button == Input.Buttons.LEFT && pointer == 0) {
@@ -369,22 +370,25 @@ public class Controls extends InputProcessorAdapter {
 			switch (context) {
 
 			case ATTACK:
-				handleAttackCommand(world.x, world.y);
+				handleAttackCommand(click.x, click.y);
 				break;
 			case RETREAT:
-				handleRetreatCommand(world.x, world.y);
+				handleRetreatCommand(click.x, click.y);
+				break;
+			case SKILL_NONE_QUEUE_MELEE_SKILL:
+				handleSkillNoneQueueMeleeSkill(click.x, click.y);
 				break;
 			case SKILL_GROUND:
-				handleSkillGround(world.x, world.y);
+				handleSkillGround(click.x, click.y);
 				break;
 			case SKILL_UNIT:
-				handleSkillUnit(world.x, world.y);
+				handleSkillUnit(click.x, click.y);
 				break;
 			case SKILL_UNIT_GROUND_1:
-				handleSkillUnitGroundPart1(world.x, world.y);
+				handleSkillUnitGroundPart1(click.x, click.y);
 				break;
 			case SKILL_UNIT_GROUND_2:
-				handleSkillUnitGroundPart2(world.x, world.y);
+				handleSkillUnitGroundPart2(click.x, click.y);
 				break;
 			default:
 				startSelectionBox(touchX, Gdx.graphics.getHeight() - touchY);
@@ -400,7 +404,7 @@ public class Controls extends InputProcessorAdapter {
 			if (context != Context.NONE) {
 				clearContext();
 			} else {
-				handleRightClick(world.x, world.y);
+				handleRightClick(click.x, click.y);
 			}
 
 			return true;
@@ -467,11 +471,11 @@ public class Controls extends InputProcessorAdapter {
 		clearContext();
 	}
 
-	private Unit curSkillUnit; // used purely for storing skill parameters in multi-part targetings
+	private UnitOrderable curSkillUnit; // used purely for storing skill parameters in multi-part targetings
 
 	private void handleSkillUnitGroundPart1(float x, float y) {
 		assertExactlyOneUnitSelected();
-		Unit target = selectUnitAtClickedPoint(x, y);
+		UnitOrderable target = selectUnitAtClickedPoint(x, y);
 
 		if (target != null) {
 			curSkillUnit = target;
@@ -484,7 +488,7 @@ public class Controls extends InputProcessorAdapter {
 		assertExactlyOneUnitSelected();
 
 		UnitGroundSkill skill = (UnitGroundSkill) this.curSkill;
-		Unit caster = selectedUnits.iterator().next();
+		UnitOrderable caster = selectedUnits.iterator().next();
 		skill.pluginTargeting(caster, curSkillUnit, x, y);
 		caster.orderUseSkill(skill);
 		clearContext();
@@ -492,9 +496,16 @@ public class Controls extends InputProcessorAdapter {
 
 	private void handleSkillNone() {
 		assertExactlyOneUnitSelected();
-		NoneSkill skill = (NoneSkill) this.curSkill;
 		Unit caster = selectedUnits.iterator().next();
+		NoneSkill skill = (NoneSkill) this.curSkill;
 
+		if(skill.isMeleeSkill && !caster.isAttacking()) {
+			// Allow the player to select a unit to attack, queuing the melee skill
+			curSkillUnit = caster;
+			context = Context.SKILL_NONE_QUEUE_MELEE_SKILL;
+			return;
+		}
+		
 		if (skill.pluginTargeting(caster)) {
 			caster.orderUseSkill(skill);
 		} else {
@@ -503,10 +514,18 @@ public class Controls extends InputProcessorAdapter {
 
 		clearContext();
 	}
+	private void handleSkillNoneQueueMeleeSkill(float x, float y) {
+		assertExactlyOneUnitSelected();
+		UnitOrderable target = selectUnitAtClickedPoint(x, y);
+		if (target != null) {
+			curSkillUnit.orderAttackUnitQueueMeleeSkill(target, (NoneSkill) curSkill);
+		}
+		clearContext();
+	}
 
 	private void assertExactlyOneUnitSelected() {
 		if (selectedUnits.size() != 1) {
-			new Exception("Selected units is not exactly one: " + selectedUnits.size()).printStackTrace();
+			new HoloException("Selected units is not exactly one: " + selectedUnits.size()).printStackTrace();
 			return;
 		}
 	}
@@ -521,7 +540,7 @@ public class Controls extends InputProcessorAdapter {
 		// select a unit if there is one underneath this point. If there are multiple units, select the one
 		// that
 		// occurs last (on top)
-		Unit target = null;
+		UnitOrderable target = null;
 
 		for (Unit u : units) {
 			p2.set(u.x, u.y);
@@ -634,7 +653,7 @@ public class Controls extends InputProcessorAdapter {
 		// select a unit if there is one underneath this point. If there are multiple units, select the one
 		// that
 		// occurs last (on top)
-		Unit target = null;
+		UnitOrderable target = null;
 
 		for (Unit u : units) {
 			p2.set(u.x, u.y);

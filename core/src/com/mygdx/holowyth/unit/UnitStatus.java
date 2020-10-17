@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.unit.UnitOrders.Order;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.interfaces.UnitStatusInfo;
 import com.mygdx.holowyth.unit.statuseffect.BasicAttackSlowEffect;
 import com.mygdx.holowyth.unit.statuseffect.BleedEffect;
@@ -40,7 +41,7 @@ public class UnitStatus implements UnitStatusInfo {
 	private float blindDurationRemaining;
 
 	private float tauntDurationRemaining = 0;
-	private Unit tauntedTowards = null;
+	private UnitOrderable tauntedTowards = null;
 
 	private UnitStun stun; 
 	
@@ -110,7 +111,7 @@ public class UnitStatus implements UnitStatusInfo {
 		}
 
 	}
-	public void applyTaunt(int duration, Unit tauntSource) {
+	public void applyTaunt(int duration, UnitOrderable tauntSource) {
 		if (tauntSource == null) {
 			logger.warn("tauntSource is null");
 			return;

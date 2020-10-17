@@ -27,6 +27,7 @@ import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloAssert;
@@ -104,7 +105,7 @@ public class MapInstance implements MapInstanceInfo {
 			if (u.isDead())
 				deadUnits.add(u);
 		}
-		for (var u : deadUnits) {
+		for (UnitOrderable u : deadUnits) {
 			logger.debug("Removed dead unit '{}' ({})", u.getName(), u);
 			units.removeUnit(u);
 		}
@@ -300,7 +301,7 @@ public class MapInstance implements MapInstanceInfo {
 		}
 	}
 
-	private void applyFriction(Unit unit) {
+	private void applyFriction(UnitOrderable unit) {
 		if (unit.getMotion().isBeingKnockedBack()) {
 
 			Vector2 newVelocity = unit.getMotion().getKnockbackVelocity();
@@ -310,7 +311,7 @@ public class MapInstance implements MapInstanceInfo {
 	}
 
 	private void endKnockbackForUnitsBelowVelocityThreshold() {
-		for (Unit unit : units.getUnits()) {
+		for (UnitOrderable unit : units.getUnits()) {
 			if (unit.getMotion().isBeingKnockedBack()) {
 				if (unit.getMotion().getKnockbackVelocity().len() < velocityThresholdToEndKnockback) {
 					unit.getMotion().endKnockback();
@@ -356,7 +357,7 @@ public class MapInstance implements MapInstanceInfo {
 			throw new RuntimeException("Unsupported Collidable type: " + collision.other.getClass().getName());
 		}
 
-		Unit thisUnit = units.colBodyToUnit().get(thisBody);
+		UnitOrderable thisUnit = units.colBodyToUnit().get(thisBody);
 		
 		Unit otherUnit = collisionType == CollisionType.UNIT ? units.colBodyToUnit().get(otherBody) : null;
 
@@ -472,14 +473,14 @@ public class MapInstance implements MapInstanceInfo {
 
 	}
 
-	private float getCollisionClearanceDistance(Unit u) {
+	private float getCollisionClearanceDistance(UnitOrderable u) {
 		return Holo.collisionClearanceDistance * (u.getMotion().getVelocityMagnitude() / Holo.defaultUnitMoveSpeed);
 	}
 
 	/**
 	 * Creates a new unit from a unitMarker and adds it to the world
 	 */
-	public @NonNull Unit addUnit(@NonNull UnitMarker unitMarker) {
+	public @NonNull UnitOrderable addUnit(@NonNull UnitMarker unitMarker) {
 		return addUnit(new Unit(unitMarker, this));
 	}
 	/**
@@ -528,7 +529,7 @@ public class MapInstance implements MapInstanceInfo {
 	 * @param u
 	 * @return
 	 */
-	public boolean removeUnit(Unit u) {
+	public boolean removeUnit(UnitOrderable u) {
 		unitsAttackingThis.remove(u);
 		return units.removeUnit(u);
 	}
@@ -577,13 +578,13 @@ public class MapInstance implements MapInstanceInfo {
 	}
 	
 	@Override
-	public Set<Unit> getUnitsAttackingThis(Unit u) {
+	public Set<Unit> getUnitsAttackingThis(UnitOrderable u) {
 		return Collections.unmodifiableSet(unitsAttackingThis.get(u));
 	}
-	public void onUnitStartsAttacking(Unit attacker, Unit target){
+	public void onUnitStartsAttacking(Unit attacker, UnitOrderable target){
 		unitsAttackingThis.get(target).add(attacker);
 	}
-	public void onUnitStopsAttacking(Unit attacker, Unit target) {
+	public void onUnitStopsAttacking(UnitOrderable attacker, UnitOrderable target) {
 		unitsAttackingThis.get(target).remove(attacker);
 	}
 

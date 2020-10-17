@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler.DamageEffectParams;
 import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.interfaces.UnitStatsInfo;
 import com.mygdx.holowyth.unit.item.Equip;
 import com.mygdx.holowyth.util.DataUtil;
@@ -769,7 +770,7 @@ public class UnitStats implements UnitStatsInfo {
 		return 60f / getAtkspd();
 	}
 
-	float getMultiTeamingAtkspdPenalty(Unit target) {
+	float getMultiTeamingAtkspdPenalty(UnitOrderable target) {
 		int n = self.getUnitsAttackingThis().size();
 
 		if (n <= 1) {

@@ -9,6 +9,7 @@ import com.mygdx.holowyth.game.MapInstanceInfo;
 import com.mygdx.holowyth.graphics.effects.EffectsHandler;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.Unit.Side;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class Projectile {
@@ -25,7 +26,7 @@ public class Projectile {
 	protected ProjectileCollision collision;
 
 	/** While it's possible to have projectiles without a unit caster, for now we say that all do */
-	protected @NonNull Unit caster;
+	protected @NonNull UnitOrderable caster;
 	protected @NonNull final MapInstance mapInstance;
 	protected @NonNull final EffectsHandler gfx;
 

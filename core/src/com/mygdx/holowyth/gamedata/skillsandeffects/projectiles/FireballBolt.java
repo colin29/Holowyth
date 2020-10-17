@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.gamedata.skillsandeffects.projectiles;
 
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class FireballBolt extends ProjectileBase {
@@ -13,9 +14,9 @@ public class FireballBolt extends ProjectileBase {
 	private float damage;
 	private float explosionRadius;
 
-	private Unit target;
+	private UnitOrderable target;
 
-	public FireballBolt(float damage, float explosionRadius, Unit caster, Unit target) {
+	public FireballBolt(float damage, float explosionRadius, Unit caster, UnitOrderable target) {
 		super(caster.x, caster.y, speed, Point.getAngleInDegrees(caster.getPos(), target.getPos()), maxDuration, caster);
 		this.damage = damage;
 		this.explosionRadius = explosionRadius;

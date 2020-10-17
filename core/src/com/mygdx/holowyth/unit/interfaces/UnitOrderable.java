@@ -1,8 +1,10 @@
 package com.mygdx.holowyth.unit.interfaces;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.mygdx.holowyth.ai.UnitAI;
 import com.mygdx.holowyth.skill.ActiveSkill;
-import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.skill.skill.NoneSkill;
 
 public interface UnitOrderable extends UnitInfo {
 
@@ -45,8 +47,10 @@ public interface UnitOrderable extends UnitInfo {
 
 	boolean isMoveOrderAllowed();
 
-	boolean isAttackOrderAllowed(Unit target);
+	boolean isAttackOrderAllowed(UnitOrderable target);
 
 	UnitAI getAI();
+
+	boolean orderAttackUnitQueueMeleeSkill(UnitOrderable unitOrd, @NonNull NoneSkill skill);
 
 }

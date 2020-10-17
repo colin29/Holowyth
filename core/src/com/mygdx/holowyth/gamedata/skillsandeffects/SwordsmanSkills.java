@@ -4,6 +4,7 @@ import com.mygdx.holowyth.gamedata.skillsandeffects.RangerEffects.CrossSlashEffe
 import com.mygdx.holowyth.skill.Skill;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.DataUtil;
 
 public class SwordsmanSkills {
@@ -17,6 +18,7 @@ public class SwordsmanSkills {
 			spCost = 9;
 			cooldown = 15 * 60;
 			globalCooldown = 4 * 60;
+			isMeleeSkill = true;
 		}
 
 		@Override
@@ -38,7 +40,7 @@ public class SwordsmanSkills {
 		}
 
 		@Override
-		public void onUnitAttack(Unit parent, Unit target) {
+		public void onUnitAttack(Unit parent, UnitOrderable target) {
 			parent.status.applySpeedIncrease(0.25f, 4 * 60);
 		}
 	};

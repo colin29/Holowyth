@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.graphics.effects.animated.AnimEffectOnFixedPos;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class MagicMissileBolt extends ProjectileBase {
@@ -33,9 +34,9 @@ public class MagicMissileBolt extends ProjectileBase {
 	private float sideWindCounter = sideWindPeriod * 0.75f;
 	private float sideWindBaseTurnSpeed = 3f;
 
-	Unit target; // target is allowed to be null;
+	UnitOrderable target; // target is allowed to be null;
 
-	public MagicMissileBolt(float x, float y, float damage, Unit target, Unit caster) {
+	public MagicMissileBolt(float x, float y, float damage, UnitOrderable target, Unit caster) {
 		super(x, y, intialSpeed, Point.getAngleInDegrees(caster.getPos(), target.getPos()), maxDuration, caster);
 		this.damage = damage;
 		this.target = target;

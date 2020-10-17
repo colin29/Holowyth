@@ -13,6 +13,7 @@ import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.sprite.Animations;
 
 public interface MapInstanceInfo {
@@ -44,7 +45,7 @@ public interface MapInstanceInfo {
 
 	Animations getAnimations();
 
-	Set<Unit> getUnitsAttackingThis(Unit u);
+	Set<Unit> getUnitsAttackingThis(UnitOrderable u);
 
 	AssetManager getAssets();
 }

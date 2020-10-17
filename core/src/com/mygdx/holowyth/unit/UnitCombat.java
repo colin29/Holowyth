@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.unit.UnitOrders.Order;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 /**
@@ -85,7 +86,7 @@ public class UnitCombat {
 	}
 	private void retreat(float x, float y, boolean avoidAOPfromTarget) {
 		
-		Unit oldTarget = attacking;
+		UnitOrderable oldTarget = attacking;
 		
 		retreatDurationRemaining = retreatDuration;
 		if (self.getMotion().pathFindTowardsPoint(x, y)) {

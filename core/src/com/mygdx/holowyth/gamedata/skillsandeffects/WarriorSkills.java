@@ -17,6 +17,7 @@ public class WarriorSkills {
 			casting.isInterruptedByDamageOrReel = false;
 			spCost = 12;
 			cooldown = 60 * 17;
+			isMeleeSkill = true;
 		}
 
 		@Override
@@ -44,6 +45,7 @@ public class WarriorSkills {
 			casting.isInterruptedByDamageOrReel = false;
 			spCost = 8;
 			cooldown = 60 * 13;
+			isMeleeSkill = true;
 		}
 
 		@Override
@@ -68,6 +70,7 @@ public class WarriorSkills {
 			casting.castTime = 0;
 			spCost = 5;
 			cooldown = 60 * 8;
+			isMeleeSkill = true;
 		}
 
 		@Override

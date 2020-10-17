@@ -16,6 +16,7 @@ import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitPFWithPath;
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.ActiveSkill.Status;
+import com.mygdx.holowyth.skill.skill.NoneSkill;
 import com.mygdx.holowyth.unit.UnitOrders.Order;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
@@ -207,6 +208,10 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	public boolean orderAttackUnit(UnitOrderable unitOrd, boolean isHardOrder) {
 		return orders.orderAttackUnit(unitOrd, isHardOrder);
 	}
+	@Override
+	public boolean orderAttackUnitQueueMeleeSkill(UnitOrderable unitOrd, @NonNull NoneSkill skill) {
+		return orders.orderAttackUnitQueueMeleeSkill(unitOrd, skill);
+	}
 
 	@Override
 	public void orderAttackMove(float x, float y) {
@@ -236,7 +241,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 
 	// @formatter:off
 	@Override
-	public boolean isAttackOrderAllowed(Unit target) {
+	public boolean isAttackOrderAllowed(UnitOrderable target) {
 		return orders.isAttackOrderAllowed(target);
 	}
 
@@ -316,7 +321,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	}
 
 	@Override
-	public Unit getOrderTarget() {
+	public UnitOrderable getOrderTarget() {
 		return orders.getOrderTarget();
 	}
 
@@ -567,14 +572,14 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	/**
 	 * For debug purposes. Gets any created unit, regardless of whether is in a {@link MapInstance}
 	 */
-	public static Unit getUnitByID(int id) {
+	public static UnitOrderable getUnitByID(int id) {
 		return idToUnit.get(id);
 	}
 
-	public static float getDist(Unit u1, Unit u2) {
+	public static float getDist(UnitOrderable u1, UnitOrderable u2) {
 		return Point.dist(u1.getPos(), u2.getPos());
 	}
-	public boolean inRange(Unit other, float range) {
+	public boolean inRange(UnitOrderable other, float range) {
 		return Point.dist(this.getPos(), other.getPos())  <= range;
 	}
 
@@ -594,7 +599,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 		return combat;
 	}
 
-	public static float getAngleInDegrees(Unit u1, Unit u2) {
+	public static float getAngleInDegrees(UnitOrderable u1, UnitOrderable u2) {
 		return Point.getAngleInDegrees(u1.getPos(), u2.getPos());
 	}
 

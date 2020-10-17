@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.graphics.effects.EffectsHandler.DamageEffectParams;
 import com.mygdx.holowyth.unit.Unit;
+import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class WindBladeBolt extends ProjectileBase {
@@ -20,10 +21,10 @@ public class WindBladeBolt extends ProjectileBase {
 
 	private float damage;
 
-	Unit caster;
-	Unit target; // target is allowed to be null;
+	UnitOrderable caster;
+	UnitOrderable target; // target is allowed to be null;
 
-	public WindBladeBolt(float x, float y, float damage, Unit caster, Unit target) {
+	public WindBladeBolt(float x, float y, float damage, Unit caster, UnitOrderable target) {
 		super(x, y, speed, Point.getAngleInDegrees(caster.getPos(), target.getPos()), maxDuration, caster);
 		this.damage = damage;
 		this.target = target;

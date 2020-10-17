@@ -32,13 +32,13 @@ public class TestGameScreen extends StandardGameScreen {
 //		Music music = Gdx.audio.newMusic(Gdx.files.internal(Holo.BGM_DISK_PATH + "Peritune_Wonder2.mp3"));
 //		music.play();
 		
-		for(int h=0;h<8;h++) {
-			for(int i=0;i<8;i++) {
-				var effect = new AnimEffectOnFixedPos(i*70 + 10, 100 + h*70, (h*8+i)+".png", mapInstance, animations);
-				effect.loop = true;
-				gfx.addGraphicEffect(effect);
-			}	
-		}
+//		for(int h=0;h<8;h++) {
+//			for(int i=0;i<8;i++) {
+//				var effect = new AnimEffectOnFixedPos(i*70 + 10, 100 + h*70, (h*8+i)+".png", mapInstance, animations);
+//				effect.loop = true;
+//				gfx.addGraphicEffect(effect);
+//			}	
+//		}
 		
 		
 		
