@@ -9,6 +9,9 @@ public abstract class UnitSkill extends ActiveSkill {
 		super(Targeting.UNIT);
 	}
 
+	/**
+	 * Same as pluginTargeting, but offers some default checking
+	 */
 	public boolean setTargeting(Unit caster, Unit target) {
 		if (tags.contains(Tag.ALLIED_TARGETING)) {
 			if (caster.isEnemy(target)) {

@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Target;
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
+import com.mygdx.holowyth.skill.skill.UnitSkill;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.interfaces.UnitStatusInfo;
@@ -41,6 +42,8 @@ public class UnitOrders {
 	 */
 	private @Nullable GroundSkill deferredGroundSkillMoveInRange;
 	private float deferredGroundSkillX, deferredGroundSkillY;
+	private @Nullable UnitSkill deferredUnitSkillMoveInRange;
+	
 	
 	/** Target for the current command */
 	private Unit orderTarget;
@@ -111,6 +114,7 @@ public class UnitOrders {
 		}
 		
 		ifInRangeCastDeferredGroundSkill();
+		ifInRangeCastDeferredUnitSkill();
 
 		startAttackingIfInRangeForAttackOrders();
 		stopAttackingIfEnemyIsOutOfRange();
@@ -126,6 +130,22 @@ public class UnitOrders {
 		if (self.motion.pathFindTowardsPoint(x, y)) {
 			clearOrder();
 			order = Order.MOVE;
+		}
+	}
+	void orderMoveInRangeToUseSkill(float x, float y, @NonNull GroundSkill skill) {
+		if(!skill.usingMaxRange()) {
+			logger.warn("orderMoveInRangeToUseSkill: skill doesn't use a max range");
+			return;
+		}
+		if (!isMoveOrderAllowed()) {
+			return;
+		}
+		if (self.motion.pathFindTowardsPoint(x, y)) {
+			clearOrder();
+			order = Order.MOVE;
+			deferredGroundSkillMoveInRange = skill;
+			deferredGroundSkillX = x; // save the cast point because the pathing dest can differ due to goal substitution
+			deferredGroundSkillY = y;
 		}
 	}
 	/**
@@ -144,22 +164,23 @@ public class UnitOrders {
 			return;
 		}
 	}
-	void orderMoveInRangeToUseSkill(float x, float y, @NonNull GroundSkill skill) {
+
+	void orderMoveInRangeToUseSkill(@NonNull UnitOrderable target, @NonNull UnitSkill skill) {
 		if(!skill.usingMaxRange()) {
 			logger.warn("orderMoveInRangeToUseSkill: skill doesn't use a max range");
 			return;
 		}
+		clearOrder();
 		if (!isMoveOrderAllowed()) {
 			return;
 		}
-		if (self.motion.pathFindTowardsPoint(x, y)) {
-			clearOrder();
-			order = Order.MOVE;
-			deferredGroundSkillMoveInRange = skill;
-			deferredGroundSkillX = x; // save the cast point because the pathing dest can differ due to goal substitution
-			deferredGroundSkillY = y;
+		orderTarget = (Unit) target;
+		if(self.motion.pathFindTowardsTarget()) {
+			order = Order.MOVE_TO_UNIT;
+			deferredUnitSkillMoveInRange = skill;
+		}else {
+			return;
 		}
-		
 	}
 
 	private void ifInRangeCastDeferredGroundSkill() {
@@ -168,6 +189,15 @@ public class UnitOrders {
 			Point ground = new Point(deferredGroundSkillX, deferredGroundSkillY);
 			if(Point.dist(ground, self.getPos()) <= skill.getMaxRange()) {
 				skill.pluginTargeting(self, ground.x, ground.y);
+				orderUseSkill(skill);
+			}
+		}
+	}
+	private void ifInRangeCastDeferredUnitSkill() {
+		if(order == Order.MOVE_TO_UNIT && deferredUnitSkillMoveInRange != null){
+			@NonNull UnitSkill skill = deferredUnitSkillMoveInRange;
+			if(Point.dist(orderTarget.getPos(), self.getPos()) <= skill.getMaxRange()) {
+				skill.setTargeting(self, orderTarget);
 				orderUseSkill(skill);
 			}
 		}
@@ -403,6 +433,7 @@ public class UnitOrders {
 		deferredGroundSkillMoveInRange = null;
 		deferredGroundSkillX = 0;
 		deferredGroundSkillY = 0;
+		deferredUnitSkillMoveInRange = null;
 
 		attackMoveDestX = 0;
 		attackMoveDestY = 0;

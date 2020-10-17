@@ -423,9 +423,7 @@ public class Controls extends InputProcessorAdapter {
 			Unit caster = selectedUnits.iterator().next();
 
 			if (skill.usingMaxRange() && Unit.getDist(caster, target) > skill.getMaxRange()) {
-				logger.info("Skill '{}' could not be used, target out of range ({}>{})", skill.name,
-						Unit.getDist(caster, target), skill.getMaxRange());
-				gameLog.addErrorMessage("Target is out of range");
+				caster.orderMoveInRangeToUseSkill(target, skill);
 				clearContext();
 				return;
 			}

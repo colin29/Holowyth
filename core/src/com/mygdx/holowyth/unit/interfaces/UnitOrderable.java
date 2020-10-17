@@ -6,6 +6,7 @@ import com.mygdx.holowyth.ai.UnitAI;
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
+import com.mygdx.holowyth.skill.skill.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
 
 public interface UnitOrderable extends UnitInfo {
@@ -58,6 +59,8 @@ public interface UnitOrderable extends UnitInfo {
 	void orderMoveToUnit(@NonNull UnitOrderable unit);
 
 	void orderMoveInRangeToUseSkill(float x, float y, @NonNull GroundSkill skill);
+	
+	void orderMoveInRangeToUseSkill(@NonNull UnitOrderable target, @NonNull UnitSkill skill);
 
 
 }

@@ -18,6 +18,7 @@ import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.ActiveSkill.Status;
 import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
+import com.mygdx.holowyth.skill.skill.UnitSkill;
 import com.mygdx.holowyth.unit.UnitOrders.Order;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
@@ -242,6 +243,9 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	@Override
 	public void orderMoveInRangeToUseSkill(float x, float y, @NonNull GroundSkill skill) {
 		orders.orderMoveInRangeToUseSkill(x, y, skill);
+	}
+	public void orderMoveInRangeToUseSkill(@NonNull UnitOrderable target, @NonNull UnitSkill skill) {
+		orders.orderMoveInRangeToUseSkill(target, skill);
 	}
 	@Override
 	public void orderMoveToUnit(@NonNull UnitOrderable unit) {
