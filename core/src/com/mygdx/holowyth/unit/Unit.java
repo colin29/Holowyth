@@ -239,8 +239,13 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	public boolean orderAttackUnitQueueMeleeSkill(UnitOrderable unitOrd, @NonNull NoneSkill skill) {
 		return orders.orderAttackUnitQueueMeleeSkill(unitOrd, skill);
 	}
+	@Override
 	public void orderMoveInRangeToUseSkill(float x, float y, @NonNull GroundSkill skill) {
 		orders.orderMoveInRangeToUseSkill(x, y, skill);
+	}
+	@Override
+	public void orderMoveToUnit(@NonNull UnitOrderable unit) {
+		orders.orderMoveToUnit(unit);
 	}
 
 	// @formatter:off

@@ -86,7 +86,8 @@ public class Controls extends InputProcessorAdapter {
 	boolean selectionBoxDragActive = false;
 
 	public enum Context {
-		NONE, ATTACK, RETREAT, SKILL_GROUND, SKILL_UNIT, SKILL_UNIT_GROUND_1, SKILL_UNIT_GROUND_2, SKILL_NONE_QUEUE_MELEE_SKILL;
+		NONE, ATTACK, RETREAT, SKILL_GROUND, SKILL_UNIT, SKILL_UNIT_GROUND_1, SKILL_UNIT_GROUND_2,
+		SKILL_NONE_QUEUE_MELEE_SKILL;
 
 		boolean isUsingSkill() {
 			switch (this) {
@@ -435,8 +436,8 @@ public class Controls extends InputProcessorAdapter {
 				List<@NonNull Unit> otherUnits = new ArrayList<>(mapInstance.getUnits());
 				otherUnits.remove(caster);
 				otherUnits.remove(target);
-				if (!HoloPF.isSegmentPathable(caster.x, caster.y, target.x, target.y,
-						pathing.getObstacleSegs(), pathing.getObstaclePoints(), otherUnits, 0)) {
+				if (!HoloPF.isSegmentPathable(caster.x, caster.y, target.x, target.y, pathing.getObstacleSegs(),
+						pathing.getObstaclePoints(), otherUnits, 0)) {
 					logger.info("Target is not in LOS");
 					return;
 				}
@@ -498,13 +499,13 @@ public class Controls extends InputProcessorAdapter {
 		Unit caster = selectedUnits.iterator().next();
 		NoneSkill skill = (NoneSkill) this.curSkill;
 
-		if(skill.isMeleeSkill && !caster.isAttacking()) {
+		if (skill.isMeleeSkill && !caster.isAttacking()) {
 			// Allow the player to select a unit to attack, queuing the melee skill
 			curSkillUnit = caster;
 			context = Context.SKILL_NONE_QUEUE_MELEE_SKILL;
 			return;
 		}
-		
+
 		if (skill.pluginTargeting(caster)) {
 			caster.orderUseSkill(skill);
 		} else {
@@ -513,6 +514,7 @@ public class Controls extends InputProcessorAdapter {
 
 		clearContext();
 	}
+
 	private void handleSkillNoneQueueMeleeSkill(float x, float y) {
 		assertExactlyOneUnitSelected();
 		UnitOrderable target = selectUnitAtClickedPoint(x, y);
@@ -529,8 +531,10 @@ public class Controls extends InputProcessorAdapter {
 		}
 	}
 
+	/**
+	 * Context should be null
+	 */
 	private void handleRightClick(float x, float y) {
-
 		// Attack command if click is over an enemy unit.
 
 		Point p1 = new Point(x, y);
@@ -549,17 +553,16 @@ public class Controls extends InputProcessorAdapter {
 			}
 			// check distance of the click to the center of the circle
 		}
-
-		if (target != null) {
-			for (UnitOrderable u : selectedUnits) {
+		for (UnitOrderable u : selectedUnits) {
+			if (target != null) {
 				if (u.getSide() != target.getSide()) {
 					u.orderAttackUnit(target);
 				} else {
-					u.orderMove(x, y);
+					u.orderMoveToUnit(target);
 				}
+			}else {
+				u.orderMove(x, y);
 			}
-		} else {
-			handleMoveCommand(x, y);
 		}
 
 	}
@@ -628,13 +631,6 @@ public class Controls extends InputProcessorAdapter {
 			return "Idle";
 		default:
 			return context.toString();
-		}
-	}
-
-	private void handleMoveCommand(float x, float y) {
-		clearContext();
-		for (UnitOrderable u : selectedUnits) {
-			u.orderMove(x, y);
 		}
 	}
 
@@ -841,7 +837,7 @@ public class Controls extends InputProcessorAdapter {
 	}
 
 	public void renderLOSIndicator() {
-		if(curSkill == null || !curSkill.requiresLOS) {
+		if (curSkill == null || !curSkill.requiresLOS) {
 			return;
 		}
 		if (context == Context.SKILL_UNIT) {

@@ -5,6 +5,7 @@ import org.eclipse.jdt.annotation.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop.Target;
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
@@ -57,7 +58,7 @@ public class UnitOrders {
 	 * chasing if the target goes out of range
 	 */
 	public enum Order {
-		MOVE, ATTACKUNIT_HARD, ATTACKUNIT_SOFT, NONE,
+		MOVE, MOVE_TO_UNIT, ATTACKUNIT_HARD, ATTACKUNIT_SOFT, NONE,
 		/**
 		 * If an attacking moving unit has no target it's moving towards its destination. If it does have a
 		 * target it's chasing that unit.
@@ -125,6 +126,22 @@ public class UnitOrders {
 		if (self.motion.pathFindTowardsPoint(x, y)) {
 			clearOrder();
 			order = Order.MOVE;
+		}
+	}
+	/**
+	 * This actually makes the unit follow the unit until ordered otherwise
+	 * @param unit
+	 */
+	void orderMoveToUnit(@NonNull UnitOrderable unit) {
+		clearOrder();
+		if (!isMoveOrderAllowed()) {
+			return;
+		}
+		orderTarget = (Unit) unit;
+		if(self.motion.pathFindTowardsTarget()) {
+			order = Order.MOVE_TO_UNIT;
+		}else {
+			return;
 		}
 	}
 	void orderMoveInRangeToUseSkill(float x, float y, @NonNull GroundSkill skill) {

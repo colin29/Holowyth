@@ -24,8 +24,8 @@ public class UnitMotion {
 	private static float waypointMinDistance = 0.01f;
 
 	// Attack Movement
-	private static int attackPathfindingInterval = 30;
-	private int framesUntilAttackRepath = attackPathfindingInterval;
+	private static int pathfindingInterval = 30;
+	private int framesUntilRepath = pathfindingInterval;
 
 	// Normal Movement
 
@@ -157,10 +157,17 @@ public class UnitMotion {
 	private void handleRepathing() {
 		if ((self.getOrder().isAttackUnit() && !self.isAttacking()) ||
 				(self.getOrder() == Order.ATTACKMOVE && self.orders.getOrderTarget() != null && !self.isAttacking())) {
-			framesUntilAttackRepath -= 1;
-			if (framesUntilAttackRepath <= 0) {
+			framesUntilRepath -= 1;
+			if (framesUntilRepath <= 0) {
 				pathFindTowardsTarget();
-				framesUntilAttackRepath = attackPathfindingInterval;
+				framesUntilRepath = pathfindingInterval;
+			}
+		}
+		if(self.getOrder() == Order.MOVE_TO_UNIT) {
+			framesUntilRepath -= 1;
+			if (framesUntilRepath <= 0) {
+				pathFindTowardsTarget();
+				framesUntilRepath = pathfindingInterval;
 			}
 		}
 	}
@@ -180,6 +187,7 @@ public class UnitMotion {
 			stopCurrentMovement();
 			break;
 		case MOVE:
+		case MOVE_TO_UNIT:
 			determineMovementFollowingPath();
 			break;
 		case RETREAT:
