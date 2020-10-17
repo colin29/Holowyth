@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.skill.ActiveSkill;
+import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
@@ -33,10 +34,19 @@ public class UnitOrders {
 	 * Units can be ordered to use melee skills while still at range. The unit follows a hard-attack command as usual, and carries out the skill when it engages
 	 */
 	private @Nullable NoneSkill queuedMeleeSkill;
+	
+	/**
+	 * If you cast a ground skill while out of range the unit will try to walk in range and cast
+	 */
+	private @Nullable GroundSkill deferredGroundSkillMoveInRange;
+	private float deferredGroundSkillX, deferredGroundSkillY;
+	
 	/** Target for the current command */
 	private Unit orderTarget;
 	private float attackMoveDestX;
 	private float attackMoveDestY;
+
+	
 	
 
 	/**
@@ -98,11 +108,13 @@ public class UnitOrders {
 				handleTargetLossAndSwitchingForAttackMove();
 			}
 		}
+		
+		ifInRangeCastDeferredGroundSkill();
 
 		startAttackingIfInRangeForAttackOrders();
 		stopAttackingIfEnemyIsOutOfRange();
 	}
-
+	
 	void orderMove(float x, float y) {
 		if (!isMoveOrderAllowed()) {
 			if (status.isStunned()) {
@@ -113,6 +125,34 @@ public class UnitOrders {
 		if (self.motion.pathFindTowardsPoint(x, y)) {
 			clearOrder();
 			order = Order.MOVE;
+		}
+	}
+	void orderMoveInRangeToUseSkill(float x, float y, @NonNull GroundSkill skill) {
+		if(!skill.usingMaxRange()) {
+			logger.warn("orderMoveInRangeToUseSkill: skill doesn't use a max range");
+			return;
+		}
+		if (!isMoveOrderAllowed()) {
+			return;
+		}
+		if (self.motion.pathFindTowardsPoint(x, y)) {
+			clearOrder();
+			order = Order.MOVE;
+			deferredGroundSkillMoveInRange = skill;
+			deferredGroundSkillX = x; // save the cast point because the pathing dest can differ due to goal substitution
+			deferredGroundSkillY = y;
+		}
+		
+	}
+
+	private void ifInRangeCastDeferredGroundSkill() {
+		if(order == Order.MOVE && deferredGroundSkillMoveInRange != null){
+			@NonNull GroundSkill skill = deferredGroundSkillMoveInRange;
+			Point ground = new Point(deferredGroundSkillX, deferredGroundSkillY);
+			if(Point.dist(ground, self.getPos()) <= skill.getMaxRange()) {
+				skill.pluginTargeting(self, ground.x, ground.y);
+				orderUseSkill(skill);
+			}
 		}
 	}
 
@@ -343,6 +383,9 @@ public class UnitOrders {
 		order = Order.NONE;
 		orderTarget = null;
 		queuedMeleeSkill = null;
+		deferredGroundSkillMoveInRange = null;
+		deferredGroundSkillX = 0;
+		deferredGroundSkillY = 0;
 
 		attackMoveDestX = 0;
 		attackMoveDestY = 0;

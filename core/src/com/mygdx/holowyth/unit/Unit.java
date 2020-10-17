@@ -16,6 +16,7 @@ import com.mygdx.holowyth.pathfinding.Path;
 import com.mygdx.holowyth.pathfinding.UnitPFWithPath;
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.ActiveSkill.Status;
+import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
 import com.mygdx.holowyth.unit.UnitOrders.Order;
 import com.mygdx.holowyth.unit.interfaces.UnitInfo;
@@ -209,11 +210,6 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 		return orders.orderAttackUnit(unitOrd, isHardOrder);
 	}
 	@Override
-	public boolean orderAttackUnitQueueMeleeSkill(UnitOrderable unitOrd, @NonNull NoneSkill skill) {
-		return orders.orderAttackUnitQueueMeleeSkill(unitOrd, skill);
-	}
-
-	@Override
 	public void orderAttackMove(float x, float y) {
 		orders.orderAttackMove(x, y);
 	}
@@ -237,6 +233,14 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	@Override
 	public void orderUseSkill(ActiveSkill skill) {
 		orders.orderUseSkill(skill);
+	}
+
+	@Override
+	public boolean orderAttackUnitQueueMeleeSkill(UnitOrderable unitOrd, @NonNull NoneSkill skill) {
+		return orders.orderAttackUnitQueueMeleeSkill(unitOrd, skill);
+	}
+	public void orderMoveInRangeToUseSkill(float x, float y, @NonNull GroundSkill skill) {
+		orders.orderMoveInRangeToUseSkill(x, y, skill);
 	}
 
 	// @formatter:off
