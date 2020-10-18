@@ -19,6 +19,7 @@ import com.mygdx.holowyth.gamedata.items.Weapons;
 import com.mygdx.holowyth.gamedata.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.gamedata.skillsandeffects.Skills;
 import com.mygdx.holowyth.gamedata.units.MonsterStats;
+import com.mygdx.holowyth.gamedata.units.Monsters;
 import com.mygdx.holowyth.gamedata.units.Players;
 import com.mygdx.holowyth.town.TownScreen;
 import com.mygdx.holowyth.town.model.Town;
@@ -196,6 +197,22 @@ public class StandardGameScreen extends GameScreen {
 		units.add(mapInstance.addUnit(Players.seth, unitPlacements.get(4)));
 		units.add(mapInstance.addUnit(Players.mikal, unitPlacements.get(5)));
 
+		return units;
+	}
+	
+	protected List<@NonNull Unit> spawnXCopiesOfUnit(Point spawnPos, UnitMarker template, int numCopies){
+		
+		// fetch locations
+		final List<@NonNull Point> unitPlacements = pathingModule.findPathablePlacements(spawnPos, numCopies, mapInstance.getUnits());
+		if (unitPlacements.size() != numCopies) {
+			logger.warn("Expected {} placements, but got {} locations. Not all units may be placed.", numCopies,
+					unitPlacements.size());
+		}
+		final List<@NonNull Unit> units = new ArrayList<@NonNull Unit>();
+
+		for(int i=0;i<unitPlacements.size();i++) {
+			units.add(mapInstance.addUnit(Monsters.goblin, unitPlacements.get(i)));
+		}
 		return units;
 	}
 

@@ -27,31 +27,28 @@ public class UnitOrders {
 	private final Unit self;
 	private final UnitStats stats;
 	private final UnitStatusInfo status;
-	
+
 	final UnitOrdersDeferring deffering;
-	
+
 	private Order order = Order.NONE;
-	
+
 	/**
-	 * Units can be ordered to use melee skills while still at range. The unit follows a hard-attack command as usual, and carries out the skill when it engages
+	 * Units can be ordered to use melee skills while still at range. The unit follows a hard-attack
+	 * command as usual, and carries out the skill when it engages
 	 */
 	private @Nullable NoneSkill queuedMeleeSkill;
-	
+
 	/**
 	 * If you cast a ground skill while out of range the unit will try to walk in range and cast
 	 */
 	private @Nullable GroundSkill deferredGroundSkillMoveInRange;
 	private float deferredGroundSkillX, deferredGroundSkillY;
 	private @Nullable UnitSkill deferredUnitSkillMoveInRange;
-	
-	
+
 	/** Target for the current command */
 	private Unit orderTarget;
 	private float attackMoveDestX;
 	private float attackMoveDestY;
-
-	
-	
 
 	/**
 	 * A unit's order represents whether it has any persistent order on it that would determine its
@@ -72,7 +69,6 @@ public class UnitOrders {
 			return this == ATTACKUNIT_HARD || this == ATTACKUNIT_SOFT;
 		}
 	}
-	
 
 	UnitOrders(Unit self) {
 		this.self = self;
@@ -112,14 +108,14 @@ public class UnitOrders {
 				handleTargetLossAndSwitchingForAttackMove();
 			}
 		}
-		
+
 		ifInRangeCastDeferredGroundSkill();
 		ifInRangeCastDeferredUnitSkill();
 
 		startAttackingIfInRangeForAttackOrders();
 		stopAttackingIfEnemyIsOutOfRange();
 	}
-	
+
 	void orderMove(float x, float y) {
 		if (!isMoveOrderAllowed()) {
 			if (status.isStunned()) {
@@ -132,8 +128,9 @@ public class UnitOrders {
 			order = Order.MOVE;
 		}
 	}
+
 	void orderMoveInRangeToUseSkill(float x, float y, @NonNull GroundSkill skill) {
-		if(!skill.usingMaxRange()) {
+		if (!skill.usingMaxRange()) {
 			logger.warn("orderMoveInRangeToUseSkill: skill doesn't use a max range");
 			return;
 		}
@@ -144,12 +141,15 @@ public class UnitOrders {
 			clearOrder();
 			order = Order.MOVE;
 			deferredGroundSkillMoveInRange = skill;
-			deferredGroundSkillX = x; // save the cast point because the pathing dest can differ due to goal substitution
+			deferredGroundSkillX = x; // save the cast point because the pathing dest can differ due to goal
+										// substitution
 			deferredGroundSkillY = y;
 		}
 	}
+
 	/**
 	 * This actually makes the unit follow the unit until ordered otherwise
+	 * 
 	 * @param unit
 	 */
 	void orderMoveToUnit(@NonNull UnitOrderable unit) {
@@ -158,15 +158,15 @@ public class UnitOrders {
 			return;
 		}
 		orderTarget = (Unit) unit;
-		if(self.motion.pathFindTowardsTarget()) {
+		if (self.motion.pathFindTowardsTarget()) {
 			order = Order.MOVE_TO_UNIT;
-		}else {
+		} else {
 			return;
 		}
 	}
 
 	void orderMoveInRangeToUseSkill(@NonNull UnitOrderable target, @NonNull UnitSkill skill) {
-		if(!skill.usingMaxRange()) {
+		if (!skill.usingMaxRange()) {
 			logger.warn("orderMoveInRangeToUseSkill: skill doesn't use a max range");
 			return;
 		}
@@ -175,28 +175,31 @@ public class UnitOrders {
 			return;
 		}
 		orderTarget = (Unit) target;
-		if(self.motion.pathFindTowardsTarget()) {
+		if (self.motion.pathFindTowardsTarget()) {
 			order = Order.MOVE_TO_UNIT;
 			deferredUnitSkillMoveInRange = skill;
-		}else {
+		} else {
 			return;
 		}
 	}
 
 	private void ifInRangeCastDeferredGroundSkill() {
-		if(order == Order.MOVE && deferredGroundSkillMoveInRange != null){
-			@NonNull GroundSkill skill = deferredGroundSkillMoveInRange;
+		if (order == Order.MOVE && deferredGroundSkillMoveInRange != null) {
+			@NonNull
+			GroundSkill skill = deferredGroundSkillMoveInRange;
 			Point ground = new Point(deferredGroundSkillX, deferredGroundSkillY);
-			if(Point.dist(ground, self.getPos()) <= skill.getMaxRange()) {
+			if (Point.dist(ground, self.getPos()) <= skill.getMaxRange()) {
 				skill.pluginTargeting(self, ground.x, ground.y);
 				orderUseSkill(skill);
 			}
 		}
 	}
+
 	private void ifInRangeCastDeferredUnitSkill() {
-		if(order == Order.MOVE_TO_UNIT && deferredUnitSkillMoveInRange != null){
-			@NonNull UnitSkill skill = deferredUnitSkillMoveInRange;
-			if(Point.dist(orderTarget.getPos(), self.getPos()) <= skill.getMaxRange()) {
+		if (order == Order.MOVE_TO_UNIT && deferredUnitSkillMoveInRange != null) {
+			@NonNull
+			UnitSkill skill = deferredUnitSkillMoveInRange;
+			if (Point.dist(orderTarget.getPos(), self.getPos()) <= skill.getMaxRange()) {
 				skill.setTargeting(self, orderTarget);
 				orderUseSkill(skill);
 			}
@@ -220,14 +223,14 @@ public class UnitOrders {
 	boolean orderAttackUnit(UnitOrderable unitOrd, boolean isHardOrder) {
 		return orderAttackUnit(unitOrd, isHardOrder, false);
 	}
-	
+
 	boolean orderAttackUnitQueueMeleeSkill(UnitOrderable unitOrd, @NonNull NoneSkill skill) {
 		if (self.combat.isAttacking()) {
 			logger.warn("orderAttackUnitQueueMeleeSkill shouldn't be called while unit is already attacking");
 			return false;
 		}
 		boolean result = orderAttackUnit(unitOrd, true);
-		if(result) {
+		if (result) {
 			queuedMeleeSkill = skill;
 		}
 		return result;
@@ -341,7 +344,7 @@ public class UnitOrders {
 
 		if (status.isStunned()) {
 			deffering.clearDeferredOrder(); // deferring a skill order is not supported but it will still clear an
-													// existing deferred order
+											// existing deferred order
 		}
 
 		if (!isUseSkillAllowed()) {
@@ -375,7 +378,9 @@ public class UnitOrders {
 	}
 
 	public boolean isMoveOrderAllowed() {
-		return isGeneralOrderAllowed() && !self.isAttacking();
+		return (isGeneralOrderAllowed()
+				|| (isAnyOrderAllowed() && !isBusyRetreating() && self.skills.isMobileChannelling())
+						&& !self.isAttacking());
 	}
 
 	public boolean isAttackMoveOrderAllowed() {
@@ -466,7 +471,7 @@ public class UnitOrders {
 
 				float aggroRange = self.getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
 
-				if (Point.dist( self.getPos(), closestEnemy.getPos()) <= aggroRange) {
+				if (Point.dist(self.getPos(), closestEnemy.getPos()) <= aggroRange) {
 					orderTarget = (Unit) closestEnemy; // manually set target/path, since we want to keep the ATTACKMOVE
 														// order
 					if (!self.motion.pathFindTowardsTarget()) {
@@ -482,7 +487,7 @@ public class UnitOrders {
 			float distToTarget = Point.dist(self.getPos(), orderTarget.getPos());
 			if (distToTarget <= getEngageRange(orderTarget)) {
 				self.combat.startAttacking(orderTarget);
-				if(queuedMeleeSkill != null) {
+				if (queuedMeleeSkill != null) {
 					queuedMeleeSkill.pluginTargeting(self);
 					self.orderUseSkill(queuedMeleeSkill);
 				}
@@ -574,7 +579,7 @@ public class UnitOrders {
 			clearOrder();
 		}
 	}
-	
+
 	Order getOrder() {
 		return order;
 	}
@@ -587,7 +592,7 @@ public class UnitOrders {
 	 * Clears the previous order first, if existed.
 	 */
 	void setOrder(Order order) {
-		if(order!=null) {
+		if (order != null) {
 			clearOrder();
 		}
 		this.order = order;

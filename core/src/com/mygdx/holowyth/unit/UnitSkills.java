@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.Skill;
+import com.mygdx.holowyth.skill.ActiveSkill.ChannelingType;
 import com.mygdx.holowyth.skill.ActiveSkill.Status;
 import com.mygdx.holowyth.util.exceptions.HoloException;
 import com.mygdx.holowyth.util.exceptions.HoloIllegalArgumentsException;
@@ -191,7 +192,9 @@ public class UnitSkills {
 	public boolean isChannelling() {
 		return this.activeSkill != null && activeSkill.getStatus() == Status.CHANNELING;
 	}
-
+	public boolean isMobileChannelling() {
+		return this.activeSkill != null && activeSkill.getStatus() == Status.CHANNELING && activeSkill.channelingType == ChannelingType.MOBILE;
+	}
 	public boolean isSkillsOnCooldown() {
 		return (curGlobalSkillsCooldown > 0);
 	}

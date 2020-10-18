@@ -45,7 +45,7 @@ public class Holo {
 	// Gameplay Cheats
 	public static boolean debugFastCastEnabled = false;
 	public static boolean debugSkillCooldownDisabled = true;
-	public static boolean debugHighHpUnits = true;
+	public static boolean debugHighHpUnits = false;
 	public static boolean debugNoManaCost = false;
 	public static boolean debugAllowSelectEnemyUnits = true;
 	
@@ -96,7 +96,7 @@ public class Holo {
 			debugRenderMapObstaclesEdges = false;
 
 		}
-
+		debugAllowSelectEnemyUnits = true;
 	}
 
 

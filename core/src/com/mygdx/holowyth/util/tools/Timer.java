@@ -1,73 +1,57 @@
 package com.mygdx.holowyth.util.tools;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 /**
- * Can use to manually run tasks at a certain interval
- * 
- * @author Colin Ta
+ * Update must be called on the timer
+ * @author Colin
  *
  */
 public class Timer {
 
-	boolean started = false;
-	
-	long timeOfLastFrame;
-	long timeSinceLastFrame;
-	public long frameNumber = 0;
-	long intervalTimeMili; // in milliseconds
-	long extraTime; // in nanoseconds
+	private boolean started;
+	private boolean isPaused;
+	private float timeElapsedMili;
 
-	//  fields for returning absolute elapsed time
-	long timeInitial;
-	
-	public Timer() {
+	protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	}
-
-	/**
-	 * Can call this redundantly, no problem
-	 * 
-	 * @param interval
-	 *            time, in milliseconds
-	 */
-	public void start(long interval) {
-		this.intervalTimeMili = interval;
+	public void start() {
 		if (!started) {
-			timeOfLastFrame = System.nanoTime();
 			started = true;
-			timeInitial = System.nanoTime();
+			timeElapsedMili = 0;
 		}
 	}
-	public void restart() {
-		timeOfLastFrame = System.nanoTime();
-		started = true;
-		timeInitial = System.nanoTime();
-		frameNumber = 0;
-		timeSinceLastFrame = 0;
-	}
 
-	public boolean taskReady() {
-		frameNumber += 1;
-		timeSinceLastFrame = System.nanoTime() - timeOfLastFrame;
-
-		if (timeSinceLastFrame > intervalTimeMili * 1000000) {
-			extraTime = Math.min(timeSinceLastFrame - intervalTimeMili * 1000000, intervalTimeMili * 1000000);
-			timeOfLastFrame = System.nanoTime() - extraTime; // carry over remaining time, up to a max of interval
-			return true;
+	public void update(float timeInSeconds) {
+		if (!isPaused) {
+			timeElapsedMili += timeInSeconds * 1000;
 		}
-		return false;
 	}
+
 	/**
-	 * In Miliseconds
-	 * @return
+	 * Re-inits the timer starting now
 	 */
-	public int getTimeElapsed() {
-		return (int) ((System.nanoTime() - timeInitial)/1000000);
-	}
-	public float getTimeElapsedSeconds() {
-		return (float)( ((System.nanoTime() - timeInitial)/ 1000000000.0));
-	}
-	public static float getTimeElapsedSeconds(long initialTime) {
-		return (float)( ((System.nanoTime() - initialTime)/ 1000000000.0));
+	public void restart() {
+		started = true;
+		timeElapsedMili = 0;
+		isPaused = false;
 	}
 
+	public float getTimeElapsedMili() {
+		return timeElapsedMili;
+	}
+
+	public float getTimeElapsedSeconds() {
+		return  timeElapsedMili / 1000.0f;
+	}
+
+	public void pause() {
+		isPaused = true;
+	}
+
+	public void resume() {
+		isPaused = false;
+	}
 }

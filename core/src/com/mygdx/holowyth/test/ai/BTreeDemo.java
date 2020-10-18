@@ -13,7 +13,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.util.template.HoloBaseScreen;
-import com.mygdx.holowyth.util.tools.Timer;
+import com.mygdx.holowyth.util.tools.TaskTimer;
 
 public class BTreeDemo extends HoloBaseScreen {
 
@@ -21,7 +21,7 @@ public class BTreeDemo extends HoloBaseScreen {
 
 	Color clearColor = HoloGL.rgb(204, 204, 255); // pale purple
 
-	final Timer timer = new Timer();
+	final TaskTimer timer = new TaskTimer();
 
 	BehaviorTreeLibraryManager treeLibraryManager = BehaviorTreeLibraryManager.getInstance();
 	BehaviorTreeLibrary library = treeLibraryManager.getLibrary();

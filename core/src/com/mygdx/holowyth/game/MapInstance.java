@@ -480,7 +480,7 @@ public class MapInstance implements MapInstanceInfo {
 	/**
 	 * Creates a new unit from a unitMarker and adds it to the world
 	 */
-	public @NonNull UnitOrderable addUnit(@NonNull UnitMarker unitMarker) {
+	public @NonNull Unit addUnit(@NonNull UnitMarker unitMarker) {
 		return addUnit(new Unit(unitMarker, this));
 	}
 	/**

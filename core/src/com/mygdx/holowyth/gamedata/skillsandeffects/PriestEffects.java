@@ -8,22 +8,6 @@ import com.mygdx.holowyth.unit.Unit;
 
 public class PriestEffects {
 
-	static class StaffStrikeEffect extends CasterUnitEffect {
-		public StaffStrikeEffect(Unit caster, Unit target) {
-			super(caster, target);
-		}
-		@Override
-		public void tick() {
-			if (caster.stats.isAttackRollSuccessful(target.stats, StaffStrike.atkBonus)) {
-				target.stats.applyDamage(caster.stats.getDamage() * StaffStrike.atkdmgMultiplier);
-				target.stats.doReelRollAgainst(caster.stats.getForce(), StaffStrike.reelDuration);
-			}else {
-				gfx.makeMissEffect(caster);
-			}
-			markAsComplete();
-		}
-	}
-
 	static class HealEffect extends CasterUnitEffect {
 		
 		public HealEffect(Unit caster, Unit target) {
@@ -39,6 +23,22 @@ public class PriestEffects {
 			effect.setAlpha(0.85f);
 			gfx.addGraphicEffect(effect);
 			gfx.makeHealEffect(Heal.healAmount, target);
+			markAsComplete();
+		}
+	}
+
+	static class StaffStrikeEffect extends CasterUnitEffect {
+		public StaffStrikeEffect(Unit caster, Unit target) {
+			super(caster, target);
+		}
+		@Override
+		public void tick() {
+			if (caster.stats.isAttackRollSuccessful(target.stats, StaffStrike.atkBonus)) {
+				target.stats.applyDamage(caster.stats.getDamage() * StaffStrike.atkdmgMultiplier);
+				target.stats.doReelRollAgainst(caster.stats.getForce(), StaffStrike.reelDuration);
+			}else {
+				gfx.makeMissEffect(caster);
+			}
 			markAsComplete();
 		}
 	}

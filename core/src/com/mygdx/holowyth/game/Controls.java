@@ -32,6 +32,7 @@ import com.mygdx.holowyth.game.ui.GameLogDisplay;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.pathfinding.HoloPF;
 import com.mygdx.holowyth.skill.ActiveSkill;
+import com.mygdx.holowyth.skill.ActiveSkill.Tag;
 import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
 import com.mygdx.holowyth.skill.skill.UnitGroundSkill;
@@ -432,6 +433,7 @@ public class Controls extends InputProcessorAdapter {
 			if (curSkill.requiresLOS) {
 				@NonNull
 				List<@NonNull Unit> otherUnits = new ArrayList<>(mapInstance.getUnits());
+				otherUnits.removeIf((unit) -> unit.isEnemy(caster));
 				otherUnits.remove(caster);
 				otherUnits.remove(target);
 				if (!HoloPF.isSegmentPathable(caster.x, caster.y, target.x, target.y, pathing.getObstacleSegs(),
@@ -847,12 +849,15 @@ public class Controls extends InputProcessorAdapter {
 
 				@NonNull
 				List<@NonNull Unit> otherUnits = new ArrayList<>(mapInstance.getUnits());
+				otherUnits.removeIf((unit) -> unit.isEnemy(caster));
 				otherUnits.remove(caster);
 				otherUnits.remove(target);
 				renderObstaclesEdges();
 				renderUnitCircles(otherUnits);
-
-				if (HoloPF.isSegmentPathable(caster.x, caster.y, unitUnderCursor.x, unitUnderCursor.y,
+				
+				if(target.isEnemy(caster) == curSkill.hasTag(Tag.ALLIED_TARGETING)) { // invalid target
+					shapeRenderer.setColor(Color.GRAY);
+				}else if (HoloPF.isSegmentPathable(caster.x, caster.y, unitUnderCursor.x, unitUnderCursor.y,
 						pathing.getObstacleSegs(), pathing.getObstaclePoints(), otherUnits, 0)) {
 					shapeRenderer.setColor(Color.GREEN);
 				} else {

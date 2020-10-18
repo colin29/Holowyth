@@ -33,6 +33,7 @@ public class Players {
 		{
 		side = Side.PLAYER;
 		name = "Elvin";
+		wornEquips.equip(Weapons.shortSword); 
 		baseStats.set(MonsterStats.baseHuman);
 		activeSkills.addAll(Skills.warriorSkills);
 		passiveSkills.add(PassiveSkills.basicCombatTraining);

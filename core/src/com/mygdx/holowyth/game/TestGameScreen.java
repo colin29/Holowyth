@@ -4,9 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.test.HomingProjectileMotion;
+import com.mygdx.holowyth.gamedata.units.Monsters;
 import com.mygdx.holowyth.graphics.effects.animated.AnimEffectOnFixedPos;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.HoloUI;
+import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class TestGameScreen extends StandardGameScreen {
 
@@ -29,7 +31,7 @@ public class TestGameScreen extends StandardGameScreen {
 //		HoloUI.parameterSlider(0, 5f, "Unit movespeed", root, skin, (value) -> Holo.defaultUnitMoveSpeed = value);
 		
 //		
-//		Music music = Gdx.audio.newMusic(Gdx.files.internal(Holo.BGM_DISK_PATH + "Peritune_Wonder2.mp3"));
+//		Music music = Gdx.audio.newMusic(Gdx.files.internal(Holo.BGM_DISK_PATH + "Strike_the_Despair_2.mp3"));
 //		music.play();
 		
 //		for(int h=0;h<8;h++) {
@@ -39,6 +41,8 @@ public class TestGameScreen extends StandardGameScreen {
 //				gfx.addGraphicEffect(effect);
 //			}	
 //		}
+		
+		spawnXCopiesOfUnit(new Point(800, 400), Monsters.goblin, 6);
 		
 		
 		

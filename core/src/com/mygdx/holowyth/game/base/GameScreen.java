@@ -21,7 +21,7 @@ import com.mygdx.holowyth.pathfinding.PathingModule;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.tools.FunctionBindings;
-import com.mygdx.holowyth.util.tools.Timer;
+import com.mygdx.holowyth.util.tools.TaskTimer;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 import com.mygdx.holowyth.world.map.trigger.TriggersHandler;
 
@@ -58,7 +58,7 @@ public abstract class GameScreen extends MapLoadingScreen {
 	/**
 	 * For running game at constant FPS
 	 */
-	protected final Timer timer = new Timer();
+	protected final TaskTimer timer = new TaskTimer();
 
 	/**
 	 * For camera panning
@@ -219,6 +219,7 @@ public abstract class GameScreen extends MapLoadingScreen {
 		if (!gamePaused) {
 			gamePaused = true;
 			getGameLog().addMessage("Game Paused");
+			gfx.pauseAnimations();
 		}
 	}
 
@@ -229,6 +230,7 @@ public abstract class GameScreen extends MapLoadingScreen {
 		if (gamePaused) {
 			gamePaused = false;
 			getGameLog().addMessage("Game Unpaused");
+			gfx.resumeAnimations();
 		}
 	}
 

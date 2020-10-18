@@ -1,5 +1,7 @@
 package com.mygdx.holowyth.skill;
 
+import org.eclipse.jdt.annotation.NonNull;
+
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.util.Holo;
@@ -24,6 +26,11 @@ public class Casting implements Cloneable, CastingInfo {
 	public boolean isInterruptedByDamageOrReel = true;
 
 	private boolean displayedSkillName = false;
+	
+	public enum CastingType {
+		NORMAL, MOBILE;
+	}
+	public @NonNull CastingType castingType = CastingType.NORMAL; 
 
 	ActiveSkill parent;
 

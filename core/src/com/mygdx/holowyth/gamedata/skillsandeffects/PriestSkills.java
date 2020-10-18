@@ -1,5 +1,6 @@
 package com.mygdx.holowyth.gamedata.skillsandeffects;
 
+import com.mygdx.holowyth.skill.skill.NoneSkill;
 import com.mygdx.holowyth.skill.skill.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
 import com.mygdx.holowyth.util.DataUtil;
@@ -15,6 +16,7 @@ public class PriestSkills {
 			casting.castTime = 60 * 1.5f;
 			spCost = 12;
 			cooldown = 12 * 60;
+			setMaxRange(150);
 			addTag(Tag.ALLIED_TARGETING);
 		}
 
@@ -31,7 +33,7 @@ public class PriestSkills {
 
 	}
 	
-	public static class StaffStrike extends UnitSkill {
+	public static class StaffStrike extends NoneSkill {
 		
 		public static float atkdmgMultiplier = 1;
 		public static int atkBonus = 5;
@@ -43,17 +45,15 @@ public class PriestSkills {
 			casting.setCastTimeSec(1.5f);
 			spCost = 12;
 			setCooldownSec(12);
+			isMeleeSkill = true;
 		}
 
 		@Override
-		protected boolean pluginTargeting(Unit caster, Unit target) {
-			if(caster.inRange(target, caster.getEngageRange(target))) {
-				setEffects(new PriestEffects.StaffStrikeEffect(caster, target));	
-				return true;
-			}else {
-				logErrorMessage("Target must be in melee range");
+		public boolean pluginTargeting(Unit caster) {
+			if (!caster.isAttacking())
 				return false;
-			}
+			setEffects(new PriestEffects.StaffStrikeEffect(caster, caster.getAttacking()));
+			return true;
 		}
 
 		@Override

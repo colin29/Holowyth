@@ -43,7 +43,7 @@ import com.mygdx.holowyth.util.HoloIO;
 import com.mygdx.holowyth.util.HoloUI;
 import com.mygdx.holowyth.util.dataobjects.Point;
 import com.mygdx.holowyth.util.dataobjects.Segment;
-import com.mygdx.holowyth.util.tools.Timer;
+import com.mygdx.holowyth.util.tools.TaskTimer;
 
 public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 
@@ -75,7 +75,7 @@ public class PathfindingDemo implements Screen, InputProcessor, PFWorld {
 	Color clearColor = defaultClearColor;
 
 	// Logic
-	Timer timer = new Timer();
+	TaskTimer timer = new TaskTimer();
 
 	
 

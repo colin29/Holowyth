@@ -143,7 +143,7 @@ public class MageSkills {
 			casting.castTime = 60 * 1.6f;
 			spCost = 16;
 			cooldown = 60 * 18;
-			setMaxRange(600);
+			setMaxRange(500);
 			addTag(Tag.MAGIC, Tag.RANGED);
 
 			defaultAimingHelperRadius = MageEffects.ThunderclapEffect.aoeRadius;
@@ -171,7 +171,7 @@ public class MageSkills {
 			spCost = 18;
 			cooldown = 60 * 24;
 			globalCooldown = 60 * 3;
-			setMaxRange(600);
+			setMaxRange(500);
 			addTag(Tag.MAGIC, Tag.RANGED);
 			defaultAimingHelperRadius = MageEffects.BlindingFlashEffect.aoeRadius;
 		}

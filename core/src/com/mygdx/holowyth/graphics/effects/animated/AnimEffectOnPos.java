@@ -9,6 +9,7 @@ import com.mygdx.holowyth.game.MapInstanceInfo;
 import com.mygdx.holowyth.unit.sprite.AnimatedEffectSprite;
 import com.mygdx.holowyth.unit.sprite.Animations;
 import com.mygdx.holowyth.util.ShapeDrawerPlus;
+import com.mygdx.holowyth.util.tools.TaskTimer;
 import com.mygdx.holowyth.util.tools.Timer;
 
 @NonNullByDefault
@@ -44,15 +45,25 @@ public class AnimEffectOnPos extends AnimatedEffect {
 
 	@Override
 	public void begin() {
-		timer.start(0);
+		timer.start();
 	}
 
 	@Override
 	public void tick() {
 	}
+	
+	public void pauseAnimation() {
+		timer.pause();
+	}
+	public void resumeAnimation() {
+		timer.resume();
+	}
+
 
 	@Override
-	public void render(SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
+	public void render(float delta, SpriteBatch batch, ShapeDrawerPlus shapeDrawer, AssetManager assets) {
+		
+		timer.update(delta);
 		
 		int origSrc, origDest;
 		origSrc = batch.getBlendSrcFunc();
@@ -68,9 +79,7 @@ public class AnimEffectOnPos extends AnimatedEffect {
 		batch.end();
 		batch.flush();
 		batch.setBlendFunction(origSrc, origDest);
-		
 		if(effect.anim.isAnimationFinished(timer.getTimeElapsedSeconds())) {
-			
 			if(loop) {
 				timer.restart();
 			}else {

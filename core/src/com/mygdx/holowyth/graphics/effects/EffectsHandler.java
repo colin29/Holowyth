@@ -92,9 +92,9 @@ public class EffectsHandler {
 		batch.end();
 	}
 
-	public void renderAnimatedEffects() {
+	public void renderAnimatedEffects(float delta) {
 		for (var effect : animatedEffects) {
-			effect.render(batch, shapeDrawer, assets);
+			effect.render(delta, batch, shapeDrawer, assets);
 		}
 	}
 
@@ -114,7 +114,16 @@ public class EffectsHandler {
 
 		skillNameEffects.tick();
 		tickAnimatedEffects();
-
+	}
+	public void pauseAnimations() {
+		for (var effect : animatedEffects) {
+			effect.pauseAnimation();
+		}
+	}
+	public void resumeAnimations() {
+		for (var effect : animatedEffects) {
+			effect.resumeAnimation();
+		}
 	}
 
 	private void tickAnimatedEffects() {

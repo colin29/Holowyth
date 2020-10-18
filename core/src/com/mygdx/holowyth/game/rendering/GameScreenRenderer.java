@@ -188,7 +188,7 @@ public class GameScreenRenderer {
 			// Effects
 			renderInGameEffects();
 			gfx.renderBlockEffects(delta);
-			gfx.renderAnimatedEffects();
+			gfx.renderAnimatedEffects(delta);
 			gfx.renderDamageTextEffects();
 		}
 

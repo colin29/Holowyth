@@ -61,6 +61,7 @@ public class Animations {
 		loadEffect("img/effects/holy_cross.png", 192, 192, 0.10f);
 		loadEffect("img/effects/casting_glow.png", 120, 120, 0.10f, true);
 		loadEffect("img/effects/lightning_ball.png", 192, 192, 0.10f);
+		loadEffect("img/effects/pinwheel.png", 192, 192, 0.05f);
 		
 		loadEffect(EFFECTS_DIR + "rixu/12.png",  64, 64, 0.02f);
 		loadEffect(EFFECTS_DIR + "rixu/53.png",  64, 64, 0.02f);

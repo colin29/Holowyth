@@ -6,14 +6,14 @@ import com.badlogic.gdx.graphics.Color;
 import com.mygdx.holowyth.Holowyth;
 import com.mygdx.holowyth.graphics.HoloGL;
 import com.mygdx.holowyth.util.template.SimpleMapDemoScreen;
-import com.mygdx.holowyth.util.tools.Timer;
+import com.mygdx.holowyth.util.tools.TaskTimer;
 import com.mygdx.holowyth.util.tools.debugstore.DebugStore;
 
 public class CollisionDemo extends SimpleMapDemoScreen {
 
 	private DebugStore debugStore = new DebugStore();
 
-	Timer timer = new Timer();
+	TaskTimer timer = new TaskTimer();
 	Color backgroundColor = HoloGL.rgb(179, 221, 166);
 	InputMultiplexer multiplexer = new InputMultiplexer();
 

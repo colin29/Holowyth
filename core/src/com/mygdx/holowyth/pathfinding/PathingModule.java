@@ -526,9 +526,9 @@ public class PathingModule {
 	 *         is unpathable, returns empty list. If only a partial number of placements could be found,
 	 *         returns that partial list.
 	 */
-	public List<Point> findPathablePlacements(Point spawnPoint, int numPlacements,
+	public List<@NonNull Point> findPathablePlacements(@NonNull Point spawnPoint, int numPlacements,
 			List<@NonNull ? extends UnitPF> existingUnits) {
-		List<Point> placements = new ArrayList<>();
+		List<@NonNull Point> placements = new ArrayList<>();
 
 		revertDynamicGraph();
 		setDynamicGraph(existingUnits, Holo.UNIT_RADIUS);

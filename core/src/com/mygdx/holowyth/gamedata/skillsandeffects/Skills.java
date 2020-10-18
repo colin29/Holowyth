@@ -24,7 +24,7 @@ public class Skills {
 					new WarriorSkills.Taunt(), new WarriorSkills.DeafeningCry()));
 	
 	public static final List<ActiveSkill> swordsmanSkills = Collections
-			.unmodifiableList(Arrays.asList(new SwordsmanSkills.TripleStrike()));
+			.unmodifiableList(Arrays.asList(new SwordsmanSkills.TripleStrike(), new SwordsmanSkills.Pinwheel()));
 
 	public static final List<ActiveSkill> mageSkills = Collections
 			.unmodifiableList(Arrays.asList(new MageSkills.Fireball(), 

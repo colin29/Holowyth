@@ -1,6 +1,7 @@
 package com.mygdx.holowyth.skill;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import com.mygdx.holowyth.game.MapInstance;
 import com.mygdx.holowyth.game.MapInstanceInfo;
 import com.mygdx.holowyth.game.ui.GameLogDisplay;
+import com.mygdx.holowyth.skill.Casting.CastingType;
 import com.mygdx.holowyth.skill.effect.CasterEffect;
 import com.mygdx.holowyth.skill.effect.Effect;
 import com.mygdx.holowyth.unit.Unit;
@@ -67,7 +69,13 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 	// Components
 	public Casting casting = new Casting(this); // default behaviour, can assign over this from a sub class.
 
-	public boolean hasChannelingBehaviour = false;
+	public @NonNull ChannelingType channelingType = ChannelingType.NONE;
+	public enum ChannelingType{
+		NONE, NORMAL, MOBILE; // With moving channel player can move while channeling
+		public boolean isChanneled() {
+			return this == NORMAL ||  this == MOBILE;
+		}
+	}
 
 	public enum Tag {
 		MAGIC, RANGED,
@@ -133,7 +141,8 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 		casting.begin(caster);
 		tick();
 		// If skill was not insta-cast, we need to stop motion and actions
-		if (status == Status.CASTING || status == Status.CHANNELING) {
+		if (casting.castingType == CastingType.MOBILE) {
+		}else if (status == Status.CASTING || status == Status.CHANNELING) {
 			caster.stopUnit();
 		}
 	}
@@ -171,7 +180,7 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 				
 				// Casting a success, carry out effects
 
-				if (hasChannelingBehaviour) {
+				if (channelingType.isChanneled()) {
 					status = Status.CHANNELING;
 				} else {
 					status = Status.DONE;
@@ -186,11 +195,23 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 				onFinishCasting();
 			}
 		}
+		if(status == Status.CHANNELING && allEffectsDone()) {
+			status = Status.DONE;
+		}
 
 		if (status == Status.DONE) {
 			caster.setActiveSkill(null);
 		}
 
+	}
+	
+	private boolean allEffectsDone() {
+		for (Effect effect : effects) {
+			if(!effect.isComplete()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -361,5 +382,12 @@ public abstract class ActiveSkill extends Skill implements Cloneable, SkillInfo 
 	}
 	public boolean usingMaxRange() {
 		return maxRange >= 0;
+	}
+
+	public Set<Tag> getTags() {
+		return Collections.unmodifiableSet(tags);
+	}
+	public boolean hasTag(Tag tag) {
+		return tags.contains(tag);
 	}
 }
