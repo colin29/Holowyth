@@ -80,6 +80,8 @@ class UnitStun {
 		}
 		float stunTimeAddedDebug;
 
+		self.combat.setTimeOutOfCombat(0);
+		
 		switch (state) {
 		case NORMAL:
 			beginStun(duration);
@@ -117,16 +119,17 @@ class UnitStun {
 
 			// logger.debug("Knockback info: Orig Vel {} maxKnockBackVel {} dv {} proratedDv {} finalVel {}", curVel.len(), maxKnockBackVel, dv.len(),
 			// dVProrated.len(), self.motion.getKnockbackVelocity().len());
-
 		} else {
 			self.getMotion().applyKnockBackVelocity(dv.x, dv.y);
 		}
+		self.combat.setTimeOutOfCombat(0);
 
 	}
 
 	void applyKnockbackStunWithoutVelProrate(float duration, float maxStunDuration, Vector2 dv) {
 		applyStun(duration, maxStunDuration);
 		self.getMotion().applyKnockBackVelocity(dv.x, dv.y);
+		self.combat.setTimeOutOfCombat(0);
 	}
 
 	boolean isUnitBeingKnockedBack() {
@@ -141,7 +144,8 @@ class UnitStun {
 			logger.warn("tried to apply reel of negative duration");
 			return;
 		}
-
+		
+		self.combat.setTimeOutOfCombat(0);
 		float reelTimeAdded;
 
 		switch (state) {

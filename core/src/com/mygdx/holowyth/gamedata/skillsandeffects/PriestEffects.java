@@ -16,13 +16,19 @@ public class PriestEffects {
 
 		@Override
 		public void tick() {
-			target.stats.applyHeal(Heal.healAmount, true);
+			final float healAmount;
+			if(target.getCombat().getTimeOutOfCombat() >= Heal.outOfCombatTimeThreshold) {
+				healAmount = Heal.healAmount * (1 + Heal.outOfCombathealingBonus);
+			}else {
+				healAmount = Heal.healAmount;
+			}
+			target.stats.applyHeal(healAmount, true);
 			
 			var effect = new AnimEffectOnUnit(target, "holy_cross.png", mapInstance, mapInstance.getAnimations());	
 			effect.setSize(72, 72);
 			effect.setAlpha(0.85f);
 			gfx.addGraphicEffect(effect);
-			gfx.makeHealEffect(Heal.healAmount, target);
+			gfx.makeHealEffect(healAmount, target);
 			markAsComplete();
 		}
 	}

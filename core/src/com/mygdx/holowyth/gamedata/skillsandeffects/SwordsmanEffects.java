@@ -23,13 +23,20 @@ public class SwordsmanEffects {
 			super(caster, target);
 		}
 
+		boolean hit;
+
+		public void begin() {
+			hit = caster.stats.isAttackRollSuccessful(target.stats, 5);
+			if (!hit) {
+				gfx.makeMissEffect(caster);
+			}
+		}
+
 		@Override
 		public void tick() {
 			if (framesElapsed % 15 == 0) {
-				if (caster.stats.isAttackRollSuccessful(target.stats, 5)) {
+				if (hit) {
 					target.stats.applyDamage(caster.stats.getDamage() * TripleStrike.atkdmgMultiplier);
-				} else {
-					gfx.makeMissEffect(caster);
 				}
 				strikesDone++;
 			}

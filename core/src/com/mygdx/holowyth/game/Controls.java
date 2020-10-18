@@ -156,6 +156,14 @@ public class Controls extends InputProcessorAdapter {
 				return "0";
 			}
 		});
+		debugValues.add("Time out of combat of one unit", () -> {
+			if (selectedUnits.size() == 1) {
+				Unit u = selectedUnits.first();
+				return String.valueOf(u.getCombat().getTimeOutOfCombat());
+			} else {
+				return "N/A";
+			}
+		});
 		debugValues.add("Current order of one unit", () -> {
 			if (selectedUnits.size() == 1) {
 				UnitOrderable u = selectedUnits.first();

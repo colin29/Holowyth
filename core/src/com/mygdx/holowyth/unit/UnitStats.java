@@ -69,7 +69,7 @@ public class UnitStats implements UnitStatsInfo {
 		}
 	}
 
-	public void reinitializeForWorld() {
+	public void reinitializeForMapInstance() {
 		gfx = self.getMapInstance().getGfx();
 	}
 
@@ -363,6 +363,7 @@ public class UnitStats implements UnitStatsInfo {
 			gfx.makeDamageEffect(d, self, effectParams);
 			return d.damage;
 		} else {
+			self.combat.setTimeOutOfCombat(0);
 			final float actualDamage = calculatePostArmorDamage(d.damage, d.armorPiercing, d.armorNegation);
 			subtractHp(actualDamage);
 			DamageInstance actual = new DamageInstance(d);

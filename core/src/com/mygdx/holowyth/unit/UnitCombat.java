@@ -39,6 +39,8 @@ public class UnitCombat {
 
 	private float attackOfOpportunityCooldown = 120;
 	private float attackOfOpportunityCooldownRemaining = 0;
+	
+	private int timeOutOfCombat = 9999; // Will apply on every map change
 
 	public UnitCombat(Unit self) {
 		this.self = self;
@@ -76,6 +78,12 @@ public class UnitCombat {
 		tickRetreatDurationIfRetreating();
 		tickRetreatCooldown();
 		tickAttackOfOpportunityCooldown();
+		
+		if(isAttacking() || !self.getUnitsAttackingThis().isEmpty()) {
+			timeOutOfCombat = 0;
+		}else {
+			timeOutOfCombat = Math.min(timeOutOfCombat+1, 9999);
+		}
 	}
 
 	void retreat(float x, float y) {
@@ -212,6 +220,13 @@ public class UnitCombat {
 		}
 		if (attacking != unit)
 			startAttacking(unit);
+	}
+
+	public int getTimeOutOfCombat() {
+		return timeOutOfCombat;
+	}
+	public void setTimeOutOfCombat(int timeOutOfCombat) {
+		this.timeOutOfCombat = timeOutOfCombat;
 	}
 
 }

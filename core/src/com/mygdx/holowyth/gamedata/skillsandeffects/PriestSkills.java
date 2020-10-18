@@ -9,6 +9,8 @@ public class PriestSkills {
 	public static class Heal extends UnitSkill {
 		
 		public static int healAmount = 15;
+		public static int outOfCombatTimeThreshold = 4 * 60;
+		public static float outOfCombathealingBonus = 0.5f;
 		
 		public Heal() {
 			super();
@@ -28,7 +30,7 @@ public class PriestSkills {
 
 		@Override
 		public String getDescription() {
-			return String.format("Heals an ally for %s", healAmount);
+			return String.format("Restore %s hp to an ally. If target has been out of combat for %s seconds, heal for %s more.", healAmount, DataUtil.asSeconds(outOfCombatTimeThreshold), DataUtil.percentage(outOfCombathealingBonus));
 		}
 
 	}

@@ -157,7 +157,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 		motion = new UnitMotion(this, world);
 		combat = new UnitCombat(this);
 		orders = new UnitOrders(this);
-		stats.reinitializeForWorld();
+		stats.reinitializeForMapInstance();
 	}
 
 	/**
