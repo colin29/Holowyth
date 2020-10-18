@@ -220,6 +220,9 @@ public abstract class GameScreen extends MapLoadingScreen {
 			gamePaused = true;
 			getGameLog().addMessage("Game Paused");
 			gfx.pauseAnimations();
+			for(Unit unit : mapInstance.getUnits()) {
+				unit.graphics.pauseAnimation();
+			}
 		}
 	}
 
@@ -231,6 +234,9 @@ public abstract class GameScreen extends MapLoadingScreen {
 			gamePaused = false;
 			getGameLog().addMessage("Game Unpaused");
 			gfx.resumeAnimations();
+			for(Unit unit : mapInstance.getUnits()) {
+				unit.graphics.resumeAnimation();
+			}
 		}
 	}
 

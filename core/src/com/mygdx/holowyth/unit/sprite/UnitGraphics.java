@@ -38,6 +38,8 @@ public class UnitGraphics {
 	private Animation<TextureRegion> prevAnimation;
 
 	private TextureRegion currentFrame;
+	
+	boolean isPaused;
 
 	public UnitGraphics(Unit self) {
 		this.self = self;
@@ -59,7 +61,7 @@ public class UnitGraphics {
 		batch.draw(currentFrame, self.getX() - SPRITE_WIDTH / 2, self.getY() - SPRITE_HEIGHT / 2);
 		batch.end();
 	}
-
+	
 	private void updateActiveAnimation(float delta) {
 
 		if (self.getMotion().isBeingKnockedBack())
@@ -81,7 +83,7 @@ public class UnitGraphics {
 			setActiveAnimation(animatedSprite.getDown());
 		}
 
-		if (activeAnimation == prevAnimation && !self.getMotion().isBeingKnockedBack() && !self.isAttacking()) {
+		if (activeAnimation == prevAnimation && !isPaused &&  !self.getMotion().isBeingKnockedBack() && !self.isAttacking()) {
 			stateTime += delta;
 		}
 		prevAnimation = activeAnimation;
@@ -98,6 +100,14 @@ public class UnitGraphics {
 		}
 	}
 
+	public void pauseAnimation() {
+		isPaused = true;
+	}
+	public void resumeAnimation() {
+		isPaused = false;
+	}
+	
+	
 	private void setActiveAnimation(Animation<TextureRegion> newState) {
 		if (activeAnimation != newState) {
 			activeAnimation = newState;
