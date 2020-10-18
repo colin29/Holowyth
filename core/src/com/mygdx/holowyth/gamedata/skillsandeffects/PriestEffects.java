@@ -24,7 +24,7 @@ public class PriestEffects {
 			}
 			target.stats.applyHeal(healAmount, true);
 			
-			var effect = new AnimEffectOnUnit(target, "holy_cross.png", mapInstance, mapInstance.getAnimations());	
+			var effect = new AnimEffectOnUnit(target, "holy_cross.png", mapInstance);	
 			effect.setSize(72, 72);
 			effect.setAlpha(0.85f);
 			gfx.addGraphicEffect(effect);

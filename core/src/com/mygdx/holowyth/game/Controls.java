@@ -131,8 +131,6 @@ public class Controls extends InputProcessorAdapter {
 
 		labelStyle = new LabelStyle(Holowyth.fonts.debugFont, Holo.debugFontColor);
 
-		logger.debug("Controls initialized");
-
 		DebugValues debugValues = debugStore.registerComponent("Controls");
 		debugValues.add("Order Context", () -> getCurrentContextText());
 

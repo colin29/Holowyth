@@ -72,7 +72,7 @@ public class ArcaneBoltBolt extends ProjectileBase {
 
 		Vector2 knockBackVec = getVelocity().setLength(1.5f);
 		enemy.stats.doKnockBackRollAgainst(25, 60 * 3f, knockBackVec);
-		gfx.addGraphicEffect(new AnimEffectOnFixedPos(pos.x, pos.y, "12.png", mapInstance, mapInstance.getAnimations()));
+		gfx.addGraphicEffect(new AnimEffectOnFixedPos(pos.x, pos.y, "12.png", mapInstance));
 	}
 
 	private void handleTargetDead() {

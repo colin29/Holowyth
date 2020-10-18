@@ -77,6 +77,9 @@ public class Projectile {
 	public final float getVy() {
 		return motion.getVy();
 	}
+	public final float getDirection() {
+		return motion.getDirection();
+	}
 	public ProjectileMotion getMotion() {
 		return motion;
 	}

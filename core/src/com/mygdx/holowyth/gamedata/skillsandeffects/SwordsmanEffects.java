@@ -3,15 +3,13 @@ package com.mygdx.holowyth.gamedata.skillsandeffects;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.Vector2;
 import com.mygdx.holowyth.gamedata.skillsandeffects.SwordsmanSkills.Pinwheel;
 import com.mygdx.holowyth.gamedata.skillsandeffects.SwordsmanSkills.TripleStrike;
 import com.mygdx.holowyth.graphics.effects.animated.AnimEffectOnUnit;
-import com.mygdx.holowyth.graphics.effects.animated.AnimatedEffect;
 import com.mygdx.holowyth.skill.effect.CasterEffect;
 import com.mygdx.holowyth.skill.effect.CasterUnitEffect;
 import com.mygdx.holowyth.unit.Unit;
-import com.mygdx.holowyth.util.dataobjects.Point;
 
 public class SwordsmanEffects {
 	public static class TripleStrikeEffect extends CasterUnitEffect {
@@ -24,9 +22,25 @@ public class SwordsmanEffects {
 		}
 
 		boolean hit;
+		private int delay = 0;
+		private int strikeInterval = 12;
 
 		public void begin() {
-			hit = caster.stats.isAttackRollSuccessful(target.stats, 5);
+			hit = caster.stats.isAttackRollSuccessful(target.stats, 10);
+			
+			for(int i=0;i<3;i++) {
+
+				Vector2 offset = new Vector2(0, 4); // offset each so they form a triangle
+				float rotation = i * 120;
+				offset.rotate(45 + rotation);
+				
+				var effect = new AnimEffectOnUnit(target, "slash_white.png", mapInstance);
+				effect.setSize(60, 60);
+				effect.setRotation(i*120);
+				effect.setDelay(delay + i*strikeInterval);
+				effect.offset(offset.x, offset.y);
+				gfx.addGraphicEffect(effect);	
+			}
 			if (!hit) {
 				gfx.makeMissEffect(caster);
 			}
@@ -34,9 +48,11 @@ public class SwordsmanEffects {
 
 		@Override
 		public void tick() {
-			if (framesElapsed % 15 == 0) {
+			if ((framesElapsed - delay) % strikeInterval == 0 && (framesElapsed-delay) > 0) {
 				if (hit) {
 					target.stats.applyDamage(caster.stats.getDamage() * TripleStrike.atkdmgMultiplier);
+				}else {
+					gfx.makeBlockEffect(caster, target);
 				}
 				strikesDone++;
 			}
@@ -61,7 +77,7 @@ public class SwordsmanEffects {
 		AnimEffectOnUnit effect;
 
 		public void begin() {
-			effect = new AnimEffectOnUnit(caster, "pinwheel.png", mapInstance, mapInstance.getAnimations());
+			effect = new AnimEffectOnUnit(caster, "pinwheel.png", mapInstance);
 			effect.loop = true;
 			effect.setAlpha(1f);
 			effect.setSize(150, 150);

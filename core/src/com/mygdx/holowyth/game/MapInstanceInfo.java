@@ -43,9 +43,9 @@ public interface MapInstanceInfo {
 
 	List<Effect> getEffects();
 
-	Animations getAnimations();
-
 	Set<Unit> getUnitsAttackingThis(UnitOrderable u);
 
 	AssetManager getAssets();
+
+	Animations getAnimations();
 }

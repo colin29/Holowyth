@@ -8,9 +8,9 @@ import com.mygdx.holowyth.unit.sprite.Animations;
 @NonNullByDefault
 public class AnimEffectOnFixedPos extends AnimEffectOnPos {
 
-	public AnimEffectOnFixedPos(float x, float y, String animName, MapInstanceInfo mapInstance, Animations animations) {
+	public AnimEffectOnFixedPos(float x, float y, String animName, MapInstanceInfo mapInstance) {
 
-		super(new FixedPosSource(x, y), animName, mapInstance, animations);
+		super(new FixedPosSource(x, y), animName, mapInstance);
 	}
 
 	private static class FixedPosSource implements PosSource {

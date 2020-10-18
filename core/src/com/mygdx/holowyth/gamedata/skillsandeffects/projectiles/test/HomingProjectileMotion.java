@@ -29,7 +29,7 @@ public class HomingProjectileMotion extends ProjectileMotion {
 	private void turnTowardsTarget() {
 		// get angle to target
 
-		float iRotation = getRotation();
+		float iRotation = getDirection();
 
 		float angleToTarget = Point.getAngleInDegrees(pos, target.getPos());
 		float relativeAngle = normalizeAngle(angleToTarget - iRotation); // represents how many degrees you should turn CCW

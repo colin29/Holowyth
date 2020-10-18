@@ -65,6 +65,7 @@ public class Animations {
 		
 		loadEffect(EFFECTS_DIR + "rixu/12.png",  64, 64, 0.02f);
 		loadEffect(EFFECTS_DIR + "rixu/53.png",  64, 64, 0.02f);
+		loadEffect(EFFECTS_DIR + "slash_white.png", 120, 120, 0.04f);
 		
 //		loadAllImagesInDirectoryAsEffects(new File(Holo.ASSETS_DISK_PATH + "img/effects/rixu/"), 64, 64, 0.02f);
 	}

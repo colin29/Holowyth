@@ -186,14 +186,14 @@ public class MageSkills {
 				}
 				@Override
 				protected void onBeginCast() {
-					var effect = new AnimEffectOnUnit(caster, "casting_glow.png", mapInstance, mapInstance.getAnimations());	
+					var effect = new AnimEffectOnUnit(caster, "casting_glow.png", mapInstance);	
 					effect.setSize(72, 72);
 					effect.setAlpha(0.85f);
 					mapInstance.getGfx().addGraphicEffect(effect);
 				}
 				@Override
 				protected void onFinishCast() {
-					var flash = new AnimEffectOnFixedPos(x, y, "lightning_ball.png", mapInstance, mapInstance.getAnimations());	
+					var flash = new AnimEffectOnFixedPos(x, y, "lightning_ball.png", mapInstance);	
 					mapInstance.getGfx().addGraphicEffect(flash);
 				}
 				

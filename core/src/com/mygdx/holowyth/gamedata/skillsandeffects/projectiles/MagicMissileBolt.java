@@ -152,7 +152,7 @@ public class MagicMissileBolt extends ProjectileBase {
 		// Apply knockback stun in direction missile was travelling
 		Vector2 knockBackVec = getVelocity().setLength(0.5f);
 		enemy.stats.doKnockBackRollAgainst(15, 60 * 0.5f, knockBackVec, 1.5f);
-		gfx.addGraphicEffect(new AnimEffectOnFixedPos(pos.x, pos.y, "53.png", mapInstance, mapInstance.getAnimations()));
+		gfx.addGraphicEffect(new AnimEffectOnFixedPos(pos.x, pos.y, "53.png", mapInstance));
 
 	}
 }

@@ -18,14 +18,22 @@
 
 	<logger name="com.mygdx.holowyth.unit.UnitStats" level="DEBUG" />
 	<logger name="com.mygdx.holowyth.unit.UnitStun" level="INFO" />
-	<logger name="com.mygdx.holowyth.unit.UnitOrderDeferring" level="INFO" />
 	<logger name="com.mygdx.holowyth.collision" level="INFO"/>
 	<logger name="com.mygdx.holowyth.ai" level="INFO"/>
 	<logger name="com.mygdx.holowyth.unit.sprite" level="INFO"/>
+<logger name="com.mygdx.holowyth.util.tools.debugstore.DebugStore" level="INFO"/>
+	
 
 	<logger name="com.mygdx.holowyth.town" level="INFO"/>
 	<logger name="com.mygdx.holowyth.LoadingScreen" level="INFO"/>
 	<logger name="com.mygdx.holowyth.PrefixingAssetManager" level="INFO"/>
+
+		<logger name="com.wizered67.game.assets.Assets" level="INFO"/>
+<logger name="com.wizered67.game.conversations.scene.SceneManager" level="INFO"/>
+
+
+		
+	
 	
 		
 	

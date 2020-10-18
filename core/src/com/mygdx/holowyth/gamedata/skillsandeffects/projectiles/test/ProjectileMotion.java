@@ -82,7 +82,7 @@ public final float getSpeed() {
 /**
  * @return angle in the range [0, 360)
  */
-public final float getRotation() {
+public final float getDirection() {
 	return direction;
 }
 

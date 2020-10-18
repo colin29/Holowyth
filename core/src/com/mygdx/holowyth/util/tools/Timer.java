@@ -3,9 +3,9 @@ package com.mygdx.holowyth.util.tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * Update must be called on the timer
+ * 
  * @author Colin
  *
  */
@@ -21,6 +21,20 @@ public class Timer {
 		if (!started) {
 			started = true;
 			timeElapsedMili = 0;
+		}else {
+			logger.warn("Timer already started");
+		}
+	}
+
+	/**
+	 * @param delay in seconds
+	 */
+	public void start(float delay) {
+		if (!started) {
+			started = true;
+			timeElapsedMili = -1 * delay * 1000;
+		}else {
+			logger.warn("Timer already started");
 		}
 	}
 
@@ -44,7 +58,7 @@ public class Timer {
 	}
 
 	public float getTimeElapsedSeconds() {
-		return  timeElapsedMili / 1000.0f;
+		return timeElapsedMili / 1000.0f;
 	}
 
 	public void pause() {
@@ -53,5 +67,12 @@ public class Timer {
 
 	public void resume() {
 		isPaused = false;
+	}
+
+	public boolean delayStillActive() {
+		return timeElapsedMili < 0;
+	}
+	public boolean isStarted() {
+		return started;
 	}
 }
