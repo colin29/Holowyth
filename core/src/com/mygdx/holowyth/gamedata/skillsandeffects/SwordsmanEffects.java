@@ -89,7 +89,7 @@ public class SwordsmanEffects {
 			if (framesElapsed % Pinwheel.strikeInterval == 0 && framesElapsed != 0) {
 				for (Unit unit : mapInstance.getUnits()) {
 					if (unit.isEnemy(caster)) {
-						if (Unit.getDist(caster, unit) <= Pinwheel.aoeRadius + caster.getRadius()) {
+						if (Unit.dist(caster, unit) <= Pinwheel.aoeRadius + caster.getRadius()) {
 							if (!atkResult.containsKey(unit)) {
 								atkResult.put(unit, caster.stats.isAttackRollSuccessful(unit.stats, Pinwheel.atkBonus));
 								if (!atkResult.get(unit)) {

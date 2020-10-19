@@ -18,6 +18,8 @@
 
 	<logger name="com.mygdx.holowyth.unit.UnitStats" level="DEBUG" />
 	<logger name="com.mygdx.holowyth.unit.UnitStun" level="INFO" />
+	<logger name="com.mygdx.holowyth.unit.UnitCombat" level="INFO" />
+	
 	<logger name="com.mygdx.holowyth.collision" level="INFO"/>
 	<logger name="com.mygdx.holowyth.ai" level="INFO"/>
 	<logger name="com.mygdx.holowyth.unit.sprite" level="INFO"/>

@@ -71,6 +71,10 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	public @NonNull final UnitEquip equip;
 	public @NonNull final UnitAI ai;
 	public @NonNull final UnitStatus status;
+	
+	public enum Class {
+		NONE, WARRIOR, SWORDSMAN, THIEF, MAGE, PRIEST, RANGER
+	}
 
 	// Id (for debug)
 	private static int curId = 0;
@@ -589,7 +593,7 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 		return idToUnit.get(id);
 	}
 
-	public static float getDist(UnitOrderable u1, UnitOrderable u2) {
+	public static float dist(UnitOrderable u1, UnitOrderable u2) {
 		return Point.dist(u1.getPos(), u2.getPos());
 	}
 	public boolean inRange(UnitOrderable other, float range) {

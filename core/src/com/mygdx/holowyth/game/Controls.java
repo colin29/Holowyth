@@ -140,7 +140,7 @@ public class Controls extends InputProcessorAdapter {
 				Iterator<Unit> iter = selectedUnits.iterator();
 				Unit u1 = iter.next();
 				Unit u2 = iter.next();
-				return Unit.getDist(u1, u2) - (u1.getRadius() + u2.getRadius());
+				return Unit.dist(u1, u2) - (u1.getRadius() + u2.getRadius());
 			} else {
 				return 0;
 			}
@@ -429,7 +429,7 @@ public class Controls extends InputProcessorAdapter {
 			UnitSkill skill = (UnitSkill) this.curSkill;
 			Unit caster = selectedUnits.iterator().next();
 
-			if (skill.usingMaxRange() && Unit.getDist(caster, target) > skill.getMaxRange()) {
+			if (skill.usingMaxRange() && Unit.dist(caster, target) > skill.getMaxRange()) {
 				caster.orderMoveInRangeToUseSkill(target, skill);
 				clearContext();
 				return;
@@ -642,9 +642,6 @@ public class Controls extends InputProcessorAdapter {
 
 	/**
 	 * Handle a left-click following being in the "attack" context
-	 * 
-	 * @param x
-	 * @param y
 	 */
 	private void handleAttackCommand(float x, float y) {
 		clearContext();

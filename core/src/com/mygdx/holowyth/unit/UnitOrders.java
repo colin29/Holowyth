@@ -79,15 +79,21 @@ public class UnitOrders {
 
 	/** Handles the complex logic revolving around switching orders and targets */
 	void tick() {
-
+		
+		// Default unit behaviour
+		if(self.side == Side.ENEMY) {
+			ifIdleAggroOntoNearbyTargets();
+		}
+		if(self.side == Side.PLAYER && stats.getHpRatio() > 0.3f) {
+			ifIdleAggroOntoNearbyTargets();
+		}
+		
 		if (status.isTaunted()) {
 			if (order == Order.NONE) {
-
 				if (isAnyOrderAllowedIgnoringTaunt())
 					orderAttackUnit((UnitOrderable) status.getTauntAttackTarget(), true, true);
 			}
 		}
-
 		if (orderTarget != null && orderTarget.stats.isDead()) {
 			if (order.isAttackUnit()) {
 				clearOrder();
@@ -112,7 +118,7 @@ public class UnitOrders {
 		ifInRangeCastDeferredGroundSkill();
 		ifInRangeCastDeferredUnitSkill();
 
-		startAttackingIfInRangeForAttackOrders();
+		startAttackingIfInRangeForAtkAndAtkMove();
 		stopAttackingIfEnemyIsOutOfRange();
 	}
 
@@ -456,7 +462,7 @@ public class UnitOrders {
 
 				float aggroRange = self.getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
 
-				if (Point.dist(self.getPos(), closestEnemy.getPos()) <= aggroRange) {
+				if (Unit.dist(self, closestEnemy) <= aggroRange) {
 					orderAttackUnit(closestEnemy, false);
 				}
 			}
@@ -471,7 +477,7 @@ public class UnitOrders {
 
 				float aggroRange = self.getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
 
-				if (Point.dist(self.getPos(), closestEnemy.getPos()) <= aggroRange) {
+				if (Unit.dist(self, closestEnemy) <= aggroRange) {
 					orderTarget = (Unit) closestEnemy; // manually set target/path, since we want to keep the ATTACKMOVE
 														// order
 					if (!self.motion.pathFindTowardsTarget()) {
@@ -482,9 +488,9 @@ public class UnitOrders {
 		}
 	}
 
-	private void startAttackingIfInRangeForAttackOrders() {
+	private void startAttackingIfInRangeForAtkAndAtkMove() {
 		if (!self.isAttacking() && (order.isAttackUnit() || isAttackMoveAndHasTarget())) {
-			float distToTarget = Point.dist(self.getPos(), orderTarget.getPos());
+			float distToTarget = Unit.dist(self, orderTarget);
 			if (distToTarget <= getEngageRange(orderTarget)) {
 				self.combat.startAttacking(orderTarget);
 				if (queuedMeleeSkill != null) {
@@ -497,7 +503,7 @@ public class UnitOrders {
 
 	private void stopAttackingIfEnemyIsOutOfRange() {
 		if (self.isAttacking()) {
-			float distToEnemy = Point.dist(self.getPos(), self.getAttacking().getPos());
+			float distToEnemy = Unit.dist(self, self.getAttacking());
 			if (distToEnemy >= getDisengageRange(self.getAttacking())) {
 				self.combat.stopAttacking();
 			}
@@ -521,20 +527,38 @@ public class UnitOrders {
 	 */
 	private void handleTargetLossAndSwitchingForAttackUnitSoft() {
 		if (order == Order.ATTACKUNIT_SOFT) {
-			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(self, self.getMapInstance());
-			otherTargetsWithinAggroRange
-					.removeIf((t) -> Point.dist(self.getPos(), t.getPos()) >= Holo.defaultAggroRange);
-			otherTargetsWithinAggroRange.remove(orderTarget);
-			float distToTarget = Point.dist(self.getPos(), orderTarget.getPos());
-
+			var otherTargets = UnitUtil.getTargetsSortedByDistance(self, self.getMapInstance());
+			otherTargets.remove(orderTarget);
+			otherTargets
+					.removeIf((t) -> Unit.dist(self, t) >= Holo.defaultAggroRange);
+			
+			final float distTarget = Unit.dist(self, orderTarget);
+			
 			float aggroRange = self.getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
 			float chaseRange = self.getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange
 					: Holo.defaultUnitAttackChaseRange;
+			
+			if(otherTargets.isEmpty()) {
+				if(distTarget > chaseRange)
+					clearOrder();
+				return;
+			}
+			
+			UnitOrderable closestOther = otherTargets.peek(); 
+			final float distClosestOther = Unit.dist(self, closestOther);
+			
+			// Let's say switch if the closest enemy target is closer than 75% the distance
 
-			if (distToTarget > aggroRange && !otherTargetsWithinAggroRange.isEmpty()) {
-				orderAttackUnit(otherTargetsWithinAggroRange.peek(), false);
-			} else if (distToTarget > chaseRange) {
-				clearOrder();
+			if(distTarget > chaseRange) {
+				if(distClosestOther<=aggroRange) {
+					orderAttackUnit(closestOther, false);
+				}else {
+					clearOrder();
+				}
+			}else {
+				if(distClosestOther < distTarget * 0.75) {
+					orderAttackUnit(closestOther, false);// switch targets
+				}
 			}
 		}
 	}
@@ -544,30 +568,38 @@ public class UnitOrders {
 	 */
 	private void handleTargetLossAndSwitchingForAttackMove() {
 		if (order == Order.ATTACKMOVE) {
-			var otherTargetsWithinAggroRange = UnitUtil.getTargetsSortedByDistance(self, self.getMapInstance());
-			otherTargetsWithinAggroRange
-					.removeIf((t) -> Point.dist(self.getPos(), t.getPos()) >= Holo.defaultAggroRange);
-			otherTargetsWithinAggroRange.remove(orderTarget);
-			float distToTarget = Point.dist(self.getPos(), orderTarget.getPos());
-
+			var otherTargets = UnitUtil.getTargetsSortedByDistance(self, self.getMapInstance());
+			otherTargets.remove(orderTarget);
+			otherTargets
+					.removeIf((t) -> Unit.dist(self, t) >= Holo.defaultAggroRange);
+			
+			final float distTarget = Unit.dist(self, orderTarget);
+			
 			float aggroRange = self.getSide() == Side.PLAYER ? Holo.alliedUnitsAggroRange : Holo.defaultAggroRange;
 			float chaseRange = self.getSide() == Side.PLAYER ? Holo.alliedUnitsAttackChaseRange
 					: Holo.defaultUnitAttackChaseRange;
+			
+			if(otherTargets.isEmpty()) {
+				if(distTarget > chaseRange)
+					repathToDestinationForAttackMove();
+				return;
+			}
+			
+			UnitOrderable closestOther = otherTargets.peek(); 
+			final float distClosestOther = Unit.dist(self, closestOther);
+			
+			// Switch if the closest enemy target is closer than 75% the distance
 
-			if (distToTarget > aggroRange && !otherTargetsWithinAggroRange.isEmpty()) {
-				// Switch targets
-
-				Unit oldTarget = orderTarget;
-
-				orderTarget = (Unit) otherTargetsWithinAggroRange.peek();
-				if (self.motion.pathFindTowardsTarget()) {
-					orderTarget = oldTarget;
-					logger.debug("Was attack moving but no path could be found to the nearest unit, ignoring");
+			if(distTarget > chaseRange) {
+				if(distClosestOther<=aggroRange) {
+					orderTarget = (Unit) closestOther;
+				}else {
+					repathToDestinationForAttackMove();
 				}
-
-			} else if (distToTarget > chaseRange) {
-				// Instead of clearing order, repath and resume moving towards the original destination
-				repathToDestinationForAttackMove();
+			}else {
+				if(distClosestOther < distTarget * 0.75) {
+					orderTarget = (Unit) closestOther;
+				}
 			}
 		}
 	}

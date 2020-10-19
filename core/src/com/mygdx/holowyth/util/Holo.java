@@ -60,10 +60,10 @@ public class Holo {
 	public static float defaultUnitDisengageRange = defaultUnitEngageRange + 10; // the distance the enemy must travel
 																					// before it stops receiving attacks
 																					// from the unit.
-	public static float defaultAggroRange = 150;
-	public static float alliedUnitsAggroRange = 100;
+	public static float defaultAggroRange = 350;
+	public static float alliedUnitsAggroRange = 150;
 
-	public static float defaultUnitAttackChaseRange = 225;
+	public static float defaultUnitAttackChaseRange = 450;
 	public static float alliedUnitsAttackChaseRange = 175;
 
 	// Debug display
