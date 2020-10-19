@@ -37,6 +37,7 @@ public class InventoryDisplay extends SingleUseUIWidget implements InventoryList
 		owned.addListener(this);
 		root.right();
 //		root.debugAll();
+		 hide();
 	}
 
 	private void createDisplay() {
@@ -80,6 +81,12 @@ public class InventoryDisplay extends SingleUseUIWidget implements InventoryList
 		});
 		return entry;
 
+	}
+	public void show() {
+		root.setVisible(true);
+	}
+	public void hide() {
+		root.setVisible(false);
 	}
 
 	@Override

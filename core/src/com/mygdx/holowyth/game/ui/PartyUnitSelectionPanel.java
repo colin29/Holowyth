@@ -48,11 +48,12 @@ public class PartyUnitSelectionPanel extends SingleUseUIWidget {
 		super(stage, skin, assets);
 		this.units = units;
 		this.inv = inv;
-		
+				
 		createPanel();
 		root.left().bottom();
 		root.debugAll();
 		root.setZIndex(2);
+		
 		
 		// Add input to highest priority
 		multiplexer.addProcessor(0, new InputProcessorAdapter() {
@@ -60,6 +61,7 @@ public class PartyUnitSelectionPanel extends SingleUseUIWidget {
 			public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 				if (button == Input.Buttons.RIGHT && pointer == 0) {
 					removeEquipsDisplay();
+					inv.hide();
 				}
 				return false;
 			}
@@ -96,8 +98,9 @@ public class PartyUnitSelectionPanel extends SingleUseUIWidget {
 		if(worn != null)
 			worn.remove();
 		showingEquipsFor = unit;
-		inv.setLinkedUnit(unit);
 		worn = new WornEquipsDisplay(unit, stage, skin, assets);
+		inv.setLinkedUnit(unit);
+		inv.show();
 	}
 	public void onScreenHide() {
 		removeEquipsDisplay();

@@ -107,6 +107,9 @@ public class WornEquips {
 			break;
 		case WEAPON:
 			removed = clearMainHandSlot();
+			if (removed != null && removed.is2HWeapon) {
+				clearOffHandSlot();
+			}
 			if (item.is2HWeapon) {
 				equips.put(WornEquips.Slot.MAIN_HAND, item);
 				removed2 = equips.put(WornEquips.Slot.OFF_HAND, item);
