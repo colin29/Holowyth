@@ -10,9 +10,11 @@ import com.mygdx.holowyth.skill.ActiveSkill;
 import com.mygdx.holowyth.skill.skill.GroundSkill;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
 import com.mygdx.holowyth.skill.skill.UnitSkill;
+import com.mygdx.holowyth.unit.Unit.JobClass;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.unit.interfaces.UnitOrderable;
 import com.mygdx.holowyth.unit.interfaces.UnitStatusInfo;
+import com.mygdx.holowyth.unit.item.Equip.WeaponType;
 import com.mygdx.holowyth.util.Holo;
 import com.mygdx.holowyth.util.dataobjects.Point;
 
@@ -85,7 +87,11 @@ public class UnitOrders {
 			ifIdleAggroOntoNearbyTargets();
 		}
 		if(self.side == Side.PLAYER && stats.getHpRatio() > 0.3f) {
-			ifIdleAggroOntoNearbyTargets();
+			if(self.getJobClass() != JobClass.PRIEST && self.getJobClass() != JobClass.MAGE) {
+				if(!self.equip.hasWeaponTypeEquipped(WeaponType.BOW)) {
+					ifIdleAggroOntoNearbyTargets();
+				}
+			}
 		}
 		
 		if (status.isTaunted()) {

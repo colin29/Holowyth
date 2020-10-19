@@ -72,9 +72,10 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	public @NonNull final UnitAI ai;
 	public @NonNull final UnitStatus status;
 	
-	public enum Class {
+	public enum JobClass {
 		NONE, WARRIOR, SWORDSMAN, THIEF, MAGE, PRIEST, RANGER
 	}
+	private @NonNull JobClass jobClass = JobClass.NONE; 
 
 	// Id (for debug)
 	private static int curId = 0;
@@ -144,6 +145,8 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 	public Unit(UnitMarker m, MapInstanceInfo mapInstance) {
 		this(m.pos.x, m.pos.y, mapInstance, m.side, m.name);
 
+		jobClass = m.jobClass;
+		
 		stats.base.set(m.baseStats);
 
 		skills.addSkills(m.activeSkills);
@@ -618,6 +621,10 @@ public class Unit implements UnitPFWithPath, UnitInfo, UnitOrderable {
 
 	public static float getAngleInDegrees(UnitOrderable u1, UnitOrderable u2) {
 		return Point.getAngleInDegrees(u1.getPos(), u2.getPos());
+	}
+
+	public JobClass getJobClass() {
+		return jobClass;
 	}
 
 }

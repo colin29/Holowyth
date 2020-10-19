@@ -3,6 +3,7 @@ package com.mygdx.holowyth.game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
 import com.mygdx.holowyth.Holowyth;
+import com.mygdx.holowyth.gamedata.items.Weapons;
 import com.mygdx.holowyth.gamedata.skillsandeffects.projectiles.test.HomingProjectileMotion;
 import com.mygdx.holowyth.gamedata.units.Monsters;
 import com.mygdx.holowyth.graphics.effects.animated.AnimEffectOnFixedPos;
@@ -16,7 +17,7 @@ public class TestGameScreen extends StandardGameScreen {
 	
 	public TestGameScreen(Holowyth game) {
 		super(game);
-		
+		session.ownedItems.addItem(Weapons.shortSword);
 		if(loadVN) {
 			vn.startConversation("lecia1.conv", "default");
 			vn.show();

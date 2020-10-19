@@ -6,6 +6,7 @@ import com.mygdx.holowyth.gamedata.items.Weapons;
 import com.mygdx.holowyth.gamedata.skillsandeffects.PassiveSkills;
 import com.mygdx.holowyth.gamedata.skillsandeffects.Skills;
 import com.mygdx.holowyth.gamedata.skillsandeffects.SwordsmanSkills;
+import com.mygdx.holowyth.unit.Unit.JobClass;
 import com.mygdx.holowyth.unit.Unit.Side;
 import com.mygdx.holowyth.world.map.UnitMarker;
 import com.mygdx.holowyth.world.map.UnitMarker.TemplateUnitMarker;
@@ -19,6 +20,7 @@ public class Players {
 		{
 		side = Side.PLAYER;
 		name = "Lecia";
+		jobClass = JobClass.SWORDSMAN;
 		baseStats.set(MonsterStats.baseHuman);
 		wornEquips.equip(Weapons.shortSword);  // weapon will be copied anyways, no need to clone
 		activeSkills.addAll(Skills.swordsmanSkills);
@@ -33,6 +35,7 @@ public class Players {
 		{
 		side = Side.PLAYER;
 		name = "Elvin";
+		jobClass = JobClass.WARRIOR;
 		wornEquips.equip(Weapons.shortSword); 
 		baseStats.set(MonsterStats.baseHuman);
 		activeSkills.addAll(Skills.warriorSkills);
@@ -45,6 +48,7 @@ public class Players {
 	public static final UnitMarker sonia = new TemplateUnitMarker() {
 		{
 		side = Side.PLAYER;
+		jobClass = JobClass.MAGE;
 		name = "Sonia";
 		baseStats.set(MonsterStats.baseHuman);
 		wornEquips.equip(Weapons.staff);  
@@ -58,6 +62,7 @@ public class Players {
 		{
 		side = Side.PLAYER;
 		name = "Renee";
+		jobClass = JobClass.PRIEST;
 		baseStats.set(MonsterStats.baseHuman);
 		wornEquips.equip(Weapons.staff);  
 		activeSkills.addAll(Skills.priestSkills);
@@ -69,6 +74,7 @@ public class Players {
 	public static final UnitMarker seth = new TemplateUnitMarker() {
 		{
 		side = Side.PLAYER;
+		jobClass = JobClass.THIEF;
 		name = "Seth";
 		baseStats.set(MonsterStats.baseHuman);
 		wornEquips.equip(Weapons.dagger);  
@@ -82,6 +88,7 @@ public class Players {
 		{
 		side = Side.PLAYER;
 		name = "Mikal";
+		jobClass = JobClass.RANGER;
 		baseStats.set(MonsterStats.baseHuman);
 		activeSkills.addAll(Skills.rangerSkills);
 		

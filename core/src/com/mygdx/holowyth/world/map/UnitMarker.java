@@ -3,6 +3,7 @@ package com.mygdx.holowyth.world.map;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
 
@@ -29,6 +30,7 @@ public class UnitMarker {
 	public String name = "Unnamed Unit";
 	public final Point pos = new Point();
 	public Unit.Side side;
+	public Unit.JobClass jobClass = Unit.JobClass.NONE; 
 	public final  UnitStatValues baseStats = new UnitStatValues();
 	public final WornEquips wornEquips;
 	public final List<ActiveSkill> activeSkills = new ArrayList<ActiveSkill>();

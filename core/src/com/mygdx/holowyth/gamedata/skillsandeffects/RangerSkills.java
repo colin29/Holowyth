@@ -1,9 +1,6 @@
 package com.mygdx.holowyth.gamedata.skillsandeffects;
 
-import com.mygdx.holowyth.game.ui.GameLogDisplay;
-import com.mygdx.holowyth.gamedata.skillsandeffects.MageEffects.MagicMissileEffect;
 import com.mygdx.holowyth.gamedata.skillsandeffects.RangerEffects.CrossSlashEffect;
-import com.mygdx.holowyth.skill.ActiveSkill.Tag;
 import com.mygdx.holowyth.skill.skill.NoneSkill;
 import com.mygdx.holowyth.skill.skill.UnitSkill;
 import com.mygdx.holowyth.unit.Unit;
